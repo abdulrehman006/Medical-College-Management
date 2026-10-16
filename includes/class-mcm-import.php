@@ -254,26 +254,32 @@ class MCM_Import {
 			return;
 		}
 
-		$type   = isset( $_POST['mcm_import_type'] ) ? sanitize_key( $_POST['mcm_import_type'] ) : '';
+		$type   = sanitize_key( MCM_Safe::post( 'mcm_import_type' ) );
 		$schema = self::schema();
 		if ( ! isset( $schema[ $type ] ) ) {
 			$this->notice = $this->error_html( __( 'Please choose a valid content type.', 'medical-college-manager' ) );
 			return;
 		}
 
-		$status = isset( $_POST['mcm_import_status'] ) && 'draft' === $_POST['mcm_import_status'] ? 'draft' : 'publish';
+		$status = 'draft' === MCM_Safe::post( 'mcm_import_status' ) ? 'draft' : 'publish';
 
-		if ( empty( $_FILES['mcm_csv']['name'] ) || ! isset( $_FILES['mcm_csv']['tmp_name'] ) ) {
+		// Off by default: matching by title merged unrelated rows that happen
+		// to share a name (e.g. every "Anatomy Lecture" in a timetable).
+		$match_title = '1' === MCM_Safe::post( 'mcm_import_match_title' );
+
+		// A single file only: an array here means a crafted multi-file field.
+		$file = isset( $_FILES['mcm_csv'] ) && is_array( $_FILES['mcm_csv'] ) ? $_FILES['mcm_csv'] : array(); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput -- Each part is validated below.
+		if ( '' === MCM_Safe::scalar( $file, 'name' ) || '' === MCM_Safe::scalar( $file, 'tmp_name' ) ) {
 			$this->notice = $this->error_html( __( 'No file was uploaded.', 'medical-college-manager' ) );
 			return;
 		}
-		if ( ! empty( $_FILES['mcm_csv']['error'] ) ) {
+		if ( 0 !== (int) MCM_Safe::scalar( $file, 'error', '0' ) ) {
 			$this->notice = $this->error_html( __( 'File upload error. Check the file size limit and try again.', 'medical-college-manager' ) );
 			return;
 		}
 
-		$tmp  = $_FILES['mcm_csv']['tmp_name']; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
-		$name = sanitize_file_name( $_FILES['mcm_csv']['name'] );
+		$tmp  = MCM_Safe::scalar( $file, 'tmp_name' );
+		$name = sanitize_file_name( MCM_Safe::scalar( $file, 'name' ) );
 		$ext  = strtolower( pathinfo( $name, PATHINFO_EXTENSION ) );
 
 		if ( 'csv' !== $ext ) {
@@ -300,7 +306,7 @@ class MCM_Import {
 			}
 		}
 
-		$result = $this->import_file( $tmp, $type, $schema[ $type ], $status );
+		$result = $this->import_file( $tmp, $type, $schema[ $type ], $status, $match_title );
 
 		$msg = sprintf(
 			/* translators: 1: created, 2: updated, 3: skipped */
@@ -309,33 +315,76 @@ class MCM_Import {
 			$result['updated'],
 			$result['skipped']
 		);
-		if ( ! empty( $result['errors'] ) ) {
-			$msg .= ' ' . esc_html( implode( ' ', array_slice( $result['errors'], 0, 5 ) ) );
+		if ( $result['same_title'] > 0 ) {
+			$msg .= ' ' . sprintf(
+				/* translators: %d: number of rows. */
+				_n(
+					'%d row has the same title as an existing entry – tick "Update existing entries with the same title" to update it instead.',
+					'%d rows have the same title as existing entries – tick "Update existing entries with the same title" to update them instead.',
+					$result['same_title'],
+					'medical-college-manager'
+				),
+				$result['same_title']
+			);
 		}
-		$this->notice = '<div class="notice notice-success is-dismissible"><p>' . esc_html( $msg ) . '</p></div>';
+
+		$html = '<p>' . esc_html( $msg ) . '</p>';
+		if ( ! empty( $result['errors'] ) ) {
+			$html .= '<ul style="list-style:disc;padding-left:20px;">';
+			foreach ( array_slice( $result['errors'], 0, 20 ) as $error ) {
+				$html .= '<li>' . esc_html( $error ) . '</li>';
+			}
+			$more = count( $result['errors'] ) - 20;
+			if ( $more > 0 ) {
+				/* translators: %d: number of further errors not listed. */
+				$html .= '<li>' . esc_html( sprintf( __( '…and %d more.', 'medical-college-manager' ), $more ) ) . '</li>';
+			}
+			$html .= '</ul>';
+		}
+		$class        = empty( $result['errors'] ) ? 'notice-success' : 'notice-warning';
+		$this->notice = '<div class="notice ' . esc_attr( $class ) . ' is-dismissible">' . $html . '</div>';
 	}
 
 	/**
 	 * Stream the CSV and create posts.
 	 *
-	 * @return array { created, skipped, errors[] }
+	 * @param string $tmp         Uploaded file path.
+	 * @param string $type        Post type.
+	 * @param array  $map         Column schema for the type.
+	 * @param string $status      Status for NEW posts.
+	 * @param bool   $match_title Update an existing entry with the same title.
+	 * @return array { created, updated, skipped, same_title, errors[] }
 	 */
-	private function import_file( $tmp, $type, $map, $status ) {
-		$created = 0;
-		$updated = 0;
-		$skipped = 0;
-		$errors  = array();
+	private function import_file( $tmp, $type, $map, $status, $match_title = false ) {
+		$created    = 0;
+		$updated    = 0;
+		$skipped    = 0;
+		$same_title = 0;
+		$errors     = array();
+		// Posts created or updated by THIS file: rows of one file never merge
+		// into each other, even when title matching is on.
+		$touched = array();
+
+		$empty = array(
+			'created'    => 0,
+			'updated'    => 0,
+			'skipped'    => 0,
+			'same_title' => 0,
+			'errors'     => array(),
+		);
 
 		$handle = fopen( $tmp, 'r' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen
 		if ( false === $handle ) {
-			return array( 'created' => 0, 'updated' => 0, 'skipped' => 0, 'errors' => array( __( 'Could not read the file.', 'medical-college-manager' ) ) );
+			$empty['errors'][] = __( 'Could not read the file.', 'medical-college-manager' );
+			return $empty;
 		}
 
 		// Explicit args silence the PHP 8.4 deprecation and keep parsing stable.
 		$header = fgetcsv( $handle, 0, ',', '"', '\\' );
-		if ( false === $header ) {
+		if ( false === $header || null === $header ) {
 			fclose( $handle ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
-			return array( 'created' => 0, 'updated' => 0, 'skipped' => 0, 'errors' => array( __( 'The file is empty.', 'medical-college-manager' ) ) );
+			$empty['errors'][] = __( 'The file is empty.', 'medical-college-manager' );
+			return $empty;
 		}
 
 		// Normalize headers: lowercase, trim, strip BOM.
@@ -370,11 +419,13 @@ class MCM_Import {
 				continue;
 			}
 
-			// Upsert: update the matching record instead of duplicating it. Match
-			// on the 'id' column an export carries, else an exact title within
-			// this type — so both an edited export and a hand-authored file are
-			// safe to re-import.
-			$existing = self::find_existing( $type, $data, $title );
+			// Upsert by the 'id' column an export carries. Title matching only
+			// when the admin ticked it, and never onto a post this same file
+			// already wrote.
+			$existing = self::find_existing( $type, $data, $title, $match_title, $touched );
+			if ( ! $existing && ! $match_title && self::title_exists( $type, $title, $touched ) ) {
+				$same_title++;
+			}
 
 			$postarr = array(
 				'post_type'  => $type,
@@ -450,6 +501,7 @@ class MCM_Import {
 				}
 			}
 
+			$touched[] = (int) $post_id;
 			if ( $existing ) {
 				$updated++;
 			} else {
@@ -458,43 +510,84 @@ class MCM_Import {
 		}
 
 		fclose( $handle ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
-		return array( 'created' => $created, 'updated' => $updated, 'skipped' => $skipped, 'errors' => $errors );
+		return array(
+			'created'    => $created,
+			'updated'    => $updated,
+			'skipped'    => $skipped,
+			'same_title' => $same_title,
+			'errors'     => $errors,
+		);
 	}
 
 	/**
-	 * Find an existing post to update for a CSV row: the 'id' column an export
-	 * carries first, then an exact title match within the same type. Returns 0
-	 * when the row is genuinely new.
+	 * Find an existing post to update for a CSV row.
 	 *
-	 * @param string $type  Post type.
-	 * @param array  $data  Row keyed by column.
-	 * @param string $title Row title.
-	 * @return int Existing post ID, or 0.
+	 * 1. The 'id' column an export carries (same type only).
+	 * 2. Only when $match_title is on: an exact title match within the type,
+	 *    excluding posts this same file already created or updated.
+	 *
+	 * @param string $type        Post type.
+	 * @param array  $data        Row keyed by column.
+	 * @param string $title       Row title.
+	 * @param bool   $match_title Whether title matching is enabled.
+	 * @param int[]  $touched     Post IDs already written by this file.
+	 * @return int Existing post ID, or 0 when the row is new.
 	 */
-	private static function find_existing( $type, $data, $title ) {
-		if ( ! empty( $data['id'] ) && ctype_digit( (string) $data['id'] ) ) {
-			$p = get_post( (int) $data['id'] );
+	private static function find_existing( $type, $data, $title, $match_title = false, $touched = array() ) {
+		$id = isset( $data['id'] ) ? MCM_Safe::str( $data['id'] ) : '';
+		if ( '' !== $id && ctype_digit( $id ) ) {
+			$p = get_post( (int) $id );
 			if ( $p && $p->post_type === $type ) {
 				return (int) $p->ID;
 			}
 		}
-		if ( '' !== $title ) {
-			$found = get_posts(
-				array(
-					'post_type'        => $type,
-					'title'            => $title,
-					'post_status'      => 'any',
-					'numberposts'      => 1,
-					'fields'           => 'ids',
-					'no_found_rows'    => true,
-					'suppress_filters' => false,
-				)
-			);
-			if ( ! empty( $found ) ) {
+		if ( $match_title ) {
+			$found = self::posts_with_title( $type, $title, $touched );
+			if ( $found ) {
 				return (int) $found[0];
 			}
 		}
 		return 0;
+	}
+
+	/**
+	 * Does an entry of this type with this exact title exist that this file
+	 * has not written itself? Used to tell the admin about likely duplicates.
+	 *
+	 * @param string $type    Post type.
+	 * @param string $title   Title.
+	 * @param int[]  $touched Post IDs already written by this file.
+	 * @return bool
+	 */
+	private static function title_exists( $type, $title, $touched ) {
+		return (bool) self::posts_with_title( $type, $title, $touched );
+	}
+
+	/**
+	 * Post IDs of one type with an exact title, excluding $exclude.
+	 *
+	 * @param string $type    Post type.
+	 * @param string $title   Title as it appears in the CSV.
+	 * @param int[]  $exclude Post IDs to ignore.
+	 * @return int[]
+	 */
+	private static function posts_with_title( $type, $title, $exclude ) {
+		$title = sanitize_text_field( $title ); // As stored by the importer.
+		if ( '' === $title ) {
+			return array();
+		}
+		return get_posts(
+			array(
+				'post_type'        => $type,
+				'title'            => $title,
+				'post_status'      => 'any',
+				'numberposts'      => 1,
+				'fields'           => 'ids',
+				'no_found_rows'    => true,
+				'post__not_in'     => array_map( 'intval', (array) $exclude ), // phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_post__not_in -- Bounded by the size of one import file.
+				'suppress_filters' => false,
+			)
+		);
 	}
 
 	/**
@@ -618,6 +711,16 @@ class MCM_Import {
 								<option value="publish"><?php esc_html_e( 'Published', 'medical-college-manager' ); ?></option>
 								<option value="draft"><?php esc_html_e( 'Draft', 'medical-college-manager' ); ?></option>
 							</select>
+						</td>
+					</tr>
+					<tr>
+						<th scope="row"><?php esc_html_e( 'Matching', 'medical-college-manager' ); ?></th>
+						<td>
+							<label>
+								<input type="checkbox" name="mcm_import_match_title" value="1" />
+								<?php esc_html_e( 'Update existing entries with the same title', 'medical-college-manager' ); ?>
+							</label>
+							<p class="description"><?php esc_html_e( 'Rows with an "id" column (from an export) always update that exact entry. Leave this off when several entries legitimately share a title, such as timetable slots. Rows inside the same file are never merged.', 'medical-college-manager' ); ?></p>
 						</td>
 					</tr>
 				</table>
