@@ -39,25 +39,38 @@ class MCM_Ajax {
 	private function handle() {
 		check_ajax_referer( 'mcm_filter', 'nonce' );
 
-		$config = isset( $_POST['config'] ) ? json_decode( wp_unslash( $_POST['config'] ), true ) : array(); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
-		if ( ! is_array( $config ) ) {
-			$config = array();
-		}
+		// Every value below is untrusted. MCM_Safe::scalar() discards arrays and
+		// objects BEFORE any sanitize_*() call sees them: on WordPress < 6.1,
+		// sanitize_key() on an array is a fatal TypeError under PHP 8.
+		$config = json_decode( MCM_Safe::post( 'config', '{}' ), true );
+		$config = is_array( $config ) ? $config : array();
 
-		// Build & sanitize taxonomy => slug filters generically.
-		$raw_taxes   = isset( $_POST['taxes'] ) ? json_decode( wp_unslash( $_POST['taxes'] ), true ) : array(); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+		// Visitor-chosen taxonomy filters: taxonomy => comma list of slugs.
+		$raw_taxes   = json_decode( MCM_Safe::post( 'taxes', '{}' ), true );
 		$tax_filters = array();
 		if ( is_array( $raw_taxes ) ) {
-			foreach ( $raw_taxes as $tax => $slug ) {
-				$tax  = sanitize_key( $tax );
-				$slug = sanitize_text_field( $slug );
-				if ( '' !== $slug && taxonomy_exists( $tax ) ) {
-					$tax_filters[ $tax ] = $slug;
+			foreach ( $raw_taxes as $tax => $slugs ) {
+				$tax   = sanitize_key( (string) $tax );
+				$slugs = MCM_Query::normalize_slugs( is_scalar( $slugs ) ? (string) $slugs : '' );
+				if ( $slugs && taxonomy_exists( $tax ) ) {
+					$tax_filters[ $tax ] = implode( ',', $slugs );
 				}
 			}
 		}
 
-		$type = isset( $config['type'] ) ? sanitize_key( $config['type'] ) : 'mcm_consultant';
+		// The author's pre-filters, echoed back from data-config: taxonomy =>
+		// list of slugs. Normalised again by MCM_Query::scope_terms().
+		$scope = array();
+		if ( isset( $config['scope'] ) && is_array( $config['scope'] ) ) {
+			foreach ( $config['scope'] as $tax => $slugs ) {
+				$tax = sanitize_key( (string) $tax );
+				if ( taxonomy_exists( $tax ) ) {
+					$scope[ $tax ] = MCM_Query::normalize_slugs( $slugs );
+				}
+			}
+		}
+
+		$type = sanitize_key( MCM_Safe::scalar( $config, 'type', 'mcm_consultant' ) );
 
 		/*
 		 * The requested post type is attacker-controlled and this endpoint is
@@ -77,7 +90,7 @@ class MCM_Ajax {
 		// key would let a visitor rank students by a private field (date of
 		// birth, blood group…) even though that field is never printed, so only
 		// keys the type is allowed to expose may drive the sort.
-		$meta_key = isset( $config['meta_key'] ) ? sanitize_key( $config['meta_key'] ) : '';
+		$meta_key = sanitize_key( MCM_Safe::scalar( $config, 'meta_key' ) );
 		if ( '' !== $meta_key && ! in_array( $meta_key, MCM_Query::sortable_meta_keys( $type ), true ) ) {
 			$meta_key = '';
 		}
@@ -85,18 +98,19 @@ class MCM_Ajax {
 		$a = MCM_Query::parse_atts(
 			array(
 				'type'        => $type,
-				'view'        => isset( $config['view'] ) ? sanitize_key( $config['view'] ) : 'grid',
-				'columns'     => isset( $config['columns'] ) ? absint( $config['columns'] ) : 3,
+				'view'        => sanitize_key( MCM_Safe::scalar( $config, 'view', 'grid' ) ),
+				'columns'     => absint( MCM_Safe::scalar( $config, 'columns', '3' ) ),
 				// Clamp so a crafted request can't ask for an unbounded result set.
-				'count'       => min( isset( $config['count'] ) ? absint( $config['count'] ) : 12, (int) apply_filters( 'mcm_ajax_max_count', 1000 ) ),
-				'orderby'     => isset( $config['orderby'] ) ? sanitize_key( $config['orderby'] ) : 'date',
-				'order'       => isset( $config['order'] ) ? sanitize_text_field( wp_unslash( $config['order'] ) ) : 'DESC',
-				'category'    => isset( $config['category'] ) ? sanitize_text_field( wp_unslash( $config['category'] ) ) : '',
+				'count'       => min( absint( MCM_Safe::scalar( $config, 'count', '12' ) ), (int) apply_filters( 'mcm_ajax_max_count', 1000 ) ),
+				'orderby'     => sanitize_key( MCM_Safe::scalar( $config, 'orderby', 'date' ) ),
+				'order'       => sanitize_text_field( MCM_Safe::scalar( $config, 'order', 'DESC' ) ),
+				'category'    => sanitize_text_field( MCM_Safe::scalar( $config, 'category' ) ),
 				'meta_key'    => $meta_key,
-				'meta_type'   => isset( $config['meta_type'] ) ? sanitize_text_field( wp_unslash( $config['meta_type'] ) ) : '',
-				'lock_tax'    => isset( $config['lock_tax'] ) ? sanitize_key( $config['lock_tax'] ) : '',
-				'lock_term'   => isset( $config['lock_term'] ) ? sanitize_text_field( wp_unslash( $config['lock_term'] ) ) : '',
-				'search'      => isset( $_POST['search'] ) ? sanitize_text_field( wp_unslash( $_POST['search'] ) ) : '',
+				'meta_type'   => sanitize_text_field( MCM_Safe::scalar( $config, 'meta_type' ) ),
+				'lock_tax'    => sanitize_key( MCM_Safe::scalar( $config, 'lock_tax' ) ),
+				'lock_term'   => sanitize_title( MCM_Safe::scalar( $config, 'lock_term' ) ),
+				'search'      => sanitize_text_field( MCM_Safe::post( 'search' ) ),
+				'scope'       => $scope,
 				'tax_filters' => $tax_filters,
 			)
 		);

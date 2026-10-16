@@ -170,7 +170,7 @@ abstract class MCM_Elementor_Widget_Base extends \Elementor\Widget_Base {
 				'mcm_scope_note',
 				array(
 					'type'            => \Elementor\Controls_Manager::RAW_HTML,
-					'raw'             => __( 'Limit this widget to specific terms. Tip: if you pre-filter here, turn the Filter bar off for a fixed list.', 'medical-college-manager' ),
+					'raw'             => __( 'Limit this widget to specific terms. With one term the list is fixed to it; with several, visitors can narrow within them using the filter bar.', 'medical-college-manager' ),
 					'content_classes' => 'elementor-descriptor',
 				)
 			);
@@ -187,8 +187,9 @@ abstract class MCM_Elementor_Widget_Base extends \Elementor\Widget_Base {
 						'label'       => $tobj ? $tobj->labels->singular_name : $tax,
 						'type'        => \Elementor\Controls_Manager::SELECT2,
 						'options'     => $options,
+						'multiple'    => true,
 						'label_block' => true,
-						'default'     => '',
+						'default'     => array(),
 					)
 				);
 			}
@@ -390,15 +391,18 @@ abstract class MCM_Elementor_Widget_Base extends \Elementor\Widget_Base {
 
 		$map         = MCM_Query::tax_map();
 		$taxes       = isset( $map[ $type ] ) ? $map[ $type ] : array();
-		$tax_filters = array();
+		// Pre-filters are the AUTHOR's scope (locked; visitors narrow within
+		// it), not a visitor filter. A control saved before 1.30.2 holds a
+		// single slug string; newer ones hold an array — both are accepted.
+		$prefilter = array();
 		foreach ( $taxes as $tax ) {
 			$key = 'tax_' . $tax;
 			if ( ! empty( $s[ $key ] ) ) {
-				$tax_filters[ $tax ] = $s[ $key ];
+				$prefilter[ $tax ] = MCM_Query::normalize_slugs( $s[ $key ] );
 			}
 		}
-		if ( $tax_filters ) {
-			$atts['tax_filters'] = $tax_filters;
+		if ( $prefilter ) {
+			$atts['prefilter'] = $prefilter;
 		}
 
 		echo MCM_Shortcodes::render_block( $atts ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped

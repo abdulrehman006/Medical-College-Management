@@ -123,56 +123,171 @@ class MCM_Query {
 			// and ANDed in, surviving AJAX so the archive stays scoped.
 			'lock_tax'    => '',
 			'lock_term'   => '',
-			// Internal: taxonomy => term map (filled by AJAX).
+			// Internal: taxonomy => term map chosen by the VISITOR (AJAX).
 			'tax_filters' => array(),
+			// Internal: taxonomy => slug(s) pre-filter set by the AUTHOR (Elementor
+			// widget controls). Locked like the friendly attributes above.
+			'prefilter'   => array(),
+			// Internal: the author scope round-tripped through data-config (AJAX).
+			'scope'       => array(),
 		);
 		$a = wp_parse_args( $atts, $defaults );
 
-		if ( ! is_array( $a['tax_filters'] ) ) {
-			$a['tax_filters'] = array();
+		foreach ( array( 'tax_filters', 'prefilter', 'scope' ) as $key ) {
+			if ( ! is_array( $a[ $key ] ) ) {
+				$a[ $key ] = array();
+			}
 		}
 		return $a;
 	}
 
 	/**
+	 * Friendly shortcode attribute => taxonomy.
+	 *
+	 * @return array<string,string>
+	 */
+	public static function attr_taxonomies() {
+		return array(
+			'department'    => 'mcm_department',
+			'session'       => 'mcm_session',
+			'teacher'       => 'mcm_teacher',
+			'professor'     => 'mcm_teacher',        // friendly alias for teacher.
+			'specialty'     => 'mcm_specialty',
+			'level'         => 'mcm_level',
+			'research_area' => 'mcm_research_area',
+			'program'       => 'mcm_program_link',   // the Program spine connector.
+		);
+	}
+
+	/**
+	 * Turn "a, b" or array( 'a', 'b' ) into a clean, unique list of slugs.
+	 * Non-scalar members are dropped, and the list is capped so a crafted
+	 * request cannot build an enormous query.
+	 *
+	 * @param mixed $value Comma list or array.
+	 * @return string[]
+	 */
+	public static function normalize_slugs( $value ) {
+		$parts = is_array( $value ) ? $value : explode( ',', MCM_Safe::str( $value ) );
+		$out   = array();
+		foreach ( $parts as $part ) {
+			if ( ! is_scalar( $part ) ) {
+				continue;
+			}
+			$slug = sanitize_title( trim( (string) $part ) );
+			if ( '' !== $slug ) {
+				$out[ $slug ] = $slug;
+			}
+		}
+		return array_slice( array_values( $out ), 0, 50 );
+	}
+
+	/**
+	 * The author's scope: every term restriction set by whoever placed the
+	 * block. That is the `category` attribute, the friendly attributes
+	 * (department, program and so on), Elementor pre-filters, and the scope
+	 * echoed back by AJAX.
+	 *
+	 * A scope is ALWAYS applied. Visitors can only narrow within it: with one
+	 * term its dropdown is hidden; with several the dropdown lists only those.
+	 *
+	 * @param array $a Parsed attributes.
+	 * @return array<string,string[]> Taxonomy => slugs.
+	 */
+	public static function scope_terms( $a ) {
+		$sources = array();
+
+		$map     = self::tax_map();
+		$type    = MCM_Safe::str( $a['type'] );
+		$primary = isset( $map[ $type ][0] ) ? $map[ $type ][0] : '';
+		if ( $primary && '' !== MCM_Safe::str( $a['category'] ) ) {
+			$sources[] = array( $primary, $a['category'] );
+		}
+		foreach ( self::attr_taxonomies() as $attr => $tax ) {
+			if ( isset( $a[ $attr ] ) && '' !== MCM_Safe::str( $a[ $attr ] ) ) {
+				$sources[] = array( $tax, $a[ $attr ] );
+			}
+		}
+		foreach ( array( 'prefilter', 'scope' ) as $key ) {
+			if ( ! empty( $a[ $key ] ) && is_array( $a[ $key ] ) ) {
+				foreach ( $a[ $key ] as $tax => $value ) {
+					$sources[] = array( $tax, $value );
+				}
+			}
+		}
+
+		$scope = array();
+		foreach ( $sources as $source ) {
+			$tax = sanitize_key( MCM_Safe::str( $source[0] ) );
+			if ( '' === $tax || ! taxonomy_exists( $tax ) ) {
+				continue;
+			}
+			$slugs = self::normalize_slugs( $source[1] );
+			if ( ! $slugs ) {
+				continue;
+			}
+			$scope[ $tax ] = isset( $scope[ $tax ] ) ? array_values( array_unique( array_merge( $scope[ $tax ], $slugs ) ) ) : $slugs;
+		}
+		return $scope;
+	}
+
+	/**
+	 * Terms a visitor may pick in one taxonomy's dropdown or facet, honouring
+	 * the author's scope. An empty array means: do not show that control.
+	 *
+	 * @param string $tax   Taxonomy.
+	 * @param array  $scope Output of scope_terms().
+	 * @return WP_Term[]
+	 */
+	private static function visible_facet_terms( $tax, $scope ) {
+		$terms = self::facet_terms( $tax );
+		if ( ! isset( $scope[ $tax ] ) ) {
+			return $terms;
+		}
+		if ( count( $scope[ $tax ] ) < 2 ) {
+			return array(); // A single scoped term: nothing to choose.
+		}
+		$keep = array_flip( $scope[ $tax ] );
+		$out  = array();
+		foreach ( $terms as $term ) {
+			if ( isset( $keep[ $term->slug ] ) ) {
+				$out[] = $term;
+			}
+		}
+		return $out;
+	}
+
+	/**
 	 * Build the combined taxonomy => terms map from all sources.
 	 *
+	 * Precedence: the author's scope is always applied. A visitor's choice for
+	 * a scoped taxonomy is intersected with it, so a choice outside the scope
+	 * is ignored and never widens it. The locked archive term wins for its own
+	 * taxonomy.
+	 *
+	 * @param array $a Parsed attributes.
 	 * @return array
 	 */
 	private static function collect_terms( $a ) {
-		$map     = self::tax_map();
-		$primary = isset( $map[ $a['type'] ][0] ) ? $map[ $a['type'] ][0] : '';
-		$terms   = array();
+		$terms = self::scope_terms( $a );
 
-		// Generic `category` maps to the primary taxonomy.
-		if ( '' !== $a['category'] && $primary ) {
-			$terms[ $primary ] = array_map( 'trim', explode( ',', $a['category'] ) );
-		}
-
-		// Friendly shortcode attributes.
-		$attr_to_tax = array(
-			'department' => 'mcm_department',
-			'session'    => 'mcm_session',
-			'teacher'    => 'mcm_teacher',
-			'professor'  => 'mcm_teacher',        // friendly alias for teacher.
-			'specialty'  => 'mcm_specialty',
-			'level'      => 'mcm_level',
-			'research_area' => 'mcm_research_area',
-			'program'    => 'mcm_program_link',    // the Program spine connector.
-		);
-		foreach ( $attr_to_tax as $attr => $tax ) {
-			if ( '' !== $a[ $attr ] ) {
-				$terms[ $tax ] = array_map( 'trim', explode( ',', $a[ $attr ] ) );
-			}
-		}
-
-		// AJAX / explicit tax_filters (taxonomy => slug).
-		foreach ( (array) $a['tax_filters'] as $tax => $slug ) {
-			$tax = sanitize_key( $tax );
-			if ( '' === $slug || ! taxonomy_exists( $tax ) ) {
+		// Visitor choices (AJAX / explicit tax_filters: taxonomy => slug list).
+		foreach ( (array) $a['tax_filters'] as $tax => $value ) {
+			$tax = sanitize_key( MCM_Safe::str( $tax ) );
+			if ( '' === $tax || ! taxonomy_exists( $tax ) ) {
 				continue;
 			}
-			$terms[ $tax ] = array_map( 'trim', explode( ',', $slug ) );
+			$slugs = self::normalize_slugs( $value );
+			if ( ! $slugs ) {
+				continue;
+			}
+			if ( isset( $terms[ $tax ] ) ) {
+				$slugs = array_values( array_intersect( $slugs, $terms[ $tax ] ) );
+				if ( ! $slugs ) {
+					continue; // Outside the scope: keep the scope.
+				}
+			}
+			$terms[ $tax ] = $slugs;
 		}
 
 		// Locked taxonomy term wins for its taxonomy (archive scoping).
@@ -385,6 +500,8 @@ class MCM_Query {
 			? __( 'Search by name, ID, PMDC No., email…', 'medical-college-manager' )
 			: __( 'Search by name, keyword…', 'medical-college-manager' );
 
+		$scope = self::scope_terms( $a );
+
 		ob_start();
 		?>
 		<div class="mcm-filters" data-type="<?php echo esc_attr( $a['type'] ); ?>">
@@ -395,11 +512,16 @@ class MCM_Query {
 				if ( $tax === $a['lock_tax'] ) {
 					continue;
 				}
-				$terms = self::facet_terms( $tax );
+				// Honour the author's pre-filter: hidden for one term, limited
+				// to the chosen terms for several.
+				$terms = self::visible_facet_terms( $tax, $scope );
 				if ( empty( $terms ) ) {
 					continue;
 				}
 				$tobj = get_taxonomy( $tax );
+				if ( ! $tobj ) {
+					continue;
+				}
 				?>
 				<select class="mcm-filter-tax" data-tax="<?php echo esc_attr( $tax ); ?>" aria-label="<?php echo esc_attr( $tobj->labels->singular_name ); ?>">
 					<option value=""><?php echo esc_html( $tobj->labels->all_items ); ?></option>
@@ -784,6 +906,8 @@ class MCM_Query {
 			? __( 'Find a Consultant …', 'medical-college-manager' )
 			: __( 'Search by name, keyword…', 'medical-college-manager' );
 
+		$scope = self::scope_terms( $a );
+
 		ob_start();
 		?>
 		<div class="mcm-dir-filters" data-type="<?php echo esc_attr( $a['type'] ); ?>">
@@ -796,7 +920,7 @@ class MCM_Query {
 				if ( ! $tax || $tax === $a['lock_tax'] ) {
 					continue;
 				}
-				$terms = self::facet_terms( $tax );
+				$terms = self::visible_facet_terms( $tax, $scope );
 				if ( empty( $terms ) ) {
 					continue;
 				}

@@ -99,6 +99,10 @@ class MCM_Shortcodes {
 			'meta_type' => $a['meta_type'],
 			'lock_tax'  => $a['lock_tax'],
 			'lock_term' => $a['lock_term'],
+			// The author's pre-filters (department="…", program="…", Elementor
+			// pre-filter controls…). Without them the first AJAX search, filter
+			// change, Reset or Print-all silently widened the list.
+			'scope'     => (object) MCM_Query::scope_terms( $a ),
 			// Without these a filtered AJAX response silently loses pagination.
 			'paginate'  => $a['paginate'],
 			'paged'     => (int) $a['paged'],
