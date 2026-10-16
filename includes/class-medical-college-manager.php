@@ -101,6 +101,8 @@ final class Medical_College_Manager {
 			'mcm_publications',
 			'mcm_research',
 			'mcm_policies',
+			'mcm_jobs',
+			'mcm_vacancies',
 			'mcm_students',
 			'mcm_student',
 			'mcm_grid',
@@ -161,6 +163,10 @@ final class Medical_College_Manager {
 		}
 		if ( class_exists( 'MCM_Program' ) ) {
 			MCM_Safe::run( array( 'MCM_Program', 'migrate' ), 'upgrade: program migration' );
+		}
+		// 1.31.0: seed job categories, make jobs printable (once).
+		if ( class_exists( 'MCM_Job' ) ) {
+			MCM_Safe::run( array( 'MCM_Job', 'install' ), 'upgrade: jobs install' );
 		}
 		// 1.30.2: normalise dates/times saved before validation existed (once).
 		if ( class_exists( 'MCM_Upgrade' ) ) {

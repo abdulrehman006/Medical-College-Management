@@ -85,6 +85,7 @@ function mcm_modules() {
 		'class-mcm-blog.php'        => 'MCM_Blog',
 		'class-mcm-notice.php'      => 'MCM_Notice',
 		'class-mcm-tender.php'      => 'MCM_Tender',
+		'class-mcm-job.php'         => 'MCM_Job',
 		'class-mcm-publication.php' => 'MCM_Publication',
 		'class-mcm-program.php'     => 'MCM_Program',
 		'class-mcm-caps.php'        => '',
@@ -169,6 +170,11 @@ function mcm_activate() {
 
 		require_once MCM_PATH . 'includes/class-mcm-upgrade.php';
 		MCM_Upgrade::maybe_migrate_dates();
+
+		require_once MCM_PATH . 'includes/class-mcm-query.php';
+		require_once MCM_PATH . 'includes/class-mcm-safe.php';
+		require_once MCM_PATH . 'includes/class-mcm-job.php';
+		MCM_Job::install();
 
 		update_option( 'mcm_version', MCM_VERSION );
 		flush_rewrite_rules();

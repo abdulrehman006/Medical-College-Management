@@ -36,6 +36,7 @@ class MCM_Query {
 			'mcm_notice'      => array( 'mcm_notice_cat', 'mcm_department' ),
 			'mcm_tender'      => array( 'mcm_tender_cat', 'mcm_department' ),
 			'mcm_scholarship' => array( 'mcm_scholarship_cat', 'mcm_department' ),
+			'mcm_job'         => array( 'mcm_job_cat', 'mcm_department' ),
 			'mcm_student'     => array( 'mcm_program_link', 'mcm_level', 'mcm_department', 'mcm_session' ),
 		);
 	}
@@ -119,6 +120,8 @@ class MCM_Query {
 			'meta_type'     => '',            // e.g. DATE, NUMERIC, CHAR.
 			'paged'         => 1,
 			'class_css'     => '',
+			// Jobs: open (default) | closed | all.
+			'status'        => '',
 			// Generic per-taxonomy attribute (slug = taxonomy without mcm_ prefix).
 			'department'    => '',
 			'session'       => '',
@@ -156,10 +159,15 @@ class MCM_Query {
 	 * the SITE timezone, or that have no date at all. Shared by every type
 	 * that auto-expires (tenders, notices, and later jobs).
 	 *
-	 * @param string $meta_key Meta key holding a Y-m-d date.
+	 * With $type 'DATETIME' the key holds "Y-m-d H:i:s" and items stay until
+	 * that exact moment (jobs close at their closing time, not at midnight).
+	 *
+	 * @param string $meta_key Meta key holding a Y-m-d date (or Y-m-d H:i:s).
+	 * @param string $type     'DATE' (default) or 'DATETIME'.
 	 * @return array
 	 */
-	public static function expiry_meta_query( $meta_key ) {
+	public static function expiry_meta_query( $meta_key, $type = 'DATE' ) {
+		$datetime = 'DATETIME' === $type;
 		return array(
 			'relation' => 'OR',
 			array(
@@ -173,9 +181,9 @@ class MCM_Query {
 			),
 			array(
 				'key'     => $meta_key,
-				'value'   => current_time( 'Y-m-d' ),
+				'value'   => current_time( $datetime ? 'Y-m-d H:i:s' : 'Y-m-d' ),
 				'compare' => '>=',
-				'type'    => 'DATE',
+				'type'    => $datetime ? 'DATETIME' : 'DATE',
 			),
 		);
 	}
@@ -1635,6 +1643,14 @@ class MCM_Query {
 				array( __( 'Venue', 'medical-college-manager' ), 'meta', 'mcm_venue' ),
 				array( __( 'Department', 'medical-college-manager' ), 'tax', 'mcm_department' ),
 			),
+			'mcm_job'        => array(
+				array( __( 'Title', 'medical-college-manager' ), 'title', '' ),
+				array( __( 'Category', 'medical-college-manager' ), 'tax', 'mcm_job_cat' ),
+				array( __( 'Department', 'medical-college-manager' ), 'tax', 'mcm_department' ),
+				array( __( 'Posts', 'medical-college-manager' ), 'meta', 'mcm_job_posts', 'center' ),
+				array( __( 'Last date', 'medical-college-manager' ), 'job_last', '' ),
+				array( __( 'Status', 'medical-college-manager' ), 'job_status', '' ),
+			),
 			// PUBLIC-SAFE columns only. Contact details (email, phone), DOB,
 			// address, blood group, guardian and gender are deliberately absent —
 			// they are personal data and live only in wp-admin. Do not add them
@@ -1718,6 +1734,10 @@ class MCM_Query {
 				return trim( $start . ( $end ? ' – ' . $end : '' ) );
 			case 'tax':
 				return implode( ', ', self::cached_term_names( $id, $key ) );
+			case 'job_last':
+				return class_exists( 'MCM_Job' ) ? wp_strip_all_tags( MCM_Job::last_date_html( $id ) ) : '';
+			case 'job_status':
+				return class_exists( 'MCM_Job' ) ? MCM_Job::status_label( MCM_Job::status( $id ) ) : '';
 		}
 		return '';
 	}
@@ -1818,6 +1838,29 @@ class MCM_Query {
 				$rows[] = self::tax_pair( __( 'Type', 'medical-college-manager' ), $id, 'mcm_scholarship_cat' );
 				$rows[] = self::meta_pair( __( 'Amount', 'medical-college-manager' ), MCM_Safe::meta( $id, 'mcm_scholarship_amount' ) );
 				$rows[] = self::meta_pair( __( 'Deadline', 'medical-college-manager' ), self::fmt_date( MCM_Safe::meta( $id, 'mcm_scholarship_deadline' ) ) );
+				break;
+
+			case 'mcm_job':
+				if ( ! class_exists( 'MCM_Job' ) ) {
+					break;
+				}
+				// Category · Department.
+				$where  = implode( ' · ', array_filter( array( self::tax_names( $id, 'mcm_job_cat' ), self::tax_names( $id, 'mcm_department' ) ) ) );
+				$rows[] = self::meta_pair( '', $where );
+				// Last date + status badge (old date struck through when extended).
+				$last   = MCM_Job::last_date_html( $id );
+				$rows[] = '<span class="mcm-meta-line mcm-job-deadline"><span class="mcm-meta-label">' . esc_html__( 'Last date', 'medical-college-manager' ) . ':</span> '
+					. ( '' !== $last ? $last : esc_html__( 'Not set', 'medical-college-manager' ) ) . ' ' . MCM_Job::badge( MCM_Job::status( $id ) ) . '</span>';
+				// Posts · Scale.
+				$posts = MCM_Safe::meta( $id, 'mcm_job_posts' );
+				$parts = array();
+				if ( '' !== $posts ) {
+					/* translators: %s: number of posts. */
+					$parts[] = sprintf( _n( '%s post', '%s posts', max( 1, (int) $posts ), 'medical-college-manager' ), $posts );
+				}
+				$parts[] = MCM_Safe::meta( $id, 'mcm_job_scale' );
+				$rows[]  = self::meta_pair( '', implode( ' · ', array_filter( $parts ) ) );
+				$rows[]  = self::meta_pair( __( 'Published', 'medical-college-manager' ), self::fmt_date( MCM_Job::publish_date( $id ) ) );
 				break;
 
 			case 'mcm_student':
@@ -1951,6 +1994,8 @@ class MCM_Query {
 		$rows    = array(); // label => value.
 		$actions = array(); // [ label, url, primary(bool) ].
 		$heading = '';
+		$badge   = ''; // Escaped HTML shown beside the heading.
+		$after   = ''; // Escaped HTML shown after the buttons.
 
 		switch ( $type ) {
 			case 'mcm_consultant':
@@ -2129,6 +2174,64 @@ class MCM_Query {
 				}
 				break;
 
+			case 'mcm_job':
+				if ( ! class_exists( 'MCM_Job' ) ) {
+					return '';
+				}
+				$status  = MCM_Job::status( $id );
+				$heading = __( 'Job Details', 'medical-college-manager' );
+				$badge   = MCM_Job::badge( $status );
+				$rows[ __( 'Category', 'medical-college-manager' ) ]            = self::tax_names( $id, 'mcm_job_cat' );
+				$rows[ __( 'Department', 'medical-college-manager' ) ]          = self::tax_names( $id, 'mcm_department' );
+				$rows[ __( 'Number of posts', 'medical-college-manager' ) ]     = MCM_Safe::meta( $id, 'mcm_job_posts' );
+				$rows[ __( 'Pay scale / package', 'medical-college-manager' ) ] = MCM_Safe::meta( $id, 'mcm_job_scale' );
+				$rows[ __( 'Employment type', 'medical-college-manager' ) ]     = MCM_Safe::meta( $id, 'mcm_job_type' );
+				$rows[ __( 'Published', 'medical-college-manager' ) ]           = self::fmt_date( MCM_Job::publish_date( $id ) );
+				$rows[ __( 'Last date to apply', 'medical-college-manager' ) ]  = wp_strip_all_tags( MCM_Job::last_date_html( $id ) );
+				if ( MCM_Job::is_extended( $id ) ) {
+					$rows[ __( 'Originally', 'medical-college-manager' ) ] = self::fmt_date( MCM_Safe::meta( $id, 'mcm_job_deadline' ) );
+				}
+				$rows[ __( 'Contact', 'medical-college-manager' ) ] = MCM_Safe::meta( $id, 'mcm_job_contact' );
+
+				// Apply: only with a link, and only while applications are accepted.
+				$apply = MCM_Safe::meta( $id, 'mcm_job_apply_url' );
+				if ( '' !== $apply && MCM_Job::is_accepting( $status ) ) {
+					$apply_label = MCM_Safe::meta( $id, 'mcm_job_apply_label' );
+					$actions[]   = array( '' !== $apply_label ? $apply_label : __( 'Apply Now', 'medical-college-manager' ), $apply, true, array( 'newtab' => true ) );
+				}
+				$doc = MCM_Safe::meta( $id, 'mcm_job_document' );
+				if ( '' !== $doc ) {
+					$actions[] = array( __( 'Download job description', 'medical-college-manager' ), $doc, empty( $actions ), array( 'download' => true ) );
+				}
+				$voucher = MCM_Safe::meta( $id, 'mcm_job_voucher' );
+				if ( '' !== $voucher ) {
+					$actions[] = array( __( 'Download voucher / form', 'medical-college-manager' ), $voucher, false, array( 'download' => true ) );
+				}
+
+				if ( 'closed' === $status ) {
+					$after .= '<p class="mcm-job-closed">' . esc_html(
+						sprintf(
+							/* translators: %s: last date. */
+							__( 'Applications closed on %s.', 'medical-college-manager' ),
+							wp_strip_all_tags( MCM_Job::last_date_html( $id ) )
+						)
+					) . '</p>';
+				}
+				$how = MCM_Safe::meta( $id, 'mcm_job_how_to_apply' );
+				if ( '' !== trim( $how ) ) {
+					$after .= '<div class="mcm-job-how"><h4 class="mcm-job-how-title">' . esc_html__( 'How to apply', 'medical-college-manager' ) . '</h4><p>' . nl2br( esc_html( $how ) ) . '</p></div>';
+				}
+				// The newspaper advertisement, linked to the full-size image.
+				if ( has_post_thumbnail( $id ) ) {
+					$full = wp_get_attachment_image_url( get_post_thumbnail_id( $id ), 'full' );
+					/* translators: %s: job title. */
+					$alt    = sprintf( __( 'Advertisement: %s', 'medical-college-manager' ), get_the_title( $id ) );
+					$after .= '<figure class="mcm-job-ad"><a href="' . esc_url( (string) $full ) . '" target="_blank" rel="noopener noreferrer">'
+						. get_the_post_thumbnail( $id, 'large', array( 'alt' => esc_attr( $alt ) ) )
+						. '</a><figcaption>' . esc_html__( 'Advertisement — click to view full size.', 'medical-college-manager' ) . '</figcaption></figure>';
+				}
+				break;
+
 			case 'mcm_scholarship':
 				$heading = __( 'Scholarship Details', 'medical-college-manager' );
 				$rows[ __( 'Type', 'medical-college-manager' ) ]                 = self::tax_names( $id, 'mcm_scholarship_cat' );
@@ -2184,14 +2287,14 @@ class MCM_Query {
 			}
 		);
 
-		if ( empty( $rows ) && empty( $actions ) ) {
+		if ( empty( $rows ) && empty( $actions ) && '' === $after ) {
 			return '';
 		}
 
 		ob_start();
 		echo '<div class="mcm-single-details mcm-single-details--' . esc_attr( str_replace( 'mcm_', '', $type ) ) . '">';
 		if ( $heading ) {
-			echo '<h3 class="mcm-sd-heading">' . esc_html( $heading ) . '</h3>';
+			echo '<h3 class="mcm-sd-heading">' . esc_html( $heading ) . ( '' !== $badge ? ' ' . $badge : '' ) . '</h3>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- $badge is built escaped by MCM_Job::badge().
 		}
 		if ( $rows ) {
 			echo '<div class="mcm-sd-grid">';
@@ -2233,6 +2336,7 @@ class MCM_Query {
 			}
 			echo '</div>';
 		}
+		echo $after; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Built from escaped parts above.
 		echo '</div>';
 		return ob_get_clean();
 	}

@@ -147,6 +147,16 @@ class MCM_CPT {
 				'supports'    => array( 'title', 'editor', 'excerpt', 'thumbnail' ),
 				'has_archive' => true,
 			),
+			// Jobs / vacancies. Editor = full job description; featured image =
+			// the newspaper advertisement. Closed jobs keep their single page.
+			'mcm_job'         => array(
+				'singular'    => __( 'Job', 'medical-college-manager' ),
+				'plural'      => __( 'Jobs', 'medical-college-manager' ),
+				'menu_icon'   => 'dashicons-businessperson',
+				'slug'        => 'jobs',
+				'supports'    => array( 'title', 'editor', 'thumbnail', 'excerpt' ),
+				'has_archive' => true,
+			),
 			'mcm_student'     => array(
 				'singular'    => __( 'Student', 'medical-college-manager' ),
 				'plural'      => __( 'Students', 'medical-college-manager' ),
@@ -187,7 +197,7 @@ class MCM_CPT {
 		return array(
 			// Shared across most CPTs — the backbone filter.
 			'mcm_department'      => array(
-				'post_types'   => array( 'mcm_timetable', 'mcm_program', 'mcm_course', 'mcm_event', 'mcm_consultant', 'mcm_team', 'mcm_admission', 'mcm_student', 'mcm_notice', 'mcm_tender', 'mcm_scholarship', 'mcm_publication', 'mcm_research', 'mcm_policy' ),
+				'post_types'   => array( 'mcm_timetable', 'mcm_program', 'mcm_course', 'mcm_event', 'mcm_consultant', 'mcm_team', 'mcm_admission', 'mcm_student', 'mcm_notice', 'mcm_tender', 'mcm_scholarship', 'mcm_publication', 'mcm_research', 'mcm_policy', 'mcm_job' ),
 				'singular'     => __( 'Department', 'medical-college-manager' ),
 				'plural'       => __( 'Departments', 'medical-college-manager' ),
 				'slug'         => 'department',
@@ -291,6 +301,13 @@ class MCM_CPT {
 			// Distinct key from the mcm_program CPT (which holds the rich program
 			// page); a matching term is auto-created for each Program entry
 			// (see MCM_Program) so there is no double data entry.
+			'mcm_job_cat'         => array(
+				'post_types'   => array( 'mcm_job' ),
+				'singular'     => __( 'Job Category', 'medical-college-manager' ),
+				'plural'       => __( 'Job Categories', 'medical-college-manager' ),
+				'slug'         => 'job-category',
+				'hierarchical' => true,
+			),
 			'mcm_program_link'    => array(
 				'post_types'   => array( 'mcm_course', 'mcm_timetable', 'mcm_admission', 'mcm_student' ),
 				'singular'     => __( 'Program', 'medical-college-manager' ),

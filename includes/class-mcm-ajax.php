@@ -141,6 +141,8 @@ class MCM_Ajax {
 				'paginate'    => MCM_Query::truthy( MCM_Safe::scalar( $config, 'paginate', 'no' ) ) ? 'yes' : 'no',
 				'paged'       => max( 1, absint( MCM_Safe::scalar( $config, 'paged', '1' ) ) ),
 				'search'      => sanitize_text_field( MCM_Safe::post( 'search' ) ),
+				// Jobs status (open/closed/all), echoed back from data-config.
+				'status'      => sanitize_key( MCM_Safe::scalar( $config, 'status' ) ),
 				'scope'       => $scope,
 				'tax_filters' => $tax_filters,
 			)

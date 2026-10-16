@@ -337,7 +337,7 @@ class MCM_Templates {
 			}
 			$pt       = get_post_type_object( $cpt );
 			$blocks[] = array(
-				'label' => $pt ? $pt->labels->name : $cpt,
+				'label' => 'mcm_job' === $cpt ? __( 'Vacancies', 'medical-college-manager' ) : ( $pt ? $pt->labels->name : $cpt ),
 				'atts'  => array(
 					'type'      => $cpt,
 					'filters'   => ( $found > $threshold ) ? 'yes' : 'no',
@@ -470,7 +470,9 @@ class MCM_Templates {
 		// sure a set image is never simply invisible. See should_show_image()
 		// for how a theme that already rendered it avoids a duplicate.
 		$media = '';
-		if ( has_post_thumbnail( $id ) && self::should_show_image( $id ) ) {
+		// Jobs show their advertisement (the featured image) inside the details
+		// panel, linked to full size, so it is not repeated here.
+		if ( 'mcm_job' !== $type && has_post_thumbnail( $id ) && self::should_show_image( $id ) ) {
 			$media = '<div class="mcm-wrap mcm-single-media">'
 				. get_the_post_thumbnail( $id, 'large', array( 'class' => 'mcm-single-img' ) )
 				. '</div>';

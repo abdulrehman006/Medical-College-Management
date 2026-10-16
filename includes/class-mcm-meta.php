@@ -546,6 +546,13 @@ class MCM_Meta {
 						'label' => __( 'Submit / Portal URL', 'medical-college-manager' ),
 						'type'  => 'url',
 					),
+					'mcm_tender_on_board'    => array(
+						'label'   => __( 'Show on notice board', 'medical-college-manager' ),
+						'type'    => 'select',
+						'options' => array( 'Yes', 'No' ),
+						'default' => 'Yes',
+						'desc'    => __( 'Lists this tender in the notice ticker and board until its deadline (when tenders are enabled under Settings → Notice board sources).', 'medical-college-manager' ),
+					),
 				),
 			),
 			'mcm_publication' => array(
@@ -660,6 +667,81 @@ class MCM_Meta {
 						'label' => __( 'Research Paper (PDF)', 'medical-college-manager' ),
 						'type'  => 'media',
 						'desc'  => __( 'Upload or select the paper. It can then be viewed and downloaded from the page.', 'medical-college-manager' ),
+					),
+				),
+			),
+			'mcm_job'         => array(
+				'box_title' => __( 'Job / Vacancy Details', 'medical-college-manager' ),
+				'fields'    => array(
+					'mcm_job_publish_date'      => array(
+						'label' => __( 'Publication date', 'medical-college-manager' ),
+						'type'  => 'date',
+						'desc'  => __( 'Leave empty to use the post date. A future date keeps the job hidden until that day.', 'medical-college-manager' ),
+					),
+					'mcm_job_deadline'          => array(
+						'label' => __( 'Last date to apply', 'medical-college-manager' ),
+						'type'  => 'date',
+						'desc'  => __( 'Required. The job closes automatically after this date and closing time.', 'medical-college-manager' ),
+					),
+					'mcm_job_deadline_time'     => array(
+						'label' => __( 'Closing time', 'medical-college-manager' ),
+						'type'  => 'time',
+						'desc'  => __( 'Leave empty for 23:59 (end of the day).', 'medical-college-manager' ),
+					),
+					'mcm_job_extended_deadline' => array(
+						'label' => __( 'Extended last date', 'medical-college-manager' ),
+						'type'  => 'date',
+						'desc'  => __( 'Optional. When set it replaces the last date, and the job shows an "Extended" badge.', 'medical-college-manager' ),
+					),
+					'mcm_job_apply_url'         => array(
+						'label' => __( 'Apply link (Google Form, NTS, ETEA, any)', 'medical-college-manager' ),
+						'type'  => 'url',
+						'desc'  => __( 'Optional. The Apply button appears only when this is filled in and the job is open.', 'medical-college-manager' ),
+					),
+					'mcm_job_apply_label'       => array(
+						'label' => __( 'Apply button text', 'medical-college-manager' ),
+						'type'  => 'text',
+						'desc'  => __( 'Leave empty for "Apply Now".', 'medical-college-manager' ),
+					),
+					'mcm_job_how_to_apply'      => array(
+						'label' => __( 'How to apply', 'medical-college-manager' ),
+						'type'  => 'textarea',
+						'desc'  => __( 'Postal or by-hand instructions, shown on the job page.', 'medical-college-manager' ),
+					),
+					'mcm_job_document'          => array(
+						'label' => __( 'Job description / brochure (PDF)', 'medical-college-manager' ),
+						'type'  => 'media',
+					),
+					'mcm_job_voucher'           => array(
+						'label'  => __( 'Fee voucher / application form', 'medical-college-manager' ),
+						'type'   => 'media',
+						'accept' => 'image,application/pdf',
+						'desc'   => __( 'Image or PDF.', 'medical-college-manager' ),
+					),
+					'mcm_job_posts'             => array(
+						'label' => __( 'Number of posts', 'medical-college-manager' ),
+						'type'  => 'number',
+					),
+					'mcm_job_scale'             => array(
+						'label' => __( 'Pay scale / package', 'medical-college-manager' ),
+						'type'  => 'text',
+						'desc'  => __( 'e.g. BPS-18', 'medical-college-manager' ),
+					),
+					'mcm_job_type'              => array(
+						'label'   => __( 'Employment type', 'medical-college-manager' ),
+						'type'    => 'select',
+						'options' => array( 'Regular', 'Contract', 'Ad-hoc', 'Visiting', 'Internship' ),
+					),
+					'mcm_job_contact'           => array(
+						'label' => __( 'Contact', 'medical-college-manager' ),
+						'type'  => 'text',
+					),
+					'mcm_job_on_board'          => array(
+						'label'   => __( 'Show on notice board', 'medical-college-manager' ),
+						'type'    => 'select',
+						'options' => array( 'Yes', 'No' ),
+						'default' => 'Yes',
+						'desc'    => __( 'Lists this job in the notice ticker and board while it is open (when jobs are enabled under Settings → Notice board sources).', 'medical-college-manager' ),
 					),
 				),
 			),
@@ -853,8 +935,10 @@ class MCM_Meta {
 				case 'select':
 					printf( '<select id="%1$s" name="%1$s" style="min-width:220px;">', esc_attr( $key ) );
 					echo '<option value="">' . esc_html__( '— Select —', 'medical-college-manager' ) . '</option>';
+					// A field's 'default' is pre-selected while nothing is stored.
+					$pick = ( '' === $value && isset( $field['default'] ) ) ? $field['default'] : $value;
 					foreach ( $field['options'] as $opt ) {
-						printf( '<option value="%1$s" %2$s>%1$s</option>', esc_attr( $opt ), selected( $value, $opt, false ) );
+						printf( '<option value="%1$s" %2$s>%1$s</option>', esc_attr( $opt ), selected( $pick, $opt, false ) );
 					}
 					echo '</select>';
 					break;
