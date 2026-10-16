@@ -73,6 +73,24 @@ class MCM_Import {
 	 *
 	 * @param string $type Post type.
 	 */
+	/**
+	 * Meta key for a CSV column of a type: the schema's 'map' entry when there
+	 * is one, otherwise mcm_<column>.
+	 *
+	 * @param string $type Post type.
+	 * @param string $col  CSV column.
+	 * @return string
+	 */
+	public static function meta_key_for( $type, $col ) {
+		$schema = self::schema();
+		return isset( $schema[ $type ]['map'][ $col ] ) ? $schema[ $type ]['map'][ $col ] : 'mcm_' . $col;
+	}
+
+	/**
+	 * Columns of an export file: exactly the columns the importer reads.
+	 *
+	 * @param string $type Post type.
+	 */
 	private static function export_columns( $type ) {
 		$schema = self::schema();
 		// 'id' is first so a re-imported export updates the exact record it came
@@ -153,7 +171,7 @@ class MCM_Import {
 					$names = wp_get_post_terms( $p->ID, $tax_keys[ $col ], array( 'fields' => 'names' ) );
 					$row[] = is_wp_error( $names ) ? '' : implode( ', ', $names );
 				} else {
-					$row[] = MCM_Safe::meta( $p->ID, 'mcm_' . $col );
+					$row[] = MCM_Safe::meta( $p->ID, self::meta_key_for( $type, $col ) );
 				}
 			}
 			fputcsv( $out, array_map( array( __CLASS__, 'csv_safe' ), $row ), ',', '"', '\\' );
@@ -232,7 +250,9 @@ class MCM_Import {
 				),
 			),
 			'mcm_tender'      => array(
-				'meta' => array( 'tender_institute', 'tender_ref', 'tender_open', 'tender_close', 'tender_bid', 'tender_fee', 'tender_earnest', 'tender_eligibility', 'tender_doc', 'tender_apply' ),
+				'meta' => array( 'tender_institute', 'tender_ref', 'tender_open', 'tender_close', 'tender_bid', 'tender_fee', 'tender_earnest', 'tender_eligibility', 'tender_doc', 'tender_apply', 'on_board' ),
+				// Column => meta key where the key is not simply mcm_<column>.
+				'map'  => array( 'on_board' => 'mcm_tender_on_board' ),
 				'tax'  => array(
 					'tender_category' => 'mcm_tender_cat',
 					'department'      => 'mcm_department',
@@ -259,6 +279,30 @@ class MCM_Import {
 					'research_area' => 'mcm_research_area',
 					'department'    => 'mcm_department',
 					'professor'     => 'mcm_teacher',
+				),
+			),
+			'mcm_job'         => array(
+				'meta' => array( 'publish_date', 'deadline', 'deadline_time', 'extended_deadline', 'apply_url', 'apply_label', 'how_to_apply', 'document', 'voucher', 'posts', 'scale', 'type', 'contact', 'on_board' ),
+				// Every job column is stored as mcm_job_<column>.
+				'map'  => array(
+					'publish_date'      => 'mcm_job_publish_date',
+					'deadline'          => 'mcm_job_deadline',
+					'deadline_time'     => 'mcm_job_deadline_time',
+					'extended_deadline' => 'mcm_job_extended_deadline',
+					'apply_url'         => 'mcm_job_apply_url',
+					'apply_label'       => 'mcm_job_apply_label',
+					'how_to_apply'      => 'mcm_job_how_to_apply',
+					'document'          => 'mcm_job_document',
+					'voucher'           => 'mcm_job_voucher',
+					'posts'             => 'mcm_job_posts',
+					'scale'             => 'mcm_job_scale',
+					'type'              => 'mcm_job_type',
+					'contact'           => 'mcm_job_contact',
+					'on_board'          => 'mcm_job_on_board',
+				),
+				'tax'  => array(
+					'job_category' => 'mcm_job_cat',
+					'department'   => 'mcm_department',
 				),
 			),
 			'mcm_policy'      => array(
@@ -337,6 +381,10 @@ class MCM_Import {
 			'mcm_policy'      => array(
 				'label'  => __( 'Policies', 'medical-college-manager' ),
 				'sample' => 'sample-policies.csv',
+			),
+			'mcm_job'         => array(
+				'label'  => __( 'Jobs', 'medical-college-manager' ),
+				'sample' => 'sample-jobs.csv',
 			),
 			'mcm_notice'      => array(
 				'label'  => __( 'Notices', 'medical-college-manager' ),
@@ -553,7 +601,7 @@ class MCM_Import {
 			// the entry. The whole row is skipped and reported instead.
 			$bad = '';
 			foreach ( $meta_keys as $mk ) {
-				$ftype = MCM_Meta::field_type( $type, 'mcm_' . $mk );
+				$ftype = MCM_Meta::field_type( $type, self::meta_key_for( $type, $mk ) );
 				if ( isset( $data[ $mk ] ) && '' !== $data[ $mk ] && ! MCM_Meta::is_valid( $ftype, $data[ $mk ] ) ) {
 					$bad = 'date' === $ftype
 						/* translators: 1: CSV row number, 2: column name, 3: the value. */
@@ -612,7 +660,9 @@ class MCM_Import {
 				if ( ! array_key_exists( $mk, $data ) || '' === $data[ $mk ] ) {
 					continue;
 				}
-				update_post_meta( $post_id, 'mcm_' . $mk, self::sanitize_meta_value( $mk, $data[ $mk ] ) );
+				$meta_key = self::meta_key_for( $type, $mk );
+				$ftype    = MCM_Meta::field_type( $type, $meta_key );
+				update_post_meta( $post_id, $meta_key, '' !== $ftype ? MCM_Meta::sanitize_value( $ftype, $data[ $mk ] ) : self::sanitize_meta_value( $mk, $data[ $mk ] ) );
 			}
 
 			// Taxonomies (term names, comma separated). Reuse an existing term
