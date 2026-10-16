@@ -32,8 +32,14 @@ class MCM_Notice {
 		// The /notices/ archive reads best as a list.
 		add_filter( 'mcm_archive_view', array( $this, 'archive_view' ), 10, 2 );
 
-		// Invalidate the cached feed whenever notices change.
+		// Invalidate the cached feed whenever notices, jobs or tenders change.
 		add_action( 'save_post_mcm_notice', array( __CLASS__, 'clear_cache' ) );
+		add_action( 'save_post_mcm_job', array( __CLASS__, 'clear_cache' ) );
+		add_action( 'save_post_mcm_tender', array( __CLASS__, 'clear_cache' ) );
+		// Fields written after the post (CSV import, REST, meta box).
+		add_action( 'added_post_meta', array( __CLASS__, 'maybe_clear_on_meta' ), 10, 3 );
+		add_action( 'updated_post_meta', array( __CLASS__, 'maybe_clear_on_meta' ), 10, 3 );
+		add_action( 'deleted_post_meta', array( __CLASS__, 'maybe_clear_on_meta' ), 10, 3 );
 		add_action( 'deleted_post', array( __CLASS__, 'clear_cache' ) );
 		add_action( 'trashed_post', array( __CLASS__, 'clear_cache' ) );
 		add_action( 'untrashed_post', array( __CLASS__, 'clear_cache' ) );
@@ -44,6 +50,68 @@ class MCM_Notice {
 	 */
 	public static function clear_cache() {
 		delete_transient( self::CACHE_KEY );
+	}
+
+	/**
+	 * Clear the feed when a field that decides board membership changes.
+	 *
+	 * @param int|int[] $meta_ids  Meta ID(s).
+	 * @param int       $object_id Post ID.
+	 * @param string    $meta_key  Meta key.
+	 */
+	public static function maybe_clear_on_meta( $meta_ids, $object_id, $meta_key ) {
+		if ( preg_match( '/^mcm_(notice|job|tender)_/', (string) $meta_key ) ) {
+			self::clear_cache();
+		}
+	}
+
+	/**
+	 * Which sources a feed shows: the include="…" attribute when given,
+	 * otherwise notices plus the sources ticked in Settings. Filterable via
+	 * mcm_notice_feed_types.
+	 *
+	 * @param array $a Parsed attributes.
+	 * @return string[] Subset of notice, job, tender.
+	 */
+	public static function feed_types( $a = array() ) {
+		$known   = array( 'notice', 'job', 'tender' );
+		$include = isset( $a['include'] ) ? trim( MCM_Safe::str( $a['include'] ) ) : '';
+		if ( '' !== $include ) {
+			$types = array_map( 'sanitize_key', array_map( 'trim', explode( ',', $include ) ) );
+		} else {
+			$types   = array( 'notice' );
+			$sources = class_exists( 'MCM_Settings' ) ? MCM_Settings::value( 'notice_sources' ) : array();
+			if ( is_array( $sources ) ) {
+				$types = array_merge( $types, $sources );
+			}
+		}
+		$types = (array) apply_filters( 'mcm_notice_feed_types', $types, $a );
+		$types = array_values( array_intersect( $known, array_map( 'strval', $types ) ) );
+		if ( ! class_exists( 'MCM_Job' ) ) {
+			$types = array_values( array_diff( $types, array( 'job' ) ) );
+		}
+		return $types;
+	}
+
+	/**
+	 * Meta query: the item has not opted out of the notice board.
+	 *
+	 * @param string $key On-board meta key.
+	 * @return array
+	 */
+	private static function on_board_meta_query( $key ) {
+		return array(
+			'relation' => 'OR',
+			array(
+				'key'     => $key,
+				'compare' => 'NOT EXISTS',
+			),
+			array(
+				'key'     => $key,
+				'value'   => array( '', 'Yes' ),
+				'compare' => 'IN',
+			),
+		);
 	}
 
 	/**
@@ -81,28 +149,71 @@ class MCM_Notice {
 	 */
 
 	/**
-	 * IDs of current notices, sorted pinned, then priority, then date (cached).
+	 * IDs on the board, sorted pinned, then priority, then date (cached).
+	 *
+	 * Notices, plus open jobs and open tenders when requested. Never creates
+	 * notice posts: jobs and tenders are listed from their own records and
+	 * drop off once their deadline has passed (within the 10-minute cache).
+	 *
+	 * @param string[]|null $types Sources (notice/job/tender); null = defaults.
+	 * @return int[]
 	 */
-	public static function get_feed() {
-		$ids = get_transient( self::CACHE_KEY );
-		if ( false !== $ids ) {
-			return is_array( $ids ) ? $ids : array();
+	public static function get_feed( $types = null ) {
+		$types = null === $types ? self::feed_types() : array_values( array_intersect( array( 'notice', 'job', 'tender' ), (array) $types ) );
+		sort( $types );
+		$sig   = implode( ',', $types );
+		$cache = get_transient( self::CACHE_KEY );
+		$cache = is_array( $cache ) ? $cache : array();
+		if ( isset( $cache[ $sig ] ) && is_array( $cache[ $sig ] ) ) {
+			return $cache[ $sig ];
 		}
 
-		$query = new WP_Query(
-			array(
-				'post_type'      => 'mcm_notice',
-				'post_status'    => 'publish',
-				'posts_per_page' => self::FEED_MAX,
-				'fields'         => 'ids',
-				'no_found_rows'  => true,
-				'orderby'        => 'date',
-				'order'          => 'DESC',
-				'meta_query'     => self::expiry_meta_query(), // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
-			)
-		);
+		// phpcs:disable WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Board membership and expiry are defined by meta; the result is cached.
+		$queries = array();
+		if ( in_array( 'notice', $types, true ) ) {
+			$queries['mcm_notice'] = self::expiry_meta_query();
+		}
+		if ( in_array( 'job', $types, true ) ) {
+			$queries['mcm_job'] = array(
+				'relation' => 'AND',
+				self::on_board_meta_query( 'mcm_job_on_board' ),
+				MCM_Job::published_meta_query(),
+				MCM_Query::expiry_meta_query( MCM_Job::EFFECTIVE, 'DATETIME' ),
+			);
+		}
+		if ( in_array( 'tender', $types, true ) ) {
+			$queries['mcm_tender'] = array(
+				'relation' => 'AND',
+				self::on_board_meta_query( 'mcm_tender_on_board' ),
+				MCM_Query::expiry_meta_query( 'mcm_tender_close' ),
+			);
+		}
 
-		$ids = $query->posts;
+		$ids = array();
+		foreach ( $queries as $post_type => $meta_query ) {
+			$query = new WP_Query(
+				array(
+					'post_type'              => $post_type,
+					'post_status'            => 'publish',
+					'posts_per_page'         => self::FEED_MAX,
+					'fields'                 => 'ids',
+					'no_found_rows'          => true,
+					'orderby'                => 'date',
+					'order'                  => 'DESC',
+					'meta_query'             => $meta_query,
+					'update_post_meta_cache' => false,
+					'update_post_term_cache' => false,
+				)
+			);
+			$ids   = array_merge( $ids, array_map( 'intval', $query->posts ) );
+		}
+		// phpcs:enable WordPress.DB.SlowDBQuery.slow_db_query_meta_query
+
+		// Prime meta and term caches once for the whole feed (sort keys, badges).
+		if ( $ids ) {
+			update_meta_cache( 'post', $ids );
+			update_object_term_cache( $ids, array_keys( $queries ) );
+		}
 		usort(
 			$ids,
 			function ( $x, $y ) {
@@ -120,7 +231,8 @@ class MCM_Notice {
 			}
 		);
 
-		set_transient( self::CACHE_KEY, $ids, 10 * MINUTE_IN_SECONDS );
+		$cache[ $sig ] = $ids;
+		set_transient( self::CACHE_KEY, $cache, 10 * MINUTE_IN_SECONDS );
 		return $ids;
 	}
 
@@ -130,6 +242,9 @@ class MCM_Notice {
 	 * @param int $id Post ID.
 	 */
 	private static function sort_key( $id ) {
+		if ( 'mcm_notice' !== get_post_type( $id ) ) {
+			return array( 0, 1, self::notice_ts( $id ) );
+		}
 		$pinned = ( 'Yes' === MCM_Safe::meta( $id, 'mcm_notice_pinned' ) ) ? 1 : 0;
 		$map    = array(
 			'Urgent'    => 3,
@@ -148,7 +263,7 @@ class MCM_Notice {
 	 * @param array $a Parsed attributes.
 	 */
 	private static function feed_for( $a ) {
-		$ids    = self::get_feed();
+		$ids    = self::get_feed( self::feed_types( $a ) );
 		$cat    = trim( (string) $a['category'] );
 		$cats   = '' !== $cat ? array_filter( array_map( 'trim', explode( ',', $cat ) ) ) : array();
 		$dept   = trim( (string) $a['department'] );
@@ -159,13 +274,15 @@ class MCM_Notice {
 
 		$out = array();
 		foreach ( $ids as $id ) {
-			if ( $cats && ! has_term( $cats, 'mcm_notice_cat', $id ) ) {
+			$is_notice = 'mcm_notice' === get_post_type( $id );
+			// Category and priority belong to notices; jobs and tenders pass.
+			if ( $is_notice && $cats && ! has_term( $cats, 'mcm_notice_cat', $id ) ) {
 				continue;
 			}
 			if ( '' !== $dept && ! has_term( $dept, 'mcm_department', $id ) ) {
 				continue;
 			}
-			if ( '' !== $prio && strtolower( (string) MCM_Safe::meta( $id, 'mcm_notice_priority' ) ) !== $prio ) {
+			if ( $is_notice && '' !== $prio && strtolower( (string) MCM_Safe::meta( $id, 'mcm_notice_priority' ) ) !== $prio ) {
 				continue;
 			}
 			if ( $cutoff && self::notice_ts( $id ) < $cutoff ) {
@@ -191,7 +308,13 @@ class MCM_Notice {
 	 * @param int $id Post ID.
 	 */
 	private static function notice_ts( $id ) {
-		$d = MCM_Safe::meta( $id, 'mcm_notice_date' );
+		$keys = array(
+			'mcm_notice' => 'mcm_notice_date',
+			'mcm_job'    => 'mcm_job_publish_date',
+			'mcm_tender' => 'mcm_tender_open',
+		);
+		$type = (string) get_post_type( $id );
+		$d    = isset( $keys[ $type ] ) ? MCM_Safe::meta( $id, $keys[ $type ] ) : '';
 		if ( $d ) {
 			$t = strtotime( $d );
 			if ( $t ) {
@@ -216,7 +339,7 @@ class MCM_Notice {
 	 * @param int $id Post ID.
 	 */
 	private static function notice_link( $id ) {
-		$u = MCM_Safe::meta( $id, 'mcm_notice_url' );
+		$u = 'mcm_notice' === get_post_type( $id ) ? MCM_Safe::meta( $id, 'mcm_notice_url' ) : '';
 		return $u ? $u : get_permalink( $id );
 	}
 
@@ -226,7 +349,7 @@ class MCM_Notice {
 	 * @param int $id Post ID.
 	 */
 	private static function link_attrs( $id ) {
-		return MCM_Safe::meta( $id, 'mcm_notice_url' ) ? ' target="_blank" rel="noopener noreferrer"' : '';
+		return ( 'mcm_notice' === get_post_type( $id ) && MCM_Safe::meta( $id, 'mcm_notice_url' ) ) ? ' target="_blank" rel="noopener noreferrer"' : '';
 	}
 
 	/**
@@ -245,6 +368,9 @@ class MCM_Notice {
 	 * @param int $id Post ID.
 	 */
 	private static function priority_class( $id ) {
+		if ( 'mcm_notice' !== get_post_type( $id ) ) {
+			return ' mcm-notice--' . ( 'mcm_job' === get_post_type( $id ) ? 'job' : 'tender' );
+		}
 		$p = strtolower( (string) MCM_Safe::meta( $id, 'mcm_notice_priority' ) );
 		return $p ? ' mcm-notice--' . sanitize_html_class( $p ) : '';
 	}
@@ -255,12 +381,42 @@ class MCM_Notice {
 	 * @param int $id Post ID.
 	 */
 	private static function badge( $id ) {
+		$type = get_post_type( $id );
+		if ( 'mcm_job' === $type ) {
+			return '<span class="mcm-notice-badge mcm-notice-badge--job">' . esc_html__( 'Job', 'medical-college-manager' ) . '</span>';
+		}
+		if ( 'mcm_tender' === $type ) {
+			return '<span class="mcm-notice-badge mcm-notice-badge--tender">' . esc_html__( 'Tender', 'medical-college-manager' ) . '</span>';
+		}
 		$terms = get_the_terms( $id, 'mcm_notice_cat' );
 		if ( is_wp_error( $terms ) || empty( $terms ) ) {
 			return '';
 		}
 		$t = $terms[0];
 		return '<span class="mcm-notice-badge mcm-notice-badge--' . esc_attr( $t->slug ) . '">' . esc_html( $t->name ) . '</span>';
+	}
+
+	/**
+	 * "Last date 31 Oct" for a job or tender on the board (empty otherwise).
+	 *
+	 * @param int $id Post ID.
+	 */
+	private static function deadline_tag( $id ) {
+		$type = get_post_type( $id );
+		$ts   = 0;
+		if ( 'mcm_job' === $type && class_exists( 'MCM_Job' ) ) {
+			$dt = MCM_Job::effective_deadline( $id );
+			$ts = $dt ? $dt->getTimestamp() : 0;
+		} elseif ( 'mcm_tender' === $type ) {
+			$date = MCM_Meta::parse_date( MCM_Safe::meta( $id, 'mcm_tender_close' ) );
+			$ts   = false !== $date ? strtotime( $date . ' 00:00:00' ) : 0;
+		}
+		if ( ! $ts ) {
+			return '';
+		}
+		$when = 'mcm_job' === $type ? wp_date( 'j M', $ts ) : date_i18n( 'j M', $ts );
+		/* translators: %s: day and month, e.g. "31 Oct". */
+		return '<span class="mcm-notice-deadline">' . esc_html( sprintf( __( 'Last date %s', 'medical-college-manager' ), $when ) ) . '</span>';
 	}
 
 	/**
@@ -298,6 +454,7 @@ class MCM_Notice {
 				'more'       => 'yes',
 				'show_date'  => 'yes',
 				'show_badge' => 'yes',
+				'include'    => '',       // notice,job,tender (default: notices + Settings).
 			),
 			is_array( $atts ) ? $atts : array(),
 			'mcm_notice'
@@ -395,6 +552,7 @@ class MCM_Notice {
 			. $badge
 			. '<a class="mcm-notice-link" href="' . esc_url( self::notice_link( $id ) ) . '"' . self::link_attrs( $id ) . '>' . esc_html( get_the_title( $id ) ) . '</a>'
 			. self::new_tag( $id )
+			. self::deadline_tag( $id )
 			. $date
 			. '</li>';
 	}
@@ -435,6 +593,7 @@ class MCM_Notice {
 				. ( 'yes' === $a['show_badge'] ? self::badge( $id ) : '' )
 				. '<span class="mcm-ticker-text">' . esc_html( get_the_title( $id ) ) . '</span>'
 				. self::new_tag( $id )
+				. self::deadline_tag( $id )
 				. '</a>';
 		}
 
@@ -487,6 +646,7 @@ class MCM_Notice {
 				. ( 'yes' === $a['show_badge'] ? self::badge( $id ) : '' )
 				. ( 'yes' === $a['show_date'] ? '<span class="mcm-notice-date">' . esc_html( self::notice_date( $id ) ) . '</span>' : '' )
 				. self::new_tag( $id )
+				. self::deadline_tag( $id )
 				. '</div>'
 				. '<a class="mcm-board-item-title" href="' . esc_url( self::notice_link( $id ) ) . '"' . self::link_attrs( $id ) . '>' . esc_html( get_the_title( $id ) ) . '</a>'
 				. '</li>';

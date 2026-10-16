@@ -1167,3 +1167,16 @@ a.mcm-board-more:focus{
 @media print{
 	.mcm-badge{ border-color:#000 !important; background:#fff !important; color:#000 !important; }
 }
+
+/* Jobs and tenders on the notice ticker / board / list. */
+.mcm-notice-badge--job{ background:var(--mcm-primary, #0a6b5d); color:#fff; }
+.mcm-notice-badge--tender{ background:#5b4b8a; color:#fff; }
+.mcm-notice-deadline{
+	display:inline-block;
+	margin-left:6px;
+	font-size:12px;
+	font-weight:600;
+	color:var(--mcm-muted, #6b7280);
+	white-space:nowrap;
+}
+.mcm-ticker .mcm-notice-deadline{ margin-left:2px; }

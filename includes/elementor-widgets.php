@@ -1196,6 +1196,28 @@ class MCM_Widget_Blog extends \Elementor\Widget_Base {
 abstract class MCM_Widget_Notice_Base extends \Elementor\Widget_Base {
 
 	/**
+	 * Department options (slug => name) for the department control.
+	 *
+	 * @return array<string,string>
+	 */
+	protected static function mcm_department_options() {
+		$terms = get_terms(
+			array(
+				'taxonomy'   => 'mcm_department',
+				'hide_empty' => false,
+			)
+		);
+		if ( is_wp_error( $terms ) || empty( $terms ) ) {
+			return array();
+		}
+		$out = array();
+		foreach ( $terms as $t ) {
+			$out[ $t->slug ] = $t->name;
+		}
+		return $out;
+	}
+
+	/**
 	 * Notice Category options (slug => name) for the category control.
 	 *
 	 * @return array<string,string>
@@ -1275,6 +1297,31 @@ abstract class MCM_Widget_Notice_Base extends \Elementor\Widget_Base {
 			)
 		);
 		$this->add_control(
+			'include',
+			array(
+				'label'       => __( 'Include', 'medical-college-manager' ),
+				'description' => __( 'Leave empty to use Settings → Notice board sources. Category and priority apply to notices only.', 'medical-college-manager' ),
+				'type'        => \Elementor\Controls_Manager::SELECT2,
+				'multiple'    => true,
+				'label_block' => true,
+				'default'     => array(),
+				'options'     => array(
+					'notice' => __( 'Notices', 'medical-college-manager' ),
+					'job'    => __( 'Open jobs', 'medical-college-manager' ),
+					'tender' => __( 'Open tenders', 'medical-college-manager' ),
+				),
+			)
+		);
+		$this->add_control(
+			'department',
+			array(
+				'label'   => __( 'Department', 'medical-college-manager' ),
+				'type'    => \Elementor\Controls_Manager::SELECT,
+				'default' => '',
+				'options' => array( '' => __( 'Any', 'medical-college-manager' ) ) + self::mcm_department_options(),
+			)
+		);
+		$this->add_control(
 			'show_date',
 			array(
 				'label'        => __( 'Show date', 'medical-college-manager' ),
@@ -1303,10 +1350,14 @@ abstract class MCM_Widget_Notice_Base extends \Elementor\Widget_Base {
 		if ( is_array( $cat ) ) {
 			$cat = implode( ',', $cat );
 		}
+		$include = isset( $s['include'] ) ? $s['include'] : array();
+		$include = is_array( $include ) ? implode( ',', array_map( 'sanitize_key', $include ) ) : sanitize_key( MCM_Safe::str( $include ) );
 		return MCM_Notice::atts(
 			array(
 				'count'      => ! empty( $s['count'] ) ? (int) $s['count'] : 10,
 				'category'   => $cat,
+				'include'    => $include,
+				'department' => isset( $s['department'] ) ? sanitize_title( MCM_Safe::str( $s['department'] ) ) : '',
 				'priority'   => ! empty( $s['priority'] ) ? $s['priority'] : '',
 				'speed'      => ! empty( $s['speed'] ) ? (int) $s['speed'] : 5,
 				'label'      => ! empty( $s['label'] ) ? $s['label'] : '',
