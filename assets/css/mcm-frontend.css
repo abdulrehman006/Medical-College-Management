@@ -977,3 +977,15 @@ html:has(.mcm-hero-full){ overflow-x: clip; }
 	font-size:14px;
 	line-height:1.5;
 }
+
+/* Shown above a listing when a live filter request fails (expired page…). */
+.mcm-ajax-error{
+	box-sizing:border-box;
+	margin:0 0 12px;
+	padding:10px 14px;
+	border:1px solid #d63638;
+	border-radius:var(--mcm-radius, 8px);
+	background:#fcf0f1;
+	color:#8a2424;
+	font-size:14px;
+}

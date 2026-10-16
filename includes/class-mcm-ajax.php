@@ -37,7 +37,22 @@ class MCM_Ajax {
 
 	/** Unguarded handler; see filter(). */
 	private function handle() {
-		check_ajax_referer( 'mcm_filter', 'nonce' );
+		/*
+		 * This endpoint only READS public listings, so the nonce is a CSRF
+		 * nicety, not access control (type_allowed() is). Full-page caches can
+		 * serve a page long after its nonce expired, which used to break every
+		 * filter silently; such sites can turn the check off with
+		 * add_filter( 'mcm_ajax_require_nonce', '__return_false' ).
+		 */
+		if ( apply_filters( 'mcm_ajax_require_nonce', true ) && ! check_ajax_referer( 'mcm_filter', 'nonce', false ) ) {
+			wp_send_json_error(
+				array(
+					'code'    => 'nonce',
+					'message' => __( 'This page has expired. Please refresh the page and try again.', 'medical-college-manager' ),
+				),
+				403
+			);
+		}
 
 		// Every value below is untrusted. MCM_Safe::scalar() discards arrays and
 		// objects BEFORE any sanitize_*() call sees them: on WordPress < 6.1,
@@ -83,7 +98,13 @@ class MCM_Ajax {
 		 * users who could already read them in wp-admin.
 		 */
 		if ( ! MCM_Query::type_allowed( $type ) ) {
-			wp_send_json_error( array( 'message' => __( 'Invalid request.', 'medical-college-manager' ) ), 403 );
+			wp_send_json_error(
+				array(
+					'code'    => 'forbidden',
+					'message' => __( 'These results are not available.', 'medical-college-manager' ),
+				),
+				403
+			);
 		}
 
 		// The sort key is attacker-controlled too. Ordering by an arbitrary meta

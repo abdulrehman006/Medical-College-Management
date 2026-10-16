@@ -35,6 +35,13 @@ class MCM_Assets {
 			array(
 				'ajaxurl' => admin_url( 'admin-ajax.php' ),
 				'nonce'   => wp_create_nonce( 'mcm_filter' ),
+				'i18n'    => array(
+					'loadError' => __( 'Could not load results. Please refresh the page and try again.', 'medical-college-manager' ),
+					'generated' => __( 'Generated', 'medical-college-manager' ),
+					'search'    => __( 'Search:', 'medical-college-manager' ),
+					'entry'     => __( 'entry', 'medical-college-manager' ),
+					'entries'   => __( 'entries', 'medical-college-manager' ),
+				),
 			)
 		);
 

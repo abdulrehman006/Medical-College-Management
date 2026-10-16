@@ -20,6 +20,32 @@
 		return taxes;
 	}
 
+	function i18n( key, fallback ) {
+		return ( window.MCM && MCM.i18n && MCM.i18n[ key ] ) || fallback;
+	}
+
+	// The server's message when it sent one (expired page, refused type),
+	// otherwise the generic "please refresh" text.
+	function errorMessage( resp, xhr ) {
+		var data = ( resp && resp.data ) || ( xhr && xhr.responseJSON && xhr.responseJSON.data ) || null;
+		return ( data && data.message ) || i18n( 'loadError', 'Could not load results. Please refresh the page and try again.' );
+	}
+
+	// One message slot per block, above the results. The current results stay
+	// visible underneath, so a failed refresh never blanks the list.
+	function showError( $wrap, text ) {
+		var $res = $wrap.find( '.mcm-results' ).first();
+		var $msg = $wrap.find( '.mcm-ajax-error' ).first();
+		if ( ! $msg.length ) {
+			$msg = $( '<p class="mcm-ajax-error" role="alert"></p>' ).insertBefore( $res );
+		}
+		$msg.text( text ).show();
+	}
+
+	function clearError( $wrap ) {
+		$wrap.find( '.mcm-ajax-error' ).hide().text( '' );
+	}
+
 	function run( $wrap ) {
 		var config = $wrap.data( 'config' ) || {};
 		var search = $wrap.find( '.mcm-search' ).val() || '';
@@ -35,9 +61,14 @@
 			taxes:  JSON.stringify( taxes ),
 			search: search
 		} ).done( function ( resp ) {
-			if ( resp && resp.success ) {
+			if ( resp && resp.success && resp.data && 'string' === typeof resp.data.html ) {
+				clearError( $wrap );
 				$res.html( resp.data.html );
+			} else {
+				showError( $wrap, errorMessage( resp, null ) );
 			}
+		} ).fail( function ( xhr ) {
+			showError( $wrap, errorMessage( null, xhr ) );
 		} ).always( function () {
 			$res.removeClass( 'mcm-loading' ).attr( 'aria-busy', 'false' );
 		} );
@@ -72,7 +103,7 @@
 		var $foot = $wrap.find( '.mcm-print-foot' ).first().clone();
 		if ( $foot.length ) {
 			$foot.find( '.mcm-print-gen' ).text(
-				'Generated ' + new Date().toLocaleString()
+				i18n( 'generated', 'Generated' ) + ' ' + new Date().toLocaleString()
 			);
 			$foot.css( 'display', 'block' );
 			$area.append( $foot );
@@ -109,7 +140,7 @@
 
 		var s = ( $wrap.find( '.mcm-search' ).val() || '' ).replace( /^\s+|\s+$/g, '' );
 		if ( s ) {
-			parts.push( 'Search: ' + s );
+			parts.push( i18n( 'search', 'Search:' ) + ' ' + s );
 		}
 
 		$wrap.find( '.mcm-filter-tax' ).each( function () {
@@ -145,7 +176,7 @@
 			$meta.find( '.mcm-print-filters' ).text( parts.join( '   •   ' ) );
 		}
 		$meta.find( '.mcm-print-sub' ).text(
-			count + ( count === 1 ? ' entry' : ' entries' ) + '   •   ' + new Date().toLocaleDateString()
+			count + ' ' + ( count === 1 ? i18n( 'entry', 'entry' ) : i18n( 'entries', 'entries' ) ) + '   •   ' + new Date().toLocaleDateString()
 		);
 	}
 
