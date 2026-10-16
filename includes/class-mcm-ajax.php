@@ -16,7 +16,27 @@ class MCM_Ajax {
 		add_action( 'wp_ajax_nopriv_mcm_filter', array( $this, 'filter' ) );
 	}
 
+	/**
+	 * AJAX entry point. Render boundary: any failure becomes a JSON error the
+	 * front end can show ("please refresh"), never a PHP error page.
+	 */
 	public function filter() {
+		try {
+			$this->handle();
+		} catch ( \Throwable $e ) {
+			MCM_Health::report( 'AJAX filter', $e );
+			wp_send_json_error(
+				array(
+					'code'    => 'error',
+					'message' => __( 'Could not load results. Please refresh the page and try again.', 'medical-college-manager' ),
+				),
+				500
+			);
+		}
+	}
+
+	/** Unguarded handler; see filter(). */
+	private function handle() {
 		check_ajax_referer( 'mcm_filter', 'nonce' );
 
 		$config = isset( $_POST['config'] ) ? json_decode( wp_unslash( $_POST['config'] ), true ) : array(); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput

@@ -47,6 +47,22 @@ class MCM_Blog {
 	 * @return string
 	 */
 	public static function render( $atts ) {
+		return MCM_Safe::render(
+			function () use ( $atts ) {
+				return MCM_Blog::build( $atts );
+			},
+			'blog list'
+		);
+	}
+
+	/**
+	 * Unguarded builder; call render() instead.
+	 *
+	 * @internal
+	 * @param array $atts Attributes.
+	 * @return string
+	 */
+	public static function build( $atts ) {
 		MCM_Assets::need();
 		$a = wp_parse_args( $atts, self::defaults() );
 

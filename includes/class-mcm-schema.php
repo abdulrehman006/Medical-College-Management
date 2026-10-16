@@ -26,31 +26,45 @@ class MCM_Schema {
 
 	/** Print the JSON-LD block for the current single page. */
 	public function output() {
+		// Render boundary: structured data must never break the <head>.
+		echo MCM_Safe::render( array( $this, 'build_output' ), 'schema.org JSON-LD' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Built and encoded in build_output().
+	}
+
+	/**
+	 * The JSON-LD block for the current single page, or ''.
+	 *
+	 * @internal
+	 * @return string
+	 */
+	public function build_output() {
 		if ( ! is_singular() ) {
-			return;
+			return '';
 		}
 
-		$id   = get_the_ID();
-		$type = get_post_type( $id );
+		// The queried object, not the loop global: wp_head runs before the loop.
+		$id   = (int) get_queried_object_id();
+		$type = $id ? get_post_type( $id ) : '';
 
 		// Never describe a private type, and never publish student data.
-		if ( ! is_post_type_viewable( $type ) || 'mcm_student' === $type ) {
-			return;
+		if ( ! $type || ! is_post_type_viewable( $type ) || 'mcm_student' === $type ) {
+			return '';
 		}
 
 		$data = $this->build( $id, $type );
 		if ( empty( $data ) ) {
-			return;
+			return '';
 		}
 
 		$data = apply_filters( 'mcm_schema_data', $data, $id, $type );
+		$json = wp_json_encode( $data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP );
+		if ( ! is_string( $json ) ) {
+			return '';
+		}
 
-		echo '<script type="application/ld+json">'
-			// JSON_HEX_TAG|JSON_HEX_AMP so a literal </script> in any value can
-			// never break out of the script element (defence in depth — values
-			// are already tag-stripped upstream).
-			. wp_json_encode( $data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP )
-			. '</script>' . "\n";
+		// JSON_HEX_TAG|JSON_HEX_AMP so a literal </script> in any value can
+		// never break out of the script element (defence in depth — values
+		// are already tag-stripped upstream).
+		return '<script type="application/ld+json">' . $json . '</script>' . "\n";
 	}
 
 	/**

@@ -237,6 +237,22 @@ class MCM_Notice {
 	}
 
 	public static function render_list( $a ) {
+		return MCM_Safe::render(
+			function () use ( $a ) {
+				return MCM_Notice::build_list( $a );
+			},
+			'notice list'
+		);
+	}
+
+	/**
+	 * Unguarded builder; call render_list() instead.
+	 *
+	 * @internal
+	 * @param array $a Attributes.
+	 * @return string
+	 */
+	public static function build_list( $a ) {
 		MCM_Assets::need();
 		$ids = self::feed_for( $a );
 		if ( empty( $ids ) ) {
@@ -263,6 +279,22 @@ class MCM_Notice {
 	}
 
 	public static function render_ticker( $a ) {
+		return MCM_Safe::render(
+			function () use ( $a ) {
+				return MCM_Notice::build_ticker( $a );
+			},
+			'notice ticker'
+		);
+	}
+
+	/**
+	 * Unguarded builder; call render_ticker() instead.
+	 *
+	 * @internal
+	 * @param array $a Attributes.
+	 * @return string
+	 */
+	public static function build_ticker( $a ) {
 		MCM_Assets::need();
 		$ids = self::feed_for( $a );
 		if ( empty( $ids ) ) {
@@ -293,6 +325,22 @@ class MCM_Notice {
 	}
 
 	public static function render_board( $a ) {
+		return MCM_Safe::render(
+			function () use ( $a ) {
+				return MCM_Notice::build_board( $a );
+			},
+			'notice board'
+		);
+	}
+
+	/**
+	 * Unguarded builder; call render_board() instead.
+	 *
+	 * @internal
+	 * @param array $a Attributes.
+	 * @return string
+	 */
+	public static function build_board( $a ) {
 		MCM_Assets::need();
 		$ids = self::feed_for( $a );
 		if ( empty( $ids ) ) {

@@ -63,6 +63,22 @@ class MCM_Templates {
 	 * provides its own specific template (which always wins).
 	 */
 	public function archive_template( $template ) {
+		// Boundary: if building the archive context fails, the theme's own
+		// template is used instead — the page still renders.
+		// run(), not render(): the value is a file path, so no notice markup
+		// may ever be appended to it.
+		$chosen = MCM_Safe::run( array( $this, 'choose_archive_template' ), 'archive template', array( $template ), $template );
+		return is_string( $chosen ) && '' !== $chosen ? $chosen : $template;
+	}
+
+	/**
+	 * Unguarded template choice; see archive_template().
+	 *
+	 * @internal
+	 * @param string $template Template path chosen by WordPress.
+	 * @return string
+	 */
+	public function choose_archive_template( $template ) {
 		if ( is_admin() || is_feed() ) {
 			return $template;
 		}
@@ -304,6 +320,18 @@ class MCM_Templates {
 	 * content of a single MCM post on its own URL.
 	 */
 	public function single_meta( $content ) {
+		// Boundary: on failure the post content is returned untouched.
+		return MCM_Safe::render( array( $this, 'build_single_meta' ), 'single page details', array( $content ), $content );
+	}
+
+	/**
+	 * Unguarded single-page additions; see single_meta().
+	 *
+	 * @internal
+	 * @param string $content Post content.
+	 * @return string
+	 */
+	public function build_single_meta( $content ) {
 		if ( is_admin() || is_feed() || ! is_singular() || ! is_main_query() || ! in_the_loop() ) {
 			return $content;
 		}

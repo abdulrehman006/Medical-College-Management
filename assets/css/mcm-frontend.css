@@ -963,3 +963,17 @@ html:has(.mcm-hero-full){ overflow-x: clip; }
 	margin:0 0 14px; padding-bottom:8px;
 	border-bottom:2px solid var(--mcm-primary, #0a6b5d);
 }
+
+/* Shown only to administrators in place of a block that failed to render. */
+.mcm-error-box{
+	box-sizing:border-box;
+	margin:12px 0;
+	padding:10px 14px;
+	border:1px solid #d63638;
+	border-left-width:4px;
+	border-radius:4px;
+	background:#fcf0f1;
+	color:#50575e;
+	font-size:14px;
+	line-height:1.5;
+}

@@ -433,19 +433,19 @@ class MCM_TermMeta {
 	/** [mcm_department_hero department="anatomy"] — video or image banner. */
 	public function sc_hero( $atts ) {
 		$term = self::resolve_term( is_array( $atts ) ? $atts : array() );
-		return $term ? self::hero_html( $term ) : '';
+		return $term ? MCM_Safe::render( array( __CLASS__, 'hero_html' ), 'shortcode mcm_department_hero', array( $term ) ) : '';
 	}
 
 	/** [mcm_department_message department="anatomy"] — the HOD message card. */
 	public function sc_message( $atts ) {
 		$term = self::resolve_term( is_array( $atts ) ? $atts : array() );
-		return $term ? self::message_html( $term ) : '';
+		return $term ? MCM_Safe::render( array( __CLASS__, 'message_html' ), 'shortcode mcm_department_message', array( $term ) ) : '';
 	}
 
 	/** [mcm_department_intro department="anatomy"] — hero + message together. */
 	public function sc_intro( $atts ) {
 		$term = self::resolve_term( is_array( $atts ) ? $atts : array() );
-		return $term ? self::term_intro( $term ) : '';
+		return $term ? MCM_Safe::render( array( __CLASS__, 'term_intro' ), 'shortcode mcm_department_intro', array( $term ) ) : '';
 	}
 
 	/**
@@ -456,6 +456,6 @@ class MCM_TermMeta {
 	 */
 	public function sc_sections( $atts ) {
 		$term = self::resolve_term( is_array( $atts ) ? $atts : array() );
-		return $term ? MCM_Templates::term_sections_html( $term ) : '';
+		return $term ? MCM_Safe::render( array( 'MCM_Templates', 'term_sections_html' ), 'shortcode mcm_department_sections', array( $term ) ) : '';
 	}
 }

@@ -57,8 +57,29 @@ class MCM_Shortcodes {
 	/**
 	 * Build one self-contained, AJAX-filterable block for the given attributes.
 	 * Public + static so archive templates can render blocks directly.
+	 *
+	 * Every listing on the site (shortcodes, Elementor widgets, archive and
+	 * department pages, program pages) comes through here, so this is the
+	 * render boundary: a failure becomes an empty block, never a broken page.
 	 */
 	public static function render_block( $atts ) {
+		$type = ( is_array( $atts ) && isset( $atts['type'] ) ) ? MCM_Safe::str( $atts['type'] ) : '';
+		return MCM_Safe::render(
+			function () use ( $atts ) {
+				return MCM_Shortcodes::build_block( $atts );
+			},
+			'listing ' . $type
+		);
+	}
+
+	/**
+	 * The unguarded block builder. Call render_block() instead.
+	 *
+	 * @internal
+	 * @param array $atts Attributes.
+	 * @return string
+	 */
+	public static function build_block( $atts ) {
 		// Backstop: whatever rendered this block (shortcode, Elementor widget,
 		// archive template) now needs the CSS/JS, even if detection missed it.
 		MCM_Assets::need();
@@ -274,7 +295,12 @@ class MCM_Shortcodes {
 		if ( ! $id ) {
 			return '';
 		}
-		MCM_Assets::need();
-		return '<div class="mcm-wrap">' . MCM_Query::single( $id ) . '</div>';
+		return MCM_Safe::render(
+			function () use ( $id ) {
+				MCM_Assets::need();
+				return '<div class="mcm-wrap">' . MCM_Query::single( $id ) . '</div>';
+			},
+			'shortcode mcm_single'
+		);
 	}
 }

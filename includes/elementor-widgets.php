@@ -356,7 +356,23 @@ abstract class MCM_Elementor_Widget_Base extends \Elementor\Widget_Base {
 		return $out;
 	}
 
+	/**
+	 * Render boundary: a failing widget renders nothing for visitors (and a
+	 * short notice for administrators) instead of breaking the page.
+	 */
 	protected function render() {
+		echo MCM_Safe::render( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Built and escaped by mcm_output().
+			function () {
+				ob_start();
+				$this->mcm_output();
+				return ob_get_clean();
+			},
+			'Elementor widget ' . $this->get_name()
+		);
+	}
+
+	/** Unguarded widget output; see render(). */
+	protected function mcm_output() {
 		$s    = $this->get_settings_for_display();
 		$type = $this->mcm_type();
 		$view = in_array( isset( $s['view'] ) ? $s['view'] : '', array( 'grid', 'list', 'table', 'directory', 'citation' ), true ) ? $s['view'] : $this->mcm_default_view();
@@ -740,7 +756,23 @@ class MCM_Widget_Blog extends \Elementor\Widget_Base {
 		return $out;
 	}
 
+	/**
+	 * Render boundary: a failing widget renders nothing for visitors (and a
+	 * short notice for administrators) instead of breaking the page.
+	 */
 	protected function render() {
+		echo MCM_Safe::render( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Built and escaped by mcm_output().
+			function () {
+				ob_start();
+				$this->mcm_output();
+				return ob_get_clean();
+			},
+			'Elementor widget ' . $this->get_name()
+		);
+	}
+
+	/** Unguarded widget output; see render(). */
+	protected function mcm_output() {
 		$s   = $this->get_settings_for_display();
 		$cat = isset( $s['category'] ) ? $s['category'] : '';
 		if ( is_array( $cat ) ) {
@@ -905,7 +937,23 @@ class MCM_Widget_Notice_Ticker extends MCM_Widget_Notice_Base {
 		);
 		$this->end_controls_section();
 	}
+	/**
+	 * Render boundary: a failing widget renders nothing for visitors (and a
+	 * short notice for administrators) instead of breaking the page.
+	 */
 	protected function render() {
+		echo MCM_Safe::render( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Built and escaped by mcm_output().
+			function () {
+				ob_start();
+				$this->mcm_output();
+				return ob_get_clean();
+			},
+			'Elementor widget ' . $this->get_name()
+		);
+	}
+
+	/** Unguarded widget output; see render(). */
+	protected function mcm_output() {
 		echo MCM_Notice::render_ticker( $this->mcm_atts() ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 }
@@ -965,7 +1013,23 @@ class MCM_Widget_Notice_Board extends MCM_Widget_Notice_Base {
 		);
 		$this->end_controls_section();
 	}
+	/**
+	 * Render boundary: a failing widget renders nothing for visitors (and a
+	 * short notice for administrators) instead of breaking the page.
+	 */
 	protected function render() {
+		echo MCM_Safe::render( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Built and escaped by mcm_output().
+			function () {
+				ob_start();
+				$this->mcm_output();
+				return ob_get_clean();
+			},
+			'Elementor widget ' . $this->get_name()
+		);
+	}
+
+	/** Unguarded widget output; see render(). */
+	protected function mcm_output() {
 		echo MCM_Notice::render_board( $this->mcm_atts() ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 }
@@ -988,7 +1052,23 @@ class MCM_Widget_Notices extends MCM_Widget_Notice_Base {
 		$this->mcm_common_controls();
 		$this->end_controls_section();
 	}
+	/**
+	 * Render boundary: a failing widget renders nothing for visitors (and a
+	 * short notice for administrators) instead of breaking the page.
+	 */
 	protected function render() {
+		echo MCM_Safe::render( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Built and escaped by mcm_output().
+			function () {
+				ob_start();
+				$this->mcm_output();
+				return ob_get_clean();
+			},
+			'Elementor widget ' . $this->get_name()
+		);
+	}
+
+	/** Unguarded widget output; see render(). */
+	protected function mcm_output() {
 		echo MCM_Notice::render_list( $this->mcm_atts() ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 }

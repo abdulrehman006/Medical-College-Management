@@ -39,6 +39,213 @@ class MCM_Health {
 	public static function init() {
 		add_action( 'admin_notices', array( __CLASS__, 'admin_notices' ) );
 		add_action( 'admin_post_mcm_health_dismiss', array( __CLASS__, 'handle_dismiss' ) );
+		add_action( 'admin_post_mcm_health_clear', array( __CLASS__, 'handle_clear' ) );
+		add_filter( 'site_status_tests', array( __CLASS__, 'register_tests' ) );
+		add_filter( 'debug_information', array( __CLASS__, 'debug_information' ) );
+	}
+
+	/* ----------------------------------------------------------------- *
+	 *  Site Health
+	 * ----------------------------------------------------------------- */
+
+	/**
+	 * Register the plugin's Site Health tests.
+	 *
+	 * @param array $tests Registered tests.
+	 * @return array
+	 */
+	public static function register_tests( $tests ) {
+		$own = array(
+			'mcm_php'        => __( 'Medical College Manager: PHP version', 'medical-college-manager' ),
+			'mcm_wp'         => __( 'Medical College Manager: WordPress version', 'medical-college-manager' ),
+			'mcm_elementor'  => __( 'Medical College Manager: Elementor', 'medical-college-manager' ),
+			'mcm_errors'     => __( 'Medical College Manager: recent errors', 'medical-college-manager' ),
+			'mcm_timezone'   => __( 'Medical College Manager: site timezone', 'medical-college-manager' ),
+			'mcm_permalinks' => __( 'Medical College Manager: permalinks', 'medical-college-manager' ),
+		);
+		foreach ( $own as $key => $label ) {
+			$tests['direct'][ $key ] = array(
+				'label' => $label,
+				'test'  => array( __CLASS__, 'test_' . substr( $key, 4 ) ),
+			);
+		}
+		return $tests;
+	}
+
+	/**
+	 * One Site Health result in the shape WordPress expects.
+	 *
+	 * @param string $test        Test id.
+	 * @param string $status      good | recommended | critical.
+	 * @param string $label       Headline.
+	 * @param string $description Plain-text explanation.
+	 * @param string $extra_html  Optional, already-escaped HTML appended to the description.
+	 * @return array
+	 */
+	private static function result( $test, $status, $label, $description, $extra_html = '' ) {
+		return array(
+			'label'       => $label,
+			'status'      => $status,
+			'badge'       => array(
+				'label' => __( 'Medical College Manager', 'medical-college-manager' ),
+				'color' => 'good' === $status ? 'blue' : ( 'critical' === $status ? 'red' : 'orange' ),
+			),
+			'description' => '<p>' . esc_html( $description ) . '</p>' . $extra_html,
+			'actions'     => '',
+			'test'        => $test,
+		);
+	}
+
+	/** @return array */
+	public static function test_php() {
+		if ( version_compare( PHP_VERSION, '7.4', '>=' ) ) {
+			/* translators: %s: PHP version. */
+			return self::result( 'mcm_php', 'good', __( 'PHP version is supported', 'medical-college-manager' ), sprintf( __( 'This server runs PHP %s.', 'medical-college-manager' ), PHP_VERSION ) );
+		}
+		return self::result(
+			'mcm_php',
+			'recommended',
+			__( 'PHP is old', 'medical-college-manager' ),
+			/* translators: %s: PHP version. */
+			sprintf( __( 'This server runs PHP %s, which no longer receives security fixes. The plugin works, but ask your host to move to PHP 8.1 or newer.', 'medical-college-manager' ), PHP_VERSION )
+		);
+	}
+
+	/** @return array */
+	public static function test_wp() {
+		$wp = isset( $GLOBALS['wp_version'] ) ? (string) $GLOBALS['wp_version'] : '';
+		/* translators: %s: WordPress version. */
+		return self::result( 'mcm_wp', 'good', __( 'WordPress version is supported', 'medical-college-manager' ), sprintf( __( 'This site runs WordPress %s.', 'medical-college-manager' ), $wp ) );
+	}
+
+	/** @return array */
+	public static function test_elementor() {
+		if ( ! defined( 'ELEMENTOR_VERSION' ) ) {
+			return self::result( 'mcm_elementor', 'good', __( 'Elementor is not active', 'medical-college-manager' ), __( 'The Medical College widgets need Elementor; every shortcode works without it.', 'medical-college-manager' ) );
+		}
+		$min = defined( 'MCM_MIN_ELEMENTOR' ) ? MCM_MIN_ELEMENTOR : '3.5.0';
+		if ( version_compare( ELEMENTOR_VERSION, $min, '<' ) ) {
+			return self::result(
+				'mcm_elementor',
+				'recommended',
+				__( 'Elementor is too old for the Medical College widgets', 'medical-college-manager' ),
+				/* translators: 1: installed Elementor version, 2: required version. */
+				sprintf( __( 'Elementor %1$s is installed; the widgets need %2$s or newer and have been switched off. Shortcodes keep working. Update Elementor to use the widgets.', 'medical-college-manager' ), ELEMENTOR_VERSION, $min )
+			);
+		}
+		/* translators: %s: Elementor version. */
+		return self::result( 'mcm_elementor', 'good', __( 'Elementor is compatible', 'medical-college-manager' ), sprintf( __( 'Elementor %s is active; the Medical College widgets are available.', 'medical-college-manager' ), ELEMENTOR_VERSION ) );
+	}
+
+	/** @return array */
+	public static function test_errors() {
+		$recent = self::recent_errors( 7 );
+		if ( ! $recent && ! self::$disabled ) {
+			return self::result( 'mcm_errors', 'good', __( 'No plugin errors in the last 7 days', 'medical-college-manager' ), __( 'Medical College Manager has not caught any problems recently.', 'medical-college-manager' ) );
+		}
+
+		$items = '';
+		foreach ( array_slice( $recent, 0, 10 ) as $err ) {
+			$items .= '<li><code>' . esc_html( isset( $err['context'] ) ? (string) $err['context'] : '' ) . '</code> &mdash; '
+				. esc_html( isset( $err['message'] ) ? (string) $err['message'] : '' )
+				. ' <span style="color:#646970;">(' . esc_html( isset( $err['file'] ) ? (string) $err['file'] : '' ) . ', '
+				. esc_html( wp_date( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), isset( $err['time'] ) ? (int) $err['time'] : 0 ) )
+				. ( ! empty( $err['count'] ) && (int) $err['count'] > 1 ? ' &times;' . (int) $err['count'] : '' )
+				. ')</span></li>';
+		}
+		foreach ( self::$disabled as $module => $why ) {
+			$items .= '<li><strong>' . esc_html__( 'Switched off:', 'medical-college-manager' ) . '</strong> <code>' . esc_html( $module ) . '</code> &mdash; ' . esc_html( $why ) . '</li>';
+		}
+		$clear = wp_nonce_url( admin_url( 'admin-post.php?action=mcm_health_clear' ), 'mcm_health_clear' );
+
+		return self::result(
+			'mcm_errors',
+			'recommended',
+			__( 'Medical College Manager caught errors recently', 'medical-college-manager' ),
+			__( 'These problems were caught and contained: visitors saw an empty block instead of a broken page. Share this list with your developer.', 'medical-college-manager' ),
+			'<ul style="list-style:disc;padding-left:20px;">' . $items . '</ul><p><a class="button" href="' . esc_url( $clear ) . '">' . esc_html__( 'Clear the error log', 'medical-college-manager' ) . '</a></p>'
+		);
+	}
+
+	/** @return array */
+	public static function test_timezone() {
+		$tz     = (string) get_option( 'timezone_string' );
+		$offset = (float) get_option( 'gmt_offset' );
+		if ( '' !== $tz || 0.0 !== $offset ) {
+			$name = function_exists( 'wp_timezone_string' ) ? wp_timezone_string() : $tz;
+			/* translators: %s: timezone name or offset. */
+			return self::result( 'mcm_timezone', 'good', __( 'Site timezone is set', 'medical-college-manager' ), sprintf( __( 'Deadlines and expiry dates are evaluated in %s.', 'medical-college-manager' ), $name ) );
+		}
+		return self::result(
+			'mcm_timezone',
+			'recommended',
+			__( 'Site timezone is UTC', 'medical-college-manager' ),
+			__( 'Tender, notice and other deadlines are checked in the site timezone, which is still UTC. Set your city (e.g. Karachi) in Settings → General so items close at local midnight.', 'medical-college-manager' )
+		);
+	}
+
+	/** @return array */
+	public static function test_permalinks() {
+		if ( '' !== (string) get_option( 'permalink_structure' ) ) {
+			return self::result( 'mcm_permalinks', 'good', __( 'Pretty permalinks are on', 'medical-college-manager' ), __( 'Archive pages such as /events/ and /department/anatomy/ work.', 'medical-college-manager' ) );
+		}
+		return self::result(
+			'mcm_permalinks',
+			'recommended',
+			__( 'Permalinks are set to "Plain"', 'medical-college-manager' ),
+			__( 'Archive and department page addresses (e.g. /events/) need pretty permalinks. Choose "Post name" in Settings → Permalinks.', 'medical-college-manager' )
+		);
+	}
+
+	/**
+	 * Debug info section (Tools → Site Health → Info).
+	 *
+	 * @param array $info Sections.
+	 * @return array
+	 */
+	public static function debug_information( $info ) {
+		$disabled = array();
+		foreach ( self::$disabled as $module => $why ) {
+			$disabled[] = $module . ' (' . $why . ')';
+		}
+		$info['medical-college-manager'] = array(
+			'label'  => __( 'Medical College Manager', 'medical-college-manager' ),
+			'fields' => array(
+				'version'   => array(
+					'label' => __( 'Version', 'medical-college-manager' ),
+					'value' => defined( 'MCM_VERSION' ) ? MCM_VERSION : '',
+				),
+				'active'    => array(
+					'label' => __( 'Active modules', 'medical-college-manager' ),
+					'value' => self::$active ? implode( ', ', self::$active ) : __( 'None', 'medical-college-manager' ),
+				),
+				'disabled'  => array(
+					'label' => __( 'Disabled modules', 'medical-college-manager' ),
+					'value' => $disabled ? implode( '; ', $disabled ) : __( 'None', 'medical-college-manager' ),
+				),
+				'errors'    => array(
+					'label' => __( 'Errors logged (last 7 days)', 'medical-college-manager' ),
+					'value' => (string) count( self::recent_errors( 7 ) ),
+				),
+				'elementor' => array(
+					'label' => __( 'Elementor version', 'medical-college-manager' ),
+					'value' => defined( 'ELEMENTOR_VERSION' ) ? ELEMENTOR_VERSION : __( 'Not active', 'medical-college-manager' ),
+				),
+			),
+		);
+		return $info;
+	}
+
+	/** Clear the error log (Site Health button). */
+	public static function handle_clear() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( 'You are not allowed to do that.', 'medical-college-manager' ), '', array( 'response' => 403 ) );
+		}
+		check_admin_referer( 'mcm_health_clear' );
+		delete_option( self::LOG_OPTION );
+		delete_transient( self::ALERT );
+		wp_safe_redirect( admin_url( 'site-health.php' ) );
+		exit;
 	}
 
 	/** @param string $name Module that booted. */

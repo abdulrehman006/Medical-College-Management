@@ -128,6 +128,16 @@ class MCM_Social {
 	 * @return string
 	 */
 	public function render_bar() {
+		return MCM_Safe::render( array( $this, 'build_bar' ), 'social bar' );
+	}
+
+	/**
+	 * Unguarded builder; call render_bar() instead.
+	 *
+	 * @internal
+	 * @return string
+	 */
+	public function build_bar() {
 		MCM_Assets::need();
 		$s     = self::get();
 		$items = '';
