@@ -1,6 +1,6 @@
 <?php
 /**
- * schema.org structured data for single pages.
+ * Structured data (schema.org JSON-LD) for single pages.
  *
  * The review asked for SEO improvement. Titles and descriptions are an SEO
  * plugin's job, but nothing else can describe *what* these pages are — only
@@ -18,8 +18,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * Structured data (schema.org JSON-LD) for single pages.
+ */
 class MCM_Schema {
 
+	/**
+	 * Register the hooks this module needs.
+	 */
 	public function __construct() {
 		add_action( 'wp_head', array( $this, 'output' ), 20 );
 	}
@@ -243,7 +249,12 @@ class MCM_Schema {
 		return array();
 	}
 
-	/** First term name for a taxonomy, or '' (uses the primed term cache). */
+	/**
+	 * First term name for a taxonomy, or '' (uses the primed term cache).
+	 *
+	 * @param int    $id Post ID.
+	 * @param string $tax Taxonomy name.
+	 */
 	private static function first_term( $id, $tax ) {
 		$names = MCM_Query::cached_term_names( $id, $tax );
 		return $names ? $names[0] : '';

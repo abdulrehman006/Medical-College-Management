@@ -10,8 +10,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * Default ordering for publications (newest year first).
+ */
 class MCM_Publication {
 
+	/**
+	 * Register the hooks this module needs.
+	 */
 	public function __construct() {
 		add_filter( 'mcm_query_args', array( $this, 'order_by_year' ), 10, 2 );
 	}

@@ -15,6 +15,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * Error log, admin notices and Site Health integration.
+ */
 class MCM_Health {
 
 	/** Option holding the last errors (not autoloaded). */
@@ -26,13 +29,25 @@ class MCM_Health {
 	/** Number of errors kept. */
 	const MAX_ERRORS = 20;
 
-	/** @var string[] Modules that booted. */
+	/**
+	 * Modules that booted.
+	 *
+	 * @var string[]
+	 */
 	private static $active = array();
 
-	/** @var array<string,string> Modules that failed => reason. */
+	/**
+	 * Modules that failed, with the reason.
+	 *
+	 * @var array<string,string>
+	 */
 	private static $disabled = array();
 
-	/** @var bool Re-entrancy guard: reporting must never recurse. */
+	/**
+	 * Re-entrancy guard: reporting must never recurse.
+	 *
+	 * @var bool
+	 */
 	private static $reporting = false;
 
 	/** Register the admin-facing hooks. Called once from the bootstrap. */
@@ -45,9 +60,10 @@ class MCM_Health {
 	}
 
 	/*
-	----------------------------------------------------------------- *
-	 *  Site Health
-	 * ----------------------------------------------------------------- */
+	 * ----------------------------------------------------------------
+	 * Site Health
+	 * ----------------------------------------------------------------
+	 */
 
 	/**
 	 * Register the plugin's Site Health tests.
@@ -97,7 +113,11 @@ class MCM_Health {
 		);
 	}
 
-	/** @return array */
+	/**
+	 * Site Health test: PHP version.
+	 *
+	 * @return array
+	 */
 	public static function test_php() {
 		if ( version_compare( PHP_VERSION, '7.4', '>=' ) ) {
 			/* translators: %s: PHP version. */
@@ -112,14 +132,22 @@ class MCM_Health {
 		);
 	}
 
-	/** @return array */
+	/**
+	 * Site Health test: WordPress version.
+	 *
+	 * @return array
+	 */
 	public static function test_wp() {
 		$wp = isset( $GLOBALS['wp_version'] ) ? (string) $GLOBALS['wp_version'] : '';
 		/* translators: %s: WordPress version. */
 		return self::result( 'mcm_wp', 'good', __( 'WordPress version is supported', 'medical-college-manager' ), sprintf( __( 'This site runs WordPress %s.', 'medical-college-manager' ), $wp ) );
 	}
 
-	/** @return array */
+	/**
+	 * Site Health test: Elementor presence and version.
+	 *
+	 * @return array
+	 */
 	public static function test_elementor() {
 		if ( ! defined( 'ELEMENTOR_VERSION' ) ) {
 			return self::result( 'mcm_elementor', 'good', __( 'Elementor is not active', 'medical-college-manager' ), __( 'The Medical College widgets need Elementor; every shortcode works without it.', 'medical-college-manager' ) );
@@ -138,7 +166,11 @@ class MCM_Health {
 		return self::result( 'mcm_elementor', 'good', __( 'Elementor is compatible', 'medical-college-manager' ), sprintf( __( 'Elementor %s is active; the Medical College widgets are available.', 'medical-college-manager' ), ELEMENTOR_VERSION ) );
 	}
 
-	/** @return array */
+	/**
+	 * Site Health test: errors caught in the last 7 days.
+	 *
+	 * @return array
+	 */
 	public static function test_errors() {
 		$recent = self::recent_errors( 7 );
 		if ( ! $recent && ! self::$disabled ) {
@@ -168,7 +200,11 @@ class MCM_Health {
 		);
 	}
 
-	/** @return array */
+	/**
+	 * Site Health test: the site timezone is set.
+	 *
+	 * @return array
+	 */
 	public static function test_timezone() {
 		$tz     = (string) get_option( 'timezone_string' );
 		$offset = (float) get_option( 'gmt_offset' );
@@ -185,7 +221,11 @@ class MCM_Health {
 		);
 	}
 
-	/** @return array */
+	/**
+	 * Site Health test: permalinks are not Plain.
+	 *
+	 * @return array
+	 */
 	public static function test_permalinks() {
 		if ( '' !== (string) get_option( 'permalink_structure' ) ) {
 			return self::result( 'mcm_permalinks', 'good', __( 'Pretty permalinks are on', 'medical-college-manager' ), __( 'Archive pages such as /events/ and /department/anatomy/ work.', 'medical-college-manager' ) );
@@ -249,7 +289,11 @@ class MCM_Health {
 		exit;
 	}
 
-	/** @param string $name Module that booted. */
+	/**
+	 * Record a module that booted.
+	 *
+	 * @param string $name Module class name.
+	 */
 	public static function module_ok( $name ) {
 		self::$active[] = (string) $name;
 	}
@@ -265,12 +309,20 @@ class MCM_Health {
 		self::report( 'module ' . $name, $e );
 	}
 
-	/** @return string[] */
+	/**
+	 * Modules that booted.
+	 *
+	 * @return string[]
+	 */
 	public static function active_modules() {
 		return self::$active;
 	}
 
-	/** @return array<string,string> */
+	/**
+	 * Modules that failed, with the reason.
+	 *
+	 * @return array<string,string>
+	 */
 	public static function disabled_modules() {
 		return self::$disabled;
 	}
@@ -328,7 +380,11 @@ class MCM_Health {
 		self::$reporting = false;
 	}
 
-	/** @return array[] Logged errors, newest first. */
+	/**
+	 * Logged errors.
+	 *
+	 * @return array[] Newest first.
+	 */
 	public static function errors() {
 		$log = get_option( self::LOG_OPTION, array() );
 		return is_array( $log ) ? $log : array();
@@ -351,7 +407,11 @@ class MCM_Health {
 		return $out;
 	}
 
-	/** Path relative to the plugin, so the log never shows server layout. */
+	/**
+	 * Path relative to the plugin, so the log never shows server layout.
+	 *
+	 * @param mixed $file File.
+	 */
 	private static function short_path( $file ) {
 		$file = wp_normalize_path( (string) $file );
 		$base = defined( 'MCM_PATH' ) ? wp_normalize_path( MCM_PATH ) : '';

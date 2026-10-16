@@ -19,10 +19,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * The Program spine: Program terms kept in sync with Program posts.
+ */
 class MCM_Program {
 
 	const TAX = 'mcm_program_link';
 
+	/**
+	 * Register the hooks this module needs.
+	 */
 	public function __construct() {
 		// Keep a Program term in sync with each Program CPT entry.
 		add_action( 'save_post_mcm_program', array( $this, 'sync_term' ), 10, 3 );
@@ -30,7 +36,11 @@ class MCM_Program {
 		add_filter( 'mcm_program_related', array( $this, 'noop' ) ); // reserved hook.
 	}
 
-	/** Placeholder so the reserved filter always exists. */
+	/**
+	 * Placeholder so the reserved filter always exists.
+	 *
+	 * @param mixed $v Value.
+	 */
 	public function noop( $v ) {
 		return $v;
 	}

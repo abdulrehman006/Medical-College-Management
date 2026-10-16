@@ -17,8 +17,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * Department fields (hero, Head of Department message, hidden sections) and department shortcodes.
+ */
 class MCM_TermMeta {
 
+	/**
+	 * Register the hooks this module needs.
+	 */
 	public function __construct() {
 		// Everything here is deferred to init. The field definitions are
 		// translated, and touching them at plugin-load time would load the text
@@ -138,7 +144,11 @@ class MCM_TermMeta {
 		return $hidden;
 	}
 
-	/** Fields for one taxonomy, or an empty array. */
+	/**
+	 * Fields for one taxonomy, or an empty array.
+	 *
+	 * @param string $tax Taxonomy name.
+	 */
 	public static function fields_for( $tax ) {
 		$all = self::taxonomies();
 		return isset( $all[ $tax ] ) ? $all[ $tax ] : array();
@@ -171,7 +181,11 @@ class MCM_TermMeta {
 		}
 	}
 
-	/** The "add new term" screen has no table wrapper. */
+	/**
+	 * The "add new term" screen has no table wrapper.
+	 *
+	 * @param string $taxonomy Taxonomy name.
+	 */
 	public function add_fields( $taxonomy ) {
 		$fields = self::fields_for( $taxonomy );
 		if ( ! $fields ) {
@@ -189,7 +203,12 @@ class MCM_TermMeta {
 		}
 	}
 
-	/** The "edit term" screen is a table. */
+	/**
+	 * The "edit term" screen is a table.
+	 *
+	 * @param WP_Term $term Term object.
+	 * @param string  $taxonomy Taxonomy name.
+	 */
 	public function edit_fields( $term, $taxonomy ) {
 		$fields = self::fields_for( $taxonomy );
 		if ( ! $fields ) {
@@ -208,7 +227,13 @@ class MCM_TermMeta {
 		}
 	}
 
-	/** Render one input. */
+	/**
+	 * Render one input.
+	 *
+	 * @param string $key Key.
+	 * @param mixed  $value Value.
+	 * @param array  $field Field definition.
+	 */
 	private static function control( $key, $value, $field ) {
 		switch ( $field['type'] ) {
 			case 'textarea':
@@ -431,23 +456,36 @@ class MCM_TermMeta {
 	}
 
 	/*
-	----------------------------------------------------------------- *
-	 *  Shortcodes for building a custom department template (Elementor).
-	 * ----------------------------------------------------------------- */
+	 * ----------------------------------------------------------------
+	 * Shortcodes for building a custom department template (Elementor).
+	 * ----------------------------------------------------------------
+	 */
 
-	/** [mcm_department_hero department="anatomy"] — video or image banner. */
+	/**
+	 * [mcm_department_hero department="anatomy"] — video or image banner.
+	 *
+	 * @param array|string $atts Shortcode attributes.
+	 */
 	public function sc_hero( $atts ) {
 		$term = self::resolve_term( is_array( $atts ) ? $atts : array() );
 		return $term ? MCM_Safe::render( array( __CLASS__, 'hero_html' ), 'shortcode mcm_department_hero', array( $term ) ) : '';
 	}
 
-	/** [mcm_department_message department="anatomy"] — the HOD message card. */
+	/**
+	 * [mcm_department_message department="anatomy"] — the HOD message card.
+	 *
+	 * @param array|string $atts Shortcode attributes.
+	 */
 	public function sc_message( $atts ) {
 		$term = self::resolve_term( is_array( $atts ) ? $atts : array() );
 		return $term ? MCM_Safe::render( array( __CLASS__, 'message_html' ), 'shortcode mcm_department_message', array( $term ) ) : '';
 	}
 
-	/** [mcm_department_intro department="anatomy"] — hero + message together. */
+	/**
+	 * [mcm_department_intro department="anatomy"] — hero + message together.
+	 *
+	 * @param array|string $atts Shortcode attributes.
+	 */
 	public function sc_intro( $atts ) {
 		$term = self::resolve_term( is_array( $atts ) ? $atts : array() );
 		return $term ? MCM_Safe::render( array( __CLASS__, 'term_intro' ), 'shortcode mcm_department_intro', array( $term ) ) : '';
@@ -458,6 +496,8 @@ class MCM_TermMeta {
 	 * department actually has (courses, timetable, faculty, publications…), each
 	 * as its own titled section. Populated types only. Perfect as the body of a
 	 * custom Elementor department template.
+	 *
+	 * @param array|string $atts Shortcode attributes.
 	 */
 	public function sc_sections( $atts ) {
 		$term = self::resolve_term( is_array( $atts ) ? $atts : array() );

@@ -11,6 +11,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * The Related Content box in wp-admin.
+ */
 class MCM_Relations {
 
 	/** Max related items shown per content type, per term. */
@@ -19,6 +22,9 @@ class MCM_Relations {
 	/** Max terms processed per connector taxonomy (keeps the box light). */
 	const MAX_TERMS = 6;
 
+	/**
+	 * Register the hooks this module needs.
+	 */
 	public function __construct() {
 		add_action( 'add_meta_boxes', array( $this, 'add_box' ) );
 	}
@@ -36,6 +42,9 @@ class MCM_Relations {
 		);
 	}
 
+	/**
+	 * Add the Related Content box to every content type.
+	 */
 	public function add_box() {
 		foreach ( array_keys( MCM_CPT::post_types() ) as $cpt ) {
 			add_meta_box(
@@ -49,6 +58,11 @@ class MCM_Relations {
 		}
 	}
 
+	/**
+	 * Shared renderer for the shortcode callbacks.
+	 *
+	 * @param WP_Post $post Post object.
+	 */
 	public function render( $post ) {
 		$type   = $post->post_type;
 		$taxes  = MCM_CPT::taxonomies();
@@ -90,8 +104,6 @@ class MCM_Relations {
 
 					$blocks .= '<div class="mcm-rel-group"><strong>' . esc_html( $plabel ) . ':</strong> ' . implode( ', ', $links );
 					if ( $info['more'] > 0 ) {
-						/*
-						translators: %d: number of additional related items */
 						/* translators: %d: number of additional related items. */
 						$blocks .= ' <span class="mcm-rel-more">' . esc_html( sprintf( __( '+%d more', 'medical-college-manager' ), $info['more'] ) ) . '</span>';
 					}
@@ -113,6 +125,10 @@ class MCM_Relations {
 	 * Posts (across every CPT using $tax) that share $term, excluding the
 	 * current post, grouped by post type and capped per type.
 	 *
+	 * @param int     $post_id Post ID.
+	 * @param string  $tax Taxonomy name.
+	 * @param WP_Term $term Term object.
+	 * @param mixed   $cpts_for Cpts for.
 	 * @return array  cpt => array( posts => int[], more => int )
 	 */
 	private function related_by_term( $post_id, $tax, $term, $cpts_for ) {

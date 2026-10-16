@@ -9,8 +9,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * Custom fields: meta boxes, validation, REST registration and admin columns.
+ */
 class MCM_Meta {
 
+	/**
+	 * Register the hooks this module needs.
+	 */
 	public function __construct() {
 		add_action( 'add_meta_boxes', array( $this, 'add_meta_boxes' ) );
 		add_action( 'save_post', array( $this, 'save' ), 10, 2 );
@@ -26,6 +32,8 @@ class MCM_Meta {
 	 * REST/storage scalar type. Post meta is stored as strings, and an empty
 	 * value fails REST 'number' schema validation, so everything is exposed as
 	 * 'string' (numeric fields still hold clean numeric strings).
+	 *
+	 * @param string $type Post type.
 	 */
 	public static function rest_type( $type ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found -- Public API: every field type maps to 'string'.
 		return 'string';
@@ -34,6 +42,9 @@ class MCM_Meta {
 	/**
 	 * Single source of truth for sanitizing a field value by its type.
 	 * Shared by the meta box save, the CSV import, and the REST sanitizer.
+	 *
+	 * @param string $type Post type.
+	 * @param mixed  $raw Raw input.
 	 */
 	public static function sanitize_value( $type, $raw ) {
 		// Arrays/objects never reach a sanitizer (PHP 8 TypeError on old WP).
@@ -787,6 +798,9 @@ class MCM_Meta {
 		);
 	}
 
+	/**
+	 * Add the details meta box to every content type.
+	 */
 	public function add_meta_boxes() {
 		foreach ( self::fields() as $cpt => $cfg ) {
 			add_meta_box(
@@ -801,6 +815,12 @@ class MCM_Meta {
 		}
 	}
 
+	/**
+	 * Shared renderer for the shortcode callbacks.
+	 *
+	 * @param WP_Post $post    Post object.
+	 * @param array   $metabox Meta box arguments.
+	 */
 	public function render( $post, $metabox ) {
 		$cpt    = $metabox['args']['cpt'];
 		$config = self::fields();
@@ -900,6 +920,12 @@ class MCM_Meta {
 		echo '</div>';
 	}
 
+	/**
+	 * Save the meta box fields.
+	 *
+	 * @param int     $post_id Post ID.
+	 * @param WP_Post $post    Post object.
+	 */
 	public function save( $post_id, $post ) {
 		if ( ! isset( $_POST['mcm_meta_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['mcm_meta_nonce'] ) ), 'mcm_meta_save' ) ) {
 			return;
@@ -946,9 +972,10 @@ class MCM_Meta {
 	}
 
 	/*
-	----------------------------------------------------------------- *
-	 *  Admin list-table columns (sortable for key meta).
-	 * ----------------------------------------------------------------- */
+	 * ----------------------------------------------------------------
+	 * Admin list-table columns (sortable for key meta).
+	 * ----------------------------------------------------------------
+	 */
 
 	/**
 	 * Which meta keys to surface as columns per CPT.
@@ -993,6 +1020,9 @@ class MCM_Meta {
 		);
 	}
 
+	/**
+	 * Hook the extra list-table columns for each content type.
+	 */
 	public function register_admin_columns() {
 		foreach ( array_keys( self::admin_columns() ) as $cpt ) {
 			add_filter( "manage_{$cpt}_posts_columns", array( $this, 'columns' ) );
@@ -1002,7 +1032,11 @@ class MCM_Meta {
 		add_action( 'pre_get_posts', array( $this, 'sort_by_meta' ) );
 	}
 
-	/** Insert our columns just before the built-in Date column. */
+	/**
+	 * Insert our columns just before the built-in Date column.
+	 *
+	 * @param array $columns List-table columns.
+	 */
 	public function columns( $columns ) {
 		$cpt = get_current_screen() ? get_current_screen()->post_type : '';
 		$map = self::admin_columns();
@@ -1020,6 +1054,12 @@ class MCM_Meta {
 		return $columns;
 	}
 
+	/**
+	 * Print one extra list-table column value.
+	 *
+	 * @param string $column  Column key.
+	 * @param int    $post_id Post ID.
+	 */
 	public function column_value( $column, $post_id ) {
 		$cpt = get_post_type( $post_id );
 		$map = self::admin_columns();
@@ -1040,6 +1080,11 @@ class MCM_Meta {
 		echo esc_html( $value );
 	}
 
+	/**
+	 * Mark which extra columns can be sorted.
+	 *
+	 * @param array $columns List-table columns.
+	 */
 	public function sortable_columns( $columns ) {
 		$cpt = get_current_screen() ? get_current_screen()->post_type : '';
 		$map = self::admin_columns();
@@ -1054,7 +1099,11 @@ class MCM_Meta {
 		return $columns;
 	}
 
-	/** Translate a sortable meta column click into a meta-ordered query. */
+	/**
+	 * Translate a sortable meta column click into a meta-ordered query.
+	 *
+	 * @param WP_Query $query The query.
+	 */
 	public function sort_by_meta( $query ) {
 		if ( ! is_admin() || ! $query->is_main_query() ) {
 			return;

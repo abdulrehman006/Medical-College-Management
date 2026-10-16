@@ -10,15 +10,24 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * The [mcm_blog] list of ordinary blog posts.
+ */
 class MCM_Blog {
 
 	const SVG_PEN   = 'M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a.996.996 0 000-1.41l-2.34-2.34a.996.996 0 00-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z';
 	const SVG_ARROW = 'M4 11h12.17l-5.59-5.59L12 4l8 8-8 8-1.41-1.41L16.17 13H4z';
 
+	/**
+	 * Register the hooks this module needs.
+	 */
 	public function __construct() {
 		add_shortcode( 'mcm_blog', array( $this, 'shortcode' ) );
 	}
 
+	/**
+	 * Default values.
+	 */
 	public static function defaults() {
 		return array(
 			'count'     => 6,
@@ -36,6 +45,11 @@ class MCM_Blog {
 		);
 	}
 
+	/**
+	 * Shortcode callback for [mcm_blog].
+	 *
+	 * @param array|string $atts Shortcode attributes.
+	 */
 	public function shortcode( $atts ) {
 		return self::render( shortcode_atts( self::defaults(), $atts, 'mcm_blog' ) );
 	}
@@ -44,6 +58,7 @@ class MCM_Blog {
 	 * Build the blog list. Accepts a full or partial attribute array (so the
 	 * Elementor widget can reuse it).
 	 *
+	 * @param array|string $atts Shortcode attributes.
 	 * @return string
 	 */
 	public static function render( $atts ) {
@@ -134,6 +149,12 @@ class MCM_Blog {
 		return ob_get_clean();
 	}
 
+	/**
+	 * Markup for one post row: date badge, thumbnail, title, excerpt and read-more link.
+	 *
+	 * @param int   $id Post ID.
+	 * @param array $a  Parsed attributes.
+	 */
 	private static function post_row( $id, $a ) {
 		$link    = get_permalink( $id );
 		$title   = get_the_title( $id );
@@ -181,6 +202,12 @@ class MCM_Blog {
 		return ob_get_clean();
 	}
 
+	/**
+	 * Excerpt trimmed to a number of words (empty when the length is 0).
+	 *
+	 * @param int $id    Post ID.
+	 * @param int $words Number of words.
+	 */
 	private static function excerpt( $id, $words ) {
 		if ( $words <= 0 ) {
 			return '';

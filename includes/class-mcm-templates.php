@@ -11,17 +11,35 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * Archive, department and single-page template integration.
+ */
 class MCM_Templates {
 
-	/** Archive render context for the current request (set by archive_template). */
+	/**
+	 * Archive render context for the current request (set by archive_template).
+	 *
+	 * @var array|null
+	 */
 	private static $context = null;
 
-	/** Post IDs whose featured image the theme has already rendered. */
+	/**
+	 * Post IDs whose featured image the theme has already rendered.
+	 *
+	 * @var array<int,bool>
+	 */
 	private static $thumb_shown = array();
 
-	/** Post IDs whose single-page details were already appended this request. */
+	/**
+	 * Post IDs whose single-page details were already appended this request.
+	 *
+	 * @var array<int,bool>
+	 */
 	private static $details_done = array();
 
+	/**
+	 * Register the hooks this module needs.
+	 */
 	public function __construct() {
 		// Show the custom fields on the native single CPT page.
 		add_filter( 'the_content', array( $this, 'single_meta' ), 20 );
@@ -37,11 +55,20 @@ class MCM_Templates {
 		add_filter( 'template_include', array( $this, 'archive_template' ) );
 	}
 
-	/** Per-page count for a CPT archive (filterable). */
+	/**
+	 * Per-page count for a CPT archive (filterable).
+	 *
+	 * @param string $cpt Post type.
+	 */
 	public static function archive_per_page( $cpt ) {
 		return max( 1, (int) apply_filters( 'mcm_archive_per_page', 12, $cpt ) );
 	}
 
+	/**
+	 * Match the archive main query's page size to the plugin's listing, so /page/N/ resolves.
+	 *
+	 * @param WP_Query $query The query.
+	 */
 	public function set_archive_per_page( $query ) {
 		if ( is_admin() || ! $query->is_main_query() || ! $query->is_post_type_archive() ) {
 			return;
@@ -64,6 +91,8 @@ class MCM_Templates {
 	 * Swap in the plugin's filterable archive template for our CPT archives and
 	 * our taxonomy term archives — unless the feature is off or the active theme
 	 * provides its own specific template (which always wins).
+	 *
+	 * @param string $template Template path.
 	 */
 	public function archive_template( $template ) {
 		// Boundary: if building the archive context fails, the theme's own
@@ -350,7 +379,11 @@ class MCM_Templates {
 		return $out;
 	}
 
-	/** Timetable reads best as a table; everything else defaults to a grid. */
+	/**
+	 * Timetable reads best as a table; everything else defaults to a grid.
+	 *
+	 * @param string $cpt Post type.
+	 */
 	private static function default_view( $cpt ) {
 		if ( 'mcm_timetable' === $cpt ) {
 			return 'table';
@@ -365,6 +398,8 @@ class MCM_Templates {
 	 * View for a single-CPT archive page. All archives use the Directory layout
 	 * (left filter sidebar); the main area adapts per type (timetable = table,
 	 * consultants/team = profile cards, others = info cards). Filterable.
+	 *
+	 * @param string $cpt Post type.
 	 */
 	private static function cpt_archive_view( $cpt ) {
 		return (string) apply_filters( 'mcm_archive_view', 'directory', $cpt );
@@ -373,6 +408,8 @@ class MCM_Templates {
 	/**
 	 * Append the meta block (and contact details, where relevant) to the
 	 * content of a single MCM post on its own URL.
+	 *
+	 * @param string $content Post content.
 	 */
 	public function single_meta( $content ) {
 		// Boundary: on failure the post content is returned untouched.
@@ -490,12 +527,12 @@ class MCM_Templates {
 	/**
 	 * Should the plugin output the featured image on this single page?
 	 *
-	 * auto (default) — only when the theme has not already rendered it, so
+	 * Auto (default) — only when the theme has not already rendered it, so
 	 *                  themes that handle CPT images keep working untouched and
 	 *                  themes that ignore them get the image anyway.
-	 * always         — output regardless (for a theme that renders it *after*
+	 * Always         — output regardless (for a theme that renders it *after*
 	 *                  the content, or one that shows it too small).
-	 * never          — leave it entirely to the theme.
+	 * Never          — leave it entirely to the theme.
 	 *
 	 * @param int $id Post ID.
 	 * @return bool
@@ -516,6 +553,8 @@ class MCM_Templates {
 	/**
 	 * Default ordering for front-end CPT archives where date-DESC is wrong.
 	 * Events list soonest-first by their event date; timetable by start time.
+	 *
+	 * @param WP_Query $query The query.
 	 */
 	public function archive_order( $query ) {
 		if ( is_admin() || ! $query->is_main_query() || ! $query->is_post_type_archive() ) {
@@ -544,6 +583,11 @@ class MCM_Templates {
 	 * Order an archive by a meta value WITHOUT dropping posts that lack it, and
 	 * without the arbitrary-row problem the EXISTS/NOT EXISTS meta_query trick
 	 * has. See MCM_Query::order_by_optional_meta() for the full explanation.
+	 *
+	 * @param WP_Query $query The query.
+	 * @param string   $meta_key Meta key.
+	 * @param string   $meta_type Meta type.
+	 * @param string   $dir ASC or DESC.
 	 */
 	private function order_by_optional_meta( $query, $meta_key, $meta_type, $dir = 'ASC' ) {
 		$cast = ( 'NUMERIC' === $meta_type ) ? 'SIGNED' : $meta_type;

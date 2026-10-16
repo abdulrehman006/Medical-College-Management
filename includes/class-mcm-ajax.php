@@ -9,8 +9,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * Live filtering endpoint (wp_ajax_mcm_filter).
+ */
 class MCM_Ajax {
 
+	/**
+	 * Register the hooks this module needs.
+	 */
 	public function __construct() {
 		add_action( 'wp_ajax_mcm_filter', array( $this, 'filter' ) );
 		add_action( 'wp_ajax_nopriv_mcm_filter', array( $this, 'filter' ) );

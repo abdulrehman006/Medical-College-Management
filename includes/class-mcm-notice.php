@@ -11,11 +11,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * Notice ticker, notice board and notices list.
+ */
 class MCM_Notice {
 
 	const CACHE_KEY = 'mcm_notice_feed';
 	const FEED_MAX  = 50; // notices held in the cached feed.
 
+	/**
+	 * Register the hooks this module needs.
+	 */
 	public function __construct() {
 		add_shortcode( 'mcm_notices', array( $this, 'sc_list' ) );
 		add_shortcode( 'mcm_notice_ticker', array( $this, 'sc_ticker' ) );
@@ -33,14 +39,29 @@ class MCM_Notice {
 		add_action( 'untrashed_post', array( __CLASS__, 'clear_cache' ) );
 	}
 
+	/**
+	 * Clear the cached notice feed.
+	 */
 	public static function clear_cache() {
 		delete_transient( self::CACHE_KEY );
 	}
 
+	/**
+	 * Show the /notices/ archive as a list.
+	 *
+	 * @param string $view Layout.
+	 * @param string $cpt  Post type.
+	 */
 	public function archive_view( $view, $cpt ) {
 		return 'mcm_notice' === $cpt ? 'list' : $view;
 	}
 
+	/**
+	 * Hide expired notices from notice listings.
+	 *
+	 * @param array $args Query arguments.
+	 * @param array $a    Parsed attributes.
+	 */
 	public function archive_expiry( $args, $a ) {
 		if ( 'mcm_notice' === $a['type'] && empty( $args['meta_query'] ) ) {
 			$args['meta_query'] = self::expiry_meta_query(); // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
@@ -54,10 +75,14 @@ class MCM_Notice {
 	}
 
 	/*
-	----------------------------------------------------------------- *
-	 *  Feed (cached, sorted: pinned -> priority -> date)
-	 * ----------------------------------------------------------------- */
+	 * ----------------------------------------------------------------
+	 * Feed (cached, sorted: pinned -> priority -> date)
+	 * ----------------------------------------------------------------
+	 */
 
+	/**
+	 * IDs of current notices, sorted pinned, then priority, then date (cached).
+	 */
 	public static function get_feed() {
 		$ids = get_transient( self::CACHE_KEY );
 		if ( false !== $ids ) {
@@ -99,6 +124,11 @@ class MCM_Notice {
 		return $ids;
 	}
 
+	/**
+	 * Sort key for one notice: pinned, priority, timestamp.
+	 *
+	 * @param int $id Post ID.
+	 */
 	private static function sort_key( $id ) {
 		$pinned = ( 'Yes' === MCM_Safe::meta( $id, 'mcm_notice_pinned' ) ) ? 1 : 0;
 		$map    = array(
@@ -114,6 +144,8 @@ class MCM_Notice {
 	/**
 	 * Filter the cached feed by category / department / priority / recency and
 	 * cap to the requested count.
+	 *
+	 * @param array $a Parsed attributes.
 	 */
 	private static function feed_for( $a ) {
 		$ids    = self::get_feed();
@@ -148,10 +180,16 @@ class MCM_Notice {
 	}
 
 	/*
-	----------------------------------------------------------------- *
-	 *  Per-notice helpers
-	 * ----------------------------------------------------------------- */
+	 * ----------------------------------------------------------------
+	 * Per-notice helpers
+	 * ----------------------------------------------------------------
+	 */
 
+	/**
+	 * Timestamp of a notice: its Notice Date, else its publish date.
+	 *
+	 * @param int $id Post ID.
+	 */
 	private static function notice_ts( $id ) {
 		$d = MCM_Safe::meta( $id, 'mcm_notice_date' );
 		if ( $d ) {
@@ -163,29 +201,59 @@ class MCM_Notice {
 		return (int) get_post_time( 'U', true, $id );
 	}
 
+	/**
+	 * Notice date formatted for display.
+	 *
+	 * @param int $id Post ID.
+	 */
 	private static function notice_date( $id ) {
 		return date_i18n( get_option( 'date_format' ), self::notice_ts( $id ) );
 	}
 
+	/**
+	 * Where a notice links: its Link URL, else its own page.
+	 *
+	 * @param int $id Post ID.
+	 */
 	private static function notice_link( $id ) {
 		$u = MCM_Safe::meta( $id, 'mcm_notice_url' );
 		return $u ? $u : get_permalink( $id );
 	}
 
+	/**
+	 * Attributes that open an external notice link in a new tab.
+	 *
+	 * @param int $id Post ID.
+	 */
 	private static function link_attrs( $id ) {
 		return MCM_Safe::meta( $id, 'mcm_notice_url' ) ? ' target="_blank" rel="noopener noreferrer"' : '';
 	}
 
+	/**
+	 * Whether a notice is recent enough for the "New" badge.
+	 *
+	 * @param int $id Post ID.
+	 */
 	private static function is_new( $id ) {
 		$days = (int) apply_filters( 'mcm_notice_new_days', 7 );
 		return $days > 0 && self::notice_ts( $id ) >= ( time() - $days * DAY_IN_SECONDS );
 	}
 
+	/**
+	 * CSS modifier class for a notice's priority.
+	 *
+	 * @param int $id Post ID.
+	 */
 	private static function priority_class( $id ) {
 		$p = strtolower( (string) MCM_Safe::meta( $id, 'mcm_notice_priority' ) );
 		return $p ? ' mcm-notice--' . sanitize_html_class( $p ) : '';
 	}
 
+	/**
+	 * Badge showing the notice's first category.
+	 *
+	 * @param int $id Post ID.
+	 */
 	private static function badge( $id ) {
 		$terms = get_the_terms( $id, 'mcm_notice_cat' );
 		if ( is_wp_error( $terms ) || empty( $terms ) ) {
@@ -195,15 +263,26 @@ class MCM_Notice {
 		return '<span class="mcm-notice-badge mcm-notice-badge--' . esc_attr( $t->slug ) . '">' . esc_html( $t->name ) . '</span>';
 	}
 
+	/**
+	 * The "New" tag, or an empty string.
+	 *
+	 * @param int $id Post ID.
+	 */
 	private static function new_tag( $id ) {
 		return self::is_new( $id ) ? '<span class="mcm-notice-new">' . esc_html__( 'New', 'medical-college-manager' ) . '</span>' : '';
 	}
 
 	/*
-	----------------------------------------------------------------- *
-	 *  Attributes
-	 * ----------------------------------------------------------------- */
+	 * ----------------------------------------------------------------
+	 * Attributes
+	 * ----------------------------------------------------------------
+	 */
 
+	/**
+	 * Normalised notice shortcode attributes.
+	 *
+	 * @param array|string $atts Shortcode attributes.
+	 */
 	public static function atts( $atts ) {
 		return shortcode_atts(
 			array(
@@ -225,27 +304,53 @@ class MCM_Notice {
 		);
 	}
 
-	/** Seconds per full scroll cycle, scaled by item count and speed. */
+	/**
+	 * Seconds per full scroll cycle, scaled by item count and speed.
+	 *
+	 * @param array $a Parsed attributes.
+	 * @param int   $items Number of items.
+	 */
 	private static function duration( $a, $items ) {
 		$speed = min( 10, max( 1, (int) $a['speed'] ) );
 		return max( 12, (int) round( $items * ( 55 / $speed ) / 10 ) * 3 );
 	}
 
 	/*
-	----------------------------------------------------------------- *
-	 *  Shortcodes + renderers
-	 * ----------------------------------------------------------------- */
+	 * ----------------------------------------------------------------
+	 * Shortcodes + renderers
+	 * ----------------------------------------------------------------
+	 */
 
+	/**
+	 * Shortcode callback for [mcm_notices].
+	 *
+	 * @param array|string $atts Shortcode attributes.
+	 */
 	public function sc_list( $atts ) {
 		return self::render_list( self::atts( $atts ) );
 	}
+	/**
+	 * Shortcode callback for [mcm_notice_ticker].
+	 *
+	 * @param array|string $atts Shortcode attributes.
+	 */
 	public function sc_ticker( $atts ) {
 		return self::render_ticker( self::atts( $atts ) );
 	}
+	/**
+	 * Shortcode callback for [mcm_notice_board].
+	 *
+	 * @param array|string $atts Shortcode attributes.
+	 */
 	public function sc_board( $atts ) {
 		return self::render_board( self::atts( $atts ) );
 	}
 
+	/**
+	 * Notices list, behind a render boundary.
+	 *
+	 * @param array $a Parsed attributes.
+	 */
 	public static function render_list( $a ) {
 		return MCM_Safe::render(
 			function () use ( $a ) {
@@ -277,6 +382,12 @@ class MCM_Notice {
 		return ob_get_clean();
 	}
 
+	/**
+	 * Markup for one row of the notices list.
+	 *
+	 * @param int   $id Post ID.
+	 * @param array $a  Parsed attributes.
+	 */
 	private static function row_html( $id, $a ) {
 		$badge = 'yes' === $a['show_badge'] ? self::badge( $id ) : '';
 		$date  = 'yes' === $a['show_date'] ? '<span class="mcm-notice-date">' . esc_html( self::notice_date( $id ) ) . '</span>' : '';
@@ -288,6 +399,11 @@ class MCM_Notice {
 			. '</li>';
 	}
 
+	/**
+	 * Scrolling notice ticker, behind a render boundary.
+	 *
+	 * @param array $a Parsed attributes.
+	 */
 	public static function render_ticker( $a ) {
 		return MCM_Safe::render(
 			function () use ( $a ) {
@@ -334,6 +450,11 @@ class MCM_Notice {
 		return ob_get_clean();
 	}
 
+	/**
+	 * Vertical auto-scrolling notice board, behind a render boundary.
+	 *
+	 * @param array $a Parsed attributes.
+	 */
 	public static function render_board( $a ) {
 		return MCM_Safe::render(
 			function () use ( $a ) {

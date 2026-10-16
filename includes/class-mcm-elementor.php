@@ -16,8 +16,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * Elementor integration: widget category and widgets, gated on the Elementor version.
+ */
 class MCM_Elementor {
 
+	/**
+	 * Register the hooks this module needs.
+	 */
 	public function __construct() {
 		add_action( 'elementor/elements/categories_registered', array( $this, 'category' ) );
 		add_action( 'elementor/widgets/register', array( $this, 'register' ) );

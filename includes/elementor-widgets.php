@@ -36,22 +36,37 @@ abstract class MCM_Elementor_Widget_Base extends \Elementor\Widget_Base {
 		return 'grid';
 	}
 
+	/**
+	 * Elementor panel category.
+	 */
 	public function get_categories() {
 		return array( 'medical-college-manager' );
 	}
 
+	/**
+	 * Icon shown in the Elementor panel.
+	 */
 	public function get_icon() {
 		return 'eicon-posts-grid';
 	}
 
+	/**
+	 * Stylesheets this widget needs.
+	 */
 	public function get_style_depends() {
 		return array( 'mcm-frontend' );
 	}
 
+	/**
+	 * Scripts this widget needs.
+	 */
 	public function get_script_depends() {
 		return array( 'mcm-frontend' );
 	}
 
+	/**
+	 * Register the widget controls.
+	 */
 	protected function register_controls() {
 		$type = $this->mcm_type();
 
@@ -371,7 +386,11 @@ abstract class MCM_Elementor_Widget_Base extends \Elementor\Widget_Base {
 		$this->end_controls_section();
 	}
 
-	/** Term slug => name options for a taxonomy. */
+	/**
+	 * Term slug => name options for a taxonomy.
+	 *
+	 * @param string $tax Taxonomy name.
+	 */
 	private function mcm_term_options( $tax ) {
 		$terms = get_terms(
 			array(
@@ -442,230 +461,456 @@ abstract class MCM_Elementor_Widget_Base extends \Elementor\Widget_Base {
 }
 
 /*
------------------------------------------------------------------- *
- *  Concrete widgets — one per public content type.
- * ------------------------------------------------------------------ */
+ * ----------------------------------------------------------------
+ * Concrete widgets — one per public content type.
+ * ----------------------------------------------------------------
+ */
 
+/**
+ * Elementor widget: Consultants.
+ */
 class MCM_Widget_Consultants extends MCM_Elementor_Widget_Base {
+	/**
+	 * Widget machine name.
+	 */
 	public function get_name() {
 		return 'mcm_consultants';
 	}
+	/**
+	 * Widget title shown in the Elementor panel.
+	 */
 	public function get_title() {
 		return __( 'Consultants', 'medical-college-manager' );
 	}
+	/**
+	 * Icon shown in the Elementor panel.
+	 */
 	public function get_icon() {
 		return 'eicon-person';
 	}
+	/**
+	 * Search keywords for the Elementor panel.
+	 */
 	public function get_keywords() {
 		return array( 'consultant', 'doctor', 'medical', 'faculty', 'medical-college-manager' );
 	}
+	/**
+	 * Post type this widget lists.
+	 */
 	protected function mcm_type() {
 		return 'mcm_consultant';
 	}
 }
 
+/**
+ * Elementor widget: Team.
+ */
 class MCM_Widget_Team extends MCM_Elementor_Widget_Base {
+	/**
+	 * Widget machine name.
+	 */
 	public function get_name() {
 		return 'mcm_team';
 	}
+	/**
+	 * Widget title shown in the Elementor panel.
+	 */
 	public function get_title() {
 		return __( 'Team', 'medical-college-manager' );
 	}
+	/**
+	 * Icon shown in the Elementor panel.
+	 */
 	public function get_icon() {
 		return 'eicon-person';
 	}
+	/**
+	 * Search keywords for the Elementor panel.
+	 */
 	public function get_keywords() {
 		return array( 'team', 'staff', 'faculty', 'people', 'medical-college-manager' );
 	}
+	/**
+	 * Post type this widget lists.
+	 */
 	protected function mcm_type() {
 		return 'mcm_team';
 	}
 }
 
+/**
+ * Elementor widget: Programs.
+ */
 class MCM_Widget_Programs extends MCM_Elementor_Widget_Base {
+	/**
+	 * Widget machine name.
+	 */
 	public function get_name() {
 		return 'mcm_programs';
 	}
+	/**
+	 * Widget title shown in the Elementor panel.
+	 */
 	public function get_title() {
 		return __( 'Programs', 'medical-college-manager' );
 	}
+	/**
+	 * Icon shown in the Elementor panel.
+	 */
 	public function get_icon() {
 		return 'eicon-document-file';
 	}
+	/**
+	 * Search keywords for the Elementor panel.
+	 */
 	public function get_keywords() {
 		return array( 'program', 'degree', 'course', 'medical-college-manager' );
 	}
+	/**
+	 * Post type this widget lists.
+	 */
 	protected function mcm_type() {
 		return 'mcm_program';
 	}
 }
 
+/**
+ * Elementor widget: Courses.
+ */
 class MCM_Widget_Courses extends MCM_Elementor_Widget_Base {
+	/**
+	 * Widget machine name.
+	 */
 	public function get_name() {
 		return 'mcm_courses';
 	}
+	/**
+	 * Widget title shown in the Elementor panel.
+	 */
 	public function get_title() {
 		return __( 'Courses', 'medical-college-manager' );
 	}
+	/**
+	 * Icon shown in the Elementor panel.
+	 */
 	public function get_icon() {
 		return 'eicon-book';
 	}
+	/**
+	 * Search keywords for the Elementor panel.
+	 */
 	public function get_keywords() {
 		return array( 'course', 'subject', 'class', 'medical-college-manager' );
 	}
+	/**
+	 * Post type this widget lists.
+	 */
 	protected function mcm_type() {
 		return 'mcm_course';
 	}
 }
 
+/**
+ * Elementor widget: Events.
+ */
 class MCM_Widget_Events extends MCM_Elementor_Widget_Base {
+	/**
+	 * Widget machine name.
+	 */
 	public function get_name() {
 		return 'mcm_events';
 	}
+	/**
+	 * Widget title shown in the Elementor panel.
+	 */
 	public function get_title() {
 		return __( 'Events', 'medical-college-manager' );
 	}
+	/**
+	 * Icon shown in the Elementor panel.
+	 */
 	public function get_icon() {
 		return 'eicon-calendar';
 	}
+	/**
+	 * Search keywords for the Elementor panel.
+	 */
 	public function get_keywords() {
 		return array( 'event', 'seminar', 'conference', 'medical-college-manager' );
 	}
+	/**
+	 * Post type this widget lists.
+	 */
 	protected function mcm_type() {
 		return 'mcm_event';
 	}
 }
 
+/**
+ * Elementor widget: Timetable.
+ */
 class MCM_Widget_Timetable extends MCM_Elementor_Widget_Base {
+	/**
+	 * Widget machine name.
+	 */
 	public function get_name() {
 		return 'mcm_timetable';
 	}
+	/**
+	 * Widget title shown in the Elementor panel.
+	 */
 	public function get_title() {
 		return __( 'Timetable', 'medical-college-manager' );
 	}
+	/**
+	 * Icon shown in the Elementor panel.
+	 */
 	public function get_icon() {
 		return 'eicon-table';
 	}
+	/**
+	 * Search keywords for the Elementor panel.
+	 */
 	public function get_keywords() {
 		return array( 'timetable', 'schedule', 'class', 'medical-college-manager' );
 	}
+	/**
+	 * Post type this widget lists.
+	 */
 	protected function mcm_type() {
 		return 'mcm_timetable';
 	}
+	/**
+	 * Default layout for this widget.
+	 */
 	protected function mcm_default_view() {
 		return 'table';
 	}
 }
 
+/**
+ * Elementor widget: Admissions.
+ */
 class MCM_Widget_Admissions extends MCM_Elementor_Widget_Base {
+	/**
+	 * Widget machine name.
+	 */
 	public function get_name() {
 		return 'mcm_admissions';
 	}
+	/**
+	 * Widget title shown in the Elementor panel.
+	 */
 	public function get_title() {
 		return __( 'Admissions', 'medical-college-manager' );
 	}
+	/**
+	 * Icon shown in the Elementor panel.
+	 */
 	public function get_icon() {
 		return 'eicon-form-horizontal';
 	}
+	/**
+	 * Search keywords for the Elementor panel.
+	 */
 	public function get_keywords() {
 		return array( 'admission', 'apply', 'intake', 'medical-college-manager' );
 	}
+	/**
+	 * Post type this widget lists.
+	 */
 	protected function mcm_type() {
 		return 'mcm_admission';
 	}
 }
 
+/**
+ * Elementor widget: Tenders.
+ */
 class MCM_Widget_Tenders extends MCM_Elementor_Widget_Base {
+	/**
+	 * Widget machine name.
+	 */
 	public function get_name() {
 		return 'mcm_tenders';
 	}
+	/**
+	 * Widget title shown in the Elementor panel.
+	 */
 	public function get_title() {
 		return __( 'Tenders', 'medical-college-manager' );
 	}
+	/**
+	 * Icon shown in the Elementor panel.
+	 */
 	public function get_icon() {
 		return 'eicon-document-file';
 	}
+	/**
+	 * Search keywords for the Elementor panel.
+	 */
 	public function get_keywords() {
 		return array( 'tender', 'procurement', 'bid', 'notice', 'medical-college-manager' );
 	}
+	/**
+	 * Post type this widget lists.
+	 */
 	protected function mcm_type() {
 		return 'mcm_tender';
 	}
 }
 
+/**
+ * Elementor widget: Scholarships.
+ */
 class MCM_Widget_Scholarships extends MCM_Elementor_Widget_Base {
+	/**
+	 * Widget machine name.
+	 */
 	public function get_name() {
 		return 'mcm_scholarships';
 	}
+	/**
+	 * Widget title shown in the Elementor panel.
+	 */
 	public function get_title() {
 		return __( 'Scholarships', 'medical-college-manager' );
 	}
+	/**
+	 * Icon shown in the Elementor panel.
+	 */
 	public function get_icon() {
 		return 'eicon-star';
 	}
+	/**
+	 * Search keywords for the Elementor panel.
+	 */
 	public function get_keywords() {
 		return array( 'scholarship', 'financial aid', 'merit', 'medical-college-manager' );
 	}
+	/**
+	 * Post type this widget lists.
+	 */
 	protected function mcm_type() {
 		return 'mcm_scholarship';
 	}
 }
 
+/**
+ * Elementor widget: Research.
+ */
 class MCM_Widget_Research extends MCM_Elementor_Widget_Base {
+	/**
+	 * Widget machine name.
+	 */
 	public function get_name() {
 		return 'mcm_research';
 	}
+	/**
+	 * Widget title shown in the Elementor panel.
+	 */
 	public function get_title() {
 		return __( 'Research Projects', 'medical-college-manager' );
 	}
+	/**
+	 * Icon shown in the Elementor panel.
+	 */
 	public function get_icon() {
 		return 'eicon-search-results';
 	}
+	/**
+	 * Search keywords for the Elementor panel.
+	 */
 	public function get_keywords() {
 		return array( 'research', 'project', 'r&d', 'investigator', 'medical-college-manager' );
 	}
+	/**
+	 * Post type this widget lists.
+	 */
 	protected function mcm_type() {
 		return 'mcm_research';
 	}
 }
 
+/**
+ * Elementor widget: Policies.
+ */
 class MCM_Widget_Policies extends MCM_Elementor_Widget_Base {
+	/**
+	 * Widget machine name.
+	 */
 	public function get_name() {
 		return 'mcm_policies';
 	}
+	/**
+	 * Widget title shown in the Elementor panel.
+	 */
 	public function get_title() {
 		return __( 'Policies', 'medical-college-manager' );
 	}
+	/**
+	 * Icon shown in the Elementor panel.
+	 */
 	public function get_icon() {
 		return 'eicon-document-file';
 	}
+	/**
+	 * Search keywords for the Elementor panel.
+	 */
 	public function get_keywords() {
 		return array( 'policy', 'policies', 'document', 'download', 'medical-college-manager' );
 	}
+	/**
+	 * Post type this widget lists.
+	 */
 	protected function mcm_type() {
 		return 'mcm_policy';
 	}
+	/**
+	 * Default layout for this widget.
+	 */
 	protected function mcm_default_view() {
 		return 'list';
 	}
 }
 
+/**
+ * Elementor widget: Publications.
+ */
 class MCM_Widget_Publications extends MCM_Elementor_Widget_Base {
+	/**
+	 * Widget machine name.
+	 */
 	public function get_name() {
 		return 'mcm_publications';
 	}
+	/**
+	 * Widget title shown in the Elementor panel.
+	 */
 	public function get_title() {
 		return __( 'Publications', 'medical-college-manager' );
 	}
+	/**
+	 * Icon shown in the Elementor panel.
+	 */
 	public function get_icon() {
 		return 'eicon-document-file';
 	}
+	/**
+	 * Search keywords for the Elementor panel.
+	 */
 	public function get_keywords() {
 		return array( 'publication', 'research', 'paper', 'journal', 'citation', 'medical-college-manager' );
 	}
+	/**
+	 * Post type this widget lists.
+	 */
 	protected function mcm_type() {
 		return 'mcm_publication';
 	}
+	/**
+	 * Default layout for this widget.
+	 */
 	protected function mcm_default_view() {
 		return 'citation';
 	}
@@ -677,25 +922,46 @@ class MCM_Widget_Publications extends MCM_Elementor_Widget_Base {
  */
 class MCM_Widget_Blog extends \Elementor\Widget_Base {
 
+	/**
+	 * Widget machine name.
+	 */
 	public function get_name() {
 		return 'mcm_blog';
 	}
+	/**
+	 * Widget title shown in the Elementor panel.
+	 */
 	public function get_title() {
 		return __( 'Blog Posts', 'medical-college-manager' );
 	}
+	/**
+	 * Icon shown in the Elementor panel.
+	 */
 	public function get_icon() {
 		return 'eicon-post-list';
 	}
+	/**
+	 * Elementor panel category.
+	 */
 	public function get_categories() {
 		return array( 'medical-college-manager' );
 	}
+	/**
+	 * Search keywords for the Elementor panel.
+	 */
 	public function get_keywords() {
 		return array( 'blog', 'posts', 'news', 'articles', 'medical-college-manager' );
 	}
+	/**
+	 * Stylesheets this widget needs.
+	 */
 	public function get_style_depends() {
 		return array( 'mcm-frontend' );
 	}
 
+	/**
+	 * Register the widget controls.
+	 */
 	protected function register_controls() {
 		$this->start_controls_section( 'mcm_blog', array( 'label' => __( 'Blog Posts', 'medical-college-manager' ) ) );
 
@@ -781,6 +1047,9 @@ class MCM_Widget_Blog extends \Elementor\Widget_Base {
 		$this->end_controls_section();
 	}
 
+	/**
+	 * Blog category options (slug => name).
+	 */
 	private function mcm_category_options() {
 		$terms = get_terms(
 			array(
@@ -863,16 +1132,28 @@ abstract class MCM_Widget_Notice_Base extends \Elementor\Widget_Base {
 		return $out;
 	}
 
+	/**
+	 * Elementor panel category.
+	 */
 	public function get_categories() {
 		return array( 'medical-college-manager' );
 	}
+	/**
+	 * Stylesheets this widget needs.
+	 */
 	public function get_style_depends() {
 		return array( 'mcm-frontend' );
 	}
+	/**
+	 * Scripts this widget needs.
+	 */
 	public function get_script_depends() {
 		return array( 'mcm-frontend' );
 	}
 
+	/**
+	 * Controls shared by the three notice widgets.
+	 */
 	protected function mcm_common_controls() {
 		$this->add_control(
 			'count',
@@ -928,6 +1209,9 @@ abstract class MCM_Widget_Notice_Base extends \Elementor\Widget_Base {
 		);
 	}
 
+	/**
+	 * Map the widget settings to notice shortcode attributes.
+	 */
 	protected function mcm_atts() {
 		$s   = $this->get_settings_for_display();
 		$cat = isset( $s['category'] ) ? $s['category'] : '';
@@ -951,19 +1235,37 @@ abstract class MCM_Widget_Notice_Base extends \Elementor\Widget_Base {
 	}
 }
 
+/**
+ * Elementor widget: Notice Ticker.
+ */
 class MCM_Widget_Notice_Ticker extends MCM_Widget_Notice_Base {
+	/**
+	 * Widget machine name.
+	 */
 	public function get_name() {
 		return 'mcm_notice_ticker';
 	}
+	/**
+	 * Widget title shown in the Elementor panel.
+	 */
 	public function get_title() {
 		return __( 'Notice Ticker', 'medical-college-manager' );
 	}
+	/**
+	 * Icon shown in the Elementor panel.
+	 */
 	public function get_icon() {
 		return 'eicon-slider-push';
 	}
+	/**
+	 * Search keywords for the Elementor panel.
+	 */
 	public function get_keywords() {
 		return array( 'notice', 'ticker', 'marquee', 'news', 'medical-college-manager' );
 	}
+	/**
+	 * Register the widget controls.
+	 */
 	protected function register_controls() {
 		$this->start_controls_section( 'mcm_notice', array( 'label' => __( 'Notice Ticker', 'medical-college-manager' ) ) );
 		$this->add_control(
@@ -1008,19 +1310,37 @@ class MCM_Widget_Notice_Ticker extends MCM_Widget_Notice_Base {
 	}
 }
 
+/**
+ * Elementor widget: Notice Board.
+ */
 class MCM_Widget_Notice_Board extends MCM_Widget_Notice_Base {
+	/**
+	 * Widget machine name.
+	 */
 	public function get_name() {
 		return 'mcm_notice_board';
 	}
+	/**
+	 * Widget title shown in the Elementor panel.
+	 */
 	public function get_title() {
 		return __( 'Notice Board', 'medical-college-manager' );
 	}
+	/**
+	 * Icon shown in the Elementor panel.
+	 */
 	public function get_icon() {
 		return 'eicon-post-list';
 	}
+	/**
+	 * Search keywords for the Elementor panel.
+	 */
 	public function get_keywords() {
 		return array( 'notice', 'board', 'announcements', 'scroll', 'medical-college-manager' );
 	}
+	/**
+	 * Register the widget controls.
+	 */
 	protected function register_controls() {
 		$this->start_controls_section( 'mcm_notice', array( 'label' => __( 'Notice Board', 'medical-college-manager' ) ) );
 		$this->add_control(
@@ -1084,19 +1404,37 @@ class MCM_Widget_Notice_Board extends MCM_Widget_Notice_Base {
 	}
 }
 
+/**
+ * Elementor widget: Notices.
+ */
 class MCM_Widget_Notices extends MCM_Widget_Notice_Base {
+	/**
+	 * Widget machine name.
+	 */
 	public function get_name() {
 		return 'mcm_notices';
 	}
+	/**
+	 * Widget title shown in the Elementor panel.
+	 */
 	public function get_title() {
 		return __( 'Notices List', 'medical-college-manager' );
 	}
+	/**
+	 * Icon shown in the Elementor panel.
+	 */
 	public function get_icon() {
 		return 'eicon-bullet-list';
 	}
+	/**
+	 * Search keywords for the Elementor panel.
+	 */
 	public function get_keywords() {
 		return array( 'notice', 'list', 'announcements', 'medical-college-manager' );
 	}
+	/**
+	 * Register the widget controls.
+	 */
 	protected function register_controls() {
 		$this->start_controls_section( 'mcm_notice', array( 'label' => __( 'Notices List', 'medical-college-manager' ) ) );
 		$this->mcm_common_controls();

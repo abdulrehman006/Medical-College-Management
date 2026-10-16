@@ -10,13 +10,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * Floating social-media bar.
+ */
 class MCM_Social {
 
 	const OPTION = 'mcm_social';
 
-	/** Whether the bar has already been output this request (avoid duplicates). */
+	/**
+	 * Whether the bar has already been output this request (avoid duplicates).
+	 *
+	 * @var bool
+	 */
 	private $shown = false;
 
+	/**
+	 * Register the hooks this module needs.
+	 */
 	public function __construct() {
 		add_action( 'admin_menu', array( $this, 'menu' ), 12 );
 		add_action( 'admin_init', array( $this, 'register' ) );
@@ -63,6 +73,9 @@ class MCM_Social {
 		);
 	}
 
+	/**
+	 * Default values.
+	 */
 	public static function defaults() {
 		$d = array(
 			'social_enable_sitewide' => '0',
@@ -75,16 +88,27 @@ class MCM_Social {
 		return $d;
 	}
 
+	/**
+	 * Saved settings merged over the defaults.
+	 */
 	public static function get() {
 		$saved = get_option( self::OPTION, array() );
 		return wp_parse_args( is_array( $saved ) ? $saved : array(), self::defaults() );
 	}
 
+	/**
+	 * One saved setting (or its default).
+	 *
+	 * @param string $key Key.
+	 */
 	public static function value( $key ) {
 		$all = self::get();
 		return isset( $all[ $key ] ) ? $all[ $key ] : '';
 	}
 
+	/**
+	 * Add the admin menu page.
+	 */
 	public function menu() {
 		add_submenu_page(
 			'mcm-settings',
@@ -96,10 +120,18 @@ class MCM_Social {
 		);
 	}
 
+	/**
+	 * Register the setting with its sanitize callback.
+	 */
 	public function register() {
 		register_setting( 'mcm_social_group', self::OPTION, array( $this, 'sanitize' ) );
 	}
 
+	/**
+	 * Sanitize the submitted settings.
+	 *
+	 * @param array $input Submitted values.
+	 */
 	public function sanitize( $input ) {
 		$defaults = self::defaults();
 		$out      = array();
@@ -179,6 +211,11 @@ class MCM_Social {
 		);
 	}
 
+	/**
+	 * Shortcode callback for [mcm_social_bar].
+	 *
+	 * @param array|string $atts Shortcode attributes.
+	 */
 	public function shortcode( $atts ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found -- Shortcode callback signature; the bar takes no attributes.
 		$this->shown = true;
 		return $this->render_bar();
@@ -193,6 +230,9 @@ class MCM_Social {
 		echo $this->render_bar(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 
+	/**
+	 * Render the admin page.
+	 */
 	public function render_page() {
 		$s = self::get();
 		?>

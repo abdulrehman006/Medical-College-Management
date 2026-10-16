@@ -9,8 +9,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * Front-end and admin asset loading, plus the settings-driven inline CSS.
+ */
 class MCM_Assets {
 
+	/**
+	 * Register the hooks this module needs.
+	 */
 	public function __construct() {
 		add_action( 'wp_enqueue_scripts', array( $this, 'frontend' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin' ) );
@@ -103,6 +109,11 @@ class MCM_Assets {
 		return (bool) apply_filters( 'mcm_needs_assets', false );
 	}
 
+	/**
+	 * Enqueue the admin scripts and styles on the plugin's screens.
+	 *
+	 * @param string $hook Admin page hook suffix.
+	 */
 	public function admin( $hook ) {
 		// Color picker only on our settings page.
 		if ( 'toplevel_page_mcm-settings' === $hook ) {

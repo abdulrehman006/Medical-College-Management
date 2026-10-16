@@ -9,6 +9,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * Query builder and HTML renderers shared by shortcodes, widgets, archives and AJAX.
+ */
 class MCM_Query {
 
 	/**
@@ -41,6 +44,7 @@ class MCM_Query {
 	 * Meta keys that the free-text search should also match (per CPT).
 	 * Lets students be found by ID, roll no, email, phone, program, batch.
 	 *
+	 * @param string $type Post type.
 	 * @return array
 	 */
 	public static function searchable_meta( $type ) {
@@ -83,13 +87,19 @@ class MCM_Query {
 		return array( 'mcm_student', 'mcm_consultant', 'mcm_team' );
 	}
 
-	/** Shared truthy check for yes/1/true/on attribute values. */
+	/**
+	 * Shared truthy check for yes/1/true/on attribute values.
+	 *
+	 * @param mixed $val Value.
+	 */
 	public static function truthy( $val ) {
 		return in_array( strtolower( (string) $val ), array( 'yes', '1', 'true', 'on' ), true );
 	}
 
 	/**
 	 * Normalize/parse shortcode-style attributes.
+	 *
+	 * @param array|string $atts Shortcode attributes.
 	 */
 	public static function parse_atts( $atts ) {
 		$defaults = array(
@@ -330,6 +340,7 @@ class MCM_Query {
 	/**
 	 * Build and run WP_Query from parsed attributes.
 	 *
+	 * @param array $a Parsed attributes.
 	 * @return WP_Query
 	 */
 	public static function get_query( $a ) {
@@ -391,11 +402,15 @@ class MCM_Query {
 	}
 
 	/*
-	----------------------------------------------------------------- *
-	 *  Meta-aware search (lets students be found by ID / email / phone).
-	 *  Registered once from the main plugin bootstrap.
-	 * ----------------------------------------------------------------- */
+	 * ----------------------------------------------------------------
+	 * Meta-aware search: students by ID / PMDC No., staff by email, phone or
+	 * designation. Registered once from the main plugin bootstrap.
+	 * ----------------------------------------------------------------
+	 */
 
+	/**
+	 * Register the SQL filters (meta search, optional-meta ordering) and facet cache invalidation.
+	 */
 	public static function register_hooks() {
 		add_filter( 'posts_join', array( __CLASS__, 'filter_join' ), 10, 2 );
 		add_filter( 'posts_where', array( __CLASS__, 'filter_where' ), 10, 2 );
@@ -438,7 +453,12 @@ class MCM_Query {
 		return $args;
 	}
 
-	/** Apply the optional-meta ordering requested by order_by_optional_meta(). */
+	/**
+	 * Apply the optional-meta ordering requested by order_by_optional_meta().
+	 *
+	 * @param array    $clauses SQL clauses.
+	 * @param WP_Query $query The query.
+	 */
 	public static function filter_order_clauses( $clauses, $query ) {
 		$cfg = $query->get( 'mcm_order_meta' );
 		if ( empty( $cfg ) || empty( $cfg['key'] ) ) {
@@ -481,6 +501,12 @@ class MCM_Query {
 		return array_values( array_unique( $all ) );
 	}
 
+	/**
+	 * Join post meta for meta-aware search.
+	 *
+	 * @param string   $join  JOIN clause.
+	 * @param WP_Query $query The query.
+	 */
 	public static function filter_join( $join, $query ) {
 		if ( $query->get( 'mcm_meta_search' ) ) {
 			global $wpdb;
@@ -489,6 +515,12 @@ class MCM_Query {
 		return $join;
 	}
 
+	/**
+	 * Match the search term against the title and the type's searchable meta.
+	 *
+	 * @param string   $where WHERE clause.
+	 * @param WP_Query $query The query.
+	 */
 	public static function filter_where( $where, $query ) {
 		$term = $query->get( 'mcm_meta_search' );
 		if ( ! $term ) {
@@ -517,12 +549,20 @@ class MCM_Query {
 		return $where;
 	}
 
+	/**
+	 * Avoid duplicate rows from the meta-search join.
+	 *
+	 * @param string   $distinct DISTINCT clause.
+	 * @param WP_Query $query    The query.
+	 */
 	public static function filter_distinct( $distinct, $query ) {
 		return $query->get( 'mcm_meta_search' ) ? 'DISTINCT' : $distinct;
 	}
 
 	/**
 	 * Render the filter bar (search + a dropdown per filterable taxonomy).
+	 *
+	 * @param array $a Parsed attributes.
 	 */
 	public static function render_filters( $a ) {
 		$map   = self::tax_map();
@@ -600,6 +640,8 @@ class MCM_Query {
 	/**
 	 * Print-only header (branding + title). The filter summary, count and date
 	 * line is filled in by JS at print time so it reflects the applied filters.
+	 *
+	 * @param array $a Parsed attributes.
 	 */
 	public static function print_header( $a ) {
 		$title = '' !== $a['print_title'] ? $a['print_title'] : self::default_print_title( $a['type'] );
@@ -734,7 +776,13 @@ class MCM_Query {
 		return is_array( $terms ) ? $terms : array();
 	}
 
-	/** Drop a cached facet when its taxonomy changes. */
+	/**
+	 * Drop a cached facet when its taxonomy changes.
+	 *
+	 * @param int    $term_id Term ID.
+	 * @param int    $tt_id Term taxonomy ID.
+	 * @param string $taxonomy Taxonomy name.
+	 */
 	public static function flush_facet_cache( $term_id, $tt_id = 0, $taxonomy = '' ) {
 		if ( $taxonomy ) {
 			wp_cache_delete( 'mcm_facet_' . $taxonomy, 'medical-college-manager' );
@@ -744,6 +792,8 @@ class MCM_Query {
 	/**
 	 * Is this URL a known oEmbed video provider we will let the server contact?
 	 * Restricts oEmbed's server-side discovery (an SSRF vector) to YouTube/Vimeo.
+	 *
+	 * @param string $url URL.
 	 */
 	public static function is_embed_provider( $url ) {
 		$host = wp_parse_url( (string) $url, PHP_URL_HOST );
@@ -949,6 +999,8 @@ class MCM_Query {
 	 * too, so a site that does not use a taxonomy never sees an empty box.
 	 * The JS groups checkboxes by their data-tax, so facets combine as
 	 * AND-between-taxonomies, OR-within-a-taxonomy.
+	 *
+	 * @param array $a Parsed attributes.
 	 */
 	public static function render_sidebar( $a ) {
 		$map   = self::tax_map();
@@ -1003,19 +1055,17 @@ class MCM_Query {
 		return ob_get_clean();
 	}
 
-	/**
-	 * Directory card (photo, name, designation, department, action button) —
-	 * the consultant/team listing layout.
-	 */
 	/*
-	----------------------------------------------------------------- *
-	 *  Publications
-	 * ----------------------------------------------------------------- */
+	 * ----------------------------------------------------------------
+	 * Publications
+	 * ----------------------------------------------------------------
+	 */
 
 	/**
 	 * Vancouver-style citation string (the medical standard):
 	 * Authors. Title. Journal. Year;Volume(Issue):Pages.
 	 *
+	 * @param int $id Post ID.
 	 * @return string Plain text (escape at output).
 	 */
 	public static function citation( $id ) {
@@ -1070,7 +1120,11 @@ class MCM_Query {
 		return trim( $out );
 	}
 
-	/** External links for a publication: DOI, PubMed, full text, PDF. */
+	/**
+	 * External links for a publication: DOI, PubMed, full text, PDF.
+	 *
+	 * @param int $id Post ID.
+	 */
 	private static function publication_links( $id ) {
 		$links = array();
 		$doi   = trim( (string) MCM_Safe::meta( $id, 'mcm_pub_doi' ) );
@@ -1103,7 +1157,11 @@ class MCM_Query {
 		return $links;
 	}
 
-	/** Does this URL point somewhere other than this site? */
+	/**
+	 * Does this URL point somewhere other than this site?
+	 *
+	 * @param string $url URL.
+	 */
 	private static function is_external_url( $url ) {
 		$host = wp_parse_url( $url, PHP_URL_HOST );
 		if ( ! $host ) {
@@ -1117,6 +1175,8 @@ class MCM_Query {
 	 * Make a pasted address safe to link. Editors routinely paste "example.com"
 	 * or "www.example.com"; esc_url() would strip a schemeless value and leave a
 	 * dead button, so assume https when no scheme is present.
+	 *
+	 * @param string $url URL.
 	 */
 	private static function external_url( $url ) {
 		$url = trim( $url );
@@ -1126,7 +1186,11 @@ class MCM_Query {
 		return 'https://' . $url;
 	}
 
-	/** One citation row in the publications list. */
+	/**
+	 * One citation row in the publications list.
+	 *
+	 * @param int $id Post ID.
+	 */
 	public static function publication_row( $id ) {
 		$type = trim( (string) MCM_Safe::meta( $id, 'mcm_pub_type' ) );
 		$year = trim( (string) MCM_Safe::meta( $id, 'mcm_pub_year' ) );
@@ -1165,12 +1229,20 @@ class MCM_Query {
 		return ob_get_clean();
 	}
 
-	/** Citation minus the title (the title is rendered as a link separately). */
+	/**
+	 * Citation minus the title (the title is rendered as a link separately).
+	 *
+	 * @param int $id Post ID.
+	 */
 	private static function citation_without_title( $id ) {
 		return self::build_citation( $id, false );
 	}
 
-	/** The publications list (ordered citation entries). */
+	/**
+	 * The publications list (ordered citation entries).
+	 *
+	 * @param WP_Query $query The query.
+	 */
 	public static function render_citation_list( $query ) {
 		ob_start();
 		if ( $query->have_posts() ) {
@@ -1186,6 +1258,11 @@ class MCM_Query {
 		return ob_get_clean();
 	}
 
+	/**
+	 * Directory card: photo, name, specialty, designation, department and button.
+	 *
+	 * @param int $id Post ID.
+	 */
 	public static function directory_card( $id ) {
 		$type  = get_post_type( $id );
 		$title = get_the_title( $id );
@@ -1251,6 +1328,8 @@ class MCM_Query {
 
 	/**
 	 * Render results in the requested view.
+	 *
+	 * @param array $a Parsed attributes.
 	 */
 	public static function render_results( $a ) {
 		// Students are the only content with private fields. Whatever view is
@@ -1321,6 +1400,9 @@ class MCM_Query {
 	/**
 	 * Numbered pagination for a paginated results query. Returns '' when there
 	 * is only a single page.
+	 *
+	 * @param WP_Query $query The query.
+	 * @param int      $current Current page.
 	 */
 	public static function render_pagination( $query, $current ) {
 		$total = (int) $query->max_num_pages;
@@ -1343,11 +1425,16 @@ class MCM_Query {
 	}
 
 	/*
-	----------------------------------------------------------------- *
-	 *  Card / list / table renderers
-	 * ----------------------------------------------------------------- */
+	 * ----------------------------------------------------------------
+	 * Card / list / table renderers
+	 * ----------------------------------------------------------------
+	 */
 
-	/** People types that get a default avatar when they have no featured image. */
+	/**
+	 * People types that get a default avatar when they have no featured image.
+	 *
+	 * @param string $type Post type.
+	 */
 	public static function is_person( $type ) {
 		return in_array( $type, array( 'mcm_consultant', 'mcm_team', 'mcm_student' ), true );
 	}
@@ -1357,6 +1444,9 @@ class MCM_Query {
 	 * image if the site provides one via the mcm_default_avatar_url filter,
 	 * otherwise a built-in silhouette. $img_class styles the <img>; $ph_class
 	 * styles the SVG placeholder box.
+	 *
+	 * @param string $img_class CSS class for the image.
+	 * @param string $ph_class CSS class for the placeholder.
 	 */
 	public static function default_avatar( $img_class, $ph_class ) {
 		// A branded placeholder (the GMC roundel) set in Settings wins; the
@@ -1369,7 +1459,14 @@ class MCM_Query {
 		return '<span class="' . esc_attr( $ph_class ) . ' mcm-avatar" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M12 12.5a4.6 4.6 0 1 0-4.6-4.6 4.6 4.6 0 0 0 4.6 4.6zm0 2.3c-3.9 0-7.1 2-7.1 4.45V21h14.2v-1.75c0-2.45-3.2-4.45-7.1-4.45z"/></svg></span>';
 	}
 
-	/** Featured image, or (for people) a default avatar, or '' otherwise. */
+	/**
+	 * Featured image, or (for people) a default avatar, or '' otherwise.
+	 *
+	 * @param int    $id Post ID.
+	 * @param string $size Image size.
+	 * @param string $img_class CSS class for the image.
+	 * @param string $ph_class CSS class for the placeholder.
+	 */
 	private static function media_html( $id, $size, $img_class, $ph_class ) {
 		$thumb = get_the_post_thumbnail(
 			$id,
@@ -1386,6 +1483,11 @@ class MCM_Query {
 		return self::is_person( get_post_type( $id ) ) ? self::default_avatar( $img_class, $ph_class ) : '';
 	}
 
+	/**
+	 * Grid card for one entry.
+	 *
+	 * @param int $id Post ID.
+	 */
 	public static function card( $id ) {
 		$type  = get_post_type( $id );
 		$title = get_the_title( $id );
@@ -1428,6 +1530,11 @@ class MCM_Query {
 		return ob_get_clean();
 	}
 
+	/**
+	 * List row for one entry.
+	 *
+	 * @param int $id Post ID.
+	 */
 	public static function list_item( $id ) {
 		$type  = get_post_type( $id );
 		$title = get_the_title( $id );
@@ -1466,6 +1573,8 @@ class MCM_Query {
 	 * Column definitions for the table view, per CPT.
 	 * Each column: array( label, kind, key ) where kind is
 	 * title | meta | tax | time | date.
+	 *
+	 * @param string $type Post type.
 	 */
 	public static function table_columns( $type ) {
 		$cols = array(
@@ -1546,6 +1655,12 @@ class MCM_Query {
 		);
 	}
 
+	/**
+	 * Table view for a query.
+	 *
+	 * @param WP_Query $query The query.
+	 * @param array    $a     Parsed attributes.
+	 */
 	public static function render_table( $query, $a ) {
 		$cols = self::table_columns( $a['type'] );
 
@@ -1577,6 +1692,12 @@ class MCM_Query {
 		return ob_get_clean();
 	}
 
+	/**
+	 * Value of one table cell.
+	 *
+	 * @param int   $id  Post ID.
+	 * @param array $col Column definition.
+	 */
 	private static function cell_value( $id, $col ) {
 		list( $label, $kind, $key ) = $col;
 		switch ( $kind ) {
@@ -1597,10 +1718,17 @@ class MCM_Query {
 	}
 
 	/*
-	----------------------------------------------------------------- *
-	 *  Meta line output
-	 * ----------------------------------------------------------------- */
+	 * ----------------------------------------------------------------
+	 * Meta line output
+	 * ----------------------------------------------------------------
+	 */
 
+	/**
+	 * The key facts shown on a card or list row, per content type.
+	 *
+	 * @param int    $id   Post ID.
+	 * @param string $type Post type.
+	 */
 	public static function meta_lines( $id, $type ) {
 		$rows = array();
 
@@ -1705,6 +1833,12 @@ class MCM_Query {
 		return '<div class="mcm-meta">' . implode( '', $rows ) . '</div>';
 	}
 
+	/**
+	 * One "Label: value" line (empty when the value is empty).
+	 *
+	 * @param string $label Label.
+	 * @param mixed  $value Value.
+	 */
 	private static function meta_pair( $label, $value ) {
 		if ( '' === $value || null === $value ) {
 			return '';
@@ -1713,6 +1847,13 @@ class MCM_Query {
 		return '<span class="mcm-meta-line">' . $label_html . '<span class="mcm-meta-value">' . esc_html( $value ) . '</span></span>';
 	}
 
+	/**
+	 * One "Label: term, term" line from a taxonomy.
+	 *
+	 * @param string $label Label.
+	 * @param int    $id    Post ID.
+	 * @param string $tax   Taxonomy name.
+	 */
 	private static function tax_pair( $label, $id, $tax ) {
 		$names = self::cached_term_names( $id, $tax );
 		if ( empty( $names ) ) {
@@ -1721,6 +1862,11 @@ class MCM_Query {
 		return self::meta_pair( $label, implode( ', ', $names ) );
 	}
 
+	/**
+	 * Start and end time line.
+	 *
+	 * @param int $id Post ID.
+	 */
 	private static function time_range( $id ) {
 		$start = MCM_Safe::meta( $id, 'mcm_start_time' );
 		$end   = MCM_Safe::meta( $id, 'mcm_end_time' );
@@ -1760,6 +1906,8 @@ class MCM_Query {
 	 * (wp_get_post_terms). In a listing loop this is the difference between one
 	 * DB query per row per taxonomy and zero extra queries.
 	 *
+	 * @param int    $id Post ID.
+	 * @param string $tax Taxonomy name.
 	 * @return string[] Term names (empty array if none / error).
 	 */
 	public static function cached_term_names( $id, $tax ) {
@@ -1770,20 +1918,29 @@ class MCM_Query {
 		return wp_list_pluck( $terms, 'name' );
 	}
 
-	/** Comma-joined term names for a taxonomy (empty string if none). */
+	/**
+	 * Comma-joined term names for a taxonomy (empty string if none).
+	 *
+	 * @param int    $id Post ID.
+	 * @param string $tax Taxonomy name.
+	 */
 	private static function tax_names( $id, $tax ) {
 		return implode( ', ', self::cached_term_names( $id, $tax ) );
 	}
 
 	/*
-	----------------------------------------------------------------- *
-	 *  Single / detail
-	 * ----------------------------------------------------------------- */
+	 * ----------------------------------------------------------------
+	 * Single / detail
+	 * ----------------------------------------------------------------
+	 */
 
 	/**
 	 * Elegant, type-specific details panel for a single CPT: a heading, an
 	 * info grid of the relevant fields, and action buttons (Apply / Register /
 	 * Call / Email / LinkedIn). Returns '' when there's nothing to show.
+	 *
+	 * @param int    $id Post ID.
+	 * @param string $type Post type.
 	 */
 	public static function single_details( $id, $type ) {
 		$rows    = array(); // label => value.
@@ -2075,6 +2232,11 @@ class MCM_Query {
 		return ob_get_clean();
 	}
 
+	/**
+	 * A single published entry, for [mcm_single].
+	 *
+	 * @param int $id Post ID.
+	 */
 	public static function single( $id ) {
 		$id   = absint( $id );
 		$type = $id ? get_post_type( $id ) : '';

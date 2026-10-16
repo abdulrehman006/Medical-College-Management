@@ -9,8 +9,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * Content list shortcodes and the shared block renderer.
+ */
 class MCM_Shortcodes {
 
+	/**
+	 * Register the hooks this module needs.
+	 */
 	public function __construct() {
 		add_shortcode( 'mcm_consultants', array( $this, 'sc_consultants' ) );
 		add_shortcode( 'mcm_team', array( $this, 'sc_team' ) );
@@ -37,11 +43,18 @@ class MCM_Shortcodes {
 
 	/**
 	 * WordPress passes '' (empty string) when a shortcode has no attributes.
+	 *
+	 * @param array|string $atts Shortcode attributes.
 	 */
 	private function normalize( $atts ) {
 		return is_array( $atts ) ? $atts : array();
 	}
 
+	/**
+	 * Whether a shortcode-style value means yes (yes/1/true/on).
+	 *
+	 * @param mixed $val Value.
+	 */
 	private static function truthy( $val ) {
 		return in_array( strtolower( (string) $val ), array( 'yes', '1', 'true', 'on' ), true );
 	}
@@ -49,6 +62,8 @@ class MCM_Shortcodes {
 	/**
 	 * Shared renderer: outputs a wrapper that AJAX can target. Instance method
 	 * kept for the shortcode callbacks; delegates to the reusable static below.
+	 *
+	 * @param array|string $atts Shortcode attributes.
 	 */
 	private function render( $atts ) {
 		return self::render_block( $atts );
@@ -61,6 +76,8 @@ class MCM_Shortcodes {
 	 * Every listing on the site (shortcodes, Elementor widgets, archive and
 	 * department pages, program pages) comes through here, so this is the
 	 * render boundary: a failure becomes an empty block, never a broken page.
+	 *
+	 * @param array|string $atts Shortcode attributes.
 	 */
 	public static function render_block( $atts ) {
 		$type = ( is_array( $atts ) && isset( $atts['type'] ) ) ? MCM_Safe::str( $atts['type'] ) : '';
@@ -178,36 +195,66 @@ class MCM_Shortcodes {
 		return ob_get_clean();
 	}
 
+	/**
+	 * Shortcode callback for [mcm_consultants].
+	 *
+	 * @param array|string $atts Shortcode attributes.
+	 */
 	public function sc_consultants( $atts ) {
 		$atts         = $this->normalize( $atts );
 		$atts['type'] = 'mcm_consultant';
 		return $this->render( $atts );
 	}
 
+	/**
+	 * Shortcode callback for [mcm_team] and [mcm_teams].
+	 *
+	 * @param array|string $atts Shortcode attributes.
+	 */
 	public function sc_team( $atts ) {
 		$atts         = $this->normalize( $atts );
 		$atts['type'] = 'mcm_team';
 		return $this->render( $atts );
 	}
 
+	/**
+	 * Shortcode callback for [mcm_programs].
+	 *
+	 * @param array|string $atts Shortcode attributes.
+	 */
 	public function sc_programs( $atts ) {
 		$atts         = $this->normalize( $atts );
 		$atts['type'] = 'mcm_program';
 		return $this->render( $atts );
 	}
 
+	/**
+	 * Shortcode callback for [mcm_courses].
+	 *
+	 * @param array|string $atts Shortcode attributes.
+	 */
 	public function sc_courses( $atts ) {
 		$atts         = $this->normalize( $atts );
 		$atts['type'] = 'mcm_course';
 		return $this->render( $atts );
 	}
 
+	/**
+	 * Shortcode callback for [mcm_events].
+	 *
+	 * @param array|string $atts Shortcode attributes.
+	 */
 	public function sc_events( $atts ) {
 		$atts         = $this->normalize( $atts );
 		$atts['type'] = 'mcm_event';
 		return $this->render( $atts );
 	}
 
+	/**
+	 * Shortcode callback for [mcm_timetable].
+	 *
+	 * @param array|string $atts Shortcode attributes.
+	 */
 	public function sc_timetable( $atts ) {
 		$atts         = $this->normalize( $atts );
 		$atts['type'] = 'mcm_timetable';
@@ -217,24 +264,44 @@ class MCM_Shortcodes {
 		return $this->render( $atts );
 	}
 
+	/**
+	 * Shortcode callback for [mcm_admissions].
+	 *
+	 * @param array|string $atts Shortcode attributes.
+	 */
 	public function sc_admissions( $atts ) {
 		$atts         = $this->normalize( $atts );
 		$atts['type'] = 'mcm_admission';
 		return $this->render( $atts );
 	}
 
+	/**
+	 * Shortcode callback for [mcm_tenders].
+	 *
+	 * @param array|string $atts Shortcode attributes.
+	 */
 	public function sc_tenders( $atts ) {
 		$atts         = $this->normalize( $atts );
 		$atts['type'] = 'mcm_tender';
 		return $this->render( $atts );
 	}
 
+	/**
+	 * Shortcode callback for [mcm_scholarships].
+	 *
+	 * @param array|string $atts Shortcode attributes.
+	 */
 	public function sc_scholarships( $atts ) {
 		$atts         = $this->normalize( $atts );
 		$atts['type'] = 'mcm_scholarship';
 		return $this->render( $atts );
 	}
 
+	/**
+	 * Shortcode callback for [mcm_publications].
+	 *
+	 * @param array|string $atts Shortcode attributes.
+	 */
 	public function sc_publications( $atts ) {
 		$atts         = $this->normalize( $atts );
 		$atts['type'] = 'mcm_publication';
@@ -247,12 +314,22 @@ class MCM_Shortcodes {
 		return $this->render( $atts );
 	}
 
+	/**
+	 * Shortcode callback for [mcm_research].
+	 *
+	 * @param array|string $atts Shortcode attributes.
+	 */
 	public function sc_research( $atts ) {
 		$atts         = $this->normalize( $atts );
 		$atts['type'] = 'mcm_research';
 		return $this->render( $atts );
 	}
 
+	/**
+	 * Shortcode callback for [mcm_policies].
+	 *
+	 * @param array|string $atts Shortcode attributes.
+	 */
 	public function sc_policies( $atts ) {
 		$atts         = $this->normalize( $atts );
 		$atts['type'] = 'mcm_policy';
@@ -262,6 +339,11 @@ class MCM_Shortcodes {
 		return $this->render( $atts );
 	}
 
+	/**
+	 * Shortcode callback for [mcm_students] and [mcm_student].
+	 *
+	 * @param array|string $atts Shortcode attributes.
+	 */
 	public function sc_students( $atts ) {
 		$atts         = $this->normalize( $atts );
 		$atts['type'] = 'mcm_student';
@@ -274,24 +356,44 @@ class MCM_Shortcodes {
 		return $this->render( $atts );
 	}
 
+	/**
+	 * Shortcode callback for [mcm_grid].
+	 *
+	 * @param array|string $atts Shortcode attributes.
+	 */
 	public function sc_grid( $atts ) {
 		$atts         = $this->normalize( $atts );
 		$atts['view'] = 'grid';
 		return $this->render( $atts );
 	}
 
+	/**
+	 * Shortcode callback for [mcm_list].
+	 *
+	 * @param array|string $atts Shortcode attributes.
+	 */
 	public function sc_list( $atts ) {
 		$atts         = $this->normalize( $atts );
 		$atts['view'] = 'list';
 		return $this->render( $atts );
 	}
 
+	/**
+	 * Shortcode callback for [mcm_table].
+	 *
+	 * @param array|string $atts Shortcode attributes.
+	 */
 	public function sc_table( $atts ) {
 		$atts         = $this->normalize( $atts );
 		$atts['view'] = 'table';
 		return $this->render( $atts );
 	}
 
+	/**
+	 * Shortcode callback for [mcm_single].
+	 *
+	 * @param array|string $atts Shortcode attributes.
+	 */
 	public function sc_single( $atts ) {
 		$a  = shortcode_atts(
 			array(

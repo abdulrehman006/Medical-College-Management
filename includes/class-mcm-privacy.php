@@ -16,8 +16,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * Personal-data exporter and eraser.
+ */
 class MCM_Privacy {
 
+	/**
+	 * Register the hooks this module needs.
+	 */
 	public function __construct() {
 		add_filter( 'wp_privacy_personal_data_exporters', array( $this, 'register_exporter' ) );
 		add_filter( 'wp_privacy_personal_data_erasers', array( $this, 'register_eraser' ) );
@@ -79,7 +85,11 @@ class MCM_Privacy {
 		);
 	}
 
-	/** @param array $exporters Registered exporters. */
+	/**
+	 * Register the personal-data exporter.
+	 *
+	 * @param array $exporters Registered exporters.
+	 */
 	public function register_exporter( $exporters ) {
 		$exporters['medical-college-manager'] = array(
 			'exporter_friendly_name' => __( 'Medical College Manager', 'medical-college-manager' ),
@@ -88,7 +98,11 @@ class MCM_Privacy {
 		return $exporters;
 	}
 
-	/** @param array $erasers Registered erasers. */
+	/**
+	 * Register the personal-data eraser.
+	 *
+	 * @param array $erasers Registered erasers.
+	 */
 	public function register_eraser( $erasers ) {
 		$erasers['medical-college-manager'] = array(
 			'eraser_friendly_name' => __( 'Medical College Manager', 'medical-college-manager' ),

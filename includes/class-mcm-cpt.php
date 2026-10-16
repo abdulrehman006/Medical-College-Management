@@ -9,8 +9,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * Registers the content types and taxonomies.
+ */
 class MCM_CPT {
 
+	/**
+	 * Register the hooks this module needs.
+	 */
 	public function __construct() {
 		add_action( 'init', array( $this, 'register_post_types' ) );
 		add_action( 'init', array( $this, 'register_taxonomies' ) );
@@ -22,6 +28,9 @@ class MCM_CPT {
 	/**
 	 * Use the classic editor for our content types so non-technical staff get a
 	 * plain title + content + labelled meta-box screen instead of blocks.
+	 *
+	 * @param mixed $use_block Use block.
+	 * @param mixed $post_type Post type.
 	 */
 	public function force_classic_editor( $use_block, $post_type ) {
 		return array_key_exists( $post_type, self::post_types() ) ? false : $use_block;
@@ -292,6 +301,9 @@ class MCM_CPT {
 		);
 	}
 
+	/**
+	 * Register every content type defined in post_types().
+	 */
 	public function register_post_types() {
 		foreach ( self::post_types() as $key => $cfg ) {
 			/* translators (all %s below): the content type's singular or plural name. */
@@ -343,6 +355,9 @@ class MCM_CPT {
 		}
 	}
 
+	/**
+	 * Register every taxonomy defined in taxonomies().
+	 */
 	public function register_taxonomies() {
 		foreach ( self::taxonomies() as $key => $cfg ) {
 			$s      = $cfg['singular'];

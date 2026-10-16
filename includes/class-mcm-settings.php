@@ -9,10 +9,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * Design, printing, privacy and page-banner settings.
+ */
 class MCM_Settings {
 
 	const OPTION = 'mcm_settings';
 
+	/**
+	 * Register the hooks this module needs.
+	 */
 	public function __construct() {
 		add_action( 'admin_menu', array( $this, 'menu' ) );
 		add_action( 'admin_init', array( $this, 'register' ) );
@@ -105,11 +111,19 @@ class MCM_Settings {
 		return wp_parse_args( is_array( $saved ) ? $saved : array(), self::default_settings() );
 	}
 
+	/**
+	 * One saved setting (or its default).
+	 *
+	 * @param string $key Key.
+	 */
 	public static function value( $key ) {
 		$all = self::get();
 		return isset( $all[ $key ] ) ? $all[ $key ] : '';
 	}
 
+	/**
+	 * Add the admin menu page.
+	 */
 	public function menu() {
 		add_menu_page(
 			__( 'Medical College Manager', 'medical-college-manager' ),
@@ -122,12 +136,17 @@ class MCM_Settings {
 		);
 	}
 
+	/**
+	 * Register the setting with its sanitize callback.
+	 */
 	public function register() {
 		register_setting( 'mcm_settings_group', self::OPTION, array( $this, 'sanitize' ) );
 	}
 
 	/**
 	 * Sanitize all incoming settings.
+	 *
+	 * @param array $input Submitted values.
 	 */
 	public function sanitize( $input ) {
 		$defaults = self::default_settings();
@@ -241,6 +260,9 @@ class MCM_Settings {
 		return $css;
 	}
 
+	/**
+	 * Render the admin page.
+	 */
 	public function render_page() {
 		$s = self::get();
 		?>
@@ -416,6 +438,13 @@ class MCM_Settings {
 		<?php
 	}
 
+	/**
+	 * A colour-picker settings row.
+	 *
+	 * @param string $key   Key.
+	 * @param string $label Label.
+	 * @param array  $s     Settings.
+	 */
 	private function color_row( $key, $label, $s ) {
 		printf(
 			'<tr><th scope="row"><label for="%1$s">%2$s</label></th><td><input type="text" class="mcm-color-field" id="%1$s" name="%4$s[%1$s]" value="%3$s" data-default-color="%3$s" /></td></tr>',
@@ -426,6 +455,15 @@ class MCM_Settings {
 		);
 	}
 
+	/**
+	 * A number settings row.
+	 *
+	 * @param string $key   Key.
+	 * @param string $label Label.
+	 * @param array  $s     Settings.
+	 * @param int    $min   Minimum.
+	 * @param int    $max   Maximum.
+	 */
 	private function number_row( $key, $label, $s, $min, $max ) {
 		printf(
 			'<tr><th scope="row"><label for="%1$s">%2$s</label></th><td><input type="number" min="%5$d" max="%6$d" id="%1$s" name="%4$s[%1$s]" value="%3$s" class="small-text" /></td></tr>',
@@ -442,6 +480,8 @@ class MCM_Settings {
 	 * Checkbox list of content types that show a Print button. Generic on
 	 * purpose: printing is not a timetable feature that other types borrow, it
 	 * is a capability any type can be given from here — no code, no override.
+	 *
+	 * @param array $s Settings.
 	 */
 	private function print_types_row( $s ) {
 		$current = isset( $s['print_types'] ) && is_array( $s['print_types'] ) ? $s['print_types'] : array();
@@ -473,7 +513,11 @@ class MCM_Settings {
 		<?php
 	}
 
-	/** Branded placeholder shown for people with no photograph. */
+	/**
+	 * Branded placeholder shown for people with no photograph.
+	 *
+	 * @param array $s Settings.
+	 */
 	private function avatar_row( $s ) {
 		?>
 		<tr>
@@ -496,7 +540,11 @@ class MCM_Settings {
 	}
 
 	/** Letterhead used on printed / PDF output. */
-	/** One banner row (video URL + image picker) per public content type. */
+	/**
+	 * One banner row (video URL + image picker) per public content type.
+	 *
+	 * @param array $s Settings.
+	 */
 	private function banner_rows( $s ) {
 		$saved = isset( $s['archive_banners'] ) && is_array( $s['archive_banners'] ) ? $s['archive_banners'] : array();
 		foreach ( MCM_CPT::post_types() as $type => $cfg ) {
@@ -530,6 +578,11 @@ class MCM_Settings {
 		}
 	}
 
+	/**
+	 * Letterhead settings rows: logo, institution name, address, footer note and signature block.
+	 *
+	 * @param array $s Settings.
+	 */
 	private function letterhead_rows( $s ) {
 		?>
 		<tr>
@@ -582,7 +635,11 @@ class MCM_Settings {
 		$this->toggle_row( 'print_signature', __( 'Signature Block', 'medical-college-manager' ), $s );
 	}
 
-	/** How the featured image is handled on single pages. */
+	/**
+	 * How the featured image is handled on single pages.
+	 *
+	 * @param array $s Settings.
+	 */
 	private function single_image_row( $s ) {
 		$mode    = isset( $s['single_image'] ) ? $s['single_image'] : 'auto';
 		$options = array(
@@ -607,6 +664,13 @@ class MCM_Settings {
 		<?php
 	}
 
+	/**
+	 * A checkbox settings row.
+	 *
+	 * @param string $key   Key.
+	 * @param string $label Label.
+	 * @param array  $s     Settings.
+	 */
 	private function toggle_row( $key, $label, $s ) {
 		printf(
 			'<tr><th scope="row">%2$s</th><td><label><input type="checkbox" id="%1$s" name="%4$s[%1$s]" value="1" %3$s /> %5$s</label></td></tr>',

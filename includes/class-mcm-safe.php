@@ -18,6 +18,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * Error boundaries and safe value readers.
+ */
 class MCM_Safe {
 
 	/**
@@ -46,10 +49,11 @@ class MCM_Safe {
 	 * @return object|null The module, or null when it failed.
 	 */
 	public static function boot( $class_name ) {
+		if ( ! class_exists( $class_name ) ) {
+			MCM_Health::module_failed( $class_name, new \RuntimeException( sprintf( 'Class %s is not available.', $class_name ) ) );
+			return null;
+		}
 		try {
-			if ( ! class_exists( $class_name ) ) {
-				throw new \RuntimeException( sprintf( 'Class %s is not available.', $class_name ) );
-			}
 			$module = new $class_name();
 			MCM_Health::module_ok( $class_name );
 			return $module;

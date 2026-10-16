@@ -9,10 +9,21 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * CSV import and export screen.
+ */
 class MCM_Import {
 
+	/**
+	 * Result notice shown at the top of the import page.
+	 *
+	 * @var string
+	 */
 	private $notice = '';
 
+	/**
+	 * Register the hooks this module needs.
+	 */
 	public function __construct() {
 		add_action( 'admin_menu', array( $this, 'menu' ), 11 );
 		// Handle CSV export early (before the admin page outputs any HTML).
@@ -57,6 +68,11 @@ class MCM_Import {
 		return $value;
 	}
 
+	/**
+	 * Columns of an export file: exactly the columns the importer reads.
+	 *
+	 * @param string $type Post type.
+	 */
 	private static function export_columns( $type ) {
 		$schema = self::schema();
 		// 'id' is first so a re-imported export updates the exact record it came
@@ -334,6 +350,9 @@ class MCM_Import {
 		);
 	}
 
+	/**
+	 * Add the admin menu page.
+	 */
 	public function menu() {
 		add_submenu_page(
 			'mcm-settings',
@@ -728,6 +747,8 @@ class MCM_Import {
 	 * and creating it only when none exists. This keeps the same entity as ONE
 	 * term across separate CSV imports so relationships connect reliably.
 	 *
+	 * @param string[] $names Term names.
+	 * @param string   $tax Taxonomy name.
 	 * @return int[]
 	 */
 	private static function resolve_term_ids( $names, $tax ) {
@@ -756,6 +777,9 @@ class MCM_Import {
 	/**
 	 * Sanitize a meta value according to the field's nature (URL / email /
 	 * multi-line) so CSV imports match the admin meta-box behaviour.
+	 *
+	 * @param string $key Key.
+	 * @param mixed  $val Value.
 	 */
 	private static function sanitize_meta_value( $key, $val ) {
 		// Derive the type from the meta-box definitions rather than a hand-kept
@@ -798,10 +822,18 @@ class MCM_Import {
 		return isset( $types[ $key ] ) ? $types[ $key ] : 'text';
 	}
 
+	/**
+	 * An error notice.
+	 *
+	 * @param string $msg Message.
+	 */
 	private function error_html( $msg ) {
 		return '<div class="notice notice-error is-dismissible"><p>' . esc_html( $msg ) . '</p></div>';
 	}
 
+	/**
+	 * Render the admin page.
+	 */
 	public function render_page() {
 		$this->process();
 		$types = self::types();
@@ -896,6 +928,11 @@ class MCM_Import {
 		<?php
 	}
 
+	/**
+	 * Comma-separated list of the columns a type's CSV may use.
+	 *
+	 * @param string $type Post type.
+	 */
 	private function columns_hint( $type ) {
 		$schema = self::schema();
 		$cols   = array( 'title', 'content' );
