@@ -136,6 +136,10 @@ class MCM_Ajax {
 				'meta_type'   => sanitize_text_field( MCM_Safe::scalar( $config, 'meta_type' ) ),
 				'lock_tax'    => sanitize_key( MCM_Safe::scalar( $config, 'lock_tax' ) ),
 				'lock_term'   => sanitize_title( MCM_Safe::scalar( $config, 'lock_term' ) ),
+				// Pagination survives filtering: a paginated block stays
+				// paginated, and the pager loads pages in place.
+				'paginate'    => MCM_Query::truthy( MCM_Safe::scalar( $config, 'paginate', 'no' ) ) ? 'yes' : 'no',
+				'paged'       => max( 1, absint( MCM_Safe::scalar( $config, 'paged', '1' ) ) ),
 				'search'      => sanitize_text_field( MCM_Safe::post( 'search' ) ),
 				'scope'       => $scope,
 				'tax_filters' => $tax_filters,

@@ -46,8 +46,12 @@
 		$wrap.find( '.mcm-ajax-error' ).hide().text( '' );
 	}
 
-	function run( $wrap ) {
-		var config = $wrap.data( 'config' ) || {};
+	// page: which results page to load (1 for every new search or filter).
+	function run( $wrap, page ) {
+		var config = $.extend( {}, $wrap.data( 'config' ) || {} );
+		config.paged = page || 1;
+		// From now on the block's pager loads pages in place (see below).
+		$wrap.data( 'mcmFiltered', true );
 		var search = $wrap.find( '.mcm-search' ).val() || '';
 		var taxes  = collectTaxes( $wrap );
 		var $res   = $wrap.find( '.mcm-results' );
@@ -199,8 +203,11 @@
 	}
 
 	function printBlock( $wrap, $btn ) {
-		// Nothing paginated on screen — print exactly what is shown.
-		if ( ! $wrap.find( '.mcm-results .mcm-pagination' ).length ) {
+		// A block that is not paginated shows everything it will ever show:
+		// print exactly that. A paginated block (whether or not a pager is
+		// visible right now) is re-fetched in full below.
+		var paginated = /^(yes|1|true|on)$/i.test( String( ( $wrap.data( 'config' ) || {} ).paginate || '' ) );
+		if ( ! paginated && ! $wrap.find( '.mcm-results .mcm-pagination' ).length ) {
 			doPrint( $wrap, null );
 			return;
 		}
@@ -267,6 +274,22 @@
 		} )
 		.on( 'click', '.mcm-wrap .mcm-print-btn', function () {
 			printBlock( blockOf( this ), $( this ) );
+		} )
+		// Pager of a block the visitor has filtered: load that page in place
+		// so the filters are kept. An unfiltered block keeps its normal page
+		// links (real URLs, back button, crawlable).
+		.on( 'click', '.mcm-wrap .mcm-pagination a', function ( e ) {
+			var $wrap = blockOf( this );
+			if ( ! $wrap.length || ! $wrap.data( 'mcmFiltered' ) ) {
+				return;
+			}
+			var href  = String( this.getAttribute( 'href' ) || '' );
+			var match = /[?&]paged=(\d+)/.exec( href ) || /\/page\/(\d+)/.exec( href );
+			e.preventDefault();
+			run( $wrap, match ? parseInt( match[ 1 ], 10 ) : 1 );
+			if ( $wrap[ 0 ].scrollIntoView ) {
+				$wrap[ 0 ].scrollIntoView( { behavior: 'smooth', block: 'start' } );
+			}
 		} )
 		// Notice ticker / board pause toggle.
 		.on( 'click', '.mcm-scroll-pause', function () {

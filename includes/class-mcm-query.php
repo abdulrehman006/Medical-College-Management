@@ -1409,9 +1409,14 @@ class MCM_Query {
 		if ( $total < 2 ) {
 			return '';
 		}
+		// In a live (AJAX) response there is no page URL to build on: the links
+		// carry ?paged=N and the front-end script loads that page in place,
+		// keeping the visitor's filters. On a normal page load they are real
+		// page URLs (/events/page/2/), so unfiltered lists stay crawlable.
+		$base  = wp_doing_ajax() ? '?paged=%#%' : str_replace( 999999999, '%#%', esc_url( get_pagenum_link( 999999999 ) ) );
 		$links = paginate_links(
 			array(
-				'base'      => str_replace( 999999999, '%#%', esc_url( get_pagenum_link( 999999999 ) ) ),
+				'base'      => $base,
 				'format'    => '?paged=%#%',
 				'current'   => max( 1, (int) $current ),
 				'total'     => $total,
