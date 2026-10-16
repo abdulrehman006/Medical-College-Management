@@ -302,19 +302,19 @@ class MCM_CPT {
 				'singular_name'      => $s,
 				'menu_name'          => $p,
 				'add_new'            => __( 'Add New', 'medical-college-manager' ),
-				/* translators: %s: content type singular name. */
+				/* translators: %s: content type or taxonomy singular name. */
 				'add_new_item'       => sprintf( __( 'Add New %s', 'medical-college-manager' ), $s ),
-				/* translators: %s: content type singular name. */
+				/* translators: %s: content type or taxonomy singular name. */
 				'edit_item'          => sprintf( __( 'Edit %s', 'medical-college-manager' ), $s ),
-				/* translators: %s: content type singular name. */
+				/* translators: %s: content type or taxonomy singular name. */
 				'new_item'           => sprintf( __( 'New %s', 'medical-college-manager' ), $s ),
-				/* translators: %s: content type singular name. */
+				/* translators: %s: content type or taxonomy singular name. */
 				'view_item'          => sprintf( __( 'View %s', 'medical-college-manager' ), $s ),
-				/* translators: %s: content type plural name. */
+				/* translators: %s: content type or taxonomy plural name. */
 				'search_items'       => sprintf( __( 'Search %s', 'medical-college-manager' ), $p ),
 				'not_found'          => __( 'Nothing found', 'medical-college-manager' ),
 				'not_found_in_trash' => __( 'Nothing found in Trash', 'medical-college-manager' ),
-				/* translators: %s: content type plural name. */
+				/* translators: %s: content type or taxonomy plural name. */
 				'all_items'          => sprintf( __( 'All %s', 'medical-college-manager' ), $p ),
 			);
 
@@ -347,17 +347,17 @@ class MCM_CPT {
 			$labels = array(
 				'name'          => $p,
 				'singular_name' => $s,
-				/* translators: %s: taxonomy plural name. */
+				/* translators: %s: content type or taxonomy plural name. */
 				'search_items'  => sprintf( __( 'Search %s', 'medical-college-manager' ), $p ),
-				/* translators: %s: taxonomy plural name. */
+				/* translators: %s: content type or taxonomy plural name. */
 				'all_items'     => sprintf( __( 'All %s', 'medical-college-manager' ), $p ),
-				/* translators: %s: taxonomy singular name. */
+				/* translators: %s: content type or taxonomy singular name. */
 				'edit_item'     => sprintf( __( 'Edit %s', 'medical-college-manager' ), $s ),
-				/* translators: %s: taxonomy singular name. */
+				/* translators: %s: content type or taxonomy singular name. */
 				'update_item'   => sprintf( __( 'Update %s', 'medical-college-manager' ), $s ),
-				/* translators: %s: taxonomy singular name. */
+				/* translators: %s: content type or taxonomy singular name. */
 				'add_new_item'  => sprintf( __( 'Add New %s', 'medical-college-manager' ), $s ),
-				/* translators: %s: taxonomy singular name. */
+				/* translators: %s: content type or taxonomy singular name. */
 				'new_item_name' => sprintf( __( 'New %s Name', 'medical-college-manager' ), $s ),
 				'menu_name'     => $p,
 			);

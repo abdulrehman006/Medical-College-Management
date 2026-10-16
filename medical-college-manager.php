@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       Medical College Manager
  * Description:       Content types for a medical college - Timetable, Programs, Courses, Events, Consultants, Team, Admissions, Notices, Tenders, Scholarships, Publications, Research Projects, Policies and Students - with shared connectors, CSV import/export, filterable archives, Elementor widgets and letterheaded printing.
- * Version:           1.30.1
+ * Version:           1.30.2
  * Author:            Abdul R
  * License:           GPL-2.0+
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
@@ -48,7 +48,7 @@ function mcm_php_version_notice() {
 /* ------------------------------------------------------------------ *
  *  Constants
  * ------------------------------------------------------------------ */
-define( 'MCM_VERSION', '1.30.1' );
+define( 'MCM_VERSION', '1.30.2' );
 define( 'MCM_FILE', __FILE__ );
 define( 'MCM_PATH', plugin_dir_path( __FILE__ ) );
 define( 'MCM_URL', plugin_dir_url( __FILE__ ) );

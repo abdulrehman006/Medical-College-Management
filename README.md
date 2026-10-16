@@ -16,6 +16,7 @@ A WordPress plugin that turns a WordPress site into a complete website for a med
 - **Design settings**: colours, spacing, columns, page banners and custom CSS, without code.
 - **SEO**: schema.org JSON-LD for people, events, courses, programs and publications.
 - **Privacy**: student records have their own capabilities (administrators only), no REST route, and only safe fields on the front end. Includes WordPress personal-data export and erase support.
+- **Built not to break your site**: every module and every rendered block runs behind an error boundary. A problem shows visitors an empty block instead of a broken page, is logged, and appears under Tools → Site Health with checks for PHP, WordPress, Elementor, timezone and permalinks.
 
 ## Requirements
 
