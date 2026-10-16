@@ -526,7 +526,7 @@ class MCM_Query {
 		$taxes = isset( $map[ $a['type'] ] ) ? $map[ $a['type'] ] : array();
 
 		$placeholder = ( 'mcm_student' === $a['type'] )
-			? __( 'Search by name, ID, PMDC No., email…', 'medical-college-manager' )
+			? __( 'Search by name, ID or PMDC No.…', 'medical-college-manager' )
 			: __( 'Search by name, keyword…', 'medical-college-manager' );
 
 		$scope = self::scope_terms( $a );

@@ -228,14 +228,6 @@ class MCM_Import {
 			'mcm_tender'     => array( 'label' => __( 'Tenders', 'medical-college-manager' ), 'sample' => 'sample-tenders.csv' ),
 			'mcm_scholarship' => array( 'label' => __( 'Scholarships', 'medical-college-manager' ), 'sample' => 'sample-scholarships.csv' ),
 			'mcm_publication' => array( 'label' => __( 'Publications', 'medical-college-manager' ), 'sample' => 'sample-publications.csv' ),
-			'mcm_research'   => array(
-				'meta' => array( 'res_pi', 'res_status', 'res_start', 'res_completed', 'res_students', 'res_coinv', 'res_funding', 'res_doc' ),
-				'tax'  => array( 'research_area' => 'mcm_research_area', 'department' => 'mcm_department', 'professor' => 'mcm_teacher' ),
-			),
-			'mcm_policy'     => array(
-				'meta' => array( 'policy_issuer', 'policy_ref', 'policy_date', 'policy_doc' ),
-				'tax'  => array( 'policy_category' => 'mcm_policy_cat', 'department' => 'mcm_department' ),
-			),
 			'mcm_research'   => array( 'label' => __( 'Research Projects', 'medical-college-manager' ), 'sample' => 'sample-research.csv' ),
 			'mcm_policy'     => array( 'label' => __( 'Policies', 'medical-college-manager' ), 'sample' => 'sample-policies.csv' ),
 			'mcm_notice'     => array( 'label' => __( 'Notices', 'medical-college-manager' ), 'sample' => 'sample-notices.csv' ),

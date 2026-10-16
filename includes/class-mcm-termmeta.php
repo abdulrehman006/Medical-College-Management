@@ -286,34 +286,6 @@ class MCM_TermMeta {
 	}
 
 	/**
-	 * The department intro block rendered above a term archive: banner video,
-	 * HOD photo, name and welcome message. Returns '' when nothing is set, so a
-	 * department that has not filled anything in looks exactly as before.
-	 *
-	 * @param WP_Term $term Term object.
-	 * @return string
-	 */
-	/**
-	 * Is this URL a known oEmbed video provider we are willing to let the
-	 * server contact? Restricts SSRF to YouTube/Vimeo only.
-	 *
-	 * @param string $url Candidate URL.
-	 * @return bool
-	 */
-	private static function is_embed_provider( $url ) {
-		$host = wp_parse_url( $url, PHP_URL_HOST );
-		if ( ! $host ) {
-			return false;
-		}
-		$host  = strtolower( $host );
-		$allow = apply_filters(
-			'mcm_embed_provider_hosts',
-			array( 'youtube.com', 'www.youtube.com', 'm.youtube.com', 'youtu.be', 'vimeo.com', 'www.vimeo.com', 'player.vimeo.com' )
-		);
-		return in_array( $host, $allow, true );
-	}
-
-	/**
 	 * Resolve which Department term a shortcode targets: the `department` (or
 	 * `dept`) attribute slug, else the current queried term when placed on a
 	 * department archive / Elementor department template.
