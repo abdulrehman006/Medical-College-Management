@@ -111,6 +111,11 @@ class MCM_Shortcodes {
 		if ( 'mcm_student' === $a['type'] && ! MCM_Query::students_visible() ) {
 			return '';
 		}
+		// Jobs are listable only while the Jobs module is up (it is what hides
+		// jobs not yet published); otherwise only staff see the list.
+		if ( 'mcm_job' === $a['type'] && ! MCM_Query::type_allowed( 'mcm_job' ) ) {
+			return '';
+		}
 
 		$data = array(
 			'type'      => $a['type'],

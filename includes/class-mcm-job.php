@@ -45,6 +45,9 @@ class MCM_Job {
 		add_filter( 'mcm_query_args', array( __CLASS__, 'query_args' ), 10, 2 );
 		add_filter( 'mcm_print_titles', array( __CLASS__, 'print_title' ) );
 		add_action( 'template_redirect', array( __CLASS__, 'hide_upcoming_single' ) );
+		// Search, feeds, sitemaps, REST and taxonomy archives too.
+		add_action( 'pre_get_posts', array( __CLASS__, 'hide_upcoming_in_queries' ) );
+		add_filter( 'rest_prepare_' . self::TYPE, array( __CLASS__, 'hide_upcoming_rest' ), 10, 2 );
 
 		add_filter( 'manage_' . self::TYPE . '_posts_columns', array( __CLASS__, 'admin_columns' ) );
 		add_action( 'manage_' . self::TYPE . '_posts_custom_column', array( __CLASS__, 'admin_column_value' ), 10, 2 );
@@ -424,6 +427,70 @@ class MCM_Job {
 			status_header( 404 );
 			nocache_headers();
 		}
+	}
+
+	/**
+	 * Whether the current user may see jobs that are not published yet.
+	 *
+	 * @return bool
+	 */
+	private static function can_see_upcoming() {
+		$obj = get_post_type_object( self::TYPE );
+		return $obj && current_user_can( $obj->cap->edit_posts );
+	}
+
+	/**
+	 * Keep upcoming jobs out of every front-end query that can list them: site
+	 * search, feeds, sitemaps, REST collections and taxonomy archives. Admin
+	 * screens and editors are left alone. Other post types have no publication
+	 * date meta, so the NOT EXISTS branch lets them through unchanged.
+	 *
+	 * @param WP_Query $query Query being prepared.
+	 */
+	public static function hide_upcoming_in_queries( $query ) {
+		if ( ( is_admin() && ! wp_doing_ajax() ) || self::can_see_upcoming() ) {
+			return;
+		}
+		$types = array_filter( (array) $query->get( 'post_type' ) );
+		$hit   = in_array( self::TYPE, $types, true ) || in_array( 'any', $types, true )
+			|| ( ! $types && ( $query->is_search() || $query->is_tax() ) );
+		if ( ! $hit ) {
+			return;
+		}
+		$meta = $query->get( 'meta_query' );
+		// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Publication date gate.
+		$query->set(
+			'meta_query',
+			$meta ? array(
+				'relation' => 'AND',
+				self::published_meta_query(),
+				$meta,
+			) : self::published_meta_query()
+		);
+	}
+
+	/**
+	 * A REST request for one upcoming job answers like a missing one.
+	 *
+	 * The controller needs a response object back (a WP_Error here is fatal),
+	 * so this is the same body core sends for an unknown ID, with a 404.
+	 *
+	 * @param WP_REST_Response $response Response.
+	 * @param WP_Post          $post     Job.
+	 * @return WP_REST_Response
+	 */
+	public static function hide_upcoming_rest( $response, $post ) {
+		if ( 'upcoming' !== self::status( $post->ID ) || current_user_can( 'edit_post', $post->ID ) ) {
+			return $response;
+		}
+		return new WP_REST_Response(
+			array(
+				'code'    => 'rest_post_invalid_id',
+				'message' => __( 'Invalid post ID.', 'medical-college-manager' ),
+				'data'    => array( 'status' => 404 ),
+			),
+			404
+		);
 	}
 
 	/*

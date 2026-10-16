@@ -87,7 +87,8 @@ class MCM_Notice {
 		}
 		$types = (array) apply_filters( 'mcm_notice_feed_types', $types, $a );
 		$types = array_values( array_intersect( $known, array_map( 'strval', $types ) ) );
-		if ( ! class_exists( 'MCM_Job' ) ) {
+		// No jobs while the Jobs module is down (the type is then not viewable).
+		if ( ! class_exists( 'MCM_Job' ) || ! is_post_type_viewable( 'mcm_job' ) ) {
 			$types = array_values( array_diff( $types, array( 'job' ) ) );
 		}
 		return $types;

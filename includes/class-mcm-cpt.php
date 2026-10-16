@@ -368,6 +368,17 @@ class MCM_CPT {
 				$args = array_merge( $args, $cfg['args'] );
 			}
 
+			// Fail closed: the Jobs module is what keeps jobs with a future
+			// publication date out of view. If it failed to start, jobs stay
+			// editable but nothing about them is public until it is fixed.
+			// Rewrite rules are kept, so /jobs/ returns once the module works.
+			if ( 'mcm_job' === $key && class_exists( 'MCM_Health' ) && array_key_exists( 'MCM_Job', MCM_Health::disabled_modules() ) ) {
+				$args['publicly_queryable']  = false;
+				$args['exclude_from_search'] = true;
+				$args['show_in_rest']        = false;
+				$args['show_in_nav_menus']   = false;
+			}
+
 			register_post_type( $key, apply_filters( "mcm_cpt_args_{$key}", $args ) );
 		}
 	}
