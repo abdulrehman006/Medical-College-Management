@@ -74,6 +74,74 @@ final class Medical_College_Manager {
 
 		// Flush rewrite rules once after an update changes CPT registration.
 		add_action( 'init', array( $this, 'maybe_flush_rewrites' ), 99 );
+
+		// Late on init, after every module registered its shortcodes: give any
+		// plugin shortcode whose module was switched off a silent stand-in, so
+		// visitors never see raw "[mcm_blog]" text on the page.
+		add_action( 'init', array( $this, 'guard_shortcodes' ), 999 );
+	}
+
+	/**
+	 * Every shortcode the plugin provides.
+	 *
+	 * @return string[]
+	 */
+	public static function shortcode_tags() {
+		return array(
+			'mcm_consultants',
+			'mcm_team',
+			'mcm_teams',
+			'mcm_programs',
+			'mcm_courses',
+			'mcm_events',
+			'mcm_timetable',
+			'mcm_admissions',
+			'mcm_tenders',
+			'mcm_scholarships',
+			'mcm_publications',
+			'mcm_research',
+			'mcm_policies',
+			'mcm_students',
+			'mcm_student',
+			'mcm_grid',
+			'mcm_list',
+			'mcm_table',
+			'mcm_single',
+			'mcm_notices',
+			'mcm_notice_ticker',
+			'mcm_notice_board',
+			'mcm_blog',
+			'mcm_social_bar',
+			'mcm_department_hero',
+			'mcm_department_message',
+			'mcm_department_intro',
+			'mcm_department_sections',
+		);
+	}
+
+	/**
+	 * Register a stand-in for every plugin shortcode that no module registered
+	 * (its module failed to start).
+	 */
+	public function guard_shortcodes() {
+		foreach ( self::shortcode_tags() as $tag ) {
+			if ( ! shortcode_exists( $tag ) ) {
+				add_shortcode( $tag, array( $this, 'unavailable_shortcode' ) );
+			}
+		}
+	}
+
+	/**
+	 * Stand-in for a shortcode whose module is switched off: nothing for
+	 * visitors, a short notice for administrators.
+	 *
+	 * @param array|string $atts    Shortcode attributes (unused).
+	 * @param string       $content Enclosed content (unused).
+	 * @param string       $tag     Shortcode tag.
+	 * @return string
+	 */
+	public function unavailable_shortcode( $atts, $content = '', $tag = '' ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundBeforeLastUsed -- Shortcode callback signature.
+		return MCM_Safe::admin_box( 'shortcode ' . MCM_Safe::str( $tag ) );
 	}
 
 	/**
