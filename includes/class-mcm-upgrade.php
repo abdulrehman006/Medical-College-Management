@@ -181,24 +181,25 @@ class MCM_Upgrade {
 
 			// One UPDATE per batch (a row-by-row update took ~20 ms per value).
 			if ( $updates ) {
-				$cases = array();
-				$args  = array();
+				$args = array();
 				foreach ( $updates as $meta_id => $normal ) {
-					$cases[] = 'WHEN %d THEN %s';
-					$args[]  = $meta_id;
-					$args[]  = $normal;
+					$args[] = $meta_id;
+					$args[] = $normal;
 				}
-				$id_ph = implode( ',', array_fill( 0, count( $updates ), '%d' ) );
-				$args  = array_merge( $args, array_keys( $updates ) );
-				// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare, WordPress.DB.PreparedSQL.NotPrepared -- CASE/IN placeholder runs built from count(); every value is a prepare() replacement.
+				$args = array_merge( $args, array_keys( $updates ) );
+				// Placeholder runs only — fixed text, no data: one "WHEN %d THEN %s"
+				// per row and one "%d" per id. Every value is a prepare() argument.
+				$case_ph = str_repeat( 'WHEN %d THEN %s ', count( $updates ) );
+				$id_ph   = implode( ',', array_fill( 0, count( $updates ), '%d' ) );
+				// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- $case_ph/$id_ph are placeholder runs built from count(); every value is a prepare() replacement.
 				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- One-time upgrade; the post meta cache is cleared below.
 				$changed = $wpdb->query(
 					$wpdb->prepare(
-						"UPDATE {$wpdb->postmeta} SET meta_value = CASE meta_id " . implode( ' ', $cases ) . " END WHERE meta_id IN ( {$id_ph} )",
+						"UPDATE {$wpdb->postmeta} SET meta_value = CASE meta_id {$case_ph}END WHERE meta_id IN ( {$id_ph} )",
 						$args
 					)
 				);
-				// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare, WordPress.DB.PreparedSQL.NotPrepared
+				// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
 				$result['converted'] += (int) $changed;
 				foreach ( array_keys( $touched ) as $post_id ) {
 					wp_cache_delete( $post_id, 'post_meta' );
