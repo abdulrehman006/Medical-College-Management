@@ -92,9 +92,9 @@ class MCM_Notice {
 	}
 
 	private static function sort_key( $id ) {
-		$pinned = ( 'Yes' === get_post_meta( $id, 'mcm_notice_pinned', true ) ) ? 1 : 0;
+		$pinned = ( 'Yes' === MCM_Safe::meta( $id, 'mcm_notice_pinned' ) ) ? 1 : 0;
 		$map    = array( 'Urgent' => 3, 'Important' => 2, 'Normal' => 1 );
-		$p      = get_post_meta( $id, 'mcm_notice_priority', true );
+		$p      = MCM_Safe::meta( $id, 'mcm_notice_priority' );
 		$prio   = isset( $map[ $p ] ) ? $map[ $p ] : 1;
 		return array( $pinned, $prio, self::notice_ts( $id ) );
 	}
@@ -121,7 +121,7 @@ class MCM_Notice {
 			if ( '' !== $dept && ! has_term( $dept, 'mcm_department', $id ) ) {
 				continue;
 			}
-			if ( '' !== $prio && strtolower( (string) get_post_meta( $id, 'mcm_notice_priority', true ) ) !== $prio ) {
+			if ( '' !== $prio && strtolower( (string) MCM_Safe::meta( $id, 'mcm_notice_priority' ) ) !== $prio ) {
 				continue;
 			}
 			if ( $cutoff && self::notice_ts( $id ) < $cutoff ) {
@@ -140,7 +140,7 @@ class MCM_Notice {
 	 * ----------------------------------------------------------------- */
 
 	private static function notice_ts( $id ) {
-		$d = get_post_meta( $id, 'mcm_notice_date', true );
+		$d = MCM_Safe::meta( $id, 'mcm_notice_date' );
 		if ( $d ) {
 			$t = strtotime( $d );
 			if ( $t ) {
@@ -155,12 +155,12 @@ class MCM_Notice {
 	}
 
 	private static function notice_link( $id ) {
-		$u = get_post_meta( $id, 'mcm_notice_url', true );
+		$u = MCM_Safe::meta( $id, 'mcm_notice_url' );
 		return $u ? $u : get_permalink( $id );
 	}
 
 	private static function link_attrs( $id ) {
-		return get_post_meta( $id, 'mcm_notice_url', true ) ? ' target="_blank" rel="noopener noreferrer"' : '';
+		return MCM_Safe::meta( $id, 'mcm_notice_url' ) ? ' target="_blank" rel="noopener noreferrer"' : '';
 	}
 
 	private static function is_new( $id ) {
@@ -169,7 +169,7 @@ class MCM_Notice {
 	}
 
 	private static function priority_class( $id ) {
-		$p = strtolower( (string) get_post_meta( $id, 'mcm_notice_priority', true ) );
+		$p = strtolower( (string) MCM_Safe::meta( $id, 'mcm_notice_priority' ) );
 		return $p ? ' mcm-notice--' . sanitize_html_class( $p ) : '';
 	}
 

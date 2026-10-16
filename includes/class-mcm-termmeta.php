@@ -98,7 +98,7 @@ class MCM_TermMeta {
 	 * @return array<string,bool>
 	 */
 	public static function hidden_sections( $term_id ) {
-		$raw    = (string) get_term_meta( $term_id, 'mcm_term_hidden', true );
+		$raw    = (string) MCM_Safe::term_meta( $term_id, 'mcm_term_hidden' );
 		$hidden = array();
 		foreach ( array_filter( array_map( 'trim', explode( ',', $raw ) ) ) as $cpt ) {
 			$hidden[ $cpt ] = true;
@@ -165,7 +165,7 @@ class MCM_TermMeta {
 		}
 		wp_nonce_field( 'mcm_term_save', 'mcm_term_nonce' );
 		foreach ( $fields as $key => $field ) {
-			$value = get_term_meta( $term->term_id, $key, true );
+			$value = MCM_Safe::term_meta( $term->term_id, $key );
 			echo '<tr class="form-field">';
 			printf( '<th scope="row"><label for="%s">%s</label></th><td>', esc_attr( $key ), esc_html( $field['label'] ) );
 			self::control( $key, $value, $field );
@@ -321,8 +321,8 @@ class MCM_TermMeta {
 		}
 		// Shared hero renderer — same banner markup as events and archive pages.
 		return MCM_Query::hero_banner(
-			get_term_meta( $term->term_id, 'mcm_term_video', true ),
-			get_term_meta( $term->term_id, 'mcm_term_banner', true ),
+			MCM_Safe::term_meta( $term->term_id, 'mcm_term_video' ),
+			MCM_Safe::term_meta( $term->term_id, 'mcm_term_banner' ),
 			$term->name
 		);
 	}
@@ -338,11 +338,11 @@ class MCM_TermMeta {
 		if ( ! $term instanceof WP_Term ) {
 			return '';
 		}
-		$hod     = trim( (string) get_term_meta( $term->term_id, 'mcm_term_hod', true ) );
-		$photo   = trim( (string) get_term_meta( $term->term_id, 'mcm_term_hod_photo', true ) );
-		$message = trim( (string) get_term_meta( $term->term_id, 'mcm_term_message', true ) );
-		$email   = trim( (string) get_term_meta( $term->term_id, 'mcm_term_email', true ) );
-		$phone   = trim( (string) get_term_meta( $term->term_id, 'mcm_term_phone', true ) );
+		$hod     = trim( (string) MCM_Safe::term_meta( $term->term_id, 'mcm_term_hod' ) );
+		$photo   = trim( (string) MCM_Safe::term_meta( $term->term_id, 'mcm_term_hod_photo' ) );
+		$message = trim( (string) MCM_Safe::term_meta( $term->term_id, 'mcm_term_message' ) );
+		$email   = trim( (string) MCM_Safe::term_meta( $term->term_id, 'mcm_term_email' ) );
+		$phone   = trim( (string) MCM_Safe::term_meta( $term->term_id, 'mcm_term_phone' ) );
 
 		if ( '' === $hod && '' === $message && '' === $email && '' === $phone ) {
 			return '';

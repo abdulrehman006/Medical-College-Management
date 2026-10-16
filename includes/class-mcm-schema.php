@@ -94,7 +94,7 @@ class MCM_Schema {
 		switch ( $type ) {
 			case 'mcm_consultant':
 			case 'mcm_team':
-				$job  = get_post_meta( $id, 'mcm_designation', true );
+				$job  = MCM_Safe::meta( $id, 'mcm_designation' );
 				$dept = self::first_term( $id, 'mcm_department' );
 				$out  = array_merge(
 					$base,
@@ -116,8 +116,8 @@ class MCM_Schema {
 					);
 				}
 				// Contact details are already public on the profile page.
-				$email = get_post_meta( $id, 'mcm_email', true );
-				$phone = get_post_meta( $id, 'mcm_phone', true );
+				$email = MCM_Safe::meta( $id, 'mcm_email' );
+				$phone = MCM_Safe::meta( $id, 'mcm_phone' );
 				if ( $email ) {
 					$out['email'] = $email;
 				}
@@ -127,17 +127,17 @@ class MCM_Schema {
 				return $out;
 
 			case 'mcm_event':
-				$date = get_post_meta( $id, 'mcm_event_date', true );
+				$date = MCM_Safe::meta( $id, 'mcm_event_date' );
 				$out  = array_merge( $base, array( '@type' => 'Event' ) );
 				if ( $date ) {
-					$start = get_post_meta( $id, 'mcm_start_time', true );
+					$start = MCM_Safe::meta( $id, 'mcm_start_time' );
 					$out['startDate'] = $start ? $date . 'T' . $start : $date;
-					$end = get_post_meta( $id, 'mcm_end_time', true );
+					$end = MCM_Safe::meta( $id, 'mcm_end_time' );
 					if ( $end ) {
 						$out['endDate'] = $date . 'T' . $end;
 					}
 				}
-				$venue = get_post_meta( $id, 'mcm_venue', true );
+				$venue = MCM_Safe::meta( $id, 'mcm_venue' );
 				if ( $venue ) {
 					$out['location'] = array(
 						'@type' => 'Place',
@@ -145,7 +145,7 @@ class MCM_Schema {
 						'address' => $venue,
 					);
 				}
-				$org = get_post_meta( $id, 'mcm_organizer', true );
+				$org = MCM_Safe::meta( $id, 'mcm_organizer' );
 				if ( $org ) {
 					$out['organizer'] = array(
 						'@type' => 'Organization',
@@ -177,7 +177,7 @@ class MCM_Schema {
 						),
 					)
 				);
-				$dur = get_post_meta( $id, 'mcm_duration', true );
+				$dur = MCM_Safe::meta( $id, 'mcm_duration' );
 				if ( $dur ) {
 					$out['timeToComplete'] = $dur;
 				}
@@ -185,22 +185,22 @@ class MCM_Schema {
 
 			case 'mcm_publication':
 				$out  = array_merge( $base, array( '@type' => 'ScholarlyArticle' ) );
-				$year = get_post_meta( $id, 'mcm_pub_year', true );
+				$year = MCM_Safe::meta( $id, 'mcm_pub_year' );
 				if ( $year ) {
 					$out['datePublished'] = $year;
 				}
-				$journal = get_post_meta( $id, 'mcm_pub_journal', true );
+				$journal = MCM_Safe::meta( $id, 'mcm_pub_journal' );
 				if ( $journal ) {
 					$out['isPartOf'] = array(
 						'@type' => 'Periodical',
 						'name'  => $journal,
 					);
 				}
-				$doi = get_post_meta( $id, 'mcm_pub_doi', true );
+				$doi = MCM_Safe::meta( $id, 'mcm_pub_doi' );
 				if ( $doi ) {
 					$out['identifier'] = preg_match( '#^https?://#i', $doi ) ? $doi : 'https://doi.org/' . ltrim( $doi, '/' );
 				}
-				$authors = get_post_meta( $id, 'mcm_pub_authors', true );
+				$authors = MCM_Safe::meta( $id, 'mcm_pub_authors' );
 				if ( $authors ) {
 					$out['author'] = array(
 						'@type' => 'Person',
@@ -211,14 +211,14 @@ class MCM_Schema {
 
 			case 'mcm_research':
 				$out = array_merge( $base, array( '@type' => 'ResearchProject' ) );
-				$pi  = get_post_meta( $id, 'mcm_res_pi', true );
+				$pi  = MCM_Safe::meta( $id, 'mcm_res_pi' );
 				if ( $pi ) {
 					$out['member'] = array(
 						'@type' => 'Person',
 						'name'  => $pi,
 					);
 				}
-				$funder = get_post_meta( $id, 'mcm_res_funding', true );
+				$funder = MCM_Safe::meta( $id, 'mcm_res_funding' );
 				if ( $funder ) {
 					$out['funder'] = array(
 						'@type' => 'Organization',

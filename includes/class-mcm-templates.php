@@ -391,7 +391,7 @@ class MCM_Templates {
 		$stream_embed = '';
 		if ( 'mcm_event' === $type ) {
 			$stream_embed = MCM_Query::video_embed(
-				get_post_meta( $id, 'mcm_event_stream', true ),
+				MCM_Safe::meta( $id, 'mcm_event_stream' ),
 				'mcm-hero mcm-hero--video mcm-wrap'
 			);
 		}

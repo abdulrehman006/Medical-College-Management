@@ -137,7 +137,7 @@ class MCM_Import {
 					$names = wp_get_post_terms( $p->ID, $tax_keys[ $col ], array( 'fields' => 'names' ) );
 					$row[] = is_wp_error( $names ) ? '' : implode( ', ', $names );
 				} else {
-					$row[] = (string) get_post_meta( $p->ID, 'mcm_' . $col, true );
+					$row[] = MCM_Safe::meta( $p->ID, 'mcm_' . $col );
 				}
 			}
 			fputcsv( $out, array_map( array( __CLASS__, 'csv_safe' ), $row ), ',', '"', '\\' );

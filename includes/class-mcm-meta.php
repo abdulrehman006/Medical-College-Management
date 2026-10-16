@@ -678,7 +678,7 @@ class MCM_Meta {
 		if ( empty( $map[ $cpt ][ $column ] ) ) {
 			return;
 		}
-		$value = get_post_meta( $post_id, $column, true );
+		$value = MCM_Safe::meta( $post_id, $column );
 		if ( '' === $value || null === $value ) {
 			echo '—';
 			return;

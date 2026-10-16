@@ -162,7 +162,7 @@ class MCM_Privacy {
 		foreach ( $found['items'] as $item ) {
 			$data = array();
 			foreach ( $item['cfg']['fields'] as $key => $label ) {
-				$value = get_post_meta( $item['id'], $key, true );
+				$value = MCM_Safe::meta( $item['id'], $key );
 				if ( '' === $value || null === $value ) {
 					continue;
 				}

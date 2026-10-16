@@ -125,7 +125,7 @@ class MCM_Program {
 				)
 			);
 			foreach ( $posts as $pid ) {
-				$value = trim( (string) get_post_meta( $pid, $meta_key, true ) );
+				$value = trim( (string) MCM_Safe::meta( $pid, $meta_key ) );
 				if ( '' === $value ) {
 					continue;
 				}
