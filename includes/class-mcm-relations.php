@@ -161,7 +161,7 @@ class MCM_Relations {
 				'post_type'      => $cpts_for,
 				'post_status'    => array( 'publish', 'draft', 'pending', 'private', 'future' ),
 				'posts_per_page' => 200, // phpcs:ignore WordPress.WP.PostsPerPage.posts_per_page_posts_per_page -- Admin meta box, IDs only; needed to count the "+N more".
-				'post__not_in'   => array( $post_id ),
+				'post__not_in'   => array( $post_id ), // phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_post__not_in -- Excludes only the post being edited, in an admin meta box.
 				'no_found_rows'  => true,
 				'orderby'        => 'title',
 				'order'          => 'ASC',

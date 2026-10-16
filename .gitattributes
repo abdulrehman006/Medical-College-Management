@@ -1,0 +1,13 @@
+# Normalise line endings in the repository.
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.pdf binary
+
+# Development files: kept in git, left out of release archives
+# (git archive / GitHub "Download ZIP" of a tag).
+/.gitattributes   export-ignore
+/.gitignore       export-ignore
+/.distignore      export-ignore
+/.phpcs.xml.dist  export-ignore
+/README.md        export-ignore

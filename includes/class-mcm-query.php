@@ -115,7 +115,7 @@ class MCM_Query {
 			'search'        => '',            // initial search string.
 			'orderby'       => 'date',
 			'order'         => 'DESC',
-			'meta_key'      => '',            // enables orderby="meta_value".
+			'meta_key'      => '',            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Shortcode attribute; enables orderby="meta_value".
 			'meta_type'     => '',            // e.g. DATE, NUMERIC, CHAR.
 			'paged'         => 1,
 			'class_css'     => '',

@@ -108,11 +108,10 @@ class MCM_Program {
 		// 1. Seed terms from existing Program CPT entries.
 		$programs = get_posts(
 			array(
-				'post_type'        => 'mcm_program',
-				'post_status'      => 'any',
-				'numberposts'      => -1,
-				'fields'           => 'ids',
-				'suppress_filters' => true,
+				'post_type'   => 'mcm_program',
+				'post_status' => 'any',
+				'numberposts' => -1,
+				'fields'      => 'ids',
 			)
 		);
 		foreach ( $programs as $pid ) {
@@ -127,11 +126,10 @@ class MCM_Program {
 		foreach ( $sources as $type => $meta_key ) {
 			$posts = get_posts(
 				array(
-					'post_type'        => $type,
-					'post_status'      => 'any',
-					'numberposts'      => -1,
-					'fields'           => 'ids',
-					'suppress_filters' => true,
+					'post_type'   => $type,
+					'post_status' => 'any',
+					'numberposts' => -1,
+					'fields'      => 'ids',
 				)
 			);
 			foreach ( $posts as $pid ) {

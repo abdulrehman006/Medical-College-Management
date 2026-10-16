@@ -101,6 +101,7 @@ final class Medical_College_Manager {
 	 * Load the plugin's translations.
 	 */
 	public function load_textdomain() {
+		// phpcs:ignore PluginCheck.CodeAnalysis.DiscouragedFunctions.load_plugin_textdomainFound -- Distributed outside WordPress.org: the translations bundled in /languages must be loaded explicitly.
 		load_plugin_textdomain( 'medical-college-manager', false, dirname( MCM_BASENAME ) . '/languages' );
 	}
 }

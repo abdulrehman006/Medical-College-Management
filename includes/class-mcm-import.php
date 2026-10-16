@@ -113,12 +113,11 @@ class MCM_Import {
 
 		$posts = get_posts(
 			array(
-				'post_type'        => $type,
-				'post_status'      => array( 'publish', 'draft', 'pending', 'private', 'future' ),
-				'numberposts'      => -1,
-				'orderby'          => 'title',
-				'order'            => 'ASC',
-				'suppress_filters' => true,
+				'post_type'   => $type,
+				'post_status' => array( 'publish', 'draft', 'pending', 'private', 'future' ),
+				'numberposts' => -1,
+				'orderby'     => 'title',
+				'order'       => 'ASC',
 			)
 		);
 

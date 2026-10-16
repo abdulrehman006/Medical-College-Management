@@ -124,17 +124,20 @@ class MCM_Privacy {
 		$more     = false;
 
 		foreach ( self::sources() as $type => $cfg ) {
-			$q = new WP_Query(
+			// get_posts() runs unfiltered by default, so a language or
+			// visibility plugin can never hide a record from a data request.
+			// One extra row is fetched to learn whether another page exists.
+			$ids = get_posts(
 				array(
-					'post_type'        => $type,
-					'post_status'      => 'any',
-					'posts_per_page'   => $per_page,
-					'paged'            => max( 1, (int) $page ),
-					'fields'           => 'ids',
-					'no_found_rows'    => false,
-					'suppress_filters' => true,
-					// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
-					'meta_query'       => array(
+					'post_type'      => $type,
+					'post_status'    => 'any',
+					'posts_per_page' => $per_page + 1,
+					'offset'         => ( max( 1, (int) $page ) - 1 ) * $per_page,
+					'orderby'        => 'ID',
+					'order'          => 'ASC',
+					'fields'         => 'ids',
+					// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Privacy requests only; matched by e-mail.
+					'meta_query'     => array(
 						array(
 							'key'     => $cfg['email'],
 							'value'   => $email,
@@ -143,16 +146,17 @@ class MCM_Privacy {
 					),
 				)
 			);
+			if ( count( $ids ) > $per_page ) {
+				$more = true;
+				$ids  = array_slice( $ids, 0, $per_page );
+			}
 
-			foreach ( $q->posts as $post_id ) {
+			foreach ( $ids as $post_id ) {
 				$items[] = array(
-					'id'   => $post_id,
+					'id'   => (int) $post_id,
 					'type' => $type,
 					'cfg'  => $cfg,
 				);
-			}
-			if ( $q->max_num_pages > $page ) {
-				$more = true;
 			}
 		}
 

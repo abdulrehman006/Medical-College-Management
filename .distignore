@@ -1,0 +1,9 @@
+# Files left out of the plugin ZIP built with `wp dist-archive`.
+.git
+.gitattributes
+.gitignore
+.distignore
+.phpcs.xml.dist
+README.md
+node_modules
+vendor

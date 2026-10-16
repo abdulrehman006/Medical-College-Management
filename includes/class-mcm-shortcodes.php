@@ -118,7 +118,7 @@ class MCM_Shortcodes {
 			'orderby'   => $a['orderby'],
 			'order'     => $a['order'],
 			'category'  => $a['category'],
-			'meta_key'  => $a['meta_key'],
+			'meta_key'  => $a['meta_key'], // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- data-config attribute, not a query argument.
 			'meta_type' => $a['meta_type'],
 			'lock_tax'  => $a['lock_tax'],
 			'lock_term' => $a['lock_term'],

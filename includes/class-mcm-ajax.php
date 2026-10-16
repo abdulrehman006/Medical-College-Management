@@ -132,7 +132,7 @@ class MCM_Ajax {
 				'orderby'     => sanitize_key( MCM_Safe::scalar( $config, 'orderby', 'date' ) ),
 				'order'       => sanitize_text_field( MCM_Safe::scalar( $config, 'order', 'DESC' ) ),
 				'category'    => sanitize_text_field( MCM_Safe::scalar( $config, 'category' ) ),
-				'meta_key'    => $meta_key,
+				'meta_key'    => $meta_key, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Shortcode attribute (whitelisted sort key), not a query argument.
 				'meta_type'   => sanitize_text_field( MCM_Safe::scalar( $config, 'meta_type' ) ),
 				'lock_tax'    => sanitize_key( MCM_Safe::scalar( $config, 'lock_tax' ) ),
 				'lock_term'   => sanitize_title( MCM_Safe::scalar( $config, 'lock_term' ) ),
