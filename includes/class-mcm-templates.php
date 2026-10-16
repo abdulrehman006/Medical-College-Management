@@ -19,6 +19,9 @@ class MCM_Templates {
 	/** Post IDs whose featured image the theme has already rendered. */
 	private static $thumb_shown = array();
 
+	/** Post IDs whose single-page details were already appended this request. */
+	private static $details_done = array();
+
 	public function __construct() {
 		// Show the custom fields on the native single CPT page.
 		add_filter( 'the_content', array( $this, 'single_meta' ), 20 );
@@ -96,11 +99,50 @@ class MCM_Templates {
 			return $template;
 		}
 
+		// Elementor Pro Theme Builder: when an Archive template's conditions
+		// match this page, the site owner designed it there — step aside.
+		if ( apply_filters( 'mcm_yield_to_theme_builder', true ) && self::theme_builder_has( 'archive' ) ) {
+			return $template;
+		}
+
 		self::$context = $ctx;
 
 		// Allow a child/parent theme to override the plugin template via /mcm/.
 		$override = locate_template( array( 'mcm/archive-mcm.php' ) );
 		return $override ? $override : MCM_PATH . 'templates/archive-mcm.php';
+	}
+
+	/**
+	 * Does Elementor Pro's Theme Builder have a template whose conditions match
+	 * the current request for this location ('archive' or 'single')?
+	 *
+	 * Written defensively against Pro's internal API: every class and method is
+	 * checked before use, and any failure counts as "no" (the plugin's own
+	 * template is then used, as before). Not exercised without Elementor Pro.
+	 *
+	 * @param string $location Theme Builder location.
+	 * @return bool
+	 */
+	public static function theme_builder_has( $location ) {
+		$module_class = '\ElementorPro\Modules\ThemeBuilder\Module';
+		if ( ! class_exists( $module_class ) || ! method_exists( $module_class, 'instance' ) ) {
+			return false;
+		}
+		try {
+			$module = call_user_func( array( $module_class, 'instance' ) );
+			if ( ! is_object( $module ) || ! method_exists( $module, 'get_conditions_manager' ) ) {
+				return false;
+			}
+			$conditions = $module->get_conditions_manager();
+			if ( ! is_object( $conditions ) || ! method_exists( $conditions, 'get_documents_for_location' ) ) {
+				return false;
+			}
+			$documents = $conditions->get_documents_for_location( $location );
+			return ! empty( $documents );
+		} catch ( \Throwable $e ) {
+			MCM_Health::report( 'Elementor Pro Theme Builder check', $e );
+			return false;
+		}
 	}
 
 	/**
@@ -345,11 +387,34 @@ class MCM_Templates {
 	 * @return string
 	 */
 	public function build_single_meta( $content ) {
-		if ( is_admin() || is_feed() || ! is_singular() || ! is_main_query() || ! in_the_loop() ) {
+		if ( is_admin() || is_feed() || ! is_singular() || ! is_main_query() ) {
 			return $content;
 		}
 
-		$id = get_the_ID();
+		$id = (int) get_the_ID();
+
+		/*
+		 * Only the post this page is about, rendered as body content, once:
+		 *  - in the loop (classic themes), OR the queried post itself when a
+		 *    builder renders it outside the loop (Elementor Pro Theme Builder's
+		 *    Post Content widget);
+		 *  - never while <head> is being built or an excerpt is generated (SEO
+		 *    plugins run the_content there) — that would use up the "once";
+		 *  - exactly once per request, so a builder that renders the content
+		 *    twice can never print the details twice.
+		 */
+		if ( ! $id || ( ! in_the_loop() && get_queried_object_id() !== $id ) ) {
+			return $content;
+		}
+		// (Not "after wp_head": block themes render the template, post content
+		// included, BEFORE wp_head runs.)
+		if ( doing_action( 'wp_head' ) || doing_filter( 'get_the_excerpt' ) || doing_filter( 'wp_trim_excerpt' ) ) {
+			return $content;
+		}
+		if ( isset( self::$details_done[ $id ] ) ) {
+			return $content;
+		}
+
 		if ( post_password_required( $id ) ) {
 			return $content;
 		}
@@ -358,6 +423,7 @@ class MCM_Templates {
 			return $content;
 		}
 
+		self::$details_done[ $id ] = true;
 		MCM_Assets::need();
 
 		$details = MCM_Query::single_details( $id, $type );
