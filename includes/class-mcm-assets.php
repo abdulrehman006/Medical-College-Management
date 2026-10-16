@@ -119,6 +119,22 @@ class MCM_Assets {
 			wp_enqueue_script( 'mcm-admin', MCM_URL . 'assets/js/mcm-admin.js', array( 'jquery' ), MCM_VERSION, true );
 		}
 
+		if ( wp_script_is( 'mcm-admin', 'enqueued' ) ) {
+			wp_localize_script(
+				'mcm-admin',
+				'MCMAdmin',
+				array(
+					'i18n' => array(
+						'selectImage' => __( 'Select image', 'medical-college-manager' ),
+						'selectFile'  => __( 'Select file', 'medical-college-manager' ),
+						'useImage'    => __( 'Use this image', 'medical-college-manager' ),
+						'useFile'     => __( 'Use this file', 'medical-college-manager' ),
+						'copied'      => __( 'Copied!', 'medical-college-manager' ),
+					),
+				)
+			);
+		}
+
 		// Light admin styling for meta boxes everywhere in admin.
 		wp_enqueue_style( 'mcm-admin', MCM_URL . 'assets/css/mcm-admin.css', array(), MCM_VERSION );
 	}

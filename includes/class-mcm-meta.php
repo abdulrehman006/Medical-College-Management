@@ -324,7 +324,10 @@ class MCM_Meta {
 						esc_attr( $key ),
 						esc_attr( $value )
 					);
-					echo '<button type="button" class="button mcm-media-pick" data-title="' . esc_attr__( 'Select document', 'medical-college-manager' ) . '" data-type="application/pdf">' . esc_html__( 'Upload / Select', 'medical-college-manager' ) . '</button> ';
+					// 'accept' (optional) lists the MIME families the picker offers,
+					// e.g. 'image,application/pdf'; documents (PDF) by default.
+					$accept = ! empty( $field['accept'] ) ? $field['accept'] : 'application/pdf';
+					echo '<button type="button" class="button mcm-media-pick" data-title="' . esc_attr__( 'Select document', 'medical-college-manager' ) . '" data-type="' . esc_attr( $accept ) . '">' . esc_html__( 'Upload / Select', 'medical-college-manager' ) . '</button> ';
 					echo '<button type="button" class="button-link mcm-media-clear">' . esc_html__( 'Clear', 'medical-college-manager' ) . '</button>';
 					echo '<span class="mcm-media-preview"></span>';
 					break;

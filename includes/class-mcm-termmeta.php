@@ -193,7 +193,7 @@ class MCM_TermMeta {
 					esc_attr( $key ),
 					esc_attr( $value )
 				);
-				echo '<button type="button" class="button mcm-media-pick">' . esc_html__( 'Select Image', 'medical-college-manager' ) . '</button> ';
+				echo '<button type="button" class="button mcm-media-pick" data-type="' . esc_attr( ! empty( $field['accept'] ) ? $field['accept'] : 'image' ) . '">' . esc_html__( 'Select Image', 'medical-college-manager' ) . '</button> ';
 				echo '<button type="button" class="button-link mcm-media-clear">' . esc_html__( 'Clear', 'medical-college-manager' ) . '</button>';
 				echo '<span class="mcm-media-preview"></span>';
 				break;
