@@ -180,90 +180,143 @@
 		);
 	}
 
-	function debounce( fn, wait ) {
-		var t;
-		return function () {
-			var ctx = this, args = arguments;
-			clearTimeout( t );
-			t = setTimeout( function () { fn.apply( ctx, args ); }, wait );
-		};
+	// The listing block an element belongs to. Only blocks rendered by
+	// render_block() carry data-config; other .mcm-wrap elements (the HOD card,
+	// single-page details) are not filterable.
+	function blockOf( el ) {
+		return $( el ).closest( '.mcm-wrap[data-config]' );
 	}
 
-	$( function () {
-		$( '.mcm-wrap' ).each( function () {
-			var $wrap = $( this );
+	// Debounced run, one timer per block.
+	function runSoon( $wrap ) {
+		clearTimeout( $wrap.data( 'mcmTimer' ) );
+		$wrap.data( 'mcmTimer', setTimeout( function () { run( $wrap ); }, 350 ) );
+	}
 
-			$wrap.on( 'change', '.mcm-filter-tax, .mcm-filter-check', function () { run( $wrap ); } );
+	function runNow( $wrap ) {
+		clearTimeout( $wrap.data( 'mcmTimer' ) );
+		run( $wrap );
+	}
 
-			$wrap.on( 'keyup', '.mcm-search', debounce( function () { run( $wrap ); }, 350 ) );
+	function printBlock( $wrap, $btn ) {
+		// Nothing paginated on screen — print exactly what is shown.
+		if ( ! $wrap.find( '.mcm-results .mcm-pagination' ).length ) {
+			doPrint( $wrap, null );
+			return;
+		}
 
-			// Explicit Search button + Enter key (directory layout).
-			$wrap.on( 'click', '.mcm-search-btn', function () { run( $wrap ); } );
-			$wrap.on( 'keydown', '.mcm-search', function ( e ) {
-				if ( e.which === 13 ) { e.preventDefault(); run( $wrap ); }
-			} );
+		/*
+		 * The list is paginated, so the visible results are only one page of
+		 * it. Printing that would silently hand someone a partial timetable or
+		 * student roll, so re-fetch the whole set (same filters and scope, no
+		 * paging) and print that instead. If the request fails — offline, or a
+		 * type the visitor cannot query — fall back to printing the visible
+		 * page rather than printing nothing.
+		 */
+		var config      = $.extend( {}, $wrap.data( 'config' ) || {} );
+		config.paginate = 'no';
+		config.paged    = 1;
+		config.count    = PRINT_ALL_LIMIT;
 
-			$wrap.on( 'click', '.mcm-reset', function () {
-				$wrap.find( '.mcm-filter-tax' ).val( '' );
-				$wrap.find( '.mcm-filter-check' ).prop( 'checked', false );
-				$wrap.find( '.mcm-search' ).val( '' );
-				run( $wrap );
-			} );
-
-			$wrap.on( 'click', '.mcm-print-btn', function () {
-				var $btn = $( this );
-
-				// Nothing paginated on screen — print exactly what is shown.
-				if ( ! $wrap.find( '.mcm-results .mcm-pagination' ).length ) {
-					doPrint( $wrap, null );
-					return;
-				}
-
-				/*
-				 * The list is paginated, so the visible results are only one
-				 * page of it. Printing that would silently hand someone a
-				 * partial timetable or student roll, so re-fetch the whole set
-				 * (same filters, no paging) and print that instead. If the
-				 * request fails — offline, or a non-public type the visitor
-				 * cannot query — fall back to printing the visible page rather
-				 * than printing nothing.
-				 */
-				var config   = $.extend( {}, $wrap.data( 'config' ) || {} );
-				config.paginate = 'no';
-				config.paged    = 1;
-				config.count    = PRINT_ALL_LIMIT;
-
-				$btn.prop( 'disabled', true );
-				$.post( MCM.ajaxurl, {
-					action: 'mcm_filter',
-					nonce:  MCM.nonce,
-					config: JSON.stringify( config ),
-					taxes:  JSON.stringify( collectTaxes( $wrap ) ),
-					search: $wrap.find( '.mcm-search' ).val() || ''
-				} ).done( function ( resp ) {
-					doPrint( $wrap, ( resp && resp.success ) ? resp.data.html : null );
-				} ).fail( function () {
-					doPrint( $wrap, null );
-				} ).always( function () {
-					$btn.prop( 'disabled', false );
-				} );
-			} );
+		$btn.prop( 'disabled', true );
+		$.post( MCM.ajaxurl, {
+			action: 'mcm_filter',
+			nonce:  MCM.nonce,
+			config: JSON.stringify( config ),
+			taxes:  JSON.stringify( collectTaxes( $wrap ) ),
+			search: $wrap.find( '.mcm-search' ).val() || ''
+		} ).done( function ( resp ) {
+			doPrint( $wrap, ( resp && resp.success && resp.data ) ? resp.data.html : null );
+		} ).fail( function () {
+			doPrint( $wrap, null );
+		} ).always( function () {
+			$btn.prop( 'disabled', false );
 		} );
+	}
 
+	/*
+	 * Event delegation on document: every handler works for blocks that exist
+	 * at page load AND for blocks inserted later — the Elementor editor
+	 * preview (which re-renders a widget on every change), Elementor popups,
+	 * tabs and accordions that load content on demand.
+	 */
+	$( document )
+		.on( 'change', '.mcm-wrap .mcm-filter-tax, .mcm-wrap .mcm-filter-check', function () {
+			runNow( blockOf( this ) );
+		} )
+		// 'input' covers typing, pasting, autofill and the search box's clear
+		// button — 'keyup' missed everything but the keyboard.
+		.on( 'input', '.mcm-wrap .mcm-search', function () {
+			runSoon( blockOf( this ) );
+		} )
+		.on( 'keydown', '.mcm-wrap .mcm-search', function ( e ) {
+			if ( 13 === e.which ) {
+				e.preventDefault();
+				runNow( blockOf( this ) );
+			}
+		} )
+		.on( 'click', '.mcm-wrap .mcm-search-btn', function () {
+			runNow( blockOf( this ) );
+		} )
+		.on( 'click', '.mcm-wrap .mcm-reset', function () {
+			var $wrap = blockOf( this );
+			$wrap.find( '.mcm-filter-tax' ).val( '' );
+			$wrap.find( '.mcm-filter-check' ).prop( 'checked', false );
+			$wrap.find( '.mcm-search' ).val( '' );
+			runNow( $wrap );
+		} )
+		.on( 'click', '.mcm-wrap .mcm-print-btn', function () {
+			printBlock( blockOf( this ), $( this ) );
+		} )
 		// Notice ticker / board pause toggle.
-		$( document ).on( 'click', '.mcm-scroll-pause', function () {
-			var $c = $( this ).closest( '.mcm-ticker, .mcm-board' );
+		.on( 'click', '.mcm-scroll-pause', function () {
+			var $c     = $( this ).closest( '.mcm-ticker, .mcm-board' );
 			var paused = $c.toggleClass( 'is-paused' ).hasClass( 'is-paused' );
 			$( this ).attr( 'aria-pressed', paused ? 'true' : 'false' );
 		} );
 
-		window.addEventListener( 'afterprint', function () {
-			document.body.classList.remove( 'mcm-printing' );
-			var area = document.getElementById( 'mcm-print-area' );
-			if ( area && area.parentNode ) {
-				area.parentNode.removeChild( area );
+	/*
+	 * Per-block initialisation for blocks that appear after page load. With
+	 * delegated events nothing needs binding; this only resets the busy state
+	 * a re-rendered block may carry and announces it ('mcm:ready') so site
+	 * code can hook in. Idempotent.
+	 */
+	function initScope( $scope ) {
+		$scope.find( '.mcm-wrap[data-config]' ).addBack( '.mcm-wrap[data-config]' ).each( function () {
+			var $wrap = $( this );
+			if ( $wrap.data( 'mcmReady' ) ) {
+				return;
 			}
+			$wrap.data( 'mcmReady', true );
+			$wrap.find( '.mcm-results' ).removeClass( 'mcm-loading' ).attr( 'aria-busy', 'false' );
+			$wrap.trigger( 'mcm:ready' );
 		} );
+	}
+
+	$( function () {
+		initScope( $( document ) );
+	} );
+
+	// Elementor: widgets rendered in the editor preview or later on the page.
+	$( window ).on( 'elementor/frontend/init', function () {
+		if ( window.elementorFrontend && window.elementorFrontend.hooks ) {
+			window.elementorFrontend.hooks.addAction( 'frontend/element_ready/widget', function ( $scope ) {
+				initScope( $scope );
+			} );
+		}
+	} );
+
+	// Elementor Pro popups.
+	$( document ).on( 'elementor/popup/show', function ( event, id, instance ) {
+		initScope( instance && instance.$element ? instance.$element : $( document ) );
+	} );
+
+	window.addEventListener( 'afterprint', function () {
+		document.body.classList.remove( 'mcm-printing' );
+		var area = document.getElementById( 'mcm-print-area' );
+		if ( area && area.parentNode ) {
+			area.parentNode.removeChild( area );
+		}
 	} );
 
 } )( jQuery );
