@@ -128,6 +128,7 @@ class MCM_Elementor {
 			'MCM_Widget_Publications',
 			'MCM_Widget_Research',
 			'MCM_Widget_Policies',
+			'MCM_Widget_Jobs',
 			'MCM_Widget_Blog',
 			'MCM_Widget_Notice_Ticker',
 			'MCM_Widget_Notice_Board',

@@ -37,6 +37,23 @@ abstract class MCM_Elementor_Widget_Base extends \Elementor\Widget_Base {
 	}
 
 	/**
+	 * Extra controls for the Content section of one widget (none by default).
+	 */
+	protected function mcm_extra_controls() {
+	}
+
+	/**
+	 * Extra listing attributes from one widget's settings (none by default).
+	 *
+	 * @param array $atts     Listing attributes built so far.
+	 * @param array $settings Widget settings.
+	 * @return array
+	 */
+	protected function mcm_extra_atts( $atts, $settings ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed -- Extension point; overridden by widgets that need settings.
+		return $atts;
+	}
+
+	/**
 	 * Elementor panel category.
 	 */
 	public function get_categories() {
@@ -152,6 +169,8 @@ abstract class MCM_Elementor_Widget_Base extends \Elementor\Widget_Base {
 				),
 			)
 		);
+
+		$this->mcm_extra_controls();
 
 		$this->end_controls_section();
 
@@ -455,6 +474,7 @@ abstract class MCM_Elementor_Widget_Base extends \Elementor\Widget_Base {
 		if ( $prefilter ) {
 			$atts['prefilter'] = $prefilter;
 		}
+		$atts = $this->mcm_extra_atts( $atts, is_array( $s ) ? $s : array() );
 
 		echo MCM_Shortcodes::render_block( $atts ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
@@ -871,6 +891,71 @@ class MCM_Widget_Policies extends MCM_Elementor_Widget_Base {
 	 */
 	protected function mcm_default_view() {
 		return 'list';
+	}
+}
+
+/**
+ * Elementor widget: Jobs / vacancies.
+ */
+class MCM_Widget_Jobs extends MCM_Elementor_Widget_Base {
+	/**
+	 * Widget machine name.
+	 */
+	public function get_name() {
+		return 'mcm_jobs';
+	}
+	/**
+	 * Widget title shown in the Elementor panel.
+	 */
+	public function get_title() {
+		return __( 'Jobs / Vacancies', 'medical-college-manager' );
+	}
+	/**
+	 * Icon shown in the Elementor panel.
+	 */
+	public function get_icon() {
+		return 'eicon-person';
+	}
+	/**
+	 * Search keywords for the Elementor panel.
+	 */
+	public function get_keywords() {
+		return array( 'jobs', 'vacancy', 'vacancies', 'careers', 'hiring', 'medical-college-manager' );
+	}
+	/**
+	 * Post type this widget lists.
+	 */
+	protected function mcm_type() {
+		return 'mcm_job';
+	}
+	/**
+	 * Status control: which jobs to list.
+	 */
+	protected function mcm_extra_controls() {
+		$this->add_control(
+			'status',
+			array(
+				'label'   => __( 'Status', 'medical-college-manager' ),
+				'type'    => \Elementor\Controls_Manager::SELECT,
+				'default' => 'open',
+				'options' => array(
+					'open'   => __( 'Open', 'medical-college-manager' ),
+					'closed' => __( 'Closed', 'medical-college-manager' ),
+					'all'    => __( 'All', 'medical-college-manager' ),
+				),
+			)
+		);
+	}
+	/**
+	 * Pass the Status control to the listing.
+	 *
+	 * @param array $atts     Listing attributes built so far.
+	 * @param array $settings Widget settings.
+	 * @return array
+	 */
+	protected function mcm_extra_atts( $atts, $settings ) {
+		$atts['status'] = MCM_Job::status_attr( isset( $settings['status'] ) ? $settings['status'] : 'open' );
+		return $atts;
 	}
 }
 

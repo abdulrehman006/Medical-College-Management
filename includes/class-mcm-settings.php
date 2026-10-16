@@ -31,45 +31,49 @@ class MCM_Settings {
 	 */
 	public static function default_settings() {
 		return array(
-			'primary_color'   => '#0a6b5d',
-			'accent_color'    => '#13a594',
-			'text_color'      => '#1f2933',
-			'muted_color'     => '#6b7280',
-			'card_bg'         => '#ffffff',
-			'page_bg'         => '#f5f7fa',
-			'border_color'    => '#e5e7eb',
-			'border_radius'   => '12',
-			'card_shadow'     => '1', // 0 = off, 1 = on.
-			'card_padding'    => '20',
-			'gap'             => '24',
-			'columns'         => '3',
-			'font_family'     => 'inherit',
-			'title_size'      => '18',
-			'image_height'    => '220',
-			'hover_lift'      => '1',
-			'archive_filters' => '1', // show the filter bar on CPT/taxonomy archives.
+			'primary_color'    => '#0a6b5d',
+			'accent_color'     => '#13a594',
+			'text_color'       => '#1f2933',
+			'muted_color'      => '#6b7280',
+			'card_bg'          => '#ffffff',
+			'page_bg'          => '#f5f7fa',
+			'border_color'     => '#e5e7eb',
+			'border_radius'    => '12',
+			'card_shadow'      => '1', // 0 = off, 1 = on.
+			'card_padding'     => '20',
+			'gap'              => '24',
+			'columns'          => '3',
+			'font_family'      => 'inherit',
+			'title_size'       => '18',
+			'image_height'     => '220',
+			'hover_lift'       => '1',
+			'archive_filters'  => '1', // show the filter bar on CPT/taxonomy archives.
 			// Public, safe-fields-only student list ([mcm_students] + AJAX).
 			// On by default so existing sites behave exactly as before.
-			'public_students' => '1',
+			'public_students'  => '1',
+			// Extra sources on the notice ticker/board/list (notices are always in).
+			'notice_sources'   => array( 'job', 'tender' ),
+			// A job counts as "Closing soon" this many days before its deadline.
+			'job_closing_days' => '3',
 			// Content types offering a Print button. Any type may be enabled —
 			// the print machinery is generic; these are just the sensible
 			// defaults (a timetable and a student list are what get handed out
 			// on paper). Developers can still use the mcm_print_types filter.
-			'print_types'     => array( 'mcm_timetable', 'mcm_student', 'mcm_research', 'mcm_policy' ),
+			'print_types'      => array( 'mcm_timetable', 'mcm_student', 'mcm_research', 'mcm_policy', 'mcm_job' ),
 			// Branded stand-in shown when a person has no photograph.
-			'default_avatar'  => '',
+			'default_avatar'   => '',
 			// Letterhead used on printed / PDF output. Blank org name falls back
 			// to the site title, blank logo to the theme logo or site icon.
-			'print_logo'      => '',
-			'print_org'       => '',
-			'print_address'   => '',
-			'print_footnote'  => '',
-			'print_signature' => '0',
+			'print_logo'       => '',
+			'print_org'        => '',
+			'print_address'    => '',
+			'print_footnote'   => '',
+			'print_signature'  => '0',
 			// auto | always | never - see MCM_Templates::should_show_image().
-			'single_image'    => 'auto',
+			'single_image'     => 'auto',
 			// Per-archive title banner: [ post_type => [ 'video' => url, 'image' => url ] ].
-			'archive_banners' => array(),
-			'custom_css'      => '',
+			'archive_banners'  => array(),
+			'custom_css'       => '',
 		);
 	}
 
@@ -171,6 +175,18 @@ class MCM_Settings {
 		}
 
 		// Printable types — keep only real, registered post types.
+		// Notice board sources: only the known extra sources are kept.
+		$out['notice_sources'] = array();
+		if ( ! empty( $input['notice_sources'] ) && is_array( $input['notice_sources'] ) ) {
+			foreach ( $input['notice_sources'] as $src ) {
+				$src = sanitize_key( MCM_Safe::str( $src ) );
+				if ( in_array( $src, array( 'job', 'tender' ), true ) && ! in_array( $src, $out['notice_sources'], true ) ) {
+					$out['notice_sources'][] = $src;
+				}
+			}
+		}
+		$out['job_closing_days'] = (string) min( 60, absint( isset( $input['job_closing_days'] ) ? MCM_Safe::str( $input['job_closing_days'] ) : '3' ) );
+
 		$out['print_types'] = array();
 		if ( ! empty( $input['print_types'] ) && is_array( $input['print_types'] ) ) {
 			foreach ( $input['print_types'] as $pt ) {
@@ -325,6 +341,41 @@ class MCM_Settings {
 					<?php $this->banner_rows( $s ); ?>
 				</table>
 
+				<h2 class="title"><?php esc_html_e( 'Notice board & jobs', 'medical-college-manager' ); ?></h2>
+				<table class="form-table" role="presentation">
+					<tr>
+						<th scope="row"><?php esc_html_e( 'Notice board sources', 'medical-college-manager' ); ?></th>
+						<td>
+							<fieldset>
+								<legend class="screen-reader-text"><?php esc_html_e( 'Notice board sources', 'medical-college-manager' ); ?></legend>
+								<?php
+								$mcm_sources = isset( $s['notice_sources'] ) && is_array( $s['notice_sources'] ) ? $s['notice_sources'] : array();
+								foreach ( array(
+									'job'    => __( 'Open jobs', 'medical-college-manager' ),
+									'tender' => __( 'Open tenders', 'medical-college-manager' ),
+								) as $mcm_src => $mcm_label ) {
+									printf(
+										'<label style="display:inline-block;margin:0 16px 6px 0;"><input type="checkbox" name="%1$s[notice_sources][]" value="%2$s" %3$s /> %4$s</label>',
+										esc_attr( self::OPTION ),
+										esc_attr( $mcm_src ),
+										checked( in_array( $mcm_src, $mcm_sources, true ), true, false ),
+										esc_html( $mcm_label )
+									);
+								}
+								?>
+								<p class="description" style="max-width:820px;"><?php esc_html_e( 'Notices always appear on the notice ticker, board and list. Tick a source to add its open items too (each item can still opt out with its own "Show on notice board" field). A shortcode can choose its own sources with include="notice,job,tender".', 'medical-college-manager' ); ?></p>
+							</fieldset>
+						</td>
+					</tr>
+					<tr>
+						<th scope="row"><label for="job_closing_days"><?php esc_html_e( 'Jobs: "Closing soon" days', 'medical-college-manager' ); ?></label></th>
+						<td>
+							<input type="number" min="0" max="60" id="job_closing_days" class="small-text" name="<?php echo esc_attr( self::OPTION ); ?>[job_closing_days]" value="<?php echo esc_attr( $s['job_closing_days'] ); ?>" />
+							<p class="description"><?php esc_html_e( 'A job shows the "Closing soon" badge this many days before its last date.', 'medical-college-manager' ); ?></p>
+						</td>
+					</tr>
+				</table>
+
 				<h2 class="title"><?php esc_html_e( 'Privacy', 'medical-college-manager' ); ?></h2>
 				<table class="form-table" role="presentation">
 					<tr>
@@ -378,6 +429,7 @@ class MCM_Settings {
 				array( '[mcm_scholarships]', __( 'Scholarships with amount, eligibility and an Apply button.', 'medical-college-manager' ) ),
 				array( '[mcm_tenders]', __( 'Active tenders with download & submit links (auto-hide after the deadline).', 'medical-college-manager' ) ),
 				array( '[mcm_policies]', __( 'Institutional policies, each with a downloadable document.', 'medical-college-manager' ) ),
+				array( '[mcm_jobs]', __( 'Jobs / vacancies (alias [mcm_vacancies]): open jobs by default; status="closed" or status="all" for past ones. Filter with category="…" and department="…".', 'medical-college-manager' ) ),
 				array( '[mcm_students]', __( 'Student list — safe fields only (name, PMDC No., department, batch). Put this on the Student Affairs page.', 'medical-college-manager' ) ),
 			),
 			__( 'Department page — auto-detect the current department, or add department="anatomy"', 'medical-college-manager' ) => array(
@@ -390,6 +442,7 @@ class MCM_Settings {
 				array( '[mcm_notice_ticker]', __( 'Scrolling headline strip — great just under the header.', 'medical-college-manager' ) ),
 				array( '[mcm_notice_board]', __( 'Vertical auto-scrolling notices panel for a sidebar or homepage column.', 'medical-college-manager' ) ),
 				array( '[mcm_notices]', __( 'Static, filterable notices list.', 'medical-college-manager' ) ),
+				array( '[mcm_notice_board include="notice,job,tender"]', __( 'Choose what a ticker/board/list shows: notices, open jobs and/or open tenders (default: notices plus the sources ticked in Settings).', 'medical-college-manager' ) ),
 				array( '[mcm_social_bar]', __( 'Floating social-media icon bar (also settable site-wide from Settings).', 'medical-college-manager' ) ),
 				array( '[mcm_blog]', __( 'Latest blog posts in a date-badge card layout.', 'medical-college-manager' ) ),
 			),

@@ -31,6 +31,8 @@ class MCM_Shortcodes {
 		add_shortcode( 'mcm_publications', array( $this, 'sc_publications' ) );
 		add_shortcode( 'mcm_research', array( $this, 'sc_research' ) );
 		add_shortcode( 'mcm_policies', array( $this, 'sc_policies' ) );
+		add_shortcode( 'mcm_jobs', array( $this, 'sc_jobs' ) );
+		add_shortcode( 'mcm_vacancies', array( $this, 'sc_jobs' ) ); // alias.
 		add_shortcode( 'mcm_students', array( $this, 'sc_students' ) );
 		add_shortcode( 'mcm_student', array( $this, 'sc_students' ) ); // alias.
 
@@ -126,6 +128,8 @@ class MCM_Shortcodes {
 			// pre-filter controls…). Without them the first AJAX search, filter
 			// change, Reset or Print-all silently widened the list.
 			'scope'     => (object) MCM_Query::scope_terms( $a ),
+			// Jobs status filter (open/closed/all) must survive AJAX, Reset and Print.
+			'status'    => sanitize_key( MCM_Safe::str( $a['status'] ) ),
 			// Without these a filtered AJAX response silently loses pagination.
 			'paginate'  => $a['paginate'],
 			'paged'     => (int) $a['paged'],
@@ -322,6 +326,20 @@ class MCM_Shortcodes {
 	public function sc_research( $atts ) {
 		$atts         = $this->normalize( $atts );
 		$atts['type'] = 'mcm_research';
+		return $this->render( $atts );
+	}
+
+	/**
+	 * Shortcode callback for [mcm_jobs] and [mcm_vacancies].
+	 *
+	 * @param array|string $atts Shortcode attributes.
+	 */
+	public function sc_jobs( $atts ) {
+		$atts         = $this->normalize( $atts );
+		$atts['type'] = 'mcm_job';
+		if ( empty( $atts['count'] ) ) {
+			$atts['count'] = 12;
+		}
 		return $this->render( $atts );
 	}
 
