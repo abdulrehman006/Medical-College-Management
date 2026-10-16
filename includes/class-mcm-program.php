@@ -42,7 +42,7 @@ class MCM_Program {
 	 * @param WP_Post $post    Post object.
 	 * @param bool    $update  Whether this is an update.
 	 */
-	public function sync_term( $post_id, $post = null, $update = false ) {
+	public function sync_term( $post_id, $post = null, $update = false ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed -- save_post_{post_type} callback signature.
 		if ( wp_is_post_revision( $post_id ) || wp_is_post_autosave( $post_id ) ) {
 			return;
 		}

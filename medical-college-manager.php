@@ -113,81 +113,6 @@ function mcm_requirement_errors() {
 }
 
 /**
- * Main plugin class — boots all components.
- */
-final class Medical_College_Manager {
-
-	/** @var Medical_College_Manager|null */
-	private static $instance = null;
-
-	/** @var object[] Booted modules, keyed by class. */
-	private $modules = array();
-
-	/** @return Medical_College_Manager */
-	public static function instance() {
-		if ( null === self::$instance ) {
-			self::$instance = new self();
-		}
-		return self::$instance;
-	}
-
-	private function __construct() {
-		MCM_Health::init();
-
-		// Translations first (priority 0), so post type and taxonomy labels
-		// registered on init are translated.
-		add_action( 'init', array( $this, 'load_textdomain' ), 0 );
-
-		// Each file and each module is loaded behind its own boundary: one
-		// broken module is switched off and reported, the others keep working.
-		foreach ( mcm_modules() as $file => $class ) {
-			if ( ! MCM_Safe::load( MCM_PATH . 'includes/' . $file, $file ) ) {
-				continue;
-			}
-			if ( '' !== $class ) {
-				$module = MCM_Safe::boot( $class );
-				if ( $module ) {
-					$this->modules[ $class ] = $module;
-				}
-			}
-		}
-
-		// Meta-aware search (students by ID / roll / PMDC No.).
-		if ( class_exists( 'MCM_Query' ) ) {
-			MCM_Safe::run( array( 'MCM_Query', 'register_hooks' ), 'query hooks' );
-		}
-
-		// Flush rewrite rules once after an update changes CPT registration.
-		add_action( 'init', array( $this, 'maybe_flush_rewrites' ), 99 );
-	}
-
-	/**
-	 * Flush rewrite rules a single time when the stored version differs from
-	 * the running version (covers plugin updates, where the activation hook
-	 * does not fire).
-	 */
-	public function maybe_flush_rewrites() {
-		if ( get_option( 'mcm_version' ) === MCM_VERSION ) {
-			return;
-		}
-		MCM_Safe::run( 'flush_rewrite_rules', 'upgrade: flush rewrite rules' );
-		// Capability grants must also run on UPGRADE, not just activation, or an
-		// existing site would keep the old post-capability behaviour for students.
-		if ( class_exists( 'MCM_Caps' ) ) {
-			MCM_Safe::run( array( 'MCM_Caps', 'grant' ), 'upgrade: capabilities' );
-		}
-		if ( class_exists( 'MCM_Program' ) ) {
-			MCM_Safe::run( array( 'MCM_Program', 'migrate' ), 'upgrade: program migration' );
-		}
-		update_option( 'mcm_version', MCM_VERSION );
-	}
-
-	public function load_textdomain() {
-		load_plugin_textdomain( 'medical-college-manager', false, dirname( MCM_BASENAME ) . '/languages' );
-	}
-}
-
-/**
  * Boot on plugins_loaded once the requirements are known to hold. When they
  * do not, nothing but an explanatory admin notice is loaded.
  */
@@ -209,6 +134,7 @@ function mcm_bootstrap() {
 		);
 		return;
 	}
+	require_once MCM_PATH . 'includes/class-medical-college-manager.php';
 	Medical_College_Manager::instance();
 }
 add_action( 'plugins_loaded', 'mcm_bootstrap' );

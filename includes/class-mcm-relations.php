@@ -144,7 +144,7 @@ class MCM_Relations {
 			array(
 				'post_type'      => $cpts_for,
 				'post_status'    => array( 'publish', 'draft', 'pending', 'private', 'future' ),
-				'posts_per_page' => 200,
+				'posts_per_page' => 200, // phpcs:ignore WordPress.WP.PostsPerPage.posts_per_page_posts_per_page -- Admin meta box, IDs only; needed to count the "+N more".
 				'post__not_in'   => array( $post_id ),
 				'no_found_rows'  => true,
 				'orderby'        => 'title',

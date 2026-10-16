@@ -83,8 +83,15 @@ class MCM_Notice {
 			function ( $x, $y ) {
 				$kx = self::sort_key( $x );
 				$ky = self::sort_key( $y );
-				// Pinned desc, priority desc, timestamp desc.
-				return ( $ky[0] <=> $kx[0] ) ?: ( $ky[1] <=> $kx[1] ) ?: ( $ky[2] <=> $kx[2] );
+				// Pinned desc, then priority desc, then timestamp desc.
+				$cmp = $ky[0] <=> $kx[0];
+				if ( 0 === $cmp ) {
+					$cmp = $ky[1] <=> $kx[1];
+				}
+				if ( 0 === $cmp ) {
+					$cmp = $ky[2] <=> $kx[2];
+				}
+				return $cmp;
 			}
 		);
 

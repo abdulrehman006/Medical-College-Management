@@ -179,7 +179,7 @@ class MCM_Social {
 		);
 	}
 
-	public function shortcode( $atts ) {
+	public function shortcode( $atts ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found -- Shortcode callback signature; the bar takes no attributes.
 		$this->shown = true;
 		return $this->render_bar();
 	}

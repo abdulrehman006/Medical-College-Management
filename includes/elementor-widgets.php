@@ -1,4 +1,4 @@
-<?php
+<?php // phpcs:disable WordPress.Files.FileName.InvalidClassFileName -- Holds every widget class; see the note below.
 /**
  * Elementor widget classes. Required only from within the Elementor
  * registration hook, so Elementor's base class is guaranteed to exist.
@@ -9,6 +9,13 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
+
+/*
+ * phpcs:disable Generic.Files.OneObjectStructurePerFile.MultipleFound
+ * -- The widget classes are small declarations sharing two base classes and
+ * are loaded together, only from Elementor's widget registration hook, so
+ * sites without Elementor never parse them. Kept in one file on purpose.
+ */
 
 // Safety: never declare these unless Elementor's base class is loaded.
 if ( ! class_exists( '\Elementor\Widget_Base' ) ) {
@@ -207,7 +214,7 @@ abstract class MCM_Elementor_Widget_Base extends \Elementor\Widget_Base {
 	 * it matters (spacing, image height).
 	 */
 	protected function register_style_controls() {
-		$V = '{{WRAPPER}}'; // phpcs:ignore
+		$wrapper = '{{WRAPPER}}';
 
 		/* ---- Style: Layout & spacing ---- */
 		$this->start_controls_section(
@@ -230,7 +237,7 @@ abstract class MCM_Elementor_Widget_Base extends \Elementor\Widget_Base {
 						'max' => 80,
 					),
 				),
-				'selectors'  => array( $V => '--mcm-gap: {{SIZE}}{{UNIT}};' ),
+				'selectors'  => array( $wrapper => '--mcm-gap: {{SIZE}}{{UNIT}};' ),
 			)
 		);
 		$this->add_responsive_control(
@@ -245,7 +252,7 @@ abstract class MCM_Elementor_Widget_Base extends \Elementor\Widget_Base {
 						'max' => 60,
 					),
 				),
-				'selectors'  => array( $V => '--mcm-pad: {{SIZE}}{{UNIT}};' ),
+				'selectors'  => array( $wrapper => '--mcm-pad: {{SIZE}}{{UNIT}};' ),
 			)
 		);
 		$this->add_responsive_control(
@@ -260,7 +267,7 @@ abstract class MCM_Elementor_Widget_Base extends \Elementor\Widget_Base {
 						'max' => 40,
 					),
 				),
-				'selectors'  => array( $V => '--mcm-radius: {{SIZE}}{{UNIT}};' ),
+				'selectors'  => array( $wrapper => '--mcm-radius: {{SIZE}}{{UNIT}};' ),
 			)
 		);
 		$this->add_responsive_control(
@@ -275,7 +282,7 @@ abstract class MCM_Elementor_Widget_Base extends \Elementor\Widget_Base {
 						'max' => 500,
 					),
 				),
-				'selectors'  => array( $V => '--mcm-img-h: {{SIZE}}{{UNIT}};' ),
+				'selectors'  => array( $wrapper => '--mcm-img-h: {{SIZE}}{{UNIT}};' ),
 				'condition'  => array( 'view' => array( 'grid', 'directory' ) ),
 			)
 		);
@@ -306,7 +313,7 @@ abstract class MCM_Elementor_Widget_Base extends \Elementor\Widget_Base {
 				array(
 					'label'     => $c[0],
 					'type'      => \Elementor\Controls_Manager::COLOR,
-					'selectors' => array( $V => $c[1] . ': {{VALUE}};' ),
+					'selectors' => array( $wrapper => $c[1] . ': {{VALUE}};' ),
 				)
 			);
 		}
@@ -322,8 +329,8 @@ abstract class MCM_Elementor_Widget_Base extends \Elementor\Widget_Base {
 			)
 		);
 
-		$title_sel = $V . ' .mcm-card-title, ' . $V . ' .mcm-card-title a, ' . $V . ' .mcm-dir-card-name, '
-			. $V . ' .mcm-dir-card-name a, ' . $V . ' .mcm-list-title, ' . $V . ' .mcm-list-title a';
+		$title_sel = $wrapper . ' .mcm-card-title, ' . $wrapper . ' .mcm-card-title a, ' . $wrapper . ' .mcm-dir-card-name, '
+			. $wrapper . ' .mcm-dir-card-name a, ' . $wrapper . ' .mcm-list-title, ' . $wrapper . ' .mcm-list-title a';
 
 		$this->add_group_control(
 			\Elementor\Group_Control_Typography::get_type(),
@@ -358,7 +365,7 @@ abstract class MCM_Elementor_Widget_Base extends \Elementor\Widget_Base {
 			array(
 				'name'     => 'st_card_shadow',
 				'label'    => __( 'Card shadow', 'medical-college-manager' ),
-				'selector' => $V . ' .mcm-card, ' . $V . ' .mcm-dir-card, ' . $V . ' .mcm-list-item',
+				'selector' => $wrapper . ' .mcm-card, ' . $wrapper . ' .mcm-dir-card, ' . $wrapper . ' .mcm-list-item',
 			)
 		);
 		$this->end_controls_section();
@@ -814,7 +821,7 @@ class MCM_Widget_Blog extends \Elementor\Widget_Base {
 			$cat = implode( ',', $cat );
 		}
 
-		echo MCM_Blog::render( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		$html = MCM_Blog::render(
 			array(
 				'count'     => ! empty( $s['count'] ) ? (int) $s['count'] : 6,
 				'orderby'   => ! empty( $s['orderby'] ) ? $s['orderby'] : 'date',
@@ -825,33 +832,36 @@ class MCM_Widget_Blog extends \Elementor\Widget_Base {
 				'read_more' => ! empty( $s['read_more'] ) ? $s['read_more'] : '',
 			)
 		);
+		echo $html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- MCM_Blog::render() escapes everything it outputs.
 	}
-}
-
-/**
- * Shared helper: Notice Category term options for the notice widgets.
- */
-function mcm_notice_cat_options() {
-	$terms = get_terms(
-		array(
-			'taxonomy'   => 'mcm_notice_cat',
-			'hide_empty' => false,
-		)
-	);
-	if ( is_wp_error( $terms ) || empty( $terms ) ) {
-		return array();
-	}
-	$out = array();
-	foreach ( $terms as $t ) {
-		$out[ $t->slug ] = $t->name;
-	}
-	return $out;
 }
 
 /**
  * Base for the three notice widgets — shared controls + settings mapping.
  */
 abstract class MCM_Widget_Notice_Base extends \Elementor\Widget_Base {
+
+	/**
+	 * Notice Category options (slug => name) for the category control.
+	 *
+	 * @return array<string,string>
+	 */
+	protected static function mcm_notice_cat_options() {
+		$terms = get_terms(
+			array(
+				'taxonomy'   => 'mcm_notice_cat',
+				'hide_empty' => false,
+			)
+		);
+		if ( is_wp_error( $terms ) || empty( $terms ) ) {
+			return array();
+		}
+		$out = array();
+		foreach ( $terms as $t ) {
+			$out[ $t->slug ] = $t->name;
+		}
+		return $out;
+	}
 
 	public function get_categories() {
 		return array( 'medical-college-manager' );
@@ -881,7 +891,7 @@ abstract class MCM_Widget_Notice_Base extends \Elementor\Widget_Base {
 				'type'        => \Elementor\Controls_Manager::SELECT2,
 				'multiple'    => true,
 				'label_block' => true,
-				'options'     => mcm_notice_cat_options(),
+				'options'     => self::mcm_notice_cat_options(),
 			)
 		);
 		$this->add_control(

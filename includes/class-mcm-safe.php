@@ -42,19 +42,19 @@ class MCM_Safe {
 	 * Construct one module. A module whose constructor throws is skipped and
 	 * reported; every other module still boots.
 	 *
-	 * @param string $class Class name.
+	 * @param string $class_name Class name.
 	 * @return object|null The module, or null when it failed.
 	 */
-	public static function boot( $class ) {
+	public static function boot( $class_name ) {
 		try {
-			if ( ! class_exists( $class ) ) {
-				throw new \RuntimeException( sprintf( 'Class %s is not available.', $class ) );
+			if ( ! class_exists( $class_name ) ) {
+				throw new \RuntimeException( sprintf( 'Class %s is not available.', $class_name ) );
 			}
-			$module = new $class();
-			MCM_Health::module_ok( $class );
+			$module = new $class_name();
+			MCM_Health::module_ok( $class_name );
 			return $module;
 		} catch ( \Throwable $e ) {
-			MCM_Health::module_failed( $class, $e );
+			MCM_Health::module_failed( $class_name, $e );
 			return null;
 		}
 	}
@@ -173,12 +173,12 @@ class MCM_Safe {
 	 *
 	 * @param array  $source  Source array.
 	 * @param string $key     Key.
-	 * @param string $default Returned when missing or not scalar.
+	 * @param string $fallback Returned when missing or not scalar.
 	 * @return string Unsanitized string — sanitize it for its purpose.
 	 */
-	public static function scalar( $source, $key, $default = '' ) {
+	public static function scalar( $source, $key, $fallback = '' ) {
 		if ( ! is_array( $source ) || ! array_key_exists( $key, $source ) || ! is_scalar( $source[ $key ] ) ) {
-			return $default;
+			return $fallback;
 		}
 		return (string) $source[ $key ];
 	}
@@ -187,13 +187,13 @@ class MCM_Safe {
 	 * A scalar from $_POST, unslashed. Non-scalars are discarded.
 	 *
 	 * @param string $key     Key.
-	 * @param string $default Returned when missing or not scalar.
+	 * @param string $fallback Returned when missing or not scalar.
 	 * @return string Unsanitized string — sanitize it for its purpose.
 	 */
-	public static function post( $key, $default = '' ) {
+	public static function post( $key, $fallback = '' ) {
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Reader only; every caller verifies its own nonce.
 		if ( ! isset( $_POST[ $key ] ) || ! is_scalar( $_POST[ $key ] ) ) {
-			return $default;
+			return $fallback;
 		}
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Callers sanitize for their own purpose.
 		return (string) wp_unslash( $_POST[ $key ] );

@@ -119,7 +119,8 @@ class MCM_Import {
 		}
 
 		$out = fopen( 'php://output', 'w' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen
-		fwrite( $out, "\xEF\xBB\xBF" ); // UTF-8 BOM so Excel opens it correctly. phpcs:ignore
+		// UTF-8 BOM so Excel opens the file correctly.
+		fwrite( $out, "\xEF\xBB\xBF" ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fwrite -- Streaming a download to php://output; WP_Filesystem has no stream API.
 		fputcsv( $out, $cols, ',', '"', '\\' );
 
 		foreach ( $posts as $p ) {
@@ -506,7 +507,11 @@ class MCM_Import {
 		$tax_keys  = isset( $map['tax'] ) ? $map['tax'] : array();
 
 		$line = 1;
-		while ( false !== ( $row = fgetcsv( $handle, 0, ',', '"', '\\' ) ) ) {
+		while ( true ) {
+			$row = fgetcsv( $handle, 0, ',', '"', '\\' );
+			if ( false === $row ) {
+				break;
+			}
 			++$line;
 			if ( null === $row || ( 1 === count( $row ) && ( null === $row[0] || '' === trim( (string) $row[0] ) ) ) ) {
 				continue; // blank line.

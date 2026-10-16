@@ -27,7 +27,7 @@ class MCM_Meta {
 	 * value fails REST 'number' schema validation, so everything is exposed as
 	 * 'string' (numeric fields still hold clean numeric strings).
 	 */
-	public static function rest_type( $type ) {
+	public static function rest_type( $type ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found -- Public API: every field type maps to 'string'.
 		return 'string';
 	}
 

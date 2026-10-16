@@ -508,10 +508,12 @@ class MCM_Query {
 		// Build with real placeholders — standards-compliant and injection-proof.
 		$placeholders = implode( ',', array_fill( 0, count( $keys ), '%s' ) );
 
+		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber -- {$placeholders} is a run of '%s' built from count( $keys ); every value is a prepare() replacement, passed in one array.
 		$where .= $wpdb->prepare(
-			" AND ( {$wpdb->posts}.post_title LIKE %s OR ( mcm_smeta.meta_key IN ( {$placeholders} ) AND mcm_smeta.meta_value LIKE %s ) ) ", // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+			" AND ( {$wpdb->posts}.post_title LIKE %s OR ( mcm_smeta.meta_key IN ( {$placeholders} ) AND mcm_smeta.meta_value LIKE %s ) ) ",
 			array_merge( array( $like ), $keys, array( $like ) )
 		);
+		// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber
 		return $where;
 	}
 
@@ -1051,7 +1053,7 @@ class MCM_Query {
 			}
 		}
 
-		// Year;Volume(Issue):Pages
+		// Tail segment, in the form year;volume(issue):pages.
 		$tail = $year;
 		if ( '' !== $vol ) {
 			$tail .= ( '' !== $tail ? ';' : '' ) . $vol;
@@ -2064,7 +2066,7 @@ class MCM_Query {
 					esc_attr( $cls ),
 					esc_url( $url ),
 					esc_html( $label ),
-					$attr // Built from controlled flags only, safe.
+					$attr // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Only the fixed strings ' target="_blank" rel="noopener noreferrer"' and ' download'.
 				);
 			}
 			echo '</div>';
