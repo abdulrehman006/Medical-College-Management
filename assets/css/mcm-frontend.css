@@ -989,3 +989,140 @@ html:has(.mcm-hero-full){ overflow-x: clip; }
 	color:#8a2424;
 	font-size:14px;
 }
+
+/* ---------- Theme-proof buttons ----------
+ * Themes and Elementor kits style every <button>: Hello Elementor gives them a
+ * pink (#c36) border, and a pink background on hover and focus, with
+ * selectors such as button:hover and [type=button]:focus that outrank a single
+ * plugin class. These rules restate each plugin button's own look for every
+ * state, scoped to plugin containers and specific enough to win, so the
+ * plugin looks the same on a bare theme. Keyboard focus keeps the visible
+ * :focus-visible outline defined above. */
+.mcm-wrap button.mcm-print-btn,
+.mcm-wrap button.mcm-search-btn,
+.mcm-wrap button.mcm-reset,
+.mcm-ticker button.mcm-scroll-pause,
+.mcm-board button.mcm-scroll-pause{
+	box-shadow:none;
+	text-transform:none;
+	text-decoration:none;
+	letter-spacing:normal;
+	font-family:inherit;
+	line-height:1.2;
+	min-height:0;
+	transition:color .15s ease, border-color .15s ease, background-color .15s ease, opacity .15s ease;
+}
+
+.mcm-wrap button.mcm-print-btn{
+	padding:10px 18px;
+	border:1px solid var(--mcm-border, #e5e7eb);
+	border-radius:8px;
+	background-color:var(--mcm-card-bg, #fff);
+	color:var(--mcm-primary, #0a6b5d);
+	font-size:14px;
+	font-weight:600;
+}
+.mcm-wrap button.mcm-print-btn:hover,
+.mcm-wrap button.mcm-print-btn:focus{
+	border-color:var(--mcm-primary, #0a6b5d);
+	background-color:var(--mcm-primary, #0a6b5d);
+	color:#fff;
+}
+
+.mcm-wrap button.mcm-search-btn{
+	padding:10px 24px;
+	border:1px solid var(--mcm-primary, #0a6b5d);
+	border-radius:8px;
+	background-color:var(--mcm-primary, #0a6b5d);
+	color:#fff;
+	font-size:15px;
+	font-weight:600;
+}
+.mcm-wrap button.mcm-search-btn:hover,
+.mcm-wrap button.mcm-search-btn:focus{
+	border-color:var(--mcm-accent, #13a594);
+	background-color:var(--mcm-accent, #13a594);
+	color:#fff;
+}
+
+.mcm-wrap .mcm-filters button.mcm-reset{
+	border:1px solid var(--mcm-border, #e5e7eb);
+	border-radius:8px;
+	background-color:transparent;
+	color:var(--mcm-muted, #6b7280);
+}
+.mcm-wrap .mcm-filters button.mcm-reset:hover,
+.mcm-wrap .mcm-filters button.mcm-reset:focus{
+	border-color:var(--mcm-primary, #0a6b5d);
+	background-color:var(--mcm-page-bg, #f5f7fa);
+	color:var(--mcm-primary, #0a6b5d);
+}
+
+.mcm-wrap button.mcm-dir-reset{
+	padding:8px 16px;
+	border:1px solid var(--mcm-border, #e5e7eb);
+	border-radius:8px;
+	background-color:var(--mcm-card-bg, #fff);
+	color:var(--mcm-text, #1f2933);
+	font-size:14px;
+	font-weight:400;
+}
+.mcm-wrap button.mcm-dir-reset:hover,
+.mcm-wrap button.mcm-dir-reset:focus{
+	border-color:var(--mcm-border, #e5e7eb);
+	background-color:var(--mcm-page-bg, #f5f7fa);
+	color:var(--mcm-text, #1f2933);
+}
+
+.mcm-ticker button.mcm-scroll-pause,
+.mcm-board button.mcm-scroll-pause{
+	padding:0 12px;
+	border:none;
+	border-radius:0;
+	background-color:transparent;
+	color:inherit;
+	font-size:11px;
+}
+.mcm-ticker button.mcm-scroll-pause:hover,
+.mcm-ticker button.mcm-scroll-pause:focus,
+.mcm-board button.mcm-scroll-pause:hover,
+.mcm-board button.mcm-scroll-pause:focus{
+	border:none;
+	background-color:transparent;
+	color:inherit;
+	opacity:1;
+}
+/* The board's pause button sits on the dark header: keep its focus ring visible. */
+.mcm-board-head button.mcm-scroll-pause:focus-visible{ outline-color:#fff; }
+
+/* ---------- Theme-proof links ----------
+ * Themes colour links on hover (Hello Elementor: a:hover{color:#336}). Plugin
+ * links whose :hover only changed the background inherited that colour —
+ * dark blue on a green button. Restate the text colour for hover and focus
+ * with element+class specificity so the theme rule cannot win. */
+a.mcm-dir-card-btn,
+a.mcm-dir-card-btn:hover,
+a.mcm-dir-card-btn:focus,
+a.mcm-list-link,
+a.mcm-list-link:hover,
+a.mcm-list-link:focus,
+a.mcm-sd-btn--primary,
+a.mcm-sd-btn--primary:hover,
+a.mcm-sd-btn--primary:focus{
+	color:#fff;
+	text-decoration:none;
+}
+a.mcm-sd-btn,
+a.mcm-sd-btn:hover,
+a.mcm-sd-btn:focus,
+a.mcm-board-more,
+a.mcm-board-more:hover,
+a.mcm-board-more:focus{
+	text-decoration:none;
+}
+a.mcm-sd-btn:not(.mcm-sd-btn--primary):hover,
+a.mcm-sd-btn:not(.mcm-sd-btn--primary):focus,
+a.mcm-board-more:hover,
+a.mcm-board-more:focus{
+	color:var(--mcm-primary, #0a6b5d);
+}
