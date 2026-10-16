@@ -16,6 +16,10 @@ class MCM_Meta {
 		add_action( 'save_post', array( $this, 'save' ), 10, 2 );
 		add_action( 'init', array( $this, 'register_meta_fields' ) );
 		add_action( 'admin_init', array( $this, 'register_admin_columns' ) );
+		// Refuse invalid date/time values on every write path.
+		add_filter( 'add_post_metadata', array( $this, 'guard_meta_write' ), 10, 4 );
+		add_filter( 'update_post_metadata', array( $this, 'guard_meta_write' ), 10, 4 );
+		add_action( 'admin_notices', array( $this, 'invalid_fields_notice' ) );
 	}
 
 	/**
@@ -32,7 +36,17 @@ class MCM_Meta {
 	 * Shared by the meta box save, the CSV import, and the REST sanitizer.
 	 */
 	public static function sanitize_value( $type, $raw ) {
+		// Arrays/objects never reach a sanitizer (PHP 8 TypeError on old WP).
+		$raw = MCM_Safe::str( $raw );
 		switch ( $type ) {
+			case 'date':
+				// Normalised to Y-m-d. An invalid value is passed through as text
+				// and then refused by guard_meta_write(), so it is never stored.
+				$iso = self::parse_date( $raw );
+				return false !== $iso ? $iso : sanitize_text_field( $raw );
+			case 'time':
+				$hm = self::parse_time( $raw );
+				return false !== $hm ? $hm : sanitize_text_field( $raw );
 			case 'email':
 				return sanitize_email( $raw );
 			case 'url':
@@ -45,6 +59,161 @@ class MCM_Meta {
 			default:
 				return sanitize_text_field( $raw );
 		}
+	}
+
+	/**
+	 * Parse a date typed the way Pakistani staff type it.
+	 *
+	 * Accepts Y-m-d, and day-first d/m/Y, d-m-Y, d.m.Y (one or two digit day
+	 * and month, one separator used consistently). Month-first (US) input is
+	 * NOT supported: 10/11/2026 is 10 November. Impossible dates such as
+	 * 31/02/2026 are rejected via checkdate().
+	 *
+	 * @param mixed $raw Input.
+	 * @return string|false Y-m-d, or false when it is not a valid date.
+	 */
+	public static function parse_date( $raw ) {
+		$raw = trim( MCM_Safe::str( $raw ) );
+		if ( '' === $raw ) {
+			return false;
+		}
+		if ( preg_match( '/^(\d{4})-(\d{1,2})-(\d{1,2})$/', $raw, $m ) ) {
+			list( , $y, $mo, $d ) = $m;
+		} elseif ( preg_match( '/^(\d{1,2})([\/.\-])(\d{1,2})\2(\d{4})$/', $raw, $m ) ) {
+			$d  = $m[1];
+			$mo = $m[3];
+			$y  = $m[4];
+		} else {
+			return false;
+		}
+		if ( ! checkdate( (int) $mo, (int) $d, (int) $y ) ) {
+			return false;
+		}
+		return sprintf( '%04d-%02d-%02d', (int) $y, (int) $mo, (int) $d );
+	}
+
+	/**
+	 * Parse a time: "14:30", "14:30:00", "2:30 PM", "2:30pm", "2:30 p.m.".
+	 *
+	 * @param mixed $raw Input.
+	 * @return string|false H:i, or false when it is not a valid time.
+	 */
+	public static function parse_time( $raw ) {
+		$raw = trim( MCM_Safe::str( $raw ) );
+		if ( ! preg_match( '/^(\d{1,2}):(\d{2})(?::\d{2})?\s*(?:([ap])\.?\s?m\.?)?$/i', $raw, $m ) ) {
+			return false;
+		}
+		$h    = (int) $m[1];
+		$min  = (int) $m[2];
+		$ampm = isset( $m[3] ) ? strtolower( $m[3] ) : '';
+		if ( $min > 59 ) {
+			return false;
+		}
+		if ( '' !== $ampm ) {
+			if ( $h < 1 || $h > 12 ) {
+				return false;
+			}
+			$h = ( 12 === $h ? 0 : $h ) + ( 'p' === $ampm ? 12 : 0 );
+		} elseif ( $h > 23 ) {
+			return false;
+		}
+		return sprintf( '%02d:%02d', $h, $min );
+	}
+
+	/**
+	 * Is a non-empty value acceptable for a date/time field? Other field
+	 * types are always acceptable (they are sanitized, not validated).
+	 *
+	 * @param string $type  Field type.
+	 * @param mixed  $value Value.
+	 * @return bool
+	 */
+	public static function is_valid( $type, $value ) {
+		$value = trim( MCM_Safe::str( $value ) );
+		if ( '' === $value ) {
+			return true;
+		}
+		if ( 'date' === $type ) {
+			return false !== self::parse_date( $value );
+		}
+		if ( 'time' === $type ) {
+			return false !== self::parse_time( $value );
+		}
+		return true;
+	}
+
+	/**
+	 * Field type of one meta key on one post type ('' when not ours).
+	 *
+	 * @param string $post_type Post type.
+	 * @param string $key       Meta key.
+	 * @return string
+	 */
+	public static function field_type( $post_type, $key ) {
+		static $map = null;
+		if ( null === $map ) {
+			$map = array();
+			foreach ( self::fields() as $cpt => $cfg ) {
+				foreach ( $cfg['fields'] as $meta_key => $field ) {
+					$map[ $cpt ][ $meta_key ] = $field['type'];
+				}
+			}
+		}
+		return isset( $map[ $post_type ][ $key ] ) ? $map[ $post_type ][ $key ] : '';
+	}
+
+	/**
+	 * Last line of defence for date/time fields, whatever the write path
+	 * (meta box, CSV, REST, another plugin calling update_post_meta): a value
+	 * that is not a valid, normalised date/time is refused, so it can never
+	 * reach the DATE comparisons that decide expiry and ordering.
+	 *
+	 * @param null|bool $check     Short-circuit value from earlier filters.
+	 * @param int       $object_id Post ID.
+	 * @param string    $meta_key  Meta key.
+	 * @param mixed     $value     Value (already passed through sanitize_meta).
+	 * @return null|bool Null to proceed, false to refuse the write.
+	 */
+	public function guard_meta_write( $check, $object_id, $meta_key, $value ) {
+		if ( null !== $check ) {
+			return $check;
+		}
+		$type = self::field_type( (string) get_post_type( $object_id ), (string) $meta_key );
+		if ( 'date' !== $type && 'time' !== $type ) {
+			return $check;
+		}
+		if ( ! is_scalar( $value ) ) {
+			return false;
+		}
+		$value = (string) $value;
+		if ( '' === $value ) {
+			return $check;
+		}
+		$normal = 'date' === $type ? self::parse_date( $value ) : self::parse_time( $value );
+		return ( false !== $normal && $normal === $value ) ? $check : false;
+	}
+
+	/** Show which date/time fields were not saved on the last update. */
+	public function invalid_fields_notice() {
+		$key  = 'mcm_meta_invalid_' . get_current_user_id();
+		$data = get_transient( $key );
+		if ( ! is_array( $data ) || empty( $data['fields'] ) ) {
+			return;
+		}
+		$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+		if ( ! $screen || 'post' !== $screen->base ) {
+			return; // Keep it for the edit screen it belongs to.
+		}
+		delete_transient( $key );
+		echo '<div class="notice notice-error is-dismissible"><p>';
+		echo esc_html(
+			sprintf(
+				/* translators: %s: comma-separated field labels. */
+				__( 'Not saved — these fields need a valid date or time: %s. Use a date like 15/10/2026 or 2026-10-15, and a time like 14:30 or 2:30 PM.', 'medical-college-manager' ),
+				implode( ', ', array_map( 'strval', $data['fields'] ) )
+			)
+		);
+		echo '</p></div>';
 	}
 
 	/**
@@ -297,7 +466,15 @@ class MCM_Meta {
 
 		echo '<div class="mcm-meta-grid">';
 		foreach ( $config[ $cpt ]['fields'] as $key => $field ) {
-			$value = get_post_meta( $post->ID, $key, true );
+			$value = MCM_Safe::meta( $post->ID, $key );
+			// Date/time inputs need the normalised form to show the value; a
+			// legacy "15/10/2026" is displayed as 2026-10-15 and fixed on save.
+			$shown = $value;
+			if ( 'date' === $field['type'] && false !== self::parse_date( $value ) ) {
+				$shown = self::parse_date( $value );
+			} elseif ( 'time' === $field['type'] && false !== self::parse_time( $value ) ) {
+				$shown = self::parse_time( $value );
+			}
 			echo '<p class="mcm-meta-field">';
 			printf( '<label for="%1$s"><strong>%2$s</strong></label><br/>', esc_attr( $key ), esc_html( $field['label'] ) );
 
@@ -337,12 +514,39 @@ class MCM_Meta {
 						'<input type="%1$s" id="%2$s" name="%2$s" value="%3$s" style="width:100%%;max-width:420px;" />',
 						esc_attr( $field['type'] ),
 						esc_attr( $key ),
-						esc_attr( $value )
+						esc_attr( $shown )
 					);
 					break;
 			}
 			if ( ! empty( $field['desc'] ) ) {
 				printf( '<br/><span class="description" style="color:#666;">%s</span>', esc_html( $field['desc'] ) );
+			}
+			// A stored value the plugin cannot read as a date/time (older data,
+			// or another plugin) is flagged so the editor can re-enter it; the
+			// browser's date input would otherwise just show an empty box.
+			if ( '' !== $value && ! self::is_valid( $field['type'], $value ) ) {
+				printf(
+					'<br/><span class="mcm-field-error" style="color:#b32d2e;">%s</span>',
+					esc_html(
+						sprintf(
+							/* translators: %s: the stored value. */
+							__( 'Stored value "%s" is not a valid date/time, so this entry may be hidden or sorted wrongly. Please enter it again.', 'medical-college-manager' ),
+							$value
+						)
+					)
+				);
+			} elseif ( '' !== $value && $shown !== $value ) {
+				printf(
+					'<br/><span class="mcm-field-note" style="color:#996800;">%s</span>',
+					esc_html(
+						sprintf(
+							/* translators: 1: stored value, 2: corrected value. */
+							__( 'Stored as "%1$s"; it will be saved as %2$s when you click Update.', 'medical-college-manager' ),
+							$value,
+							$shown
+						)
+					)
+				);
 			}
 			echo '</p>';
 		}
@@ -365,13 +569,32 @@ class MCM_Meta {
 			return;
 		}
 
+		$invalid = array();
 		foreach ( $config[ $post->post_type ]['fields'] as $key => $field ) {
-			if ( ! isset( $_POST[ $key ] ) ) {
+			// Missing or non-scalar (a crafted array) fields are left alone.
+			if ( ! isset( $_POST[ $key ] ) || ! is_scalar( $_POST[ $key ] ) ) {
 				continue;
 			}
-			$raw   = wp_unslash( $_POST[ $key ] );
+			$raw = MCM_Safe::post( $key );
+			// A date/time that cannot be understood is NOT saved (the old value
+			// stays) and the editor is told which field to fix.
+			if ( ! self::is_valid( $field['type'], $raw ) ) {
+				$invalid[] = $field['label'];
+				continue;
+			}
 			$clean = self::sanitize_value( $field['type'], $raw );
 			update_post_meta( $post_id, $key, $clean );
+		}
+
+		if ( $invalid ) {
+			set_transient(
+				'mcm_meta_invalid_' . get_current_user_id(),
+				array(
+					'post'   => (int) $post_id,
+					'fields' => $invalid,
+				),
+				5 * MINUTE_IN_SECONDS
+			);
 		}
 	}
 

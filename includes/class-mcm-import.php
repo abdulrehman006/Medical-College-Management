@@ -435,6 +435,27 @@ class MCM_Import {
 				continue;
 			}
 
+			// Dates and times must be understood before anything is written: a
+			// deadline the database cannot read would silently hide or misorder
+			// the entry. The whole row is skipped and reported instead.
+			$bad = '';
+			foreach ( $meta_keys as $mk ) {
+				$ftype = MCM_Meta::field_type( $type, 'mcm_' . $mk );
+				if ( isset( $data[ $mk ] ) && '' !== $data[ $mk ] && ! MCM_Meta::is_valid( $ftype, $data[ $mk ] ) ) {
+					$bad = 'date' === $ftype
+						/* translators: 1: CSV row number, 2: column name, 3: the value. */
+						? sprintf( __( 'Row %1$d skipped: "%2$s" value "%3$s" is not a valid date (use 15/10/2026 or 2026-10-15).', 'medical-college-manager' ), $line, $mk, $data[ $mk ] )
+						/* translators: 1: CSV row number, 2: column name, 3: the value. */
+						: sprintf( __( 'Row %1$d skipped: "%2$s" value "%3$s" is not a valid time (use 14:30 or 2:30 PM).', 'medical-college-manager' ), $line, $mk, $data[ $mk ] );
+					break;
+				}
+			}
+			if ( '' !== $bad ) {
+				$skipped++;
+				$errors[] = $bad;
+				continue;
+			}
+
 			// Upsert by the 'id' column an export carries. Title matching only
 			// when the admin ticked it, and never onto a post this same file
 			// already wrote.

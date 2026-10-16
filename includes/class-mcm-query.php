@@ -1660,12 +1660,27 @@ class MCM_Query {
 		return self::meta_pair( __( 'Time', 'medical-college-manager' ), $val );
 	}
 
-	private static function fmt_date( $raw ) {
-		if ( ! $raw ) {
+	/**
+	 * A stored date for display, in the site's date format.
+	 *
+	 * Reads every accepted input form (Y-m-d, d/m/Y…), so older non-ISO values
+	 * still display correctly. A value that is not a date at all shows as
+	 * "Date not set" (the edit screen flags it) instead of raw text.
+	 *
+	 * @param mixed $raw Stored value.
+	 * @return string
+	 */
+	public static function fmt_date( $raw ) {
+		$raw = trim( MCM_Safe::str( $raw ) );
+		if ( '' === $raw ) {
 			return '';
 		}
-		$ts = strtotime( $raw );
-		return $ts ? date_i18n( get_option( 'date_format' ), $ts ) : $raw;
+		$iso = MCM_Meta::parse_date( $raw );
+		if ( false === $iso ) {
+			return __( 'Date not set', 'medical-college-manager' );
+		}
+		$ts = strtotime( $iso . ' 00:00:00' );
+		return $ts ? date_i18n( get_option( 'date_format' ), $ts ) : $iso;
 	}
 
 	/**
