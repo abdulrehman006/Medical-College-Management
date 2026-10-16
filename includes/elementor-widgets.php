@@ -224,7 +224,12 @@ abstract class MCM_Elementor_Widget_Base extends \Elementor\Widget_Base {
 				'label'      => __( 'Gap between cards', 'medical-college-manager' ),
 				'type'       => \Elementor\Controls_Manager::SLIDER,
 				'size_units' => array( 'px' ),
-				'range'      => array( 'px' => array( 'min' => 0, 'max' => 80 ) ),
+				'range'      => array(
+					'px' => array(
+						'min' => 0,
+						'max' => 80,
+					),
+				),
 				'selectors'  => array( $V => '--mcm-gap: {{SIZE}}{{UNIT}};' ),
 			)
 		);
@@ -234,7 +239,12 @@ abstract class MCM_Elementor_Widget_Base extends \Elementor\Widget_Base {
 				'label'      => __( 'Card padding', 'medical-college-manager' ),
 				'type'       => \Elementor\Controls_Manager::SLIDER,
 				'size_units' => array( 'px' ),
-				'range'      => array( 'px' => array( 'min' => 0, 'max' => 60 ) ),
+				'range'      => array(
+					'px' => array(
+						'min' => 0,
+						'max' => 60,
+					),
+				),
 				'selectors'  => array( $V => '--mcm-pad: {{SIZE}}{{UNIT}};' ),
 			)
 		);
@@ -244,7 +254,12 @@ abstract class MCM_Elementor_Widget_Base extends \Elementor\Widget_Base {
 				'label'      => __( 'Corner radius', 'medical-college-manager' ),
 				'type'       => \Elementor\Controls_Manager::SLIDER,
 				'size_units' => array( 'px' ),
-				'range'      => array( 'px' => array( 'min' => 0, 'max' => 40 ) ),
+				'range'      => array(
+					'px' => array(
+						'min' => 0,
+						'max' => 40,
+					),
+				),
 				'selectors'  => array( $V => '--mcm-radius: {{SIZE}}{{UNIT}};' ),
 			)
 		);
@@ -254,7 +269,12 @@ abstract class MCM_Elementor_Widget_Base extends \Elementor\Widget_Base {
 				'label'      => __( 'Image height', 'medical-college-manager' ),
 				'type'       => \Elementor\Controls_Manager::SLIDER,
 				'size_units' => array( 'px' ),
-				'range'      => array( 'px' => array( 'min' => 100, 'max' => 500 ) ),
+				'range'      => array(
+					'px' => array(
+						'min' => 100,
+						'max' => 500,
+					),
+				),
 				'selectors'  => array( $V => '--mcm-img-h: {{SIZE}}{{UNIT}};' ),
 				'condition'  => array( 'view' => array( 'grid', 'directory' ) ),
 			)
@@ -272,13 +292,13 @@ abstract class MCM_Elementor_Widget_Base extends \Elementor\Widget_Base {
 		);
 
 		$colors = array(
-			'st_primary'  => array( __( 'Primary (buttons, links)', 'medical-college-manager' ), '--mcm-primary' ),
-			'st_accent'   => array( __( 'Accent (hover)', 'medical-college-manager' ), '--mcm-accent' ),
-			'st_text'     => array( __( 'Heading / title text', 'medical-college-manager' ), '--mcm-text' ),
-			'st_muted'    => array( __( 'Secondary / meta text', 'medical-college-manager' ), '--mcm-muted' ),
-			'st_cardbg'   => array( __( 'Card background', 'medical-college-manager' ), '--mcm-card-bg' ),
-			'st_border'   => array( __( 'Borders', 'medical-college-manager' ), '--mcm-border' ),
-			'st_panelbg'  => array( __( 'Filter / panel background', 'medical-college-manager' ), '--mcm-page-bg' ),
+			'st_primary' => array( __( 'Primary (buttons, links)', 'medical-college-manager' ), '--mcm-primary' ),
+			'st_accent'  => array( __( 'Accent (hover)', 'medical-college-manager' ), '--mcm-accent' ),
+			'st_text'    => array( __( 'Heading / title text', 'medical-college-manager' ), '--mcm-text' ),
+			'st_muted'   => array( __( 'Secondary / meta text', 'medical-college-manager' ), '--mcm-muted' ),
+			'st_cardbg'  => array( __( 'Card background', 'medical-college-manager' ), '--mcm-card-bg' ),
+			'st_border'  => array( __( 'Borders', 'medical-college-manager' ), '--mcm-border' ),
+			'st_panelbg' => array( __( 'Filter / panel background', 'medical-college-manager' ), '--mcm-page-bg' ),
 		);
 		foreach ( $colors as $id => $c ) {
 			$this->add_control(
@@ -346,7 +366,12 @@ abstract class MCM_Elementor_Widget_Base extends \Elementor\Widget_Base {
 
 	/** Term slug => name options for a taxonomy. */
 	private function mcm_term_options( $tax ) {
-		$terms = get_terms( array( 'taxonomy' => $tax, 'hide_empty' => false ) );
+		$terms = get_terms(
+			array(
+				'taxonomy'   => $tax,
+				'hide_empty' => false,
+			)
+		);
 		if ( is_wp_error( $terms ) || empty( $terms ) ) {
 			return array();
 		}
@@ -389,8 +414,8 @@ abstract class MCM_Elementor_Widget_Base extends \Elementor\Widget_Base {
 			'order'   => ( isset( $s['order'] ) && 'ASC' === $s['order'] ) ? 'ASC' : 'DESC',
 		);
 
-		$map         = MCM_Query::tax_map();
-		$taxes       = isset( $map[ $type ] ) ? $map[ $type ] : array();
+		$map   = MCM_Query::tax_map();
+		$taxes = isset( $map[ $type ] ) ? $map[ $type ] : array();
 		// Pre-filters are the AUTHOR's scope (locked; visitors narrow within
 		// it), not a visitor filter. A control saved before 1.30.2 holds a
 		// single slug string; newer ones hold an array — both are accepted.
@@ -409,7 +434,8 @@ abstract class MCM_Elementor_Widget_Base extends \Elementor\Widget_Base {
 	}
 }
 
-/* ------------------------------------------------------------------ *
+/*
+------------------------------------------------------------------ *
  *  Concrete widgets — one per public content type.
  * ------------------------------------------------------------------ */
 
@@ -749,7 +775,12 @@ class MCM_Widget_Blog extends \Elementor\Widget_Base {
 	}
 
 	private function mcm_category_options() {
-		$terms = get_terms( array( 'taxonomy' => 'category', 'hide_empty' => false ) );
+		$terms = get_terms(
+			array(
+				'taxonomy'   => 'category',
+				'hide_empty' => false,
+			)
+		);
 		if ( is_wp_error( $terms ) || empty( $terms ) ) {
 			return array();
 		}
@@ -801,7 +832,12 @@ class MCM_Widget_Blog extends \Elementor\Widget_Base {
  * Shared helper: Notice Category term options for the notice widgets.
  */
 function mcm_notice_cat_options() {
-	$terms = get_terms( array( 'taxonomy' => 'mcm_notice_cat', 'hide_empty' => false ) );
+	$terms = get_terms(
+		array(
+			'taxonomy'   => 'mcm_notice_cat',
+			'hide_empty' => false,
+		)
+	);
 	if ( is_wp_error( $terms ) || empty( $terms ) ) {
 		return array();
 	}

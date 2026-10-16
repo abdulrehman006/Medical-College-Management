@@ -50,8 +50,8 @@ class MCM_Relations {
 	}
 
 	public function render( $post ) {
-		$type  = $post->post_type;
-		$taxes = MCM_CPT::taxonomies();
+		$type   = $post->post_type;
+		$taxes  = MCM_CPT::taxonomies();
 		$blocks = '';
 
 		foreach ( self::connectors() as $tax ) {
@@ -80,9 +80,9 @@ class MCM_Relations {
 
 					$links = array();
 					foreach ( $info['posts'] as $rid ) {
-						$edit  = get_edit_post_link( $rid );
-						$title = get_the_title( $rid );
-						$title = '' === $title ? __( '(no title)', 'medical-college-manager' ) : $title;
+						$edit    = get_edit_post_link( $rid );
+						$title   = get_the_title( $rid );
+						$title   = '' === $title ? __( '(no title)', 'medical-college-manager' ) : $title;
 						$links[] = $edit
 							? '<a href="' . esc_url( $edit ) . '">' . esc_html( $title ) . '</a>'
 							: esc_html( $title );
@@ -90,7 +90,8 @@ class MCM_Relations {
 
 					$blocks .= '<div class="mcm-rel-group"><strong>' . esc_html( $plabel ) . ':</strong> ' . implode( ', ', $links );
 					if ( $info['more'] > 0 ) {
-						/* translators: %d: number of additional related items */
+						/*
+						translators: %d: number of additional related items */
 						/* translators: %d: number of additional related items. */
 						$blocks .= ' <span class="mcm-rel-more">' . esc_html( sprintf( __( '+%d more', 'medical-college-manager' ), $info['more'] ) ) . '</span>';
 					}
@@ -163,12 +164,15 @@ class MCM_Relations {
 		foreach ( $query->posts as $rid ) {
 			$cpt = get_post_type( $rid );
 			if ( ! isset( $grouped[ $cpt ] ) ) {
-				$grouped[ $cpt ] = array( 'posts' => array(), 'more' => 0 );
+				$grouped[ $cpt ] = array(
+					'posts' => array(),
+					'more'  => 0,
+				);
 			}
 			if ( count( $grouped[ $cpt ]['posts'] ) < self::PER_TYPE ) {
 				$grouped[ $cpt ]['posts'][] = $rid;
 			} else {
-				$grouped[ $cpt ]['more']++;
+				++$grouped[ $cpt ]['more'];
 			}
 		}
 

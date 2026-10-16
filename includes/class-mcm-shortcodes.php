@@ -179,37 +179,37 @@ class MCM_Shortcodes {
 	}
 
 	public function sc_consultants( $atts ) {
-		$atts = $this->normalize( $atts );
+		$atts         = $this->normalize( $atts );
 		$atts['type'] = 'mcm_consultant';
 		return $this->render( $atts );
 	}
 
 	public function sc_team( $atts ) {
-		$atts = $this->normalize( $atts );
+		$atts         = $this->normalize( $atts );
 		$atts['type'] = 'mcm_team';
 		return $this->render( $atts );
 	}
 
 	public function sc_programs( $atts ) {
-		$atts = $this->normalize( $atts );
+		$atts         = $this->normalize( $atts );
 		$atts['type'] = 'mcm_program';
 		return $this->render( $atts );
 	}
 
 	public function sc_courses( $atts ) {
-		$atts = $this->normalize( $atts );
+		$atts         = $this->normalize( $atts );
 		$atts['type'] = 'mcm_course';
 		return $this->render( $atts );
 	}
 
 	public function sc_events( $atts ) {
-		$atts = $this->normalize( $atts );
+		$atts         = $this->normalize( $atts );
 		$atts['type'] = 'mcm_event';
 		return $this->render( $atts );
 	}
 
 	public function sc_timetable( $atts ) {
-		$atts = $this->normalize( $atts );
+		$atts         = $this->normalize( $atts );
 		$atts['type'] = 'mcm_timetable';
 		if ( empty( $atts['view'] ) ) {
 			$atts['view'] = 'table';
@@ -218,19 +218,19 @@ class MCM_Shortcodes {
 	}
 
 	public function sc_admissions( $atts ) {
-		$atts = $this->normalize( $atts );
+		$atts         = $this->normalize( $atts );
 		$atts['type'] = 'mcm_admission';
 		return $this->render( $atts );
 	}
 
 	public function sc_tenders( $atts ) {
-		$atts = $this->normalize( $atts );
+		$atts         = $this->normalize( $atts );
 		$atts['type'] = 'mcm_tender';
 		return $this->render( $atts );
 	}
 
 	public function sc_scholarships( $atts ) {
-		$atts = $this->normalize( $atts );
+		$atts         = $this->normalize( $atts );
 		$atts['type'] = 'mcm_scholarship';
 		return $this->render( $atts );
 	}
@@ -263,7 +263,7 @@ class MCM_Shortcodes {
 	}
 
 	public function sc_students( $atts ) {
-		$atts = $this->normalize( $atts );
+		$atts         = $this->normalize( $atts );
 		$atts['type'] = 'mcm_student';
 		if ( empty( $atts['view'] ) ) {
 			$atts['view'] = 'table';
@@ -275,25 +275,25 @@ class MCM_Shortcodes {
 	}
 
 	public function sc_grid( $atts ) {
-		$atts = $this->normalize( $atts );
+		$atts         = $this->normalize( $atts );
 		$atts['view'] = 'grid';
 		return $this->render( $atts );
 	}
 
 	public function sc_list( $atts ) {
-		$atts = $this->normalize( $atts );
+		$atts         = $this->normalize( $atts );
 		$atts['view'] = 'list';
 		return $this->render( $atts );
 	}
 
 	public function sc_table( $atts ) {
-		$atts = $this->normalize( $atts );
+		$atts         = $this->normalize( $atts );
 		$atts['view'] = 'table';
 		return $this->render( $atts );
 	}
 
 	public function sc_single( $atts ) {
-		$a = shortcode_atts(
+		$a  = shortcode_atts(
 			array(
 				'id'   => 0,
 				'type' => '',

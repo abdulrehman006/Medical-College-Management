@@ -61,7 +61,7 @@ class MCM_Import {
 		$schema = self::schema();
 		// 'id' is first so a re-imported export updates the exact record it came
 		// from instead of creating a duplicate (see import_file / find_existing).
-		$cols   = array( 'id', 'title', 'content', 'excerpt' );
+		$cols = array( 'id', 'title', 'content', 'excerpt' );
 		if ( isset( $schema[ $type ]['tax'] ) ) {
 			$cols = array_merge( $cols, array_keys( $schema[ $type ]['tax'] ) );
 		}
@@ -156,61 +156,117 @@ class MCM_Import {
 	 */
 	public static function schema() {
 		return array(
-			'mcm_timetable'  => array(
+			'mcm_timetable'   => array(
 				'meta' => array( 'day', 'start_time', 'end_time', 'subject', 'room', 'year' ),
-				'tax'  => array( 'program' => 'mcm_program_link', 'department' => 'mcm_department', 'session' => 'mcm_session', 'teacher' => 'mcm_teacher' ),
+				'tax'  => array(
+					'program'    => 'mcm_program_link',
+					'department' => 'mcm_department',
+					'session'    => 'mcm_session',
+					'teacher'    => 'mcm_teacher',
+				),
 			),
-			'mcm_program'    => array(
+			'mcm_program'     => array(
 				'meta' => array( 'degree_level', 'duration', 'fees', 'intake', 'apply_url' ),
-				'tax'  => array( 'program_category' => 'mcm_program_cat', 'department' => 'mcm_department' ),
+				'tax'  => array(
+					'program_category' => 'mcm_program_cat',
+					'department'       => 'mcm_department',
+				),
 			),
-			'mcm_course'     => array(
+			'mcm_course'      => array(
 				'meta' => array( 'course_code', 'credit_hours', 'semester', 'course_lead' ),
-				'tax'  => array( 'program' => 'mcm_program_link', 'course_category' => 'mcm_course_cat', 'department' => 'mcm_department', 'teacher' => 'mcm_teacher', 'session' => 'mcm_session' ),
+				'tax'  => array(
+					'program'         => 'mcm_program_link',
+					'course_category' => 'mcm_course_cat',
+					'department'      => 'mcm_department',
+					'teacher'         => 'mcm_teacher',
+					'session'         => 'mcm_session',
+				),
 			),
-			'mcm_event'      => array(
+			'mcm_event'       => array(
 				'meta' => array( 'event_date', 'start_time', 'end_time', 'venue', 'organizer', 'event_url', 'event_stream' ),
-				'tax'  => array( 'event_category' => 'mcm_event_cat', 'department' => 'mcm_department' ),
+				'tax'  => array(
+					'event_category' => 'mcm_event_cat',
+					'department'     => 'mcm_department',
+				),
 			),
-			'mcm_consultant' => array(
+			'mcm_consultant'  => array(
 				'meta' => array( 'designation', 'qualifications', 'experience', 'opd_days', 'opd_time', 'phone', 'email', 'linkedin', 'joining_date', 'orcid', 'scholar', 'pubmed' ),
-				'tax'  => array( 'department' => 'mcm_department', 'specialty' => 'mcm_specialty', 'faculty' => 'mcm_teacher', 'research_area' => 'mcm_research_area' ),
+				'tax'  => array(
+					'department'    => 'mcm_department',
+					'specialty'     => 'mcm_specialty',
+					'faculty'       => 'mcm_teacher',
+					'research_area' => 'mcm_research_area',
+				),
 			),
-			'mcm_team'       => array(
+			'mcm_team'        => array(
 				'meta' => array( 'designation', 'qualifications', 'experience', 'phone', 'email', 'linkedin', 'joining_date', 'orcid', 'scholar', 'pubmed' ),
-				'tax'  => array( 'department' => 'mcm_department', 'specialty' => 'mcm_specialty', 'faculty' => 'mcm_teacher', 'research_area' => 'mcm_research_area' ),
+				'tax'  => array(
+					'department'    => 'mcm_department',
+					'specialty'     => 'mcm_specialty',
+					'faculty'       => 'mcm_teacher',
+					'research_area' => 'mcm_research_area',
+				),
 			),
-			'mcm_admission'  => array(
+			'mcm_admission'   => array(
 				'meta' => array( 'program_name', 'open_date', 'close_date', 'eligibility', 'fee', 'apply_url' ),
-				'tax'  => array( 'program' => 'mcm_program_link', 'department' => 'mcm_department', 'session' => 'mcm_session' ),
+				'tax'  => array(
+					'program'    => 'mcm_program_link',
+					'department' => 'mcm_department',
+					'session'    => 'mcm_session',
+				),
 			),
-			'mcm_tender'     => array(
+			'mcm_tender'      => array(
 				'meta' => array( 'tender_institute', 'tender_ref', 'tender_open', 'tender_close', 'tender_bid', 'tender_fee', 'tender_earnest', 'tender_eligibility', 'tender_doc', 'tender_apply' ),
-				'tax'  => array( 'tender_category' => 'mcm_tender_cat', 'department' => 'mcm_department' ),
+				'tax'  => array(
+					'tender_category' => 'mcm_tender_cat',
+					'department'      => 'mcm_department',
+				),
 			),
 			'mcm_scholarship' => array(
 				'meta' => array( 'scholarship_amount', 'scholarship_eligibility', 'scholarship_deadline', 'scholarship_apply' ),
-				'tax'  => array( 'scholarship_type' => 'mcm_scholarship_cat', 'department' => 'mcm_department' ),
+				'tax'  => array(
+					'scholarship_type' => 'mcm_scholarship_cat',
+					'department'       => 'mcm_department',
+				),
 			),
 			'mcm_publication' => array(
 				'meta' => array( 'pub_authors', 'pub_journal', 'pub_year', 'pub_volume', 'pub_issue', 'pub_pages', 'pub_type', 'pub_doi', 'pub_pmid', 'pub_url', 'pub_pdf', 'pub_supervisor', 'pub_fellows', 'pub_open_access', 'pub_impact', 'pub_indexing' ),
-				'tax'  => array( 'research_area' => 'mcm_research_area', 'department' => 'mcm_department', 'professor' => 'mcm_teacher' ),
+				'tax'  => array(
+					'research_area' => 'mcm_research_area',
+					'department'    => 'mcm_department',
+					'professor'     => 'mcm_teacher',
+				),
 			),
-			'mcm_research'   => array(
+			'mcm_research'    => array(
 				'meta' => array( 'res_pi', 'res_status', 'res_start', 'res_completed', 'res_students', 'res_coinv', 'res_funding', 'res_doc' ),
-				'tax'  => array( 'research_area' => 'mcm_research_area', 'department' => 'mcm_department', 'professor' => 'mcm_teacher' ),
+				'tax'  => array(
+					'research_area' => 'mcm_research_area',
+					'department'    => 'mcm_department',
+					'professor'     => 'mcm_teacher',
+				),
 			),
-			'mcm_policy'     => array(
+			'mcm_policy'      => array(
 				'meta' => array( 'policy_issuer', 'policy_ref', 'policy_date', 'policy_doc' ),
-				'tax'  => array( 'policy_category' => 'mcm_policy_cat', 'department' => 'mcm_department' ),
+				'tax'  => array(
+					'policy_category' => 'mcm_policy_cat',
+					'department'      => 'mcm_department',
+				),
 			),
-			'mcm_notice'     => array(
+			'mcm_notice'      => array(
 				'meta' => array( 'notice_priority', 'notice_pinned', 'notice_date', 'notice_expiry', 'notice_url', 'notice_attachment' ),
-				'tax'  => array( 'notice_category' => 'mcm_notice_cat', 'department' => 'mcm_department' ),
+				'tax'  => array(
+					'notice_category' => 'mcm_notice_cat',
+					'department'      => 'mcm_department',
+				),
 			),
-			'mcm_student'    => array(
+			'mcm_student'     => array(
 				'meta' => array( 'student_id', 'roll_no', 'email', 'phone', 'program', 'batch', 'gender', 'dob', 'status', 'blood_group', 'address', 'guardian', 'guardian_phone' ),
-				'tax'  => array( 'program' => 'mcm_program_link', 'level' => 'mcm_level', 'department' => 'mcm_department', 'session' => 'mcm_session' ),
+				'tax'  => array(
+					'program'    => 'mcm_program_link',
+					'level'      => 'mcm_level',
+					'department' => 'mcm_department',
+					'session'    => 'mcm_session',
+				),
 			),
 		);
 	}
@@ -218,20 +274,62 @@ class MCM_Import {
 	/** Friendly labels + sample file names. */
 	public static function types() {
 		return array(
-			'mcm_timetable'  => array( 'label' => __( 'Timetable', 'medical-college-manager' ), 'sample' => 'sample-timetable.csv' ),
-			'mcm_program'    => array( 'label' => __( 'Programs', 'medical-college-manager' ), 'sample' => 'sample-programs.csv' ),
-			'mcm_course'     => array( 'label' => __( 'Courses', 'medical-college-manager' ), 'sample' => 'sample-courses.csv' ),
-			'mcm_event'      => array( 'label' => __( 'Events', 'medical-college-manager' ), 'sample' => 'sample-events.csv' ),
-			'mcm_consultant' => array( 'label' => __( 'Consultants', 'medical-college-manager' ), 'sample' => 'sample-consultants.csv' ),
-			'mcm_team'       => array( 'label' => __( 'Team', 'medical-college-manager' ), 'sample' => 'sample-team.csv' ),
-			'mcm_admission'  => array( 'label' => __( 'Admissions', 'medical-college-manager' ), 'sample' => 'sample-admissions.csv' ),
-			'mcm_tender'     => array( 'label' => __( 'Tenders', 'medical-college-manager' ), 'sample' => 'sample-tenders.csv' ),
-			'mcm_scholarship' => array( 'label' => __( 'Scholarships', 'medical-college-manager' ), 'sample' => 'sample-scholarships.csv' ),
-			'mcm_publication' => array( 'label' => __( 'Publications', 'medical-college-manager' ), 'sample' => 'sample-publications.csv' ),
-			'mcm_research'   => array( 'label' => __( 'Research Projects', 'medical-college-manager' ), 'sample' => 'sample-research.csv' ),
-			'mcm_policy'     => array( 'label' => __( 'Policies', 'medical-college-manager' ), 'sample' => 'sample-policies.csv' ),
-			'mcm_notice'     => array( 'label' => __( 'Notices', 'medical-college-manager' ), 'sample' => 'sample-notices.csv' ),
-			'mcm_student'    => array( 'label' => __( 'Students', 'medical-college-manager' ), 'sample' => 'sample-students.csv' ),
+			'mcm_timetable'   => array(
+				'label'  => __( 'Timetable', 'medical-college-manager' ),
+				'sample' => 'sample-timetable.csv',
+			),
+			'mcm_program'     => array(
+				'label'  => __( 'Programs', 'medical-college-manager' ),
+				'sample' => 'sample-programs.csv',
+			),
+			'mcm_course'      => array(
+				'label'  => __( 'Courses', 'medical-college-manager' ),
+				'sample' => 'sample-courses.csv',
+			),
+			'mcm_event'       => array(
+				'label'  => __( 'Events', 'medical-college-manager' ),
+				'sample' => 'sample-events.csv',
+			),
+			'mcm_consultant'  => array(
+				'label'  => __( 'Consultants', 'medical-college-manager' ),
+				'sample' => 'sample-consultants.csv',
+			),
+			'mcm_team'        => array(
+				'label'  => __( 'Team', 'medical-college-manager' ),
+				'sample' => 'sample-team.csv',
+			),
+			'mcm_admission'   => array(
+				'label'  => __( 'Admissions', 'medical-college-manager' ),
+				'sample' => 'sample-admissions.csv',
+			),
+			'mcm_tender'      => array(
+				'label'  => __( 'Tenders', 'medical-college-manager' ),
+				'sample' => 'sample-tenders.csv',
+			),
+			'mcm_scholarship' => array(
+				'label'  => __( 'Scholarships', 'medical-college-manager' ),
+				'sample' => 'sample-scholarships.csv',
+			),
+			'mcm_publication' => array(
+				'label'  => __( 'Publications', 'medical-college-manager' ),
+				'sample' => 'sample-publications.csv',
+			),
+			'mcm_research'    => array(
+				'label'  => __( 'Research Projects', 'medical-college-manager' ),
+				'sample' => 'sample-research.csv',
+			),
+			'mcm_policy'      => array(
+				'label'  => __( 'Policies', 'medical-college-manager' ),
+				'sample' => 'sample-policies.csv',
+			),
+			'mcm_notice'      => array(
+				'label'  => __( 'Notices', 'medical-college-manager' ),
+				'sample' => 'sample-notices.csv',
+			),
+			'mcm_student'     => array(
+				'label'  => __( 'Students', 'medical-college-manager' ),
+				'sample' => 'sample-students.csv',
+			),
 		);
 	}
 
@@ -409,7 +507,7 @@ class MCM_Import {
 
 		$line = 1;
 		while ( false !== ( $row = fgetcsv( $handle, 0, ',', '"', '\\' ) ) ) {
-			$line++;
+			++$line;
 			if ( null === $row || ( 1 === count( $row ) && ( null === $row[0] || '' === trim( (string) $row[0] ) ) ) ) {
 				continue; // blank line.
 			}
@@ -421,7 +519,7 @@ class MCM_Import {
 
 			$title = isset( $data['title'] ) ? $data['title'] : '';
 			if ( '' === $title ) {
-				$skipped++;
+				++$skipped;
 				/* translators: %d: CSV row number. */
 				$errors[] = sprintf( __( 'Row %d skipped (no title).', 'medical-college-manager' ), $line );
 				continue;
@@ -443,7 +541,7 @@ class MCM_Import {
 				}
 			}
 			if ( '' !== $bad ) {
-				$skipped++;
+				++$skipped;
 				$errors[] = $bad;
 				continue;
 			}
@@ -453,7 +551,7 @@ class MCM_Import {
 			// already wrote.
 			$existing = self::find_existing( $type, $data, $title, $match_title, $touched );
 			if ( ! $existing && ! $match_title && self::title_exists( $type, $title, $touched ) ) {
-				$same_title++;
+				++$same_title;
 			}
 
 			$postarr = array(
@@ -476,11 +574,11 @@ class MCM_Import {
 				$post_id = wp_update_post( $postarr, true );
 			} else {
 				$postarr['post_status'] = $status;
-				$post_id = wp_insert_post( $postarr, true );
+				$post_id                = wp_insert_post( $postarr, true );
 			}
 
 			if ( is_wp_error( $post_id ) ) {
-				$skipped++;
+				++$skipped;
 				/* translators: %d: CSV row number. */
 				$errors[] = sprintf( __( 'Row %d failed.', 'medical-college-manager' ), $line );
 				continue;
@@ -532,9 +630,9 @@ class MCM_Import {
 
 			$touched[] = (int) $post_id;
 			if ( $existing ) {
-				$updated++;
+				++$updated;
 			} else {
-				$created++;
+				++$created;
 			}
 		}
 
@@ -681,8 +779,8 @@ class MCM_Import {
 					continue;
 				}
 				foreach ( $cfg['fields'] as $meta_key => $field ) {
-					$type   = isset( $field['type'] ) ? $field['type'] : 'text';
-					$short  = ( 0 === strpos( $meta_key, 'mcm_' ) ) ? substr( $meta_key, 4 ) : $meta_key;
+					$type               = isset( $field['type'] ) ? $field['type'] : 'text';
+					$short              = ( 0 === strpos( $meta_key, 'mcm_' ) ) ? substr( $meta_key, 4 ) : $meta_key;
 					$types[ $meta_key ] = $type;
 					// Never let one CPT's short name overwrite another's.
 					if ( ! isset( $types[ $short ] ) ) {

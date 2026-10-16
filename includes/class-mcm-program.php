@@ -191,10 +191,10 @@ class MCM_Program {
 				continue;
 			}
 
-			$view  = ( 'mcm_timetable' === $type ) ? 'table' : 'grid';
-			$out  .= '<section class="mcm-program-section">';
-			$out  .= '<h2 class="mcm-program-section-title">' . esc_html( $label ) . '</h2>';
-			$out  .= MCM_Shortcodes::render_block(
+			$view = ( 'mcm_timetable' === $type ) ? 'table' : 'grid';
+			$out .= '<section class="mcm-program-section">';
+			$out .= '<h2 class="mcm-program-section-title">' . esc_html( $label ) . '</h2>';
+			$out .= MCM_Shortcodes::render_block(
 				array(
 					'type'      => $type,
 					'view'      => $view,
@@ -204,7 +204,7 @@ class MCM_Program {
 					'count'     => 50,
 				)
 			);
-			$out  .= '</section>';
+			$out .= '</section>';
 		}
 
 		return $out;

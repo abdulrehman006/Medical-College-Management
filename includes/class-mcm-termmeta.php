@@ -54,14 +54,46 @@ class MCM_TermMeta {
 			'mcm_term_fields',
 			array(
 				'mcm_department' => array(
-					'mcm_term_video'     => array( 'label' => __( 'Hero Video URL', 'medical-college-manager' ), 'type' => 'url', 'desc' => __( 'YouTube/Vimeo link or an uploaded MP4 for the banner at the top of the page. Takes priority over the hero image. Note: some videos have embedding turned off by their owner and will show "Video unavailable" on any website — if that happens, use a different (embeddable) video or upload an MP4.', 'medical-college-manager' ) ),
-					'mcm_term_banner'    => array( 'label' => __( 'Hero Image', 'medical-college-manager' ), 'type' => 'media', 'desc' => __( 'Static banner shown at the top when no hero video is set. A wide (16:9) image works best.', 'medical-college-manager' ) ),
-					'mcm_term_hod'       => array( 'label' => __( 'Head of Department', 'medical-college-manager' ), 'type' => 'text', 'desc' => __( 'Name shown with the message.', 'medical-college-manager' ) ),
-					'mcm_term_hod_photo' => array( 'label' => __( 'HOD Photograph', 'medical-college-manager' ), 'type' => 'media', 'desc' => __( 'Shown beside the message.', 'medical-college-manager' ) ),
-					'mcm_term_message'   => array( 'label' => __( "Head of Department's Message", 'medical-college-manager' ), 'type' => 'textarea', 'desc' => __( 'The welcome / introduction message for this department page.', 'medical-college-manager' ) ),
-					'mcm_term_email'     => array( 'label' => __( 'Departmental Email', 'medical-college-manager' ), 'type' => 'email', 'desc' => __( 'e.g. anatomy@gmcdik.edu.pk', 'medical-college-manager' ) ),
-					'mcm_term_phone'     => array( 'label' => __( 'Departmental Phone', 'medical-college-manager' ), 'type' => 'text', 'desc' => '' ),
-					'mcm_term_hidden'    => array( 'label' => __( 'Hide Sections', 'medical-college-manager' ), 'type' => 'sections', 'desc' => __( 'Tick any sections you do NOT want on this department page (e.g. hide the timetable). Unticked sections appear automatically whenever they have content.', 'medical-college-manager' ) ),
+					'mcm_term_video'     => array(
+						'label' => __( 'Hero Video URL', 'medical-college-manager' ),
+						'type'  => 'url',
+						'desc'  => __( 'YouTube/Vimeo link or an uploaded MP4 for the banner at the top of the page. Takes priority over the hero image. Note: some videos have embedding turned off by their owner and will show "Video unavailable" on any website — if that happens, use a different (embeddable) video or upload an MP4.', 'medical-college-manager' ),
+					),
+					'mcm_term_banner'    => array(
+						'label' => __( 'Hero Image', 'medical-college-manager' ),
+						'type'  => 'media',
+						'desc'  => __( 'Static banner shown at the top when no hero video is set. A wide (16:9) image works best.', 'medical-college-manager' ),
+					),
+					'mcm_term_hod'       => array(
+						'label' => __( 'Head of Department', 'medical-college-manager' ),
+						'type'  => 'text',
+						'desc'  => __( 'Name shown with the message.', 'medical-college-manager' ),
+					),
+					'mcm_term_hod_photo' => array(
+						'label' => __( 'HOD Photograph', 'medical-college-manager' ),
+						'type'  => 'media',
+						'desc'  => __( 'Shown beside the message.', 'medical-college-manager' ),
+					),
+					'mcm_term_message'   => array(
+						'label' => __( "Head of Department's Message", 'medical-college-manager' ),
+						'type'  => 'textarea',
+						'desc'  => __( 'The welcome / introduction message for this department page.', 'medical-college-manager' ),
+					),
+					'mcm_term_email'     => array(
+						'label' => __( 'Departmental Email', 'medical-college-manager' ),
+						'type'  => 'email',
+						'desc'  => __( 'e.g. anatomy@gmcdik.edu.pk', 'medical-college-manager' ),
+					),
+					'mcm_term_phone'     => array(
+						'label' => __( 'Departmental Phone', 'medical-college-manager' ),
+						'type'  => 'text',
+						'desc'  => '',
+					),
+					'mcm_term_hidden'    => array(
+						'label' => __( 'Hide Sections', 'medical-college-manager' ),
+						'type'  => 'sections',
+						'desc'  => __( 'Tick any sections you do NOT want on this department page (e.g. hide the timetable). Unticked sections appear automatically whenever they have content.', 'medical-college-manager' ),
+					),
 				),
 			)
 		);
@@ -398,7 +430,8 @@ class MCM_TermMeta {
 		return self::hero_html( $term ) . self::message_html( $term );
 	}
 
-	/* ----------------------------------------------------------------- *
+	/*
+	----------------------------------------------------------------- *
 	 *  Shortcodes for building a custom department template (Elementor).
 	 * ----------------------------------------------------------------- */
 

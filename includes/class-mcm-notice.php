@@ -53,7 +53,8 @@ class MCM_Notice {
 		return MCM_Query::expiry_meta_query( 'mcm_notice_expiry' );
 	}
 
-	/* ----------------------------------------------------------------- *
+	/*
+	----------------------------------------------------------------- *
 	 *  Feed (cached, sorted: pinned -> priority -> date)
 	 * ----------------------------------------------------------------- */
 
@@ -93,7 +94,11 @@ class MCM_Notice {
 
 	private static function sort_key( $id ) {
 		$pinned = ( 'Yes' === MCM_Safe::meta( $id, 'mcm_notice_pinned' ) ) ? 1 : 0;
-		$map    = array( 'Urgent' => 3, 'Important' => 2, 'Normal' => 1 );
+		$map    = array(
+			'Urgent'    => 3,
+			'Important' => 2,
+			'Normal'    => 1,
+		);
 		$p      = MCM_Safe::meta( $id, 'mcm_notice_priority' );
 		$prio   = isset( $map[ $p ] ) ? $map[ $p ] : 1;
 		return array( $pinned, $prio, self::notice_ts( $id ) );
@@ -135,7 +140,8 @@ class MCM_Notice {
 		return $out;
 	}
 
-	/* ----------------------------------------------------------------- *
+	/*
+	----------------------------------------------------------------- *
 	 *  Per-notice helpers
 	 * ----------------------------------------------------------------- */
 
@@ -186,7 +192,8 @@ class MCM_Notice {
 		return self::is_new( $id ) ? '<span class="mcm-notice-new">' . esc_html__( 'New', 'medical-college-manager' ) . '</span>' : '';
 	}
 
-	/* ----------------------------------------------------------------- *
+	/*
+	----------------------------------------------------------------- *
 	 *  Attributes
 	 * ----------------------------------------------------------------- */
 
@@ -217,7 +224,8 @@ class MCM_Notice {
 		return max( 12, (int) round( $items * ( 55 / $speed ) / 10 ) * 3 );
 	}
 
-	/* ----------------------------------------------------------------- *
+	/*
+	----------------------------------------------------------------- *
 	 *  Shortcodes + renderers
 	 * ----------------------------------------------------------------- */
 

@@ -194,9 +194,9 @@ class MCM_Templates {
 			if ( ! $term instanceof WP_Term ) {
 				return null;
 			}
-			$tax    = $term->taxonomy;
-			$blocks = self::term_blocks( $term );
-			$tobj   = get_taxonomy( $tax );
+			$tax     = $term->taxonomy;
+			$blocks  = self::term_blocks( $term );
+			$tobj    = get_taxonomy( $tax );
 			$heading = ( $tobj ? $tobj->labels->singular_name . ': ' : '' ) . $term->name;
 
 			if ( empty( $blocks ) ) {
@@ -302,7 +302,7 @@ class MCM_Templates {
 				)
 			);
 			$probe      = new WP_Query( apply_filters( 'mcm_query_args', $probe_args, $probe_atts ) );
-			$found = (int) $probe->found_posts;
+			$found      = (int) $probe->found_posts;
 			if ( $found < 1 ) {
 				continue; // empty — no section.
 			}

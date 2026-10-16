@@ -162,14 +162,14 @@ class MCM_Settings {
 			}
 		}
 
-		$out['default_avatar'] = isset( $input['default_avatar'] ) ? esc_url_raw( $input['default_avatar'] ) : '';
-		$out['print_logo']    = isset( $input['print_logo'] ) ? esc_url_raw( $input['print_logo'] ) : '';
-		$out['print_org']     = isset( $input['print_org'] ) ? sanitize_text_field( $input['print_org'] ) : '';
-		$out['print_address'] = isset( $input['print_address'] ) ? sanitize_text_field( $input['print_address'] ) : '';
-		$out['print_footnote']= isset( $input['print_footnote'] ) ? sanitize_text_field( $input['print_footnote'] ) : '';
+		$out['default_avatar']  = isset( $input['default_avatar'] ) ? esc_url_raw( $input['default_avatar'] ) : '';
+		$out['print_logo']      = isset( $input['print_logo'] ) ? esc_url_raw( $input['print_logo'] ) : '';
+		$out['print_org']       = isset( $input['print_org'] ) ? sanitize_text_field( $input['print_org'] ) : '';
+		$out['print_address']   = isset( $input['print_address'] ) ? sanitize_text_field( $input['print_address'] ) : '';
+		$out['print_footnote']  = isset( $input['print_footnote'] ) ? sanitize_text_field( $input['print_footnote'] ) : '';
 		$out['print_signature'] = ! empty( $input['print_signature'] ) ? '1' : '0';
 
-		$mode = isset( $input['single_image'] ) ? sanitize_key( $input['single_image'] ) : 'auto';
+		$mode                = isset( $input['single_image'] ) ? sanitize_key( $input['single_image'] ) : 'auto';
 		$out['single_image'] = in_array( $mode, array( 'auto', 'always', 'never' ), true ) ? $mode : 'auto';
 
 		// Per-archive banners — keep only real content types, sanitize the URLs.
@@ -183,7 +183,10 @@ class MCM_Settings {
 				$video = isset( $vals['video'] ) ? esc_url_raw( $vals['video'] ) : '';
 				$image = isset( $vals['image'] ) ? esc_url_raw( $vals['image'] ) : '';
 				if ( '' !== $video || '' !== $image ) {
-					$out['archive_banners'][ $pt ] = array( 'video' => $video, 'image' => $image );
+					$out['archive_banners'][ $pt ] = array(
+						'video' => $video,
+						'image' => $image,
+					);
 				}
 			}
 		}
@@ -191,8 +194,8 @@ class MCM_Settings {
 		// font_family is interpolated raw into an inline <style> (--mcm-font),
 		// so restrict it to characters that can appear in a font stack. Prevents
 		// a "x;} body{display:none}" style-rule injection.
-		$font = isset( $input['font_family'] ) ? (string) $input['font_family'] : 'inherit';
-		$font = preg_replace( '/[^A-Za-z0-9 ,\'"\-]/', '', $font );
+		$font               = isset( $input['font_family'] ) ? (string) $input['font_family'] : 'inherit';
+		$font               = preg_replace( '/[^A-Za-z0-9 ,\'"\-]/', '', $font );
 		$out['font_family'] = '' !== trim( $font ) ? $font : 'inherit';
 
 		// Custom CSS — strip tags only, keep CSS intact.
@@ -212,7 +215,7 @@ class MCM_Settings {
 		$shadow = '1' === $s['card_shadow'] ? '0 6px 20px rgba(0,0,0,.08)' : 'none';
 		$lift   = '1' === $s['hover_lift'] ? 'translateY(-4px)' : 'none';
 
-		$css  = ":root{";
+		$css  = ':root{';
 		$css .= "--mcm-primary:{$s['primary_color']};";
 		$css .= "--mcm-accent:{$s['accent_color']};";
 		$css .= "--mcm-text:{$s['text_color']};";
@@ -229,7 +232,7 @@ class MCM_Settings {
 		$css .= "--mcm-lift:{$lift};";
 		$css .= "--mcm-font:{$s['font_family']};";
 		$css .= "--mcm-cols:{$s['columns']};";
-		$css .= "}";
+		$css .= '}';
 
 		// Append raw custom CSS verbatim.
 		if ( ! empty( $s['custom_css'] ) ) {
@@ -515,7 +518,11 @@ class MCM_Settings {
 							value="<?php echo esc_attr( $image ); ?>" placeholder="<?php esc_attr_e( 'Or an image URL', 'medical-college-manager' ); ?>" />
 						<button type="button" class="button mcm-media-pick"><?php esc_html_e( 'Select Image', 'medical-college-manager' ); ?></button>
 						<button type="button" class="button-link mcm-media-clear"><?php esc_html_e( 'Clear', 'medical-college-manager' ); ?></button>
-						<span class="mcm-media-preview"><?php if ( $image ) : ?><img src="<?php echo esc_url( $image ); ?>" alt="" style="max-height:44px;margin-top:6px;" /><?php endif; ?></span>
+						<span class="mcm-media-preview">
+						<?php
+						if ( $image ) :
+							?>
+							<img src="<?php echo esc_url( $image ); ?>" alt="" style="max-height:44px;margin-top:6px;" /><?php endif; ?></span>
 					</div>
 				</td>
 			</tr>

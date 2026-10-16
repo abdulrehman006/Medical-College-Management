@@ -99,7 +99,7 @@ class MCM_Schema {
 				$out  = array_merge(
 					$base,
 					array(
-						'@type'      => 'Person',
+						'@type'       => 'Person',
 						'affiliation' => array(
 							'@type' => 'CollegeOrUniversity',
 							'name'  => get_bloginfo( 'name' ),
@@ -130,9 +130,9 @@ class MCM_Schema {
 				$date = MCM_Safe::meta( $id, 'mcm_event_date' );
 				$out  = array_merge( $base, array( '@type' => 'Event' ) );
 				if ( $date ) {
-					$start = MCM_Safe::meta( $id, 'mcm_start_time' );
+					$start            = MCM_Safe::meta( $id, 'mcm_start_time' );
 					$out['startDate'] = $start ? $date . 'T' . $start : $date;
-					$end = MCM_Safe::meta( $id, 'mcm_end_time' );
+					$end              = MCM_Safe::meta( $id, 'mcm_end_time' );
 					if ( $end ) {
 						$out['endDate'] = $date . 'T' . $end;
 					}
@@ -140,8 +140,8 @@ class MCM_Schema {
 				$venue = MCM_Safe::meta( $id, 'mcm_venue' );
 				if ( $venue ) {
 					$out['location'] = array(
-						'@type' => 'Place',
-						'name'  => $venue,
+						'@type'   => 'Place',
+						'name'    => $venue,
 						'address' => $venue,
 					);
 				}
