@@ -907,12 +907,32 @@ class MCM_Query {
 		// searches only those, and is forced to the table renderer (see
 		// render_results). So a public, safe student directory is permitted while
 		// the sensitive fields (email, phone, DOB, address, guardian, blood
-		// group) stay in wp-admin. Any OTHER non-public type still needs caps.
+		// group) stay in wp-admin. Whether that safe list is PUBLIC is a
+		// setting (College Manager → Settings → Public student directory).
+		// Any OTHER non-public type still needs caps.
 		if ( 'mcm_student' === $type ) {
-			return true;
+			return self::students_visible();
 		}
 		$obj = get_post_type_object( $type );
 		$cap = ( $obj && isset( $obj->cap->edit_posts ) ) ? $obj->cap->edit_posts : 'edit_posts';
+		return current_user_can( $cap );
+	}
+
+	/**
+	 * May the current visitor see the (safe-fields-only) student list?
+	 *
+	 * Yes when the "Public student directory" setting is on (the default,
+	 * which keeps pre-1.30.2 behaviour); otherwise only for users who can
+	 * manage student records in wp-admin.
+	 *
+	 * @return bool
+	 */
+	public static function students_visible() {
+		if ( '1' === (string) MCM_Settings::value( 'public_students' ) ) {
+			return true;
+		}
+		$obj = get_post_type_object( 'mcm_student' );
+		$cap = ( $obj && isset( $obj->cap->edit_posts ) ) ? $obj->cap->edit_posts : 'edit_mcm_students';
 		return current_user_can( $cap );
 	}
 

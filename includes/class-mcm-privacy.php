@@ -35,6 +35,8 @@ class MCM_Privacy {
 			array(
 				'mcm_student'    => array(
 					'label'  => __( 'Student Record', 'medical-college-manager' ),
+					// Academic record kept on erasure (exported, but not personal data).
+					'keep'   => array( 'mcm_program', 'mcm_batch', 'mcm_status' ),
 					'email'  => 'mcm_email',
 					'fields' => array(
 						'mcm_student_id'  => __( 'Student ID', 'medical-college-manager' ),
@@ -54,6 +56,7 @@ class MCM_Privacy {
 				),
 				'mcm_consultant' => array(
 					'label'  => __( 'Consultant Profile', 'medical-college-manager' ),
+					'keep'   => array( 'mcm_designation' ),
 					'email'  => 'mcm_email',
 					'fields' => array(
 						'mcm_designation' => __( 'Designation', 'medical-college-manager' ),
@@ -63,6 +66,7 @@ class MCM_Privacy {
 				),
 				'mcm_team'       => array(
 					'label'  => __( 'Team Profile', 'medical-college-manager' ),
+					'keep'   => array( 'mcm_designation' ),
 					'email'  => 'mcm_email',
 					'fields' => array(
 						'mcm_designation' => __( 'Designation', 'medical-college-manager' ),
@@ -201,39 +205,93 @@ class MCM_Privacy {
 	 * department), and silently deleting enrolment history would be a worse
 	 * outcome than anonymising it. The admin is told this explicitly.
 	 *
+	 * A student's name (the post title) is personal data too, so it is
+	 * replaced with "Anonymised student #<ID>" and the slug with
+	 * "anonymised-student-<ID>". Staff profiles keep their name: they are
+	 * public faculty pages, and the admin is told so.
+	 *
+	 * Paging: WordPress calls this with page 1, 2, 3… But erasing a record
+	 * removes the email it was found by, so page 2 of what REMAINS would skip
+	 * records. Every call therefore takes page 1 of the remaining matches, and
+	 * reports done only when nothing matches any more.
+	 *
 	 * @param string $email Email address.
-	 * @param int    $page  Page number.
+	 * @param int    $page  Page number (ignored, see above).
 	 * @return array
 	 */
 	public function erase( $email, $page = 1 ) {
-		$found   = self::find( $email, $page );
-		$removed = false;
-		$msgs    = array();
+		unset( $page );
+		$found    = self::find( $email, 1 );
+		$removed  = false;
+		$retained = false;
+		$progress = false;
+		$msgs     = array();
 
 		foreach ( $found['items'] as $item ) {
+			$id      = (int) $item['id'];
 			$cleared = 0;
+			$keep    = isset( $item['cfg']['keep'] ) ? (array) $item['cfg']['keep'] : array();
 			foreach ( array_keys( $item['cfg']['fields'] ) as $key ) {
-				if ( '' !== (string) get_post_meta( $item['id'], $key, true ) ) {
-					delete_post_meta( $item['id'], $key );
+				if ( in_array( $key, $keep, true ) ) {
+					continue; // Not personal data — see 'keep' in sources().
+				}
+				if ( '' !== MCM_Safe::meta( $id, $key ) ) {
+					delete_post_meta( $id, $key );
 					++$cleared;
 				}
 			}
-			if ( $cleared ) {
-				$removed = true;
-				$msgs[]  = sprintf(
-					/* translators: 1: record type label, 2: record title. */
-					__( 'Anonymised the personal fields on %1$s "%2$s". The record itself was kept, because academic history is retained; delete it manually if a full removal is required.', 'medical-college-manager' ),
+
+			$renamed = false;
+			if ( 'mcm_student' === $item['type'] ) {
+				/* translators: %d: post ID. */
+				$anon = sprintf( __( 'Anonymised student #%d', 'medical-college-manager' ), $id );
+				if ( get_post_field( 'post_title', $id ) !== $anon ) {
+					$result  = wp_update_post(
+						array(
+							'ID'         => $id,
+							'post_title' => $anon,
+							'post_name'  => 'anonymised-student-' . $id,
+						),
+						true
+					);
+					$renamed = ! is_wp_error( $result );
+				}
+			}
+
+			if ( ! $cleared && ! $renamed ) {
+				continue;
+			}
+			$progress = true;
+			$removed  = true;
+			$retained = true; // The record itself is always kept.
+
+			if ( 'mcm_student' === $item['type'] ) {
+				$msgs[] = sprintf(
+					/* translators: 1: post ID, 2: number of fields removed. */
+					__( 'Student record #%1$d: the name was replaced and %2$d personal field(s) removed. The academic record (program, batch, status, department, session, level) was kept; delete the record manually if a full removal is required.', 'medical-college-manager' ),
+					$id,
+					$cleared
+				);
+			} else {
+				$msgs[] = sprintf(
+					/* translators: 1: record type label, 2: record title, 3: number of fields removed. */
+					__( '%1$s "%2$s": %3$d personal field(s) removed. The public profile, its name and designation were kept; delete the profile manually if it should be removed.', 'medical-college-manager' ),
 					$item['cfg']['label'],
-					get_the_title( $item['id'] )
+					get_the_title( $id ),
+					$cleared
 				);
 			}
 		}
 
+		// Done when nothing matches any more — or when this pass could not
+		// change anything, so a stuck record can never loop forever.
+		$remaining = self::find( $email, 1 );
+
 		return array(
 			'items_removed'  => $removed,
-			'items_retained' => false,
+			'items_retained' => $retained,
 			'messages'       => $msgs,
-			'done'           => $found['done'],
+			'done'           => ! $progress || empty( $remaining['items'] ),
 		);
 	}
 }

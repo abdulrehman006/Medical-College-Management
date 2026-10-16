@@ -87,6 +87,12 @@ class MCM_Shortcodes {
 		$a   = MCM_Query::parse_atts( is_array( $atts ) ? $atts : array() );
 		$uid = 'mcm-' . wp_generate_password( 6, false, false );
 
+		// [mcm_students], [mcm_table type="mcm_student"]… render nothing when the
+		// public student directory is switched off and the viewer is not staff.
+		if ( 'mcm_student' === $a['type'] && ! MCM_Query::students_visible() ) {
+			return '';
+		}
+
 		$data = array(
 			'type'      => $a['type'],
 			'view'      => $a['view'],

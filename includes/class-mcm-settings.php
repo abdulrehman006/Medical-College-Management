@@ -42,6 +42,9 @@ class MCM_Settings {
 			'image_height'    => '220',
 			'hover_lift'      => '1',
 			'archive_filters' => '1', // show the filter bar on CPT/taxonomy archives.
+			// Public, safe-fields-only student list ([mcm_students] + AJAX).
+			// On by default so existing sites behave exactly as before.
+			'public_students' => '1',
 			// Content types offering a Print button. Any type may be enabled —
 			// the print machinery is generic; these are just the sensible
 			// defaults (a timetable and a student list are what get handed out
@@ -143,7 +146,7 @@ class MCM_Settings {
 			$out[ $n ] = isset( $input[ $n ] ) ? absint( $input[ $n ] ) : $defaults[ $n ];
 		}
 
-		$toggles = array( 'card_shadow', 'hover_lift', 'archive_filters' );
+		$toggles = array( 'card_shadow', 'hover_lift', 'archive_filters', 'public_students' );
 		foreach ( $toggles as $t ) {
 			$out[ $t ] = ! empty( $input[ $t ] ) ? '1' : '0';
 		}
@@ -295,6 +298,25 @@ class MCM_Settings {
 				<p class="description" style="max-width:820px;"><?php esc_html_e( 'Add a title banner to the top of any listing page — a video (YouTube/Vimeo link or an uploaded MP4) or a static image. Leave both blank to show no banner. A video takes priority over an image.', 'medical-college-manager' ); ?></p>
 				<table class="form-table" role="presentation">
 					<?php $this->banner_rows( $s ); ?>
+				</table>
+
+				<h2 class="title"><?php esc_html_e( 'Privacy', 'medical-college-manager' ); ?></h2>
+				<table class="form-table" role="presentation">
+					<tr>
+						<th scope="row"><?php esc_html_e( 'Public student directory', 'medical-college-manager' ); ?></th>
+						<td>
+							<label>
+								<input type="checkbox" id="public_students" name="<?php echo esc_attr( self::OPTION ); ?>[public_students]" value="1" <?php checked( $s['public_students'], '1' ); ?> />
+								<?php esc_html_e( 'Anyone can view and search the student list', 'medical-college-manager' ); ?>
+							</label>
+							<p class="description" style="max-width:820px;">
+								<?php esc_html_e( 'When on, any visitor can see and search the student list produced by [mcm_students]: Name, Student ID, PMDC No., Level, Program, Department, Batch and Status. Email, phone, date of birth, address, blood group, gender and guardian details are never shown on the website either way.', 'medical-college-manager' ); ?>
+							</p>
+							<p class="description" style="max-width:820px;">
+								<?php esc_html_e( 'When off, the list (and its live search) is shown only to logged-in staff who can manage student records — administrators by default. Everyone else sees nothing where the list would be.', 'medical-college-manager' ); ?>
+							</p>
+						</td>
+					</tr>
 				</table>
 
 				<h2 class="title"><?php esc_html_e( 'Custom CSS', 'medical-college-manager' ); ?></h2>
