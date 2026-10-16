@@ -142,6 +142,35 @@ class MCM_Query {
 	}
 
 	/**
+	 * Meta query keeping items whose date in $meta_key is today or later in
+	 * the SITE timezone, or that have no date at all. Shared by every type
+	 * that auto-expires (tenders, notices, and later jobs).
+	 *
+	 * @param string $meta_key Meta key holding a Y-m-d date.
+	 * @return array
+	 */
+	public static function expiry_meta_query( $meta_key ) {
+		return array(
+			'relation' => 'OR',
+			array(
+				'key'     => $meta_key,
+				'compare' => 'NOT EXISTS',
+			),
+			array(
+				'key'     => $meta_key,
+				'value'   => '',
+				'compare' => '=',
+			),
+			array(
+				'key'     => $meta_key,
+				'value'   => current_time( 'Y-m-d' ),
+				'compare' => '>=',
+				'type'    => 'DATE',
+			),
+		);
+	}
+
+	/**
 	 * Friendly shortcode attribute => taxonomy.
 	 *
 	 * @return array<string,string>

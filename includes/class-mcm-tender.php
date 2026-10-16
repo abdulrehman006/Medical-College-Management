@@ -37,11 +37,6 @@ class MCM_Tender {
 
 	/** Meta query matching tenders whose submission deadline has not passed. */
 	public static function open_meta_query() {
-		return array(
-			'relation' => 'OR',
-			array( 'key' => 'mcm_tender_close', 'compare' => 'NOT EXISTS' ),
-			array( 'key' => 'mcm_tender_close', 'value' => '', 'compare' => '=' ),
-			array( 'key' => 'mcm_tender_close', 'value' => current_time( 'Y-m-d' ), 'compare' => '>=', 'type' => 'DATE' ),
-		);
+		return MCM_Query::expiry_meta_query( 'mcm_tender_close' );
 	}
 }

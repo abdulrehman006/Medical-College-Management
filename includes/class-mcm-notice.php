@@ -50,12 +50,7 @@ class MCM_Notice {
 
 	/** Meta query that excludes notices whose expiry date has passed. */
 	public static function expiry_meta_query() {
-		return array(
-			'relation' => 'OR',
-			array( 'key' => 'mcm_notice_expiry', 'compare' => 'NOT EXISTS' ),
-			array( 'key' => 'mcm_notice_expiry', 'value' => '', 'compare' => '=' ),
-			array( 'key' => 'mcm_notice_expiry', 'value' => current_time( 'Y-m-d' ), 'compare' => '>=', 'type' => 'DATE' ),
-		);
+		return MCM_Query::expiry_meta_query( 'mcm_notice_expiry' );
 	}
 
 	/* ----------------------------------------------------------------- *
