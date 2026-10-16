@@ -1,0 +1,6 @@
+title,content,course_category,department,teacher,session,course_code,credit_hours,semester,course_lead
+Gross Anatomy,"Study of macroscopic structures of the human body.",Basic Sciences,Anatomy,Dr. Sara Khan,Fall 2025,ANAT-101,4,Semester 1,Dr. Sara Khan
+Human Physiology,"Function of body systems in health.",Basic Sciences,Physiology,Dr. Imran Ali,Fall 2025,PHYS-102,4,Semester 1,Dr. Imran Ali
+Medical Biochemistry,"Biomolecules and metabolic pathways.",Basic Sciences,Biochemistry,Dr. Ayesha Noor,Fall 2025,BIOC-103,3,Semester 2,Dr. Ayesha Noor
+General Pathology,"Mechanisms of disease.",Clinical Sciences,Pathology,Dr. Bilal Ahmed,Spring 2026,PATH-201,4,Semester 3,Dr. Bilal Ahmed
+Pharmacology I,"Principles of drug action.",Clinical Sciences,Pharmacology,Dr. Hina Raza,Spring 2026,PHAR-202,3,Semester 3,Dr. Hina Raza

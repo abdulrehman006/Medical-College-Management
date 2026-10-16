@@ -1,0 +1,6 @@
+title,content,program_category,department,degree_level,duration,fees,intake,apply_url
+MBBS,"Bachelor of Medicine and Bachelor of Surgery — the flagship undergraduate medical program.",Undergraduate,General Medicine,Undergraduate,5 Years,PKR 1200000/year,100,https://example.edu/apply/mbbs
+BDS,"Bachelor of Dental Surgery covering oral health and dentistry.",Undergraduate,Dentistry,Undergraduate,4 Years,PKR 1000000/year,50,https://example.edu/apply/bds
+Doctor of Physical Therapy,"Five-year DPT program for rehabilitation specialists.",Undergraduate,Physiotherapy,Undergraduate,5 Years,PKR 600000/year,60,https://example.edu/apply/dpt
+MD Internal Medicine,"Postgraduate training in internal medicine.",Postgraduate,Internal Medicine,Postgraduate,4 Years,PKR 800000/year,20,https://example.edu/apply/md-medicine
+MS General Surgery,"Postgraduate surgical residency program.",Postgraduate,Surgery,Postgraduate,5 Years,PKR 900000/year,15,https://example.edu/apply/ms-surgery

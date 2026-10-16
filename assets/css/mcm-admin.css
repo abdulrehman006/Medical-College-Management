@@ -1,0 +1,20 @@
+/* Medical College Manager — admin styles */
+.mcm-meta-grid{
+	display:grid;
+	grid-template-columns: repeat(2, minmax(0,1fr));
+	gap: 16px 24px;
+}
+@media (max-width: 782px){ .mcm-meta-grid{ grid-template-columns: 1fr; } }
+.mcm-meta-field{ margin:0; }
+.mcm-meta-field label{ display:block; margin-bottom:4px; }
+.mcm-settings-wrap .form-table th{ width: 220px; }
+.mcm-settings-wrap h2.title{ margin-top: 28px; }
+
+/* Related Content meta box */
+.mcm-relations .mcm-rel-term{ padding: 10px 0; border-bottom: 1px solid #f0f0f1; }
+.mcm-relations .mcm-rel-term:last-child{ border-bottom: 0; }
+.mcm-relations .mcm-rel-term h4{ margin: 0 0 6px; font-size: 13px; color: #1d2327; }
+.mcm-relations .mcm-rel-group{ margin: 0 0 4px; font-size: 13px; line-height: 1.6; }
+.mcm-relations .mcm-rel-group strong{ color: #50575e; }
+.mcm-relations .mcm-rel-more{ color: #787c82; font-style: italic; }
+.mcm-rel-empty{ color: #787c82; margin: 4px 0; }

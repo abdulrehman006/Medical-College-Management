@@ -1,0 +1,2045 @@
+# Copyright (C) 2026 abdulrehmanallshore
+# This file is distributed under the GPL-2.0+ license.
+msgid ""
+msgstr ""
+"Project-Id-Version: Medical College Manager 1.23.0\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Domain: medical-college-manager\n"
+
+#: includes/class-mcm-query.php:984
+msgid "&larr; Prev"
+msgstr ""
+
+#: includes/class-mcm-relations.php:85
+msgid "(no title)"
+msgstr ""
+
+#: includes/class-mcm-relations.php:95
+msgid "+%d more"
+msgstr ""
+
+#: includes/class-mcm-settings.php:208
+msgid "Accent Color"
+msgstr ""
+
+#: includes/class-mcm-cpt.php:292
+msgid "Add New"
+msgstr ""
+
+#: includes/class-mcm-cpt.php:294
+#: includes/class-mcm-cpt.php:347
+msgid "Add New %s"
+msgstr ""
+
+#: includes/class-mcm-social.php:191
+msgid "Add your social links below. Leave a field empty to hide that icon. Then either turn on \"Show on whole website\", or place the shortcode on any page."
+msgstr ""
+
+#: includes/class-mcm-meta.php:266
+#: includes/class-mcm-privacy.php:50
+msgid "Address"
+msgstr ""
+
+#: includes/class-mcm-settings.php:392
+msgid "Address / Contact Line"
+msgstr ""
+
+#: includes/class-mcm-settings.php:332
+msgid "Adds a Print button to those listings. The printout keeps whatever filters and search the visitor applied, and prints only the list — not the surrounding page."
+msgstr ""
+
+#: includes/class-mcm-cpt.php:86
+msgid "Admission"
+msgstr ""
+
+#: includes/class-mcm-meta.php:165
+#: includes/class-mcm-query.php:1479
+msgid "Admission Details"
+msgstr ""
+
+#: includes/class-mcm-cpt.php:87
+#: includes/class-mcm-import.php:191
+#: includes/elementor-widgets.php:353
+msgid "Admissions"
+msgstr ""
+
+#: includes/class-mcm-settings.php:251
+msgid "Advanced: write any CSS here. It is printed after the generated styles, so it always wins. Use the .mcm- classes (see the readme / shortcode reference)."
+msgstr ""
+
+#: includes/class-mcm-cpt.php:306
+#: includes/class-mcm-cpt.php:341
+msgid "All %s"
+msgstr ""
+
+#: includes/class-mcm-settings.php:420
+msgid "Always show it"
+msgstr ""
+
+#: includes/class-mcm-query.php:1323
+msgid "Amount"
+msgstr ""
+
+#: includes/class-mcm-meta.php:236
+#: includes/class-mcm-query.php:1573
+msgid "Amount / Coverage"
+msgstr ""
+
+#: includes/class-mcm-privacy.php:225
+msgid "Anonymised the personal fields on %1$s \"%2$s\". The record itself was kept, because academic history is retained; delete it manually if a full removal is required."
+msgstr ""
+
+#: includes/elementor-widgets.php:663
+msgid "Any"
+msgstr ""
+
+#: includes/class-mcm-meta.php:238
+#: includes/class-mcm-query.php:1575
+msgid "Application Deadline"
+msgstr ""
+
+#: includes/class-mcm-meta.php:171
+#: includes/class-mcm-query.php:1485
+msgid "Application Fee"
+msgstr ""
+
+#: includes/class-mcm-meta.php:108
+#: includes/class-mcm-meta.php:239
+msgid "Apply / Info URL"
+msgstr ""
+
+#: includes/class-mcm-query.php:1459
+#: includes/class-mcm-query.php:1578
+msgid "Apply / More Info"
+msgstr ""
+
+#: includes/class-mcm-query.php:1488
+msgid "Apply Now"
+msgstr ""
+
+#: includes/class-mcm-meta.php:172
+msgid "Apply URL"
+msgstr ""
+
+#: includes/elementor-widgets.php:116
+msgid "Ascending"
+msgstr ""
+
+#: includes/class-mcm-meta.php:250
+msgid "Attachment / File URL"
+msgstr ""
+
+#: includes/class-mcm-settings.php:259
+msgid "Attributes (all optional): view=\"grid|list|table\", columns, count, filters=\"yes\", print=\"yes\", category, department, session, teacher, specialty, orderby, order, search, class_css."
+msgstr ""
+
+#: includes/class-mcm-query.php:1516
+msgid "Authors"
+msgstr ""
+
+#: includes/class-mcm-meta.php:193
+msgid "Authors (Vancouver order, comma separated)"
+msgstr ""
+
+#: includes/class-mcm-settings.php:419
+msgid "Auto — show it only if the theme does not (recommended)"
+msgstr ""
+
+#: includes/class-mcm-termmeta.php:54
+msgid "Banner Video URL"
+msgstr ""
+
+#: includes/class-mcm-privacy.php:45
+#: includes/class-mcm-query.php:1172
+#: includes/class-mcm-query.php:1333
+msgid "Batch"
+msgstr ""
+
+#: includes/class-mcm-meta.php:261
+msgid "Batch / Year"
+msgstr ""
+
+#: includes/class-mcm-query.php:1499
+msgid "Bid Opening"
+msgstr ""
+
+#: includes/class-mcm-meta.php:182
+msgid "Bid Opening Date"
+msgstr ""
+
+#: includes/elementor-widgets.php:472
+#: includes/elementor-widgets.php:488
+msgid "Blog Posts"
+msgstr ""
+
+#: includes/class-mcm-meta.php:265
+#: includes/class-mcm-privacy.php:49
+msgid "Blood Group"
+msgstr ""
+
+#: includes/class-mcm-settings.php:213
+msgid "Border Color"
+msgstr ""
+
+#: includes/class-mcm-settings.php:223
+msgid "Border Radius (px)"
+msgstr ""
+
+#: includes/class-mcm-import.php:529
+msgid "CSV File"
+msgstr ""
+
+#: includes/class-mcm-import.php:213
+#: includes/class-mcm-import.php:214
+msgid "CSV Import / Export"
+msgstr ""
+
+#: includes/class-mcm-query.php:1420
+msgid "Call"
+msgstr ""
+
+#: includes/class-mcm-settings.php:211
+msgid "Card Background"
+msgstr ""
+
+#: includes/class-mcm-settings.php:222
+msgid "Card Padding (px)"
+msgstr ""
+
+#: includes/class-mcm-settings.php:227
+msgid "Card Shadow"
+msgstr ""
+
+#: includes/elementor-widgets.php:513
+#: includes/elementor-widgets.php:649
+msgid "Categories"
+msgstr ""
+
+#: includes/class-mcm-query.php:1292
+#: includes/class-mcm-query.php:1299
+#: includes/class-mcm-query.php:1310
+#: includes/class-mcm-query.php:1495
+#: includes/class-mcm-query.php:1558
+#: includes/class-mcm-query.php:1584
+msgid "Category"
+msgstr ""
+
+#: includes/class-mcm-query.php:505
+msgid "Checked by"
+msgstr ""
+
+#: includes/class-mcm-query.php:1515
+msgid "Citation"
+msgstr ""
+
+#: includes/elementor-widgets.php:65
+msgid "Citations (publications)"
+msgstr ""
+
+#: includes/class-mcm-query.php:407
+msgid "Class Timetable"
+msgstr ""
+
+#: includes/class-mcm-meta.php:328
+#: includes/class-mcm-settings.php:350
+#: includes/class-mcm-settings.php:372
+#: includes/class-mcm-termmeta.php:147
+msgid "Clear"
+msgstr ""
+
+#: includes/class-mcm-meta.php:412
+#: includes/class-mcm-query.php:1129
+#: includes/class-mcm-query.php:1288
+#: includes/class-mcm-query.php:1483
+msgid "Closes"
+msgstr ""
+
+#: includes/class-mcm-meta.php:169
+msgid "Closing Date"
+msgstr ""
+
+#: includes/class-mcm-meta.php:219
+#: includes/class-mcm-query.php:1544
+msgid "Co-Investigators"
+msgstr ""
+
+#: includes/class-mcm-meta.php:397
+#: includes/class-mcm-query.php:1119
+#: includes/class-mcm-query.php:1260
+msgid "Code"
+msgstr ""
+
+#: includes/class-mcm-settings.php:90
+msgid "College Manager"
+msgstr ""
+
+#: includes/class-mcm-settings.php:204
+msgid "Colors"
+msgstr ""
+
+#: includes/elementor-widgets.php:73
+msgid "Columns"
+msgstr ""
+
+#: includes/class-mcm-query.php:1543
+msgid "Completed"
+msgstr ""
+
+#: includes/class-mcm-cpt.php:70
+msgid "Consultant"
+msgstr ""
+
+#: includes/class-mcm-meta.php:133
+msgid "Consultant / Doctor Profile"
+msgstr ""
+
+#: includes/class-mcm-privacy.php:56
+msgid "Consultant Profile"
+msgstr ""
+
+#: includes/class-mcm-cpt.php:71
+#: includes/class-mcm-import.php:189
+#: includes/elementor-widgets.php:242
+msgid "Consultants"
+msgstr ""
+
+#: includes/elementor-widgets.php:52
+msgid "Content"
+msgstr ""
+
+#: includes/class-mcm-import.php:519
+#: includes/class-mcm-import.php:566
+msgid "Content Type"
+msgstr ""
+
+#: includes/class-mcm-import.php:309
+msgid "Could not read the file."
+msgstr ""
+
+#: includes/class-mcm-cpt.php:54
+#: includes/class-mcm-query.php:1120
+msgid "Course"
+msgstr ""
+
+#: includes/class-mcm-cpt.php:232
+msgid "Course Categories"
+msgstr ""
+
+#: includes/class-mcm-cpt.php:231
+msgid "Course Category"
+msgstr ""
+
+#: includes/class-mcm-meta.php:114
+#: includes/class-mcm-query.php:1441
+msgid "Course Code"
+msgstr ""
+
+#: includes/class-mcm-meta.php:112
+#: includes/class-mcm-query.php:1440
+msgid "Course Details"
+msgstr ""
+
+#: includes/class-mcm-meta.php:117
+#: includes/class-mcm-query.php:1447
+msgid "Course Lead"
+msgstr ""
+
+#: includes/class-mcm-cpt.php:55
+#: includes/class-mcm-import.php:187
+#: includes/elementor-widgets.php:296
+msgid "Courses"
+msgstr ""
+
+#: includes/class-mcm-import.php:533
+msgid "Create As"
+msgstr ""
+
+#: includes/class-mcm-meta.php:115
+#: includes/class-mcm-query.php:1445
+msgid "Credit Hours"
+msgstr ""
+
+#: includes/class-mcm-query.php:1123
+#: includes/class-mcm-query.php:1263
+msgid "Credits"
+msgstr ""
+
+#: includes/class-mcm-settings.php:250
+msgid "Custom CSS"
+msgstr ""
+
+#: includes/class-mcm-query.php:735
+msgid "DOI"
+msgstr ""
+
+#: includes/class-mcm-meta.php:200
+msgid "DOI (e.g. 10.1234/abcd)"
+msgstr ""
+
+#: includes/class-mcm-meta.php:123
+#: includes/class-mcm-meta.php:401
+#: includes/class-mcm-query.php:1156
+#: includes/class-mcm-query.php:1267
+#: includes/class-mcm-query.php:1294
+#: includes/class-mcm-query.php:1465
+msgid "Date"
+msgstr ""
+
+#: includes/class-mcm-meta.php:263
+#: includes/class-mcm-privacy.php:47
+msgid "Date of Birth"
+msgstr ""
+
+#: includes/class-mcm-meta.php:217
+msgid "Date of Completion"
+msgstr ""
+
+#: includes/class-mcm-meta.php:93
+#: includes/class-mcm-meta.php:388
+#: includes/class-mcm-query.php:1110
+#: includes/class-mcm-query.php:1246
+#: includes/class-mcm-query.php:1601
+msgid "Day"
+msgstr ""
+
+#: includes/class-mcm-query.php:1300
+#: includes/class-mcm-query.php:1324
+msgid "Deadline"
+msgstr ""
+
+#: includes/class-mcm-settings.php:220
+msgid "Default Grid Columns"
+msgstr ""
+
+#: includes/class-mcm-settings.php:344
+msgid "Default Profile Image"
+msgstr ""
+
+#: includes/class-mcm-meta.php:104
+#: includes/class-mcm-query.php:1452
+msgid "Degree Level"
+msgstr ""
+
+#: includes/class-mcm-cpt.php:182
+#: includes/class-mcm-query.php:1114
+#: includes/class-mcm-query.php:1121
+#: includes/class-mcm-query.php:1130
+#: includes/class-mcm-query.php:1136
+#: includes/class-mcm-query.php:1143
+msgid "Department"
+msgstr ""
+
+#: includes/class-mcm-termmeta.php:55
+msgid "Departmental Email"
+msgstr ""
+
+#: includes/class-mcm-termmeta.php:56
+msgid "Departmental Phone"
+msgstr ""
+
+#: includes/class-mcm-cpt.php:183
+msgid "Departments"
+msgstr ""
+
+#: includes/class-mcm-query.php:1261
+#: includes/class-mcm-query.php:1274
+#: includes/class-mcm-query.php:1281
+#: includes/class-mcm-query.php:1332
+msgid "Dept"
+msgstr ""
+
+#: includes/elementor-widgets.php:115
+msgid "Descending"
+msgstr ""
+
+#: includes/class-mcm-meta.php:135
+#: includes/class-mcm-meta.php:405
+#: includes/class-mcm-privacy.php:59
+#: includes/class-mcm-privacy.php:68
+#: includes/class-mcm-query.php:1135
+#: includes/class-mcm-query.php:1142
+msgid "Designation"
+msgstr ""
+
+#: includes/class-mcm-meta.php:152
+#: includes/class-mcm-meta.php:408
+msgid "Designation / Role"
+msgstr ""
+
+#: includes/elementor-widgets.php:64
+msgid "Directory (left filters)"
+msgstr ""
+
+#: includes/class-mcm-social.php:215
+msgid "Display"
+msgstr ""
+
+#: includes/class-mcm-query.php:1500
+msgid "Document Fee"
+msgstr ""
+
+#: includes/class-mcm-query.php:1534
+#: includes/class-mcm-query.php:1552
+#: includes/class-mcm-query.php:1592
+msgid "Download"
+msgstr ""
+
+#: includes/class-mcm-query.php:1565
+msgid "Download Policy"
+msgstr ""
+
+#: includes/class-mcm-query.php:1506
+msgid "Download Tender Document"
+msgstr ""
+
+#: includes/class-mcm-import.php:547
+msgid "Download a ready-made sample for each type, fill it with your data, and upload it above."
+msgstr ""
+
+#: includes/class-mcm-import.php:561
+msgid "Download every entry of a content type as a CSV — including its meta fields and its Departments / Sessions / Faculty / Categories. The columns match the import format, so you can export, edit in a spreadsheet, and re-import."
+msgstr ""
+
+#: includes/class-mcm-import.php:537
+msgid "Draft"
+msgstr ""
+
+#: includes/class-mcm-meta.php:105
+#: includes/class-mcm-meta.php:394
+#: includes/class-mcm-query.php:1149
+#: includes/class-mcm-query.php:1255
+#: includes/class-mcm-query.php:1453
+msgid "Duration"
+msgstr ""
+
+#: includes/class-mcm-query.php:1501
+msgid "Earnest Money"
+msgstr ""
+
+#: includes/class-mcm-meta.php:184
+msgid "Earnest Money / Bid Security"
+msgstr ""
+
+#: includes/class-mcm-cpt.php:296
+#: includes/class-mcm-cpt.php:343
+msgid "Edit %s"
+msgstr ""
+
+#: includes/class-mcm-query.php:1312
+msgid "Effective"
+msgstr ""
+
+#: includes/class-mcm-meta.php:229
+#: includes/class-mcm-query.php:1561
+msgid "Effective Date"
+msgstr ""
+
+#: includes/class-mcm-meta.php:170
+#: includes/class-mcm-meta.php:185
+#: includes/class-mcm-meta.php:237
+#: includes/class-mcm-query.php:1484
+#: includes/class-mcm-query.php:1502
+#: includes/class-mcm-query.php:1574
+msgid "Eligibility"
+msgstr ""
+
+#: includes/class-mcm-meta.php:142
+#: includes/class-mcm-meta.php:157
+#: includes/class-mcm-meta.php:258
+#: includes/class-mcm-privacy.php:42
+#: includes/class-mcm-privacy.php:60
+#: includes/class-mcm-privacy.php:69
+msgid "Email"
+msgstr ""
+
+#: includes/class-mcm-settings.php:447
+msgid "Enable"
+msgstr ""
+
+#: includes/class-mcm-meta.php:95
+#: includes/class-mcm-meta.php:125
+msgid "End Time"
+msgstr ""
+
+#: includes/class-mcm-cpt.php:62
+#: includes/class-mcm-query.php:1155
+msgid "Event"
+msgstr ""
+
+#: includes/class-mcm-cpt.php:239
+msgid "Event Categories"
+msgstr ""
+
+#: includes/class-mcm-cpt.php:238
+msgid "Event Category"
+msgstr ""
+
+#: includes/class-mcm-meta.php:121
+#: includes/class-mcm-query.php:1464
+msgid "Event Details"
+msgstr ""
+
+#: includes/class-mcm-cpt.php:63
+#: includes/class-mcm-import.php:188
+#: includes/elementor-widgets.php:314
+msgid "Events"
+msgstr ""
+
+#: includes/class-mcm-settings.php:199
+msgid "Everything below is live and dynamic. Adjust colors, spacing and card style, or drop in your own CSS. All shortcodes update automatically."
+msgstr ""
+
+#: includes/elementor-widgets.php:552
+msgid "Excerpt words (0 to hide)"
+msgstr ""
+
+#: includes/class-mcm-meta.php:137
+#: includes/class-mcm-meta.php:154
+#: includes/class-mcm-query.php:1407
+msgid "Experience"
+msgstr ""
+
+#: includes/class-mcm-meta.php:248
+msgid "Expiry Date (auto-hides after)"
+msgstr ""
+
+#: includes/class-mcm-import.php:560
+msgid "Export"
+msgstr ""
+
+#: includes/class-mcm-import.php:576
+msgid "Export CSV"
+msgstr ""
+
+#: includes/class-mcm-social.php:36
+msgid "Facebook"
+msgstr ""
+
+#: includes/class-mcm-cpt.php:208
+#: includes/class-mcm-cpt.php:209
+msgid "Faculty"
+msgstr ""
+
+#: includes/class-mcm-settings.php:425
+msgid "Featured Image on Single Pages"
+msgstr ""
+
+#: includes/class-mcm-query.php:1131
+msgid "Fee"
+msgstr ""
+
+#: includes/class-mcm-meta.php:106
+#: includes/class-mcm-query.php:1151
+#: includes/class-mcm-query.php:1455
+msgid "Fees"
+msgstr ""
+
+#: includes/class-mcm-meta.php:205
+#: includes/class-mcm-meta.php:218
+#: includes/class-mcm-query.php:1524
+#: includes/class-mcm-query.php:1545
+msgid "Fellowship Members"
+msgstr ""
+
+#: includes/class-mcm-import.php:251
+msgid "File upload error. Check the file size limit and try again."
+msgstr ""
+
+#: includes/class-mcm-meta.php:296
+msgid "Fill in the details below, then click Publish/Update. Only the Title (at the top) is required — leave any field blank to skip it."
+msgstr ""
+
+#: includes/elementor-widgets.php:129
+msgid "Filter bar (search + dropdowns)"
+msgstr ""
+
+#: includes/class-mcm-settings.php:229
+msgid "Filterable Archive Pages"
+msgstr ""
+
+#: includes/elementor-widgets.php:124
+msgid "Filters & Tools"
+msgstr ""
+
+#: includes/class-mcm-query.php:613
+msgid "Find a Consultant …"
+msgstr ""
+
+#: includes/class-mcm-social.php:222
+msgid "Float the bar on every page (no shortcode needed)"
+msgstr ""
+
+#: includes/class-mcm-settings.php:233
+msgid "Font Family"
+msgstr ""
+
+#: includes/class-mcm-settings.php:402
+msgid "Footer Note"
+msgstr ""
+
+#: includes/class-mcm-query.php:750
+msgid "Full text"
+msgstr ""
+
+#: includes/class-mcm-meta.php:202
+msgid "Full-text / Publisher URL"
+msgstr ""
+
+#: includes/class-mcm-query.php:1546
+msgid "Funding"
+msgstr ""
+
+#: includes/class-mcm-meta.php:220
+msgid "Funding Body / Grant"
+msgstr ""
+
+#: includes/class-mcm-settings.php:221
+msgid "Gap Between Cards (px)"
+msgstr ""
+
+#: includes/class-mcm-meta.php:262
+#: includes/class-mcm-privacy.php:46
+msgid "Gender"
+msgstr ""
+
+#: includes/class-mcm-query.php:1432
+msgid "Google Scholar"
+msgstr ""
+
+#: includes/class-mcm-meta.php:145
+#: includes/class-mcm-meta.php:160
+msgid "Google Scholar URL"
+msgstr ""
+
+#: includes/elementor-widgets.php:61
+msgid "Grid"
+msgstr ""
+
+#: includes/class-mcm-privacy.php:51
+msgid "Guardian"
+msgstr ""
+
+#: includes/class-mcm-meta.php:267
+msgid "Guardian Name"
+msgstr ""
+
+#: includes/class-mcm-meta.php:268
+#: includes/class-mcm-privacy.php:52
+msgid "Guardian Phone"
+msgstr ""
+
+#: includes/class-mcm-termmeta.php:52
+msgid "HOD Photograph"
+msgstr ""
+
+#: includes/class-mcm-termmeta.php:51
+#: includes/class-mcm-termmeta.php:249
+msgid "Head of Department"
+msgstr ""
+
+#: includes/elementor-widgets.php:772
+msgid "Heading"
+msgstr ""
+
+#: includes/elementor-widgets.php:781
+msgid "Height (px)"
+msgstr ""
+
+#: includes/class-mcm-social.php:240
+msgid "Hide on small screens"
+msgstr ""
+
+#: includes/class-mcm-settings.php:228
+msgid "Hover Lift Effect"
+msgstr ""
+
+#: includes/class-mcm-query.php:1328
+msgid "ID"
+msgstr ""
+
+#: includes/class-mcm-settings.php:225
+msgid "Image Height (px)"
+msgstr ""
+
+#: includes/class-mcm-meta.php:207
+#: includes/class-mcm-query.php:1525
+msgid "Impact Factor"
+msgstr ""
+
+#: includes/class-mcm-import.php:506
+msgid "Import"
+msgstr ""
+
+#: includes/class-mcm-import.php:542
+msgid "Import CSV"
+msgstr ""
+
+#: includes/class-mcm-import.php:287
+msgid "Import complete: %1$d item(s) created, %2$d row(s) skipped."
+msgstr ""
+
+#: includes/elementor-widgets.php:665
+msgid "Important"
+msgstr ""
+
+#: includes/class-mcm-query.php:1526
+msgid "Indexing"
+msgstr ""
+
+#: includes/class-mcm-meta.php:208
+msgid "Indexing (HEC W/X/Y, Scopus, PubMed…)"
+msgstr ""
+
+#: includes/class-mcm-social.php:40
+msgid "Instagram"
+msgstr ""
+
+#: includes/class-mcm-meta.php:178
+msgid "Institute / Facility Name"
+msgstr ""
+
+#: includes/class-mcm-settings.php:382
+msgid "Institution Name"
+msgstr ""
+
+#: includes/class-mcm-query.php:410
+msgid "Institutional Policies"
+msgstr ""
+
+#: includes/class-mcm-meta.php:107
+#: includes/class-mcm-query.php:1456
+msgid "Intake / Seats"
+msgstr ""
+
+#: includes/elementor-widgets.php:493
+msgid "Intro text (optional)"
+msgstr ""
+
+#: includes/class-mcm-ajax.php:53
+msgid "Invalid request."
+msgstr ""
+
+#: includes/class-mcm-import.php:264
+msgid "Invalid upload."
+msgstr ""
+
+#: includes/class-mcm-meta.php:197
+msgid "Issue"
+msgstr ""
+
+#: includes/class-mcm-query.php:1311
+#: includes/class-mcm-query.php:1559
+msgid "Issued By"
+msgstr ""
+
+#: includes/class-mcm-meta.php:227
+msgid "Issued By (KMU / GMC / PMDC…)"
+msgstr ""
+
+#: includes/class-mcm-meta.php:138
+#: includes/class-mcm-meta.php:155
+msgid "Joining / Appointment Date"
+msgstr ""
+
+#: includes/class-mcm-query.php:1316
+#: includes/class-mcm-query.php:1517
+msgid "Journal"
+msgstr ""
+
+#: includes/class-mcm-meta.php:194
+msgid "Journal / Publisher"
+msgstr ""
+
+#: includes/elementor-widgets.php:731
+msgid "Label"
+msgstr ""
+
+#: includes/class-mcm-notice.php:271
+#: includes/elementor-widgets.php:733
+msgid "Latest"
+msgstr ""
+
+#: includes/elementor-widgets.php:57
+msgid "Layout"
+msgstr ""
+
+#: includes/class-mcm-settings.php:217
+msgid "Layout & Cards"
+msgstr ""
+
+#: includes/class-mcm-settings.php:388
+msgid "Leave blank to use the site title."
+msgstr ""
+
+#: includes/class-mcm-social.php:231
+msgid "Left"
+msgstr ""
+
+#: includes/class-mcm-settings.php:366
+msgid "Letterhead Logo"
+msgstr ""
+
+#: includes/class-mcm-cpt.php:198
+#: includes/class-mcm-meta.php:393
+#: includes/class-mcm-query.php:1148
+#: includes/class-mcm-query.php:1169
+#: includes/class-mcm-query.php:1254
+#: includes/class-mcm-query.php:1330
+msgid "Level"
+msgstr ""
+
+#: includes/class-mcm-cpt.php:199
+msgid "Levels"
+msgstr ""
+
+#: includes/elementor-widgets.php:160
+msgid "Limit this widget to specific terms. Tip: if you pre-filter here, turn the Filter bar off for a fixed list."
+msgstr ""
+
+#: includes/class-mcm-meta.php:249
+msgid "Link URL (result page / form)"
+msgstr ""
+
+#: includes/class-mcm-privacy.php:71
+#: includes/class-mcm-query.php:1426
+#: includes/class-mcm-social.php:56
+msgid "LinkedIn"
+msgstr ""
+
+#: includes/class-mcm-meta.php:143
+#: includes/class-mcm-meta.php:158
+msgid "LinkedIn URL"
+msgstr ""
+
+#: includes/class-mcm-social.php:196
+msgid "Links"
+msgstr ""
+
+#: includes/elementor-widgets.php:62
+msgid "List"
+msgstr ""
+
+#: includes/class-mcm-query.php:417
+msgid "Listing"
+msgstr ""
+
+#: includes/class-mcm-meta.php:128
+msgid "Live Stream / Embed URL"
+msgstr ""
+
+#: includes/class-mcm-settings.php:433
+msgid "Many themes only show a featured image for blog posts, so an image set on a Consultant or Event can end up invisible. Auto fills that gap without ever showing the picture twice. Choose \"Always\" if your theme shows it below the content instead of above."
+msgstr ""
+
+#: includes/class-mcm-elementor.php:26
+msgid "Medical College"
+msgstr ""
+
+#: includes/class-mcm-privacy.php:81
+#: includes/class-mcm-privacy.php:90
+#: includes/class-mcm-settings.php:89
+msgid "Medical College Manager"
+msgstr ""
+
+#: medical-college-manager.php:33
+msgid "Medical College Manager requires PHP 7.2 or newer. This server runs PHP %s, so the plugin has not been loaded."
+msgstr ""
+
+#: includes/class-mcm-import.php:503
+msgid "Medical College Manager — CSV Import / Export"
+msgstr ""
+
+#: includes/class-mcm-settings.php:198
+msgid "Medical College Manager — Design & Settings"
+msgstr ""
+
+#: includes/class-mcm-social.php:190
+msgid "Medical College Manager — Social Bar"
+msgstr ""
+
+#: includes/class-mcm-query.php:855
+msgid "Meet the Consultant"
+msgstr ""
+
+#: includes/elementor-widgets.php:102
+msgid "Menu order"
+msgstr ""
+
+#: includes/elementor-widgets.php:530
+msgid "Most commented"
+msgstr ""
+
+#: includes/class-mcm-settings.php:210
+msgid "Muted / Meta Text"
+msgstr ""
+
+#: includes/class-mcm-privacy.php:177
+#: includes/class-mcm-query.php:1134
+#: includes/class-mcm-query.php:1141
+#: includes/class-mcm-query.php:1166
+msgid "Name"
+msgstr ""
+
+#: includes/class-mcm-meta.php:214
+msgid "Name of the supervising professor / consultant."
+msgstr ""
+
+#: includes/class-mcm-termmeta.php:51
+msgid "Name shown above the welcome message."
+msgstr ""
+
+#: includes/class-mcm-settings.php:421
+msgid "Never — leave it entirely to the theme"
+msgstr ""
+
+#: includes/class-mcm-notice.php:191
+msgid "New"
+msgstr ""
+
+#: includes/class-mcm-cpt.php:298
+msgid "New %s"
+msgstr ""
+
+#: includes/class-mcm-cpt.php:349
+msgid "New %s Name"
+msgstr ""
+
+#: includes/elementor-widgets.php:543
+msgid "Newest first"
+msgstr ""
+
+#: includes/class-mcm-query.php:985
+msgid "Next &rarr;"
+msgstr ""
+
+#: includes/class-mcm-import.php:247
+msgid "No file was uploaded."
+msgstr ""
+
+#: includes/class-mcm-notice.php:243
+msgid "No notices at the moment."
+msgstr ""
+
+#: includes/class-mcm-blog.php:105
+msgid "No posts found."
+msgstr ""
+
+#: includes/class-mcm-query.php:836
+msgid "No publications found."
+msgstr ""
+
+#: includes/class-mcm-relations.php:104
+msgid "No related content yet. Assign shared Departments, Faculty, Sessions or Specialties to link this with other content."
+msgstr ""
+
+#: includes/class-mcm-query.php:937
+#: includes/class-mcm-query.php:954
+#: includes/class-mcm-query.php:1210
+msgid "No results found."
+msgstr ""
+
+#: includes/elementor-widgets.php:666
+msgid "Normal"
+msgstr ""
+
+#: includes/class-mcm-settings.php:278
+msgid "Note: taxonomy attribute values use the term SLUG (e.g. \"fall-2025\", \"dr-sara-khan\"). The front-end filter dropdowns and search work automatically via AJAX — no slugs needed there."
+msgstr ""
+
+#: includes/class-mcm-cpt.php:303
+msgid "Nothing found"
+msgstr ""
+
+#: includes/class-mcm-cpt.php:304
+msgid "Nothing found in Trash"
+msgstr ""
+
+#: includes/class-mcm-cpt.php:94
+#: includes/class-mcm-query.php:1583
+msgid "Notice"
+msgstr ""
+
+#: includes/class-mcm-notice.php:301
+#: includes/elementor-widgets.php:759
+#: includes/elementor-widgets.php:768
+#: includes/elementor-widgets.php:774
+msgid "Notice Board"
+msgstr ""
+
+#: includes/class-mcm-cpt.php:246
+msgid "Notice Categories"
+msgstr ""
+
+#: includes/class-mcm-cpt.php:245
+msgid "Notice Category"
+msgstr ""
+
+#: includes/class-mcm-meta.php:247
+msgid "Notice Date (defaults to publish date)"
+msgstr ""
+
+#: includes/class-mcm-meta.php:243
+msgid "Notice Details"
+msgstr ""
+
+#: includes/elementor-widgets.php:718
+#: includes/elementor-widgets.php:727
+msgid "Notice Ticker"
+msgstr ""
+
+#: includes/class-mcm-cpt.php:95
+#: includes/class-mcm-import.php:205
+msgid "Notices"
+msgstr ""
+
+#: includes/elementor-widgets.php:819
+#: includes/elementor-widgets.php:828
+msgid "Notices List"
+msgstr ""
+
+#: includes/elementor-widgets.php:85
+msgid "Number of items"
+msgstr ""
+
+#: includes/elementor-widgets.php:639
+msgid "Number of notices"
+msgstr ""
+
+#: includes/elementor-widgets.php:502
+msgid "Number of posts"
+msgstr ""
+
+#: includes/class-mcm-query.php:1138
+#: includes/class-mcm-query.php:1276
+msgid "OPD"
+msgstr ""
+
+#: includes/class-mcm-meta.php:139
+msgid "OPD / Available Days"
+msgstr ""
+
+#: includes/class-mcm-query.php:1409
+msgid "OPD Days"
+msgstr ""
+
+#: includes/class-mcm-meta.php:140
+#: includes/class-mcm-query.php:1410
+msgid "OPD Timing"
+msgstr ""
+
+#: includes/class-mcm-query.php:1429
+msgid "ORCID"
+msgstr ""
+
+#: includes/class-mcm-meta.php:144
+#: includes/class-mcm-meta.php:159
+msgid "ORCID iD URL"
+msgstr ""
+
+#: includes/elementor-widgets.php:132
+msgid "Off"
+msgstr ""
+
+#: includes/elementor-widgets.php:544
+msgid "Oldest first"
+msgstr ""
+
+#: includes/elementor-widgets.php:131
+msgid "On"
+msgstr ""
+
+#: includes/class-mcm-social.php:236
+msgid "On mobile"
+msgstr ""
+
+#: includes/class-mcm-meta.php:206
+#: includes/class-mcm-query.php:800
+msgid "Open Access"
+msgstr ""
+
+#: includes/class-mcm-query.php:1595
+msgid "Open Link"
+msgstr ""
+
+#: includes/class-mcm-meta.php:168
+msgid "Opening Date"
+msgstr ""
+
+#: includes/class-mcm-meta.php:411
+#: includes/class-mcm-query.php:1128
+#: includes/class-mcm-query.php:1287
+#: includes/class-mcm-query.php:1482
+msgid "Opens"
+msgstr ""
+
+#: includes/elementor-widgets.php:111
+#: includes/elementor-widgets.php:539
+msgid "Order"
+msgstr ""
+
+#: includes/elementor-widgets.php:96
+#: includes/elementor-widgets.php:524
+msgid "Order by"
+msgstr ""
+
+#: includes/class-mcm-meta.php:127
+#: includes/class-mcm-query.php:1470
+msgid "Organizer"
+msgstr ""
+
+#: includes/class-mcm-query.php:753
+msgid "PDF"
+msgstr ""
+
+#: includes/class-mcm-meta.php:257
+#: includes/class-mcm-meta.php:416
+#: includes/class-mcm-privacy.php:41
+#: includes/class-mcm-query.php:1168
+#: includes/class-mcm-query.php:1329
+msgid "PMDC No."
+msgstr ""
+
+#: includes/class-mcm-meta.php:198
+msgid "Pages (e.g. 45-52)"
+msgstr ""
+
+#: includes/class-mcm-query.php:988
+msgid "Pagination"
+msgstr ""
+
+#: includes/class-mcm-meta.php:203
+msgid "Paper (PDF)"
+msgstr ""
+
+#: includes/class-mcm-notice.php:290
+#: includes/class-mcm-notice.php:321
+msgid "Pause"
+msgstr ""
+
+#: includes/class-mcm-meta.php:141
+#: includes/class-mcm-meta.php:156
+#: includes/class-mcm-meta.php:259
+#: includes/class-mcm-privacy.php:43
+#: includes/class-mcm-privacy.php:61
+#: includes/class-mcm-privacy.php:70
+msgid "Phone"
+msgstr ""
+
+#: includes/class-mcm-meta.php:246
+msgid "Pin to top"
+msgstr ""
+
+#: includes/class-mcm-import.php:240
+msgid "Please choose a valid content type."
+msgstr ""
+
+#: includes/class-mcm-import.php:260
+msgid "Please upload a .csv file."
+msgstr ""
+
+#: includes/class-mcm-cpt.php:135
+#: includes/class-mcm-import.php:204
+#: includes/elementor-widgets.php:425
+msgid "Policies"
+msgstr ""
+
+#: includes/class-mcm-cpt.php:134
+msgid "Policy"
+msgstr ""
+
+#: includes/class-mcm-cpt.php:276
+msgid "Policy Categories"
+msgstr ""
+
+#: includes/class-mcm-cpt.php:275
+msgid "Policy Category"
+msgstr ""
+
+#: includes/class-mcm-meta.php:225
+#: includes/class-mcm-query.php:1557
+msgid "Policy Details"
+msgstr ""
+
+#: includes/class-mcm-meta.php:230
+msgid "Policy Document (PDF)"
+msgstr ""
+
+#: includes/elementor-widgets.php:154
+msgid "Pre-filter (optional)"
+msgstr ""
+
+#: includes/class-mcm-social.php:251
+msgid "Prefer to place it manually (e.g. in a specific page or an Elementor Shortcode widget)? Use:"
+msgstr ""
+
+#: includes/class-mcm-query.php:501
+msgid "Prepared by"
+msgstr ""
+
+#: includes/class-mcm-settings.php:207
+msgid "Primary Color"
+msgstr ""
+
+#: includes/class-mcm-query.php:509
+msgid "Principal / Head of Department"
+msgstr ""
+
+#: includes/class-mcm-shortcodes.php:111
+#: includes/class-mcm-shortcodes.php:133
+msgid "Print"
+msgstr ""
+
+#: includes/elementor-widgets.php:141
+msgid "Print button"
+msgstr ""
+
+#: includes/class-mcm-settings.php:314
+#: includes/class-mcm-settings.php:317
+msgid "Printable Content Types"
+msgstr ""
+
+#: includes/class-mcm-settings.php:408
+msgid "Printed bottom-left. The generation date is added bottom-right automatically."
+msgstr ""
+
+#: includes/class-mcm-settings.php:242
+msgid "Printed sheets and \"Save as PDF\" both use this letterhead, so a timetable or student list handed out on paper carries the college identity. Filters, result count and date are added automatically from whatever the visitor had on screen."
+msgstr ""
+
+#: includes/class-mcm-settings.php:398
+msgid "Printed under the institution name."
+msgstr ""
+
+#: includes/class-mcm-settings.php:241
+msgid "Printing & Letterhead"
+msgstr ""
+
+#: includes/class-mcm-meta.php:245
+#: includes/class-mcm-query.php:1293
+#: includes/class-mcm-query.php:1586
+#: includes/elementor-widgets.php:659
+msgid "Priority"
+msgstr ""
+
+#: includes/class-mcm-query.php:1113
+#: includes/class-mcm-query.php:1122
+#: includes/class-mcm-query.php:1249
+#: includes/class-mcm-query.php:1262
+#: includes/class-mcm-query.php:1443
+#: includes/class-mcm-query.php:1522
+msgid "Professor"
+msgstr ""
+
+#: includes/class-mcm-query.php:1402
+msgid "Profile"
+msgstr ""
+
+#: includes/class-mcm-cpt.php:46
+#: includes/class-mcm-meta.php:260
+#: includes/class-mcm-privacy.php:44
+#: includes/class-mcm-query.php:1127
+#: includes/class-mcm-query.php:1147
+#: includes/class-mcm-query.php:1170
+msgid "Program"
+msgstr ""
+
+#: includes/class-mcm-cpt.php:225
+msgid "Program Categories"
+msgstr ""
+
+#: includes/class-mcm-cpt.php:224
+msgid "Program Category"
+msgstr ""
+
+#: includes/class-mcm-meta.php:102
+#: includes/class-mcm-query.php:1451
+msgid "Program Details"
+msgstr ""
+
+#: includes/class-mcm-meta.php:167
+msgid "Program Name"
+msgstr ""
+
+#: includes/class-mcm-cpt.php:47
+#: includes/class-mcm-import.php:186
+#: includes/elementor-widgets.php:278
+msgid "Programs"
+msgstr ""
+
+#: includes/class-mcm-query.php:739
+#: includes/class-mcm-query.php:745
+#: includes/class-mcm-query.php:1435
+msgid "PubMed"
+msgstr ""
+
+#: includes/class-mcm-meta.php:146
+#: includes/class-mcm-meta.php:161
+msgid "PubMed Author URL"
+msgstr ""
+
+#: includes/class-mcm-meta.php:201
+msgid "PubMed ID (PMID)"
+msgstr ""
+
+#: includes/class-mcm-cpt.php:118
+msgid "Publication"
+msgstr ""
+
+#: includes/class-mcm-query.php:1514
+msgid "Publication Details"
+msgstr ""
+
+#: includes/class-mcm-meta.php:191
+msgid "Publication Details (Vancouver)"
+msgstr ""
+
+#: includes/class-mcm-meta.php:199
+msgid "Publication Type"
+msgstr ""
+
+#: includes/class-mcm-cpt.php:119
+#: includes/class-mcm-import.php:194
+#: includes/elementor-widgets.php:446
+msgid "Publications"
+msgstr ""
+
+#: includes/class-mcm-import.php:536
+#: includes/class-mcm-query.php:1497
+msgid "Published"
+msgstr ""
+
+#: includes/class-mcm-meta.php:180
+msgid "Published Date"
+msgstr ""
+
+#: includes/class-mcm-meta.php:136
+#: includes/class-mcm-meta.php:153
+#: includes/class-mcm-query.php:1406
+msgid "Qualifications"
+msgstr ""
+
+#: includes/elementor-widgets.php:103
+#: includes/elementor-widgets.php:531
+msgid "Random"
+msgstr ""
+
+#: includes/class-mcm-blog.php:120
+#: includes/elementor-widgets.php:565
+msgid "Read More"
+msgstr ""
+
+#: includes/elementor-widgets.php:563
+msgid "Read-more label"
+msgstr ""
+
+#: includes/class-mcm-query.php:1298
+msgid "Ref"
+msgstr ""
+
+#: includes/class-mcm-meta.php:179
+msgid "Reference / Tender No."
+msgstr ""
+
+#: includes/class-mcm-meta.php:228
+#: includes/class-mcm-query.php:1494
+#: includes/class-mcm-query.php:1560
+msgid "Reference No."
+msgstr ""
+
+#: includes/class-mcm-query.php:1474
+msgid "Register"
+msgstr ""
+
+#: includes/class-mcm-meta.php:129
+msgid "Registration URL"
+msgstr ""
+
+#: includes/class-mcm-relations.php:43
+msgid "Related Content"
+msgstr ""
+
+#: includes/class-mcm-cpt.php:268
+#: includes/class-mcm-query.php:1306
+#: includes/class-mcm-query.php:1318
+#: includes/class-mcm-query.php:1520
+#: includes/class-mcm-query.php:1547
+msgid "Research Area"
+msgstr ""
+
+#: includes/class-mcm-cpt.php:269
+msgid "Research Areas"
+msgstr ""
+
+#: includes/class-mcm-query.php:1539
+msgid "Research Details"
+msgstr ""
+
+#: includes/class-mcm-query.php:1412
+msgid "Research Interests"
+msgstr ""
+
+#: includes/class-mcm-meta.php:221
+msgid "Research Paper (PDF)"
+msgstr ""
+
+#: includes/class-mcm-cpt.php:126
+msgid "Research Project"
+msgstr ""
+
+#: includes/class-mcm-meta.php:212
+msgid "Research Project Details"
+msgstr ""
+
+#: includes/class-mcm-cpt.php:127
+#: includes/class-mcm-import.php:203
+#: includes/class-mcm-query.php:409
+#: includes/elementor-widgets.php:407
+msgid "Research Projects"
+msgstr ""
+
+#: includes/class-mcm-meta.php:215
+msgid "Research Status"
+msgstr ""
+
+#: includes/class-mcm-query.php:387
+msgid "Reset"
+msgstr ""
+
+#: includes/class-mcm-query.php:653
+msgid "Reset filters"
+msgstr ""
+
+#: includes/class-mcm-social.php:230
+msgid "Right"
+msgstr ""
+
+#: includes/class-mcm-meta.php:390
+#: includes/class-mcm-query.php:1115
+#: includes/class-mcm-query.php:1250
+#: includes/class-mcm-query.php:1608
+msgid "Room"
+msgstr ""
+
+#: includes/class-mcm-meta.php:97
+msgid "Room / Venue"
+msgstr ""
+
+#: includes/class-mcm-import.php:363
+msgid "Row %d failed."
+msgstr ""
+
+#: includes/class-mcm-import.php:347
+msgid "Row %d skipped (no title)."
+msgstr ""
+
+#: includes/class-mcm-import.php:546
+msgid "Sample CSV Templates"
+msgstr ""
+
+#: includes/class-mcm-settings.php:254
+msgid "Save Settings"
+msgstr ""
+
+#: includes/class-mcm-social.php:246
+msgid "Save Social Bar"
+msgstr ""
+
+#: includes/class-mcm-cpt.php:110
+msgid "Scholarship"
+msgstr ""
+
+#: includes/class-mcm-meta.php:234
+#: includes/class-mcm-query.php:1570
+msgid "Scholarship Details"
+msgstr ""
+
+#: includes/class-mcm-cpt.php:259
+msgid "Scholarship Type"
+msgstr ""
+
+#: includes/class-mcm-cpt.php:260
+msgid "Scholarship Types"
+msgstr ""
+
+#: includes/class-mcm-cpt.php:111
+#: includes/class-mcm-import.php:193
+#: includes/elementor-widgets.php:389
+msgid "Scholarships"
+msgstr ""
+
+#: includes/elementor-widgets.php:791
+msgid "Scroll speed (1 slow - 10 fast)"
+msgstr ""
+
+#: includes/class-mcm-query.php:621
+msgid "Search"
+msgstr ""
+
+#: includes/class-mcm-cpt.php:302
+#: includes/class-mcm-cpt.php:339
+msgid "Search %s"
+msgstr ""
+
+#: includes/class-mcm-query.php:359
+msgid "Search by name, ID, PMDC No., email…"
+msgstr ""
+
+#: includes/class-mcm-query.php:360
+#: includes/class-mcm-query.php:614
+msgid "Search by name, keyword…"
+msgstr ""
+
+#: includes/class-mcm-query.php:1152
+#: includes/class-mcm-query.php:1256
+msgid "Seats"
+msgstr ""
+
+#: includes/class-mcm-settings.php:212
+msgid "Section Background"
+msgstr ""
+
+#: includes/class-mcm-import.php:233
+msgid "Security check failed. Please try again."
+msgstr ""
+
+#: includes/class-mcm-settings.php:349
+#: includes/class-mcm-settings.php:371
+#: includes/class-mcm-termmeta.php:146
+msgid "Select Image"
+msgstr ""
+
+#: includes/class-mcm-meta.php:327
+msgid "Select document"
+msgstr ""
+
+#: includes/class-mcm-meta.php:116
+#: includes/class-mcm-meta.php:398
+#: includes/class-mcm-query.php:1124
+#: includes/class-mcm-query.php:1446
+msgid "Semester"
+msgstr ""
+
+#: includes/class-mcm-cpt.php:190
+#: includes/class-mcm-query.php:1116
+#: includes/class-mcm-query.php:1444
+msgid "Session"
+msgstr ""
+
+#: includes/class-mcm-cpt.php:191
+msgid "Sessions"
+msgstr ""
+
+#: includes/class-mcm-social.php:250
+msgid "Shortcode"
+msgstr ""
+
+#: includes/class-mcm-settings.php:258
+msgid "Shortcode Quick Reference"
+msgstr ""
+
+#: includes/elementor-widgets.php:801
+msgid "Show \"View all\" link"
+msgstr ""
+
+#: includes/class-mcm-social.php:239
+msgid "Show as a bottom bar"
+msgstr ""
+
+#: includes/elementor-widgets.php:682
+msgid "Show category badge"
+msgstr ""
+
+#: includes/elementor-widgets.php:673
+msgid "Show date"
+msgstr ""
+
+#: includes/class-mcm-social.php:218
+msgid "Show on whole website"
+msgstr ""
+
+#: includes/class-mcm-termmeta.php:52
+msgid "Shown beside the welcome message."
+msgstr ""
+
+#: includes/class-mcm-settings.php:351
+msgid "Shown for any consultant, faculty member, staff member or student without a photograph. Upload a branded placeholder carrying the college logo; leave blank for a plain silhouette. A square image works best."
+msgstr ""
+
+#: includes/class-mcm-settings.php:373
+msgid "Shown top-left of every printed sheet. Leave blank to fall back to your theme logo, then the site icon. A wide transparent PNG works best."
+msgstr ""
+
+#: includes/class-mcm-social.php:227
+msgid "Side"
+msgstr ""
+
+#: includes/class-mcm-settings.php:412
+msgid "Signature Block"
+msgstr ""
+
+#: includes/class-mcm-social.php:91
+#: includes/class-mcm-social.php:92
+msgid "Social Bar"
+msgstr ""
+
+#: includes/class-mcm-social.php:167
+msgid "Social media links"
+msgstr ""
+
+#: includes/class-mcm-cpt.php:217
+msgid "Specialties"
+msgstr ""
+
+#: includes/class-mcm-cpt.php:216
+#: includes/class-mcm-query.php:1137
+#: includes/class-mcm-query.php:1144
+#: includes/class-mcm-query.php:1275
+#: includes/class-mcm-query.php:1282
+#: includes/class-mcm-query.php:1405
+msgid "Specialty"
+msgstr ""
+
+#: includes/elementor-widgets.php:740
+msgid "Speed (1 slow - 10 fast)"
+msgstr ""
+
+#: includes/class-mcm-meta.php:216
+msgid "Start Date"
+msgstr ""
+
+#: includes/class-mcm-meta.php:94
+#: includes/class-mcm-meta.php:124
+msgid "Start Time"
+msgstr ""
+
+#: includes/class-mcm-query.php:1542
+msgid "Started"
+msgstr ""
+
+#: includes/class-mcm-meta.php:264
+#: includes/class-mcm-meta.php:417
+#: includes/class-mcm-privacy.php:48
+#: includes/class-mcm-query.php:1173
+#: includes/class-mcm-query.php:1305
+#: includes/class-mcm-query.php:1334
+msgid "Status"
+msgstr ""
+
+#: includes/class-mcm-cpt.php:142
+msgid "Student"
+msgstr ""
+
+#: includes/class-mcm-meta.php:256
+#: includes/class-mcm-meta.php:415
+#: includes/class-mcm-privacy.php:40
+#: includes/class-mcm-query.php:1167
+msgid "Student ID"
+msgstr ""
+
+#: includes/class-mcm-query.php:408
+msgid "Student List"
+msgstr ""
+
+#: includes/class-mcm-meta.php:254
+#: includes/class-mcm-privacy.php:37
+msgid "Student Record"
+msgstr ""
+
+#: includes/class-mcm-cpt.php:143
+#: includes/class-mcm-import.php:206
+msgid "Students"
+msgstr ""
+
+#: includes/class-mcm-meta.php:218
+msgid "Students working under the supervisor — one per line, e.g. \"Dr. Farooq — Final Year MBBS\"."
+msgstr ""
+
+#: includes/class-mcm-meta.php:205
+msgid "Students working under the supervisor — one per line, e.g. \"Dr. Samina — 2nd Year MBBS\"."
+msgstr ""
+
+#: includes/class-mcm-meta.php:389
+#: includes/class-mcm-query.php:1112
+#: includes/class-mcm-query.php:1248
+#: includes/class-mcm-query.php:1605
+msgid "Subject"
+msgstr ""
+
+#: includes/class-mcm-meta.php:96
+msgid "Subject / Topic"
+msgstr ""
+
+#: includes/class-mcm-query.php:1498
+msgid "Submission Deadline"
+msgstr ""
+
+#: includes/class-mcm-meta.php:181
+msgid "Submission Deadline (auto-hides after)"
+msgstr ""
+
+#: includes/class-mcm-query.php:1509
+msgid "Submit / Portal"
+msgstr ""
+
+#: includes/class-mcm-meta.php:187
+msgid "Submit / Portal URL"
+msgstr ""
+
+#: includes/class-mcm-meta.php:204
+msgid "Supervising professor / consultant, if this was supervised work."
+msgstr ""
+
+#: includes/class-mcm-meta.php:204
+#: includes/class-mcm-meta.php:214
+#: includes/class-mcm-query.php:1304
+#: includes/class-mcm-query.php:1523
+#: includes/class-mcm-query.php:1540
+msgid "Supervisor"
+msgstr ""
+
+#: includes/elementor-widgets.php:63
+msgid "Table"
+msgstr ""
+
+#: includes/class-mcm-cpt.php:79
+#: includes/class-mcm-import.php:190
+#: includes/elementor-widgets.php:260
+msgid "Team"
+msgstr ""
+
+#: includes/class-mcm-cpt.php:78
+msgid "Team Member"
+msgstr ""
+
+#: includes/class-mcm-meta.php:150
+msgid "Team Member Profile"
+msgstr ""
+
+#: includes/class-mcm-privacy.php:65
+msgid "Team Profile"
+msgstr ""
+
+#: includes/class-mcm-cpt.php:102
+msgid "Tender"
+msgstr ""
+
+#: includes/class-mcm-cpt.php:253
+msgid "Tender Categories"
+msgstr ""
+
+#: includes/class-mcm-cpt.php:252
+msgid "Tender Category"
+msgstr ""
+
+#: includes/class-mcm-meta.php:176
+#: includes/class-mcm-query.php:1493
+msgid "Tender Details"
+msgstr ""
+
+#: includes/class-mcm-meta.php:183
+msgid "Tender Document Fee"
+msgstr ""
+
+#: includes/class-mcm-meta.php:186
+msgid "Tender Document URL (download)"
+msgstr ""
+
+#: includes/class-mcm-cpt.php:103
+#: includes/class-mcm-import.php:192
+#: includes/elementor-widgets.php:371
+msgid "Tenders"
+msgstr ""
+
+#: includes/class-mcm-settings.php:209
+msgid "Text Color"
+msgstr ""
+
+#: includes/class-mcm-termmeta.php:53
+msgid "The Head of Department's short message for this department page."
+msgstr ""
+
+#: includes/class-mcm-social.php:253
+msgid "The bar is fixed/floating, so it appears over the page wherever the shortcode is placed. If \"Show on whole website\" is on, the shortcode is not needed (and duplicates are prevented automatically)."
+msgstr ""
+
+#: includes/class-mcm-import.php:316
+msgid "The file is empty."
+msgstr ""
+
+#: includes/class-mcm-import.php:278
+msgid "The uploaded file does not look like a CSV."
+msgstr ""
+
+#: includes/class-mcm-social.php:48
+msgid "TikTok"
+msgstr ""
+
+#: includes/class-mcm-query.php:1111
+#: includes/class-mcm-query.php:1157
+#: includes/class-mcm-query.php:1368
+#: includes/class-mcm-query.php:1468
+#: includes/class-mcm-query.php:1604
+msgid "Time"
+msgstr ""
+
+#: includes/class-mcm-cpt.php:39
+#: includes/class-mcm-import.php:185
+#: includes/elementor-widgets.php:332
+msgid "Timetable"
+msgstr ""
+
+#: includes/class-mcm-meta.php:91
+msgid "Timetable Details"
+msgstr ""
+
+#: includes/class-mcm-cpt.php:38
+#: includes/class-mcm-query.php:1600
+msgid "Timetable Entry"
+msgstr ""
+
+#: includes/class-mcm-import.php:512
+msgid "Tip: import Timetable and Courses before Consultants/Team — a person whose name matches a Faculty entry is then auto-linked to the classes they teach. You can also add a \"faculty\" column to set this explicitly."
+msgstr ""
+
+#: includes/class-mcm-query.php:1182
+#: includes/elementor-widgets.php:101
+#: includes/elementor-widgets.php:529
+msgid "Title"
+msgstr ""
+
+#: includes/class-mcm-settings.php:224
+msgid "Title Font Size (px)"
+msgstr ""
+
+#: includes/class-mcm-query.php:1322
+#: includes/class-mcm-query.php:1519
+#: includes/class-mcm-query.php:1571
+msgid "Type"
+msgstr ""
+
+#: includes/class-mcm-cpt.php:345
+msgid "Update %s"
+msgstr ""
+
+#: includes/class-mcm-meta.php:327
+msgid "Upload / Select"
+msgstr ""
+
+#: includes/class-mcm-import.php:509
+msgid "Upload a CSV to bulk-create any content type. The first row must be the column headers. Departments, sessions, faculty and categories are created automatically from the values you provide (comma-separate multiple terms). Matching values are reused as one shared term, so content imported from different files links together automatically."
+msgstr ""
+
+#: includes/class-mcm-meta.php:203
+msgid "Upload or select the PDF. It can then be viewed and downloaded from the page."
+msgstr ""
+
+#: includes/class-mcm-meta.php:221
+msgid "Upload or select the paper. It can then be viewed and downloaded from the page."
+msgstr ""
+
+#: includes/elementor-widgets.php:664
+msgid "Urgent"
+msgstr ""
+
+#: includes/class-mcm-meta.php:126
+#: includes/class-mcm-meta.php:402
+#: includes/class-mcm-query.php:1158
+#: includes/class-mcm-query.php:1269
+#: includes/class-mcm-query.php:1469
+msgid "Venue"
+msgstr ""
+
+#: includes/class-mcm-query.php:1095
+msgid "View"
+msgstr ""
+
+#: includes/class-mcm-cpt.php:300
+msgid "View %s"
+msgstr ""
+
+#: includes/class-mcm-query.php:1551
+msgid "View Paper"
+msgstr ""
+
+#: includes/class-mcm-query.php:857
+msgid "View Profile"
+msgstr ""
+
+#: includes/class-mcm-notice.php:328
+msgid "View all notices"
+msgstr ""
+
+#: includes/class-mcm-query.php:859
+#: includes/class-mcm-query.php:1060
+msgid "View details"
+msgstr ""
+
+#: includes/class-mcm-meta.php:196
+msgid "Volume"
+msgstr ""
+
+#: includes/class-mcm-termmeta.php:53
+msgid "Welcome Message"
+msgstr ""
+
+#: includes/class-mcm-social.php:60
+msgid "WhatsApp"
+msgstr ""
+
+#: includes/class-mcm-social.php:44
+msgid "X (Twitter)"
+msgstr ""
+
+#: includes/class-mcm-meta.php:195
+#: includes/class-mcm-query.php:1317
+#: includes/class-mcm-query.php:1518
+#: includes/class-mcm-query.php:1609
+msgid "Year"
+msgstr ""
+
+#: includes/class-mcm-meta.php:98
+msgid "Year / Semester"
+msgstr ""
+
+#: includes/class-mcm-import.php:229
+msgid "You do not have permission to import."
+msgstr ""
+
+#: includes/class-mcm-social.php:52
+msgid "YouTube"
+msgstr ""
+
+#: includes/class-mcm-termmeta.php:54
+msgid "YouTube/Vimeo link or an uploaded MP4. Replaces the page title banner."
+msgstr ""
+
+#: includes/class-mcm-settings.php:236
+msgid "e.g. \"Poppins\", sans-serif — or leave as \"inherit\"."
+msgstr ""
+
+#: includes/class-mcm-social.php:208
+msgid "e.g. 923001234567 (country code, digits only)"
+msgstr ""
+
+#: includes/class-mcm-settings.php:397
+msgid "e.g. Dera Ismail Khan, KP, Pakistan · +92 966 000000 · info@example.edu.pk"
+msgstr ""
+
+#: includes/class-mcm-settings.php:407
+msgid "e.g. This is a computer-generated document."
+msgstr ""
+
+#: includes/class-mcm-termmeta.php:55
+msgid "e.g. anatomy@gmcdik.edu.pk"
+msgstr ""
+
+#: includes/class-mcm-social.php:208
+msgid "https://…"
+msgstr ""
+
+#: includes/class-mcm-meta.php:311
+msgid "— Select —"
+msgstr ""
+

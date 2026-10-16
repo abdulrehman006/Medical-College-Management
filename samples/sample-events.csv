@@ -1,0 +1,6 @@
+title,content,event_category,department,event_date,start_time,end_time,venue,organizer,event_url
+Annual Medical Symposium 2026,"Keynotes and research presentations across specialties.",Conference,General Medicine,2026-03-15,09:00,17:00,Main Auditorium,Office of Research,https://example.edu/events/symposium-2026
+Cardiology CME Workshop,"Hands-on workshop on ECG interpretation.",Workshop,Internal Medicine,2026-04-10,10:00,14:00,Seminar Hall 2,Department of Cardiology,https://example.edu/events/cardio-cme
+White Coat Ceremony,"Welcoming the new MBBS batch.",Ceremony,General Medicine,2026-09-01,16:00,18:00,Convocation Lawn,Student Affairs,https://example.edu/events/white-coat
+Blood Donation Drive,"Campus-wide blood donation camp.",Community,Pathology,2026-02-20,09:00,15:00,Sports Complex,Hematology Society,https://example.edu/events/blood-drive
+Research Methodology Seminar,"Introduction to clinical research design.",Seminar,Internal Medicine,2026-05-05,11:00,13:00,Lecture Theatre 1,Postgraduate Office,https://example.edu/events/research-seminar

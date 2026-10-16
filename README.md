@@ -1,0 +1,67 @@
+# Medical College Manager
+
+A WordPress plugin that turns a WordPress site into a complete website for a medical college: academics, faculty, research, admissions, notices and student records, all managed from wp-admin and displayed with shortcodes, Elementor widgets or automatic archive pages.
+
+## Features
+
+- **14 content types**: Timetable, Programs, Courses, Events, Consultants, Team, Admissions, Notices, Tenders, Scholarships, Publications, Research Projects, Policies and Students.
+- **Shared connectors**: Department, Faculty, Program, Session, Research Area and Specialty link content across types, so a department or professor page lists everything related to it automatically.
+- **Department pages** with a hero video or image, a Head of Department message card and only the sections that have content.
+- **Live search and filters** (AJAX) in grid, list, table, directory and citation layouts.
+- **Publications** as a numbered Vancouver reference list with automatic DOI and PubMed links.
+- **Notice board**: scrolling ticker, auto-scroll board and list, with pinning, priority and auto-expiry. Tenders hide themselves after their deadline.
+- **Printing on the college letterhead** (logo, address, signature block), including filtered lists and Save as PDF.
+- **CSV import/export** for every type, with upsert on re-import and sample files in `samples/`.
+- **Elementor**: 16 drag-and-drop widgets with full style controls.
+- **Design settings**: colours, spacing, columns, page banners and custom CSS, without code.
+- **SEO**: schema.org JSON-LD for people, events, courses, programs and publications.
+- **Privacy**: student records have their own capabilities (administrators only), no REST route, and only safe fields on the front end. Includes WordPress personal-data export and erase support.
+
+## Requirements
+
+- WordPress 5.8 or newer
+- PHP 7.2 or newer
+- Elementor 3.5+ (optional, only for the widgets)
+
+## Installation
+
+1. Download this repository as a ZIP, or clone it into `wp-content/plugins/medical-college-manager`.
+2. In wp-admin, go to **Plugins** and activate **Medical College Manager**.
+3. Open **College Manager** in the admin menu for design, printing and banner settings.
+4. Add content, or bulk-load it from **College Manager → CSV Import / Export**.
+5. Place a shortcode such as `[mcm_consultants]` on any page, or use the **Medical College** widgets in Elementor.
+
+## Shortcodes
+
+| Shortcode | Shows |
+| --- | --- |
+| `[mcm_consultants]`, `[mcm_team]` | Faculty and staff directory |
+| `[mcm_programs]`, `[mcm_courses]`, `[mcm_timetable]` | Academics |
+| `[mcm_admissions]`, `[mcm_scholarships]` | Admissions and scholarships |
+| `[mcm_events]`, `[mcm_tenders]`, `[mcm_policies]` | Events, open tenders, policies |
+| `[mcm_publications]`, `[mcm_research]` | Research output |
+| `[mcm_students]` | Student list (safe fields only) |
+| `[mcm_notice_ticker]`, `[mcm_notice_board]`, `[mcm_notices]` | Notices |
+| `[mcm_department_intro]`, `[mcm_department_sections]` | Department page parts |
+| `[mcm_blog]`, `[mcm_social_bar]` | Blog posts, social links |
+
+Common attributes: `view`, `columns`, `count`, `filters="yes"`, `print`, `paginate`, and connector filters such as `department="anatomy"` or `program="mbbs"`. The full reference is on the plugin's settings page and in `readme.txt`.
+
+## Project structure
+
+```
+medical-college-manager.php   Bootstrap, constants, activation and upgrades
+includes/                     One class per feature (types, fields, query engine, shortcodes, templates, import, Elementor…)
+templates/archive-mcm.php     Archive and department page template (overridable from a theme)
+assets/                       Front-end and admin CSS/JS
+samples/                      Example CSV files for the importer
+languages/                    Translation template (.pot)
+```
+
+## Security
+
+Please report security issues privately to the maintainer rather than opening a public issue.
+
+## License
+
+GPL-2.0-or-later. See [LICENSE](LICENSE).

@@ -1,0 +1,6 @@
+title,content,department,session,teacher,day,start_time,end_time,subject,room,year
+Anatomy Lecture,"Gross anatomy of the thorax.",Anatomy,Fall 2025,Dr. Sara Khan,Monday,09:00,10:30,Thorax & Mediastinum,Room A-101,1st Year MBBS
+Physiology Lecture,"Cardiac cycle and ECG basics.",Physiology,Fall 2025,Dr. Imran Ali,Monday,11:00,12:30,Cardiovascular Physiology,Room B-202,1st Year MBBS
+Biochemistry Lab,"Enzyme kinetics practical.",Biochemistry,Fall 2025,Dr. Ayesha Noor,Tuesday,09:00,11:00,Enzymes,Lab C-1,1st Year MBBS
+Pathology Tutorial,"Inflammation case discussion.",Pathology,Fall 2025,Dr. Bilal Ahmed,Wednesday,10:00,11:00,Acute Inflammation,Room A-105,2nd Year MBBS
+Pharmacology Lecture,"Autonomic drugs overview.",Pharmacology,Fall 2025,Dr. Hina Raza,Thursday,09:00,10:30,ANS Pharmacology,Room B-204,2nd Year MBBS
