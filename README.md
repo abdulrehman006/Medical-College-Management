@@ -4,7 +4,7 @@ A WordPress plugin that turns a WordPress site into a complete website for a med
 
 ## Features
 
-- **14 content types**: Timetable, Programs, Courses, Events, Consultants, Team, Admissions, Notices, Tenders, Scholarships, Publications, Research Projects, Policies and Students.
+- **15 content types**: Timetable, Programs, Courses, Events, Consultants, Team, Admissions, Notices, Tenders, Scholarships, Publications, Research Projects, Policies, Jobs and Students.
 - **Shared connectors**: Department, Faculty, Program, Session, Research Area and Specialty link content across types, so a department or professor page lists everything related to it automatically.
 - **Department pages** with a hero video or image, a Head of Department message card and only the sections that have content.
 - **Live search and filters** (AJAX) in grid, list, table, directory and citation layouts.
@@ -41,8 +41,9 @@ A WordPress plugin that turns a WordPress site into a complete website for a med
 | `[mcm_admissions]`, `[mcm_scholarships]` | Admissions and scholarships |
 | `[mcm_events]`, `[mcm_tenders]`, `[mcm_policies]` | Events, open tenders, policies |
 | `[mcm_publications]`, `[mcm_research]` | Research output |
+| `[mcm_jobs]` (alias `[mcm_vacancies]`) | Jobs / vacancies: open by default, `status="closed"` or `"all"` |
 | `[mcm_students]` | Student list (safe fields only) |
-| `[mcm_notice_ticker]`, `[mcm_notice_board]`, `[mcm_notices]` | Notices |
+| `[mcm_notice_ticker]`, `[mcm_notice_board]`, `[mcm_notices]` | Notices, plus open jobs and tenders (`include="notice,job,tender"`) |
 | `[mcm_department_intro]`, `[mcm_department_sections]` | Department page parts |
 | `[mcm_blog]`, `[mcm_social_bar]` | Blog posts, social links |
 

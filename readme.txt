@@ -4,11 +4,11 @@ Tags: medical, college, faculty, timetable, admissions
 Requires at least: 5.8
 Tested up to: 7.1
 Requires PHP: 7.2
-Stable tag: 1.30.2
+Stable tag: 1.31.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Fourteen connected content types for a medical college, with CSV import/export, filterable
+Fifteen connected content types for a medical college, with CSV import/export, filterable
 archives, Elementor widgets and letterheaded printing.
 
 == Description ==
@@ -34,6 +34,10 @@ Post types & their taxonomies / fields:
 * Students     — Level (Graduate/Undergraduate), Fields: student ID, roll/registration no, email,
                  Department, Session.                     phone, program, batch, gender, DOB, status,
                                                           blood group, address, guardian + phone.
+* Jobs         — Job Category, Department.       Fields: publication date, last date + closing time,
+                                                          extended last date, apply link/label, how to
+                                                          apply, job description, voucher/form, posts,
+                                                          scale, type, contact, show on notice board.
 
 Department is shared across all types, so a student can filter Timetable, Courses,
 Consultants, Team etc. by the same departments consistently.
@@ -69,7 +73,8 @@ Export:
    Matching terms are reused, not duplicated. Great for backups and bulk edits.
 
 Sample files included: sample-timetable.csv, sample-programs.csv, sample-courses.csv,
-sample-events.csv, sample-consultants.csv, sample-team.csv, sample-admissions.csv.
+sample-events.csv, sample-consultants.csv, sample-team.csv, sample-admissions.csv,
+sample-jobs.csv and the other sample-*.csv files in /samples/.
 
 == Shortcodes ==
 
@@ -78,7 +83,12 @@ Per-type (recommended):
   [mcm_timetable]      [mcm_programs]     [mcm_courses]
   [mcm_events]         [mcm_consultants]  [mcm_team]
   [mcm_admissions]     [mcm_tenders]      [mcm_scholarships]
-  [mcm_students]       [mcm_publications]
+  [mcm_students]       [mcm_publications] [mcm_jobs]
+
+Jobs / Vacancies: [mcm_jobs] (alias [mcm_vacancies]) lists open jobs, soonest last
+date first. status="closed" or status="all" lists past jobs too; category="…" and
+department="…" pre-filter. A job is Open, Closing soon, Extended or Closed by its
+dates in the site timezone; a future publication date hides it everywhere.
 
 Research & Development (Publications): each paper stores authors, journal, year,
 volume, issue, pages, type, DOI, PMID, article URL, PDF, open access, impact
@@ -263,62 +273,33 @@ shadow + hover toggles, font family, and a raw Custom CSS box. Generated CSS use
 
 == Changelog ==
 
+= 1.31.0 =
+New: Jobs / Vacancies.
+* New content type Jobs with Job Categories (Teaching Faculty, Clinical,
+  Administrative, Support Staff are created once) and Departments. Fields:
+  publication date, last date and closing time, extended last date, apply link
+  and label, how to apply, job description and voucher/form (image or PDF),
+  number of posts, scale, type, contact.
+* Status is worked out from the dates in the site timezone: Open, Closing soon
+  (Settings > "Closing soon" days, default 3), Extended (old date struck
+  through), Closed. A job with a future publication date is hidden everywhere.
+  Closed jobs leave the list but their pages stay online.
+* [mcm_jobs] (alias [mcm_vacancies]) and an Elementor "Jobs / Vacancies" widget:
+  status="open" (default), "closed" or "all", with category and department
+  filters; the status survives search, filters, Reset and Print.
+* Department pages get a Vacancies section while that department has open jobs.
+* Notice board, ticker and list can show open jobs and open tenders next to
+  notices (Settings > Notice board sources; per item "Show on notice board";
+  include="notice,job,tender" per shortcode or widget).
+* CSV import/export for jobs (sample-jobs.csv); tenders gain an on_board column.
+* JobPosting structured data while a job is open; none once it closes.
+* Vacancies print on the letterhead.
 = 1.30.2 =
-Reliability and hardening release. Nothing a visitor sees changes unless it was broken.
-* Safety net: every module boots, and every shortcode, Elementor widget, archive
-  page, single-page panel, JSON-LD block and live filter renders, behind its own
-  error boundary. A failure shows visitors an empty block instead of a broken
-  page, shows administrators a short notice, and is logged.
-* New Tools > Site Health checks (PHP, WordPress, Elementor, recent errors,
-  timezone, permalinks) and a Medical College Manager section in Site Health >
-  Info. Errors are kept in a small log you can clear from there.
-* Requirements gate: on WordPress older than 5.8 the plugin loads nothing but a
-  notice. On Elementor older than 3.5 only the widgets are switched off (with a
-  notice); shortcodes keep working.
-* Fixed: pre-filters (department="", program="" … and Elementor pre-filter
-  controls) were lost on the first search, filter change, Reset or Print. They
-  are now always applied; with several terms visitors can narrow within them.
-* Fixed: Upload / Select did nothing in post meta boxes and on the Add Department
-  form. Fields can now accept images and PDFs.
-* Fixed: CSV import merged rows that share a title (e.g. timetable slots). Rows
-  now match by id only, unless you tick "Update existing entries with the same
-  title"; rows of one file are never merged; the result names likely duplicates.
-* Fixed: phone numbers such as +92-300… gained an apostrophe after export and
-  re-import.
-* Fixed: dates are validated and stored as YYYY-MM-DD (15/10/2026, 15-10-2026,
-  15.10.2026 accepted; 31/02/2026 rejected) and times as HH:MM (2:30 PM accepted).
-  An invalid value is not saved and the field is named in a notice or CSV error,
-  so a tender can no longer vanish because of a mistyped deadline.
-* Fixed: department pages showed an empty Tenders/Notices section when all of
-  them had expired.
-* Live filters now show "please refresh" when a request fails or the page has
-  expired, work for content added later (Elementor editor, popups, tabs) and
-  react to pasted text. New filter mcm_ajax_require_nonce for cached sites.
-* New setting: Public student directory (Settings > Privacy), on by default.
-  When off, the student list is shown only to staff who manage students.
-* Privacy eraser: replaces the student's name, no longer skips records beyond
-  20 per email, keeps the academic record, and reports accurately.
-* Block themes (Twenty Twenty-Four/Five): archive and department pages now show
-  the theme's header and footer. Elementor Pro Theme Builder archive templates
-  take precedence when they match. Single-page details appear exactly once.
-* Hello Elementor: plugin buttons and links keep their own colours on hover and
-  focus.
-* Stored values that are lists instead of text can no longer break a page.
-* Clean-up: duplicate import keys and dead code removed; uninstall now removes
-  every option, transient and capability on every site of a network.
-* Fixed: after a live search or filter on a paginated list (archive pages, or a
-  shortcode with paginate="yes"), the pager disappeared, so results beyond the
-  first page could not be reached and Print printed only one page. The pager
-  now stays and loads pages in place with the filters kept, and Print always
-  prints the whole list.
-* One-time upgrade: dates and times saved by older versions in another format
-  (e.g. 15/10/2026, 2:30 PM) are converted to the standard format, so expiry
-  and sorting work on them. Values that cannot be read are left unchanged and
-  listed under Tools > Site Health > "Unreadable dates" with edit links. It
-  runs in the background (first admin page or WP-Cron), never during a
-  visitor's page load.
-* If a part of the plugin is switched off after an error, its shortcodes show
-  nothing to visitors instead of raw [shortcode] text.
+Reliability and hardening release: error boundaries around every module and
+render, Site Health checks and an error log, date/time validation with a
+one-time upgrade of old values, pre-filters kept on live filters, Reset and
+Print, safer CSV import, a Public student directory setting and many fixes.
+Full details in changelog.txt.
 
 = 1.30.1 =
 Security hardening.

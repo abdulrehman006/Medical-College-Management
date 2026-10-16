@@ -1,5 +1,26 @@
 Medical College Manager — complete changelog.
 
+= 1.31.0 =
+New: Jobs / Vacancies.
+* New content type Jobs with Job Categories (Teaching Faculty, Clinical,
+  Administrative, Support Staff are created once) and Departments. Fields:
+  publication date, last date and closing time, extended last date, apply link
+  and label, how to apply, job description and voucher/form (image or PDF),
+  number of posts, scale, type, contact.
+* Status is worked out from the dates in the site timezone: Open, Closing soon
+  (Settings > "Closing soon" days, default 3), Extended (old date struck
+  through), Closed. A job with a future publication date is hidden everywhere.
+  Closed jobs leave the list but their pages stay online.
+* [mcm_jobs] (alias [mcm_vacancies]) and an Elementor "Jobs / Vacancies" widget:
+  status="open" (default), "closed" or "all", with category and department
+  filters; the status survives search, filters, Reset and Print.
+* Department pages get a Vacancies section while that department has open jobs.
+* Notice board, ticker and list can show open jobs and open tenders next to
+  notices (Settings > Notice board sources; per item "Show on notice board";
+  include="notice,job,tender" per shortcode or widget).
+* CSV import/export for jobs (sample-jobs.csv); tenders gain an on_board column.
+* JobPosting structured data while a job is open; none once it closes.
+* Vacancies print on the letterhead.
 = 1.30.2 =
 Reliability and hardening release. Nothing a visitor sees changes unless it was broken.
 * Safety net: every module boots, and every shortcode, Elementor widget, archive
