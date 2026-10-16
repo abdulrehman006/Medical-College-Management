@@ -231,22 +231,35 @@ class MCM_Templates {
 			if ( isset( $hidden[ $cpt ] ) ) {
 				continue; // admin hid this section on the department page.
 			}
-			$probe = new WP_Query(
-				array(
-					'post_type'              => $cpt,
-					'post_status'            => 'publish',
-					'posts_per_page'         => 1,
-					'fields'                 => 'ids',
-					'no_found_rows'          => false,
-					'ignore_sticky_posts'    => true,
-					'update_post_meta_cache' => false,
-					'update_post_term_cache' => false,
-					// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
-					'tax_query'              => array(
-						array( 'taxonomy' => $tax, 'field' => 'term_id', 'terms' => $term->term_id ),
+			$probe_args = array(
+				'post_type'              => $cpt,
+				'post_status'            => 'publish',
+				'posts_per_page'         => 1,
+				'fields'                 => 'ids',
+				'no_found_rows'          => false,
+				'ignore_sticky_posts'    => true,
+				'update_post_meta_cache' => false,
+				'update_post_term_cache' => false,
+				// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
+				'tax_query'              => array(
+					array(
+						'taxonomy' => $tax,
+						'field'    => 'term_id',
+						'terms'    => $term->term_id,
 					),
+				),
+			);
+			// Run the probe through the same filters as the section itself, so
+			// expired tenders/notices (hidden by mcm_query_args) cannot create a
+			// section that then renders "No results found".
+			$probe_atts = MCM_Query::parse_atts(
+				array(
+					'type'      => $cpt,
+					'lock_tax'  => $tax,
+					'lock_term' => $term->slug,
 				)
 			);
+			$probe      = new WP_Query( apply_filters( 'mcm_query_args', $probe_args, $probe_atts ) );
 			$found = (int) $probe->found_posts;
 			if ( $found < 1 ) {
 				continue; // empty — no section.
