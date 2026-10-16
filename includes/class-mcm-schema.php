@@ -244,9 +244,94 @@ class MCM_Schema {
 						),
 					)
 				);
+
+			case 'mcm_job':
+				return self::job_posting( $id, $base );
 		}
 
 		return array();
+	}
+
+	/**
+	 * JobPosting for an open job (Google's required properties: title,
+	 * description, datePosted, hiringOrganization, jobLocation). Nothing at all
+	 * once the job is closed, so search engines drop an expired posting.
+	 *
+	 * @param int   $id   Post ID.
+	 * @param array $base Shared properties (context, name, url, image).
+	 * @return array
+	 */
+	private static function job_posting( $id, $base ) {
+		if ( ! class_exists( 'MCM_Job' ) || ! MCM_Job::is_accepting( MCM_Job::status( $id ) ) ) {
+			return array();
+		}
+
+		$post = get_post( $id );
+		// Block-editor comments are markup noise, not description.
+		$desc = $post ? trim( (string) preg_replace( '/<!--.*?-->/s', '', wp_kses_post( $post->post_content ) ) ) : '';
+		if ( '' === $desc ) {
+			$desc = isset( $base['description'] ) ? $base['description'] : wp_strip_all_tags( get_the_title( $id ) );
+		}
+		$lh  = MCM_Query::letterhead();
+		$org = array(
+			'@type'  => 'CollegeOrUniversity',
+			'name'   => $lh['org'],
+			'sameAs' => home_url( '/' ),
+		);
+		if ( $lh['logo'] ) {
+			$org['logo'] = $lh['logo'];
+		}
+
+		$address = array( '@type' => 'PostalAddress' );
+		if ( $lh['address'] ) {
+			$address['streetAddress'] = $lh['address'];
+		}
+		/**
+		 * ISO 3166-1 country code for the job location (default PK).
+		 *
+		 * @param string $country Country code.
+		 * @param int    $id      Job post ID.
+		 */
+		$country = (string) apply_filters( 'mcm_job_address_country', 'PK', $id );
+		if ( '' !== $country ) {
+			$address['addressCountry'] = $country;
+		}
+
+		$out                       = $base;
+		$out['@type']              = 'JobPosting';
+		$out['title']              = wp_strip_all_tags( get_the_title( $id ) );
+		$out['description']        = $desc;
+		$out['datePosted']         = MCM_Job::publish_date( $id );
+		$out['hiringOrganization'] = $org;
+		$out['jobLocation']        = array(
+			'@type'   => 'Place',
+			'address' => $address,
+		);
+		unset( $out['name'] );
+
+		$deadline = MCM_Job::effective_deadline( $id );
+		if ( $deadline ) {
+			$out['validThrough'] = $deadline->format( 'c' ); // ISO 8601 with offset.
+		}
+
+		$map  = array(
+			'Regular'    => 'FULL_TIME',
+			'Contract'   => 'CONTRACTOR',
+			'Ad-hoc'     => 'CONTRACTOR',
+			'Visiting'   => 'PART_TIME',
+			'Internship' => 'INTERN',
+		);
+		$kind = MCM_Safe::meta( $id, 'mcm_job_type' );
+		if ( isset( $map[ $kind ] ) ) {
+			$out['employmentType'] = $map[ $kind ];
+		}
+
+		$posts = absint( MCM_Safe::meta( $id, 'mcm_job_posts' ) );
+		if ( $posts > 0 ) {
+			$out['totalJobOpenings'] = $posts;
+		}
+
+		return $out;
 	}
 
 	/**
