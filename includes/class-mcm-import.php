@@ -35,8 +35,24 @@ class MCM_Import {
 	 */
 	private static function csv_safe( $value ) {
 		$value = (string) $value;
-		if ( '' !== $value && in_array( $value[0], array( '=', '+', '-', '@', "	", "" ), true ) ) {
+		if ( '' !== $value && in_array( $value[0], array( '=', '+', '-', '@', "\t", "\r" ), true ) ) {
 			return "'" . $value;
+		}
+		return $value;
+	}
+
+	/**
+	 * Undo csv_safe() on import: drop ONE leading apostrophe when it guards a
+	 * formula character, so "+92-300…" or "-5" survive export → re-import.
+	 * A deliberate apostrophe before any other character is kept.
+	 *
+	 * @param string $value Cell value.
+	 * @return string
+	 */
+	private static function csv_unsafe( $value ) {
+		$value = (string) $value;
+		if ( strlen( $value ) > 1 && "'" === $value[0] && in_array( $value[1], array( '=', '+', '-', '@', "\t", "\r" ), true ) ) {
+			return substr( $value, 1 );
 		}
 		return $value;
 	}
@@ -408,7 +424,7 @@ class MCM_Import {
 
 			$data = array();
 			foreach ( $header as $i => $col ) {
-				$data[ $col ] = isset( $row[ $i ] ) ? trim( (string) $row[ $i ] ) : '';
+				$data[ $col ] = isset( $row[ $i ] ) ? self::csv_unsafe( trim( (string) $row[ $i ] ) ) : '';
 			}
 
 			$title = isset( $data['title'] ) ? $data['title'] : '';
