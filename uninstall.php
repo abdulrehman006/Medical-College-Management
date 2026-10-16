@@ -26,6 +26,7 @@ function mcm_uninstall_site() {
 		'mcm_version',
 		'mcm_program_migrated',
 		'mcm_error_log',
+		'mcm_dates_migration',
 	);
 	foreach ( $options as $option ) {
 		delete_option( $option );
@@ -33,6 +34,7 @@ function mcm_uninstall_site() {
 
 	delete_transient( 'mcm_notice_feed' );
 	delete_transient( 'mcm_health_alert' );
+	delete_transient( 'mcm_dates_migration_notice' );
 
 	// Remove the student capabilities from every role so none are orphaned.
 	if ( class_exists( 'MCM_Caps' ) ) {

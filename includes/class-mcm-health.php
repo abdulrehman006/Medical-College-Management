@@ -79,6 +79,7 @@ class MCM_Health {
 			'mcm_errors'     => __( 'Medical College Manager: recent errors', 'medical-college-manager' ),
 			'mcm_timezone'   => __( 'Medical College Manager: site timezone', 'medical-college-manager' ),
 			'mcm_permalinks' => __( 'Medical College Manager: permalinks', 'medical-college-manager' ),
+			'mcm_dates'      => __( 'Medical College Manager: unreadable dates', 'medical-college-manager' ),
 		);
 		foreach ( $own as $key => $label ) {
 			$tests['direct'][ $key ] = array(
@@ -218,6 +219,86 @@ class MCM_Health {
 			'recommended',
 			__( 'Site timezone is UTC', 'medical-college-manager' ),
 			__( 'Tender, notice and other deadlines are checked in the site timezone, which is still UTC. Set your city (e.g. Karachi) in Settings → General so items close at local midnight.', 'medical-college-manager' )
+		);
+	}
+
+	/**
+	 * Site Health test: stored dates and times the plugin cannot read, with edit links.
+	 *
+	 * @return array
+	 */
+	public static function test_dates() {
+		if ( ! class_exists( 'MCM_Upgrade' ) || ! class_exists( 'MCM_Meta' ) ) {
+			return self::result( 'mcm_dates', 'good', __( 'Date check not available', 'medical-college-manager' ), __( 'The date check module is not running.', 'medical-college-manager' ) );
+		}
+
+		// Read-only scan: always reflects the data as it is now, so the list
+		// shrinks as soon as an entry is fixed.
+		$scan   = MCM_Upgrade::scan_dates( false );
+		$record = get_option( MCM_Upgrade::DATES_OPTION );
+		$ran    = '';
+		if ( is_array( $record ) && isset( $record['converted'], $record['time'] ) ) {
+			$ran = sprintf(
+				/* translators: 1: number of values converted, 2: date of the upgrade. */
+				__( 'The 1.30.2 upgrade converted %1$d stored dates/times to the standard format on %2$s.', 'medical-college-manager' ),
+				(int) $record['converted'],
+				wp_date( get_option( 'date_format' ), (int) $record['time'] )
+			);
+		}
+
+		if ( ! $scan['unreadable'] && ! $scan['convertible'] ) {
+			return self::result(
+				'mcm_dates',
+				'good',
+				__( 'All stored dates and times are readable', 'medical-college-manager' ),
+				trim(
+					sprintf(
+						/* translators: %d: number of values checked. */
+						__( '%d stored dates and times checked.', 'medical-college-manager' ),
+						$scan['scanned']
+					) . ' ' . $ran
+				)
+			);
+		}
+
+		$rows = '';
+		foreach ( array_slice( $scan['unreadable'], 0, 100 ) as $item ) {
+			$type  = get_post_type_object( $item['type'] );
+			$field = MCM_Meta::fields();
+			$label = isset( $field[ $item['type'] ]['fields'][ $item['field'] ]['label'] ) ? $field[ $item['type'] ]['fields'][ $item['field'] ]['label'] : $item['field'];
+			$rows .= '<tr><td><a href="' . esc_url( admin_url( 'post.php?post=' . (int) $item['post_id'] . '&action=edit' ) ) . '">' . esc_html( get_the_title( $item['post_id'] ) ? get_the_title( $item['post_id'] ) : '#' . $item['post_id'] ) . '</a></td>'
+				. '<td>' . esc_html( $type ? $type->labels->singular_name : $item['type'] ) . '</td>'
+				. '<td>' . esc_html( $label ) . '</td>'
+				. '<td><code>' . esc_html( $item['value'] ) . '</code></td></tr>';
+		}
+		$table = '';
+		if ( $rows ) {
+			$table = '<table class="widefat striped" style="margin-top:8px;"><thead><tr><th>' . esc_html__( 'Entry', 'medical-college-manager' ) . '</th><th>' . esc_html__( 'Type', 'medical-college-manager' ) . '</th><th>' . esc_html__( 'Field', 'medical-college-manager' ) . '</th><th>' . esc_html__( 'Stored value', 'medical-college-manager' ) . '</th></tr></thead><tbody>' . $rows . '</tbody></table>';
+			if ( count( $scan['unreadable'] ) > 100 ) {
+				/* translators: %d: number of further items not listed. */
+				$table .= '<p>' . esc_html( sprintf( __( '…and %d more.', 'medical-college-manager' ), count( $scan['unreadable'] ) - 100 ) ) . '</p>';
+			}
+		}
+		if ( $scan['convertible'] ) {
+			$table .= '<p>' . esc_html(
+				sprintf(
+					/* translators: %d: number of values. */
+					_n( '%d further value is readable but not yet in the standard format; it is corrected the next time the entry is saved.', '%d further values are readable but not yet in the standard format; they are corrected the next time each entry is saved.', $scan['convertible'], 'medical-college-manager' ),
+					$scan['convertible']
+				)
+			) . '</p>';
+		}
+
+		return self::result(
+			'mcm_dates',
+			'recommended',
+			sprintf(
+				/* translators: %d: number of unreadable values. */
+				_n( '%d stored date or time cannot be read', '%d stored dates or times cannot be read', max( 1, count( $scan['unreadable'] ) ), 'medical-college-manager' ),
+				count( $scan['unreadable'] )
+			),
+			trim( __( 'These values were left unchanged. Until they are fixed, the entries may be hidden (for example an expired-looking tender) or sorted in the wrong place. Open each entry and enter the date again, e.g. 15/10/2026, or the time, e.g. 14:30.', 'medical-college-manager' ) . ' ' . $ran ),
+			$table
 		);
 	}
 

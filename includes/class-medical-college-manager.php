@@ -162,6 +162,10 @@ final class Medical_College_Manager {
 		if ( class_exists( 'MCM_Program' ) ) {
 			MCM_Safe::run( array( 'MCM_Program', 'migrate' ), 'upgrade: program migration' );
 		}
+		// 1.30.2: normalise dates/times saved before validation existed (once).
+		if ( class_exists( 'MCM_Upgrade' ) ) {
+			MCM_Safe::run( array( 'MCM_Upgrade', 'maybe_migrate_dates' ), 'upgrade: date normalisation' );
+		}
 		update_option( 'mcm_version', MCM_VERSION );
 	}
 

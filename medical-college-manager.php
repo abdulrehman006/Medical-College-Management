@@ -72,6 +72,7 @@ function mcm_modules() {
 	return array(
 		'class-mcm-cpt.php'         => 'MCM_CPT',
 		'class-mcm-meta.php'        => 'MCM_Meta',
+		'class-mcm-upgrade.php'     => 'MCM_Upgrade',
 		'class-mcm-settings.php'    => 'MCM_Settings',
 		'class-mcm-assets.php'      => 'MCM_Assets',
 		'class-mcm-query.php'       => '',
@@ -165,6 +166,9 @@ function mcm_activate() {
 
 		MCM_Caps::grant();
 		MCM_Program::migrate();
+
+		require_once MCM_PATH . 'includes/class-mcm-upgrade.php';
+		MCM_Upgrade::maybe_migrate_dates();
 
 		update_option( 'mcm_version', MCM_VERSION );
 		flush_rewrite_rules();

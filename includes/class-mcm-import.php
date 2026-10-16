@@ -461,7 +461,7 @@ class MCM_Import {
 			}
 			$more = count( $result['errors'] ) - 20;
 			if ( $more > 0 ) {
-				/* translators: %d: number of further errors not listed. */
+				/* translators: %d: number of further items not listed. */
 				$html .= '<li>' . esc_html( sprintf( __( '…and %d more.', 'medical-college-manager' ), $more ) ) . '</li>';
 			}
 			$html .= '</ul>';

@@ -306,6 +306,19 @@ Reliability and hardening release. Nothing a visitor sees changes unless it was 
 * Stored values that are lists instead of text can no longer break a page.
 * Clean-up: duplicate import keys and dead code removed; uninstall now removes
   every option, transient and capability on every site of a network.
+* Fixed: after a live search or filter on a paginated list (archive pages, or a
+  shortcode with paginate="yes"), the pager disappeared, so results beyond the
+  first page could not be reached and Print printed only one page. The pager
+  now stays and loads pages in place with the filters kept, and Print always
+  prints the whole list.
+* One-time upgrade: dates and times saved by older versions in another format
+  (e.g. 15/10/2026, 2:30 PM) are converted to the standard format, so expiry
+  and sorting work on them. Values that cannot be read are left unchanged and
+  listed under Tools > Site Health > "Unreadable dates" with edit links. It
+  runs in the background (first admin page or WP-Cron), never during a
+  visitor's page load.
+* If a part of the plugin is switched off after an error, its shortcodes show
+  nothing to visitors instead of raw [shortcode] text.
 
 = 1.30.1 =
 Security hardening.
@@ -318,4 +331,4 @@ Security hardening.
 * Added a directory-listing guard to /languages/.
 
 = Earlier versions =
-See changelog.txt in the plugin folder for 1.30.0 and every release before it.
+See changelog.txt in the plugin folder for the complete history.
