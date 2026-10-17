@@ -67,6 +67,8 @@ class MCM_Meta {
 				return sanitize_textarea_field( $raw );
 			case 'number':
 				return is_numeric( $raw ) ? $raw + 0 : '';
+			case 'gender':
+				return self::normalize_gender( $raw );
 			default:
 				return sanitize_text_field( $raw );
 		}
@@ -150,7 +152,33 @@ class MCM_Meta {
 		if ( 'time' === $type ) {
 			return false !== self::parse_time( $value );
 		}
+		if ( 'gender' === $type ) {
+			return '' !== self::normalize_gender( $value );
+		}
 		return true;
+	}
+
+	/**
+	 * Canonical gender value: "Male", "Female", "Other" or '' when not recognised.
+	 * Accepts any case and the usual short forms (M / F / O, man / woman), so
+	 * CSV files and REST clients cannot store a value the photo logic ignores.
+	 *
+	 * @param mixed $raw Raw value.
+	 * @return string
+	 */
+	public static function normalize_gender( $raw ) {
+		$map = array(
+			'male'   => 'Male',
+			'm'      => 'Male',
+			'man'    => 'Male',
+			'female' => 'Female',
+			'f'      => 'Female',
+			'woman'  => 'Female',
+			'other'  => 'Other',
+			'o'      => 'Other',
+		);
+		$key = strtolower( trim( MCM_Safe::str( $raw ) ) );
+		return isset( $map[ $key ] ) ? $map[ $key ] : '';
 	}
 
 	/**
@@ -246,7 +274,7 @@ class MCM_Meta {
 					array(
 						'type'              => self::rest_type( $type ),
 						'single'            => true,
-						'show_in_rest'      => $in_rest,
+						'show_in_rest'      => $in_rest && ( ! isset( $field['rest'] ) || false !== $field['rest'] ),
 						'sanitize_callback' => function ( $value ) use ( $type ) {
 							return self::sanitize_value( $type, $value );
 						},
@@ -395,6 +423,15 @@ class MCM_Meta {
 						'label' => __( 'Joining / Appointment Date', 'medical-college-manager' ),
 						'type'  => 'date',
 					),
+					'mcm_gender'         => array(
+						'label'   => __( 'Gender', 'medical-college-manager' ),
+						'type'    => 'gender',
+						'options' => array( 'Male', 'Female' ),
+						// Never sent through the REST API: staff profiles are public,
+						// their gender is not. Only used to pick the default photo.
+						'rest'    => false,
+						'desc'    => __( 'Not shown on the website. Used only to choose the male or female default photo when no photo is uploaded (College Manager → Settings).', 'medical-college-manager' ),
+					),
 					'mcm_opd_days'       => array(
 						'label' => __( 'OPD / Available Days', 'medical-college-manager' ),
 						'type'  => 'text',
@@ -447,6 +484,15 @@ class MCM_Meta {
 					'mcm_joining_date'   => array(
 						'label' => __( 'Joining / Appointment Date', 'medical-college-manager' ),
 						'type'  => 'date',
+					),
+					'mcm_gender'         => array(
+						'label'   => __( 'Gender', 'medical-college-manager' ),
+						'type'    => 'gender',
+						'options' => array( 'Male', 'Female' ),
+						// Never sent through the REST API: staff profiles are public,
+						// their gender is not. Only used to pick the default photo.
+						'rest'    => false,
+						'desc'    => __( 'Not shown on the website. Used only to choose the male or female default photo when no photo is uploaded (College Manager → Settings).', 'medical-college-manager' ),
 					),
 					'mcm_phone'          => array(
 						'label' => __( 'Phone', 'medical-college-manager' ),
@@ -847,7 +893,7 @@ class MCM_Meta {
 					),
 					'mcm_gender'         => array(
 						'label'   => __( 'Gender', 'medical-college-manager' ),
-						'type'    => 'select',
+						'type'    => 'gender',
 						'options' => array( 'Male', 'Female', 'Other' ),
 					),
 					'mcm_dob'            => array(
@@ -923,6 +969,8 @@ class MCM_Meta {
 				$shown = self::parse_date( $value );
 			} elseif ( 'time' === $field['type'] && false !== self::parse_time( $value ) ) {
 				$shown = self::parse_time( $value );
+			} elseif ( 'gender' === $field['type'] && '' !== self::normalize_gender( $value ) ) {
+				$shown = self::normalize_gender( $value );
 			}
 			echo '<p class="mcm-meta-field">';
 			printf( '<label for="%1$s"><strong>%2$s</strong></label><br/>', esc_attr( $key ), esc_html( $field['label'] ) );
@@ -933,10 +981,14 @@ class MCM_Meta {
 					break;
 
 				case 'select':
+				case 'gender':
 					printf( '<select id="%1$s" name="%1$s" style="min-width:220px;">', esc_attr( $key ) );
 					echo '<option value="">' . esc_html__( '— Select —', 'medical-college-manager' ) . '</option>';
 					// A field's 'default' is pre-selected while nothing is stored.
 					$pick = ( '' === $value && isset( $field['default'] ) ) ? $field['default'] : $value;
+					if ( 'gender' === $field['type'] ) {
+						$pick = self::normalize_gender( $pick ); // Older records may hold "male" or "M".
+					}
 					foreach ( $field['options'] as $opt ) {
 						printf( '<option value="%1$s" %2$s>%1$s</option>', esc_attr( $opt ), selected( $pick, $opt, false ) );
 					}
@@ -980,8 +1032,11 @@ class MCM_Meta {
 					'<br/><span class="mcm-field-error" style="color:#b32d2e;">%s</span>',
 					esc_html(
 						sprintf(
-							/* translators: %s: the stored value. */
-							__( 'Stored value "%s" is not a valid date/time, so this entry may be hidden or sorted wrongly. Please enter it again.', 'medical-college-manager' ),
+							'gender' === $field['type']
+								/* translators: %s: the stored value. */
+								? __( 'Stored value "%s" is not a recognised gender, so the general default photo is used. Choose a value and click Update.', 'medical-college-manager' )
+								/* translators: %s: the stored value. */
+								: __( 'Stored value "%s" is not a valid date/time, so this entry may be hidden or sorted wrongly. Please enter it again.', 'medical-college-manager' ),
 							$value
 						)
 					)

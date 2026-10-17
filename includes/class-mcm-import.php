@@ -224,7 +224,7 @@ class MCM_Import {
 				),
 			),
 			'mcm_consultant'  => array(
-				'meta' => array( 'designation', 'qualifications', 'experience', 'opd_days', 'opd_time', 'phone', 'email', 'linkedin', 'joining_date', 'orcid', 'scholar', 'pubmed' ),
+				'meta' => array( 'designation', 'qualifications', 'experience', 'opd_days', 'opd_time', 'phone', 'email', 'linkedin', 'joining_date', 'orcid', 'scholar', 'pubmed', 'gender' ),
 				'tax'  => array(
 					'department'    => 'mcm_department',
 					'specialty'     => 'mcm_specialty',
@@ -233,7 +233,7 @@ class MCM_Import {
 				),
 			),
 			'mcm_team'        => array(
-				'meta' => array( 'designation', 'qualifications', 'experience', 'phone', 'email', 'linkedin', 'joining_date', 'orcid', 'scholar', 'pubmed' ),
+				'meta' => array( 'designation', 'qualifications', 'experience', 'phone', 'email', 'linkedin', 'joining_date', 'orcid', 'scholar', 'pubmed', 'gender' ),
 				'tax'  => array(
 					'department'    => 'mcm_department',
 					'specialty'     => 'mcm_specialty',
@@ -603,6 +603,11 @@ class MCM_Import {
 			foreach ( $meta_keys as $mk ) {
 				$ftype = MCM_Meta::field_type( $type, self::meta_key_for( $type, $mk ) );
 				if ( isset( $data[ $mk ] ) && '' !== $data[ $mk ] && ! MCM_Meta::is_valid( $ftype, $data[ $mk ] ) ) {
+					if ( 'gender' === $ftype ) {
+						/* translators: 1: CSV row number, 2: column name, 3: the value. */
+						$bad = sprintf( __( 'Row %1$d skipped: "%2$s" value "%3$s" is not recognised (use Male or Female, or leave it empty).', 'medical-college-manager' ), $line, $mk, $data[ $mk ] );
+						break;
+					}
 					$bad = 'date' === $ftype
 						/* translators: 1: CSV row number, 2: column name, 3: the value. */
 						? sprintf( __( 'Row %1$d skipped: "%2$s" value "%3$s" is not a valid date (use 15/10/2026 or 2026-10-15).', 'medical-college-manager' ), $line, $mk, $data[ $mk ] )
