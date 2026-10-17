@@ -178,12 +178,12 @@
    not the [mcm_single] two-column grid) — keep it from going full-bleed. */
 .mcm-single-media.mcm-wrap{ margin:0 auto 24px; }
 .mcm-single-media.mcm-wrap img.mcm-single-img{
-	width:100%; height:auto; max-height:460px; object-fit:cover;
+	width:100%; height:auto; max-height:360px; object-fit:cover; /* display standard §3 */
 	border-radius: var(--mcm-radius, 12px); display:block;
 }
 @media (max-width:600px){
 	.mcm-single-media.mcm-wrap{ margin-bottom:16px; }
-	.mcm-single-media.mcm-wrap img.mcm-single-img{ max-height:260px; }
+	.mcm-single-media.mcm-wrap img.mcm-single-img{ max-height:220px; }
 }
 .mcm-single-title{ margin:0 0 8px; color: var(--mcm-text, #1f2933); }
 .mcm-single-content{ margin-top:12px; }
@@ -221,7 +221,9 @@
 .mcm-print-btn:hover{ background: var(--mcm-primary, #0a6b5d); color:#fff; }
 
 /* ---------- Table view ---------- */
-.mcm-table-wrap{ overflow-x:auto; border:1px solid var(--mcm-border, #e5e7eb); border-radius: var(--mcm-radius, 12px); }
+.mcm-table-link{ color:var(--mcm-primary, #0a6b5d); font-weight:600; text-decoration:none; }
+.mcm-table-link:hover, .mcm-table-link:focus{ text-decoration:underline; }
+.mcm-table-wrap{ border:1px solid var(--mcm-border, #e5e7eb); border-radius: var(--mcm-radius, 12px); }
 .mcm-table{ width:100%; border-collapse:collapse; background: var(--mcm-card-bg, #fff); font-size:14px; }
 .mcm-table thead th{
 	text-align:left;
@@ -305,6 +307,8 @@
 	flex-direction:column;
 	gap:5px;
 }
+/* An odd last cell spans both columns: never an empty grey cell (display standard §3). */
+.mcm-sd-grid > .mcm-sd-item:last-child:nth-child(odd){ grid-column:1 / -1; }
 .mcm-sd-label{ font-size:11px; text-transform:uppercase; letter-spacing:.6px; color:var(--mcm-muted, #6b7280); font-weight:700; }
 .mcm-sd-value{ font-size:15px; color:var(--mcm-text, #1f2933); line-height:1.5; }
 .mcm-sd-actions{ display:flex; flex-wrap:wrap; gap:12px; margin-top:24px; }
@@ -704,8 +708,18 @@
 .mcm-list-ph{ width:72px; height:72px; border-radius:8px; flex:0 0 auto; }
 .mcm-list-ph svg{ width:56%; }
 .mcm-single-ph{ width:100%; aspect-ratio:1 / 1; border-radius:var(--mcm-radius, 12px); }
-.mcm-single-avatar{ max-width:220px; margin:0 auto 22px; }
-.mcm-single-avatar img.mcm-single-img{ width:100%; aspect-ratio:1 / 1; object-fit:cover; border-radius:var(--mcm-radius, 12px); display:block; }
+/* People: photo beside the details (display standard §3). Same 4:5 frame for an
+   own photo and a default photo; stacks above the details on phones. */
+.mcm-single-meta--profile{ display:grid; grid-template-columns:260px minmax(0,1fr); gap:32px; align-items:start; }
+.mcm-single-meta-main{ min-width:0; }
+.mcm-single-avatar{ margin:0; }
+.mcm-single-avatar img.mcm-single-img{ width:100%; aspect-ratio:4 / 5; object-fit:cover; border-radius:var(--mcm-radius, 12px); display:block; }
+.mcm-single-avatar .mcm-single-ph{ display:flex; align-items:center; justify-content:center; width:100%; aspect-ratio:4 / 5; border-radius:var(--mcm-radius, 12px); background:var(--mcm-card-bg, #fff); border:1px solid var(--mcm-border, #e5e7eb); }
+.mcm-single-avatar .mcm-single-ph svg{ width:45%; height:auto; fill:#9ca3af; }
+@media (max-width:760px){
+	.mcm-single-meta--profile{ grid-template-columns:1fr; gap:20px; }
+	.mcm-single-avatar{ max-width:240px; }
+}
 
 /* ---------- Publications (citation list) ---------- */
 .mcm-pub-list{ list-style:none; margin:0; padding:0; counter-reset:mcmpub; }

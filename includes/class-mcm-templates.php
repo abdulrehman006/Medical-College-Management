@@ -469,20 +469,41 @@ class MCM_Templates {
 		// show one for a CPT — many only do it for posts — so the plugin makes
 		// sure a set image is never simply invisible. See should_show_image()
 		// for how a theme that already rendered it avoids a duplicate.
-		$media = '';
+		$media  = '';
+		$person = in_array( $type, array( 'mcm_consultant', 'mcm_team' ), true );
 		// Jobs show their advertisement (the featured image) inside the details
-		// panel, linked to full size, so it is not repeated here.
-		if ( 'mcm_job' !== $type && has_post_thumbnail( $id ) && self::should_show_image( $id ) ) {
+		// panel, linked to full size, so it is not repeated here. People get a
+		// profile photo beside their details instead of a banner, and timetable
+		// entries are schedule rows with no banner at all (display standard §3).
+		if ( ! $person && ! in_array( $type, array( 'mcm_job', 'mcm_timetable' ), true ) && has_post_thumbnail( $id ) && self::should_show_image( $id ) ) {
 			$media = '<div class="mcm-wrap mcm-single-media">'
 				. get_the_post_thumbnail( $id, 'large', array( 'class' => 'mcm-single-img' ) )
 				. '</div>';
 		}
 
-		// For people with no featured image, show the default avatar at the top
-		// of the details card so the single page never looks photo-less.
+		// People: one profile layout, photo beside the details — the person's own
+		// photo, or the default photo (male / female / general / silhouette). The
+		// same frame either way, so a profile never changes shape because a photo
+		// is missing. When the theme already printed the photo, it is not repeated.
 		$avatar = '';
-		if ( MCM_Query::is_person( $type ) && ! has_post_thumbnail( $id ) ) {
-			$avatar = '<div class="mcm-single-avatar">' . MCM_Query::default_avatar( 'mcm-single-img', 'mcm-single-ph', $id, 'large' ) . '</div>';
+		if ( $person ) {
+			if ( has_post_thumbnail( $id ) ) {
+				if ( self::should_show_image( $id ) ) {
+					$avatar = get_the_post_thumbnail(
+						$id,
+						'medium_large',
+						array(
+							'class' => 'mcm-single-img',
+							'alt'   => esc_attr( get_the_title( $id ) ),
+						)
+					);
+				}
+			} else {
+				$avatar = MCM_Query::default_avatar( 'mcm-single-img', 'mcm-single-ph', $id, 'medium_large' );
+			}
+			if ( '' !== $avatar ) {
+				$avatar = '<div class="mcm-single-avatar">' . $avatar . '</div>';
+			}
 		}
 
 		// A Program page lists its own curriculum, schedule and intake (matched
@@ -505,7 +526,8 @@ class MCM_Templates {
 			return $stream_embed . $media . $content . $related;
 		}
 
-		return $stream_embed . $media . $content . '<div class="mcm-wrap mcm-single-meta">' . $avatar . $details . '</div>' . $related;
+		$meta_class = '' !== $avatar ? 'mcm-wrap mcm-single-meta mcm-single-meta--profile' : 'mcm-wrap mcm-single-meta';
+		return $stream_embed . $media . $content . '<div class="' . esc_attr( $meta_class ) . '">' . $avatar . '<div class="mcm-single-meta-main">' . $details . '</div></div>' . $related;
 	}
 
 	/**

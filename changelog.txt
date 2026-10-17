@@ -18,6 +18,23 @@ Medical College Manager — complete changelog.
 * Privacy: the personal-data exporter and eraser now include the gender of
   consultants and team members.
 * Developers: mcm_default_avatar_url now also receives the post ID and gender.
+* Fixed: the table view of notices, tenders, scholarships, publications,
+  research projects and policies showed only a Title column. Each now has its
+  own columns (e.g. tenders: reference, category, closing date, department).
+* Fixed: consultants and team members looked different depending on where
+  they were shown. They now use the same profile card (photo, name, specialty,
+  designation, department, one button) in shortcode grids, Elementor widgets,
+  department pages and archives.
+* Fixed: a person's page showed their photo as a full-width banner, or a
+  full-width placeholder box when there was no photo. People now get a profile
+  layout: the photo (or default photo) beside their details.
+* Fixed: an odd number of details left an empty grey box on single pages; the
+  last item now spans the full width. Featured images on single pages are at
+  most 360 px high (220 px on phones) and timetable entries show no banner.
+* Table titles now link to the entry's page (students stay plain text).
+* The same link label in grid, list and directory views ("View details",
+  "Meet the Consultant", "View Profile", "View & Apply" for jobs); developers
+  can change it with the mcm_link_label filter.
 
 = 1.31.0 =
 New: Jobs / Vacancies.

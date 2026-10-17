@@ -1267,6 +1267,30 @@ class MCM_Query {
 	}
 
 	/**
+	 * The link label for a type — the same in grid, list and directory views
+	 * (display standard §2).
+	 *
+	 * @param string $type Post type.
+	 * @return string
+	 */
+	public static function link_label( $type ) {
+		switch ( $type ) {
+			case 'mcm_consultant':
+				$label = __( 'Meet the Consultant', 'medical-college-manager' );
+				break;
+			case 'mcm_team':
+				$label = __( 'View Profile', 'medical-college-manager' );
+				break;
+			case 'mcm_job':
+				$label = __( 'View & Apply', 'medical-college-manager' );
+				break;
+			default:
+				$label = __( 'View details', 'medical-college-manager' );
+		}
+		return (string) apply_filters( 'mcm_link_label', $label, $type );
+	}
+
+	/**
 	 * Directory card: photo, name, specialty, designation, department and button.
 	 *
 	 * @param int $id Post ID.
@@ -1290,13 +1314,7 @@ class MCM_Query {
 		// belongs on the card under the photo, next to the name.
 		$spec = self::cached_term_names( $id, 'mcm_specialty' );
 
-		if ( 'mcm_consultant' === $type ) {
-			$btn = __( 'Meet the Consultant', 'medical-college-manager' );
-		} elseif ( 'mcm_team' === $type ) {
-			$btn = __( 'View Profile', 'medical-college-manager' );
-		} else {
-			$btn = __( 'View details', 'medical-college-manager' );
-		}
+		$btn = self::link_label( $type );
 
 		ob_start();
 		?>
@@ -1553,7 +1571,13 @@ class MCM_Query {
 	 * @param int $id Post ID.
 	 */
 	public static function card( $id ) {
-		$type  = get_post_type( $id );
+		$type = get_post_type( $id );
+		// Display standard §2: a person looks the same in every grid — shortcode,
+		// Elementor widget, department page or archive — so people always get
+		// the profile card.
+		if ( in_array( $type, array( 'mcm_consultant', 'mcm_team' ), true ) ) {
+			return self::directory_card( $id );
+		}
 		$title = get_the_title( $id );
 		// Only link to a front-end single when the type is publicly viewable
 		// (students are private — render plain text instead of a 404 link).
@@ -1586,7 +1610,7 @@ class MCM_Query {
 					<p class="mcm-card-excerpt"><?php echo esc_html( wp_trim_words( $excerpt, 22 ) ); ?></p>
 				<?php endif; ?>
 				<?php if ( $link ) : ?>
-					<a class="mcm-card-link" href="<?php echo esc_url( $link ); ?>"><?php esc_html_e( 'View details', 'medical-college-manager' ); ?> &rarr;</a>
+					<a class="mcm-card-link" href="<?php echo esc_url( $link ); ?>"><?php echo esc_html( self::link_label( $type ) ); ?> &rarr;</a>
 				<?php endif; ?>
 			</div>
 		</article>
@@ -1626,7 +1650,7 @@ class MCM_Query {
 				<?php echo self::meta_lines( $id, $type ); // phpcs:ignore ?>
 			</div>
 			<?php if ( $link ) : ?>
-			<a class="mcm-list-link" href="<?php echo esc_url( $link ); ?>"><?php esc_html_e( 'View', 'medical-college-manager' ); ?> &rarr;</a>
+			<a class="mcm-list-link" href="<?php echo esc_url( $link ); ?>"><?php echo esc_html( self::link_label( $type ) ); ?> &rarr;</a>
 			<?php endif; ?>
 		</div>
 		<?php
@@ -1642,7 +1666,7 @@ class MCM_Query {
 	 */
 	public static function table_columns( $type ) {
 		$cols = array(
-			'mcm_timetable'  => array(
+			'mcm_timetable'   => array(
 				array( __( 'Day', 'medical-college-manager' ), 'meta', 'mcm_day' ),
 				array( __( 'Time', 'medical-college-manager' ), 'time', '' ),
 				array( __( 'Subject', 'medical-college-manager' ), 'meta', 'mcm_subject' ),
@@ -1651,7 +1675,7 @@ class MCM_Query {
 				array( __( 'Room', 'medical-college-manager' ), 'meta', 'mcm_room' ),
 				array( __( 'Session', 'medical-college-manager' ), 'tax', 'mcm_session' ),
 			),
-			'mcm_course'     => array(
+			'mcm_course'      => array(
 				array( __( 'Code', 'medical-college-manager' ), 'meta', 'mcm_course_code' ),
 				array( __( 'Course', 'medical-college-manager' ), 'title', '' ),
 				array( __( 'Department', 'medical-college-manager' ), 'tax', 'mcm_department' ),
@@ -1659,27 +1683,27 @@ class MCM_Query {
 				array( __( 'Credits', 'medical-college-manager' ), 'meta', 'mcm_credit_hours', 'center' ),
 				array( __( 'Semester', 'medical-college-manager' ), 'meta', 'mcm_semester' ),
 			),
-			'mcm_admission'  => array(
+			'mcm_admission'   => array(
 				array( __( 'Program', 'medical-college-manager' ), 'title', '' ),
 				array( __( 'Opens', 'medical-college-manager' ), 'date', 'mcm_open_date' ),
 				array( __( 'Closes', 'medical-college-manager' ), 'date', 'mcm_close_date' ),
 				array( __( 'Department', 'medical-college-manager' ), 'tax', 'mcm_department' ),
 				array( __( 'Fee', 'medical-college-manager' ), 'meta', 'mcm_fee' ),
 			),
-			'mcm_consultant' => array(
+			'mcm_consultant'  => array(
 				array( __( 'Name', 'medical-college-manager' ), 'title', '' ),
 				array( __( 'Designation', 'medical-college-manager' ), 'meta', 'mcm_designation' ),
 				array( __( 'Department', 'medical-college-manager' ), 'tax', 'mcm_department' ),
 				array( __( 'Specialty', 'medical-college-manager' ), 'tax', 'mcm_specialty' ),
 				array( __( 'OPD', 'medical-college-manager' ), 'meta', 'mcm_opd_days' ),
 			),
-			'mcm_team'       => array(
+			'mcm_team'        => array(
 				array( __( 'Name', 'medical-college-manager' ), 'title', '' ),
 				array( __( 'Designation', 'medical-college-manager' ), 'meta', 'mcm_designation' ),
 				array( __( 'Department', 'medical-college-manager' ), 'tax', 'mcm_department' ),
 				array( __( 'Specialty', 'medical-college-manager' ), 'tax', 'mcm_specialty' ),
 			),
-			'mcm_program'    => array(
+			'mcm_program'     => array(
 				array( __( 'Program', 'medical-college-manager' ), 'title', '' ),
 				array( __( 'Level', 'medical-college-manager' ), 'meta', 'mcm_degree_level' ),
 				array( __( 'Duration', 'medical-college-manager' ), 'meta', 'mcm_duration' ),
@@ -1687,14 +1711,14 @@ class MCM_Query {
 				array( __( 'Fees', 'medical-college-manager' ), 'meta', 'mcm_fees' ),
 				array( __( 'Seats', 'medical-college-manager' ), 'meta', 'mcm_intake' ),
 			),
-			'mcm_event'      => array(
+			'mcm_event'       => array(
 				array( __( 'Event', 'medical-college-manager' ), 'title', '' ),
 				array( __( 'Date', 'medical-college-manager' ), 'date', 'mcm_event_date' ),
 				array( __( 'Time', 'medical-college-manager' ), 'time', '' ),
 				array( __( 'Venue', 'medical-college-manager' ), 'meta', 'mcm_venue' ),
 				array( __( 'Department', 'medical-college-manager' ), 'tax', 'mcm_department' ),
 			),
-			'mcm_job'        => array(
+			'mcm_job'         => array(
 				array( __( 'Title', 'medical-college-manager' ), 'title', '' ),
 				array( __( 'Category', 'medical-college-manager' ), 'tax', 'mcm_job_cat' ),
 				array( __( 'Department', 'medical-college-manager' ), 'tax', 'mcm_department' ),
@@ -1702,11 +1726,55 @@ class MCM_Query {
 				array( __( 'Last date', 'medical-college-manager' ), 'job_last', '' ),
 				array( __( 'Status', 'medical-college-manager' ), 'job_status', '' ),
 			),
+			// Display standard §5: every public type has real columns (these six
+			// used to fall back to a Title-only table).
+			'mcm_notice'      => array(
+				array( __( 'Notice', 'medical-college-manager' ), 'title', '' ),
+				array( __( 'Category', 'medical-college-manager' ), 'tax', 'mcm_notice_cat' ),
+				array( __( 'Priority', 'medical-college-manager' ), 'meta', 'mcm_notice_priority' ),
+				array( __( 'Date', 'medical-college-manager' ), 'date', 'mcm_notice_date' ),
+				array( __( 'Department', 'medical-college-manager' ), 'tax', 'mcm_department' ),
+			),
+			'mcm_tender'      => array(
+				array( __( 'Tender', 'medical-college-manager' ), 'title', '' ),
+				array( __( 'Reference', 'medical-college-manager' ), 'meta', 'mcm_tender_ref' ),
+				array( __( 'Category', 'medical-college-manager' ), 'tax', 'mcm_tender_cat' ),
+				array( __( 'Closing date', 'medical-college-manager' ), 'date', 'mcm_tender_close' ),
+				array( __( 'Department', 'medical-college-manager' ), 'tax', 'mcm_department' ),
+			),
+			'mcm_scholarship' => array(
+				array( __( 'Scholarship', 'medical-college-manager' ), 'title', '' ),
+				array( __( 'Type', 'medical-college-manager' ), 'tax', 'mcm_scholarship_cat' ),
+				array( __( 'Amount', 'medical-college-manager' ), 'meta', 'mcm_scholarship_amount' ),
+				array( __( 'Deadline', 'medical-college-manager' ), 'date', 'mcm_scholarship_deadline' ),
+				array( __( 'Department', 'medical-college-manager' ), 'tax', 'mcm_department' ),
+			),
+			'mcm_publication' => array(
+				array( __( 'Title', 'medical-college-manager' ), 'title', '' ),
+				array( __( 'Journal', 'medical-college-manager' ), 'meta', 'mcm_pub_journal' ),
+				array( __( 'Year', 'medical-college-manager' ), 'meta', 'mcm_pub_year', 'center' ),
+				array( __( 'Type', 'medical-college-manager' ), 'meta', 'mcm_pub_type' ),
+				array( __( 'Department', 'medical-college-manager' ), 'tax', 'mcm_department' ),
+			),
+			'mcm_research'    => array(
+				array( __( 'Project', 'medical-college-manager' ), 'title', '' ),
+				array( __( 'Principal investigator', 'medical-college-manager' ), 'meta', 'mcm_res_pi' ),
+				array( __( 'Status', 'medical-college-manager' ), 'meta', 'mcm_res_status' ),
+				array( __( 'Research area', 'medical-college-manager' ), 'tax', 'mcm_research_area' ),
+				array( __( 'Department', 'medical-college-manager' ), 'tax', 'mcm_department' ),
+			),
+			'mcm_policy'      => array(
+				array( __( 'Policy', 'medical-college-manager' ), 'title', '' ),
+				array( __( 'Category', 'medical-college-manager' ), 'tax', 'mcm_policy_cat' ),
+				array( __( 'Issued by', 'medical-college-manager' ), 'meta', 'mcm_policy_issuer' ),
+				array( __( 'Reference', 'medical-college-manager' ), 'meta', 'mcm_policy_ref' ),
+				array( __( 'Effective', 'medical-college-manager' ), 'date', 'mcm_policy_date' ),
+			),
 			// PUBLIC-SAFE columns only. Contact details (email, phone), DOB,
 			// address, blood group, guardian and gender are deliberately absent —
 			// they are personal data and live only in wp-admin. Do not add them
 			// here: this table is reachable on a public page.
-			'mcm_student'    => array(
+			'mcm_student'     => array(
 				array( __( 'Name', 'medical-college-manager' ), 'title', '' ),
 				array( __( 'Student ID', 'medical-college-manager' ), 'meta', 'mcm_student_id' ),
 				array( __( 'PMDC No.', 'medical-college-manager' ), 'meta', 'mcm_roll_no' ),
@@ -1734,7 +1802,8 @@ class MCM_Query {
 	 * @param array    $a     Parsed attributes.
 	 */
 	public static function render_table( $query, $a ) {
-		$cols = self::table_columns( $a['type'] );
+		$cols        = self::table_columns( $a['type'] );
+		$title_links = 'mcm_student' !== $a['type'] && is_post_type_viewable( $a['type'] );
 
 		ob_start();
 		echo '<div class="mcm-table-wrap"><table class="mcm-table">';
@@ -1751,8 +1820,14 @@ class MCM_Query {
 				$id = get_the_ID();
 				echo '<tr>';
 				foreach ( $cols as $col ) {
-					$cls = isset( $col[3] ) ? ' class="mcm-col-' . esc_attr( $col[3] ) . '"' : '';
-					echo '<td data-label="' . esc_attr( $col[0] ) . '"' . $cls . '>' . esc_html( self::cell_value( $id, $col ) ) . '</td>'; // phpcs:ignore
+					$cls  = isset( $col[3] ) ? ' class="mcm-col-' . esc_attr( $col[3] ) . '"' : '';
+					$cell = esc_html( self::cell_value( $id, $col ) );
+					// Display standard §4: the title links to the single page for
+					// public types. Students (not publicly viewable) stay plain text.
+					if ( 'title' === $col[1] && '' !== $cell && $title_links ) {
+						$cell = '<a class="mcm-table-link" href="' . esc_url( get_permalink( $id ) ) . '">' . $cell . '</a>';
+					}
+					echo '<td data-label="' . esc_attr( $col[0] ) . '"' . $cls . '>' . $cell . '</td>'; // phpcs:ignore
 				}
 				echo '</tr>';
 			}
