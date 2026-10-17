@@ -68,6 +68,7 @@ class MCM_Privacy {
 						'mcm_designation' => __( 'Designation', 'medical-college-manager' ),
 						'mcm_email'       => __( 'Email', 'medical-college-manager' ),
 						'mcm_phone'       => __( 'Phone', 'medical-college-manager' ),
+						'mcm_gender'      => __( 'Gender', 'medical-college-manager' ),
 					),
 				),
 				'mcm_team'       => array(
@@ -79,6 +80,7 @@ class MCM_Privacy {
 						'mcm_email'       => __( 'Email', 'medical-college-manager' ),
 						'mcm_phone'       => __( 'Phone', 'medical-college-manager' ),
 						'mcm_linkedin'    => __( 'LinkedIn', 'medical-college-manager' ),
+						'mcm_gender'      => __( 'Gender', 'medical-college-manager' ),
 					),
 				),
 			)
