@@ -1,5 +1,19 @@
 Medical College Manager — complete changelog.
 
+= 1.32.0 (in development) =
+* New: Gender field (Male / Female) for consultants and team members. It is
+  never shown on the website and never sent through the REST API.
+* New: Settings → Default Photo — Male and Default Photo — Female. A person
+  without a photo now shows the photo for their gender, then the general
+  Default Profile Image, then the built-in silhouette. People whose gender is
+  not set look exactly as before.
+* Default photos chosen from the Media Library are now served at the right
+  size with srcset, width and height (faster, no layout shift).
+* CSV import/export: gender column for consultants and team (Male, Female,
+  M, F accepted; anything else skips the row with a message). Student gender
+  values are normalised the same way (Male / Female / Other).
+* Developers: mcm_default_avatar_url now also receives the post ID and gender.
+
 = 1.31.0 =
 New: Jobs / Vacancies.
 * New content type Jobs with Job Categories (Teaching Faculty, Clinical,

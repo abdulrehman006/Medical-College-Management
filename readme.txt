@@ -26,9 +26,13 @@ Post types & their taxonomies / fields:
                  Course Category.
 * Events       — Event Category, Department.     Fields: date, start/end time, venue, organizer, reg URL.
 * Consultants  — Department, Specialty, Faculty. Fields: designation, qualifications, experience,
-                                                          OPD days/time, phone, email.
+                                                          OPD days/time, phone, email, gender*.
 * Team         — Department, Specialty, Faculty. Fields: designation, qualifications, experience,
-                                                          phone, email, LinkedIn.
+                                                          phone, email, LinkedIn, gender*.
+
+  * Gender (Male / Female) is never shown on the website or sent through the REST
+    API. It only picks the male or female default photo for people without a photo
+    (College Manager → Settings → Default Photo — Male / Female).
 * Admissions   — Department, Session.            Fields: program name, open/close date, eligibility,
                                                           fee, apply URL.
 * Students     — Level (Graduate/Undergraduate), Fields: student ID, roll/registration no, email,
