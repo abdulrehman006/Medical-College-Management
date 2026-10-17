@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-10-17T09:34:15+00:00\n"
+"POT-Creation-Date: 2026-10-17T11:01:44+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: medical-college-manager\n"
@@ -21,8 +21,8 @@ msgstr ""
 #: includes/class-mcm-health.php:334
 #: includes/class-mcm-health.php:512
 #: includes/class-mcm-health.php:525
-#: includes/class-mcm-privacy.php:95
-#: includes/class-mcm-privacy.php:108
+#: includes/class-mcm-privacy.php:97
+#: includes/class-mcm-privacy.php:110
 #: includes/class-mcm-settings.php:136
 #: includes/class-mcm-upgrade.php:228
 msgid "Medical College Manager"
@@ -663,7 +663,7 @@ msgstr ""
 
 #. translators: %d: number of further items not listed.
 #: includes/class-mcm-health.php:279
-#: includes/class-mcm-import.php:513
+#: includes/class-mcm-import.php:538
 #, php-format
 msgid "…and %d more."
 msgstr ""
@@ -807,117 +807,139 @@ msgid_plural "%d rows have the same title as existing entries – tick \"Update 
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/class-mcm-import.php:551
+#. translators: %d: number of warnings.
+#: includes/class-mcm-import.php:508
+#, php-format
+msgid "%d warning (the row was imported)."
+msgid_plural "%d warnings (the rows were imported)."
+msgstr[0] ""
+msgstr[1] ""
+
+#: includes/class-mcm-import.php:514
+msgid "Skipped rows:"
+msgstr ""
+
+#: includes/class-mcm-import.php:515
+msgid "Warnings:"
+msgstr ""
+
+#: includes/class-mcm-import.php:575
 msgid "Could not read the file."
 msgstr ""
 
-#: includes/class-mcm-import.php:559
+#: includes/class-mcm-import.php:583
 msgid "The file is empty."
 msgstr ""
 
 #. translators: %d: CSV row number.
-#: includes/class-mcm-import.php:595
+#: includes/class-mcm-import.php:619
 #, php-format
 msgid "Row %d skipped (no title)."
 msgstr ""
 
 #. translators: 1: CSV row number, 2: column name, 3: the value.
-#: includes/class-mcm-import.php:608
-#, php-format
-msgid "Row %1$d skipped: \"%2$s\" value \"%3$s\" is not recognised (use Male or Female, or leave it empty)."
-msgstr ""
-
-#. translators: 1: CSV row number, 2: column name, 3: the value.
-#: includes/class-mcm-import.php:613
+#: includes/class-mcm-import.php:635
 #, php-format
 msgid "Row %1$d skipped: \"%2$s\" value \"%3$s\" is not a valid date (use 15/10/2026 or 2026-10-15)."
 msgstr ""
 
 #. translators: 1: CSV row number, 2: column name, 3: the value.
-#: includes/class-mcm-import.php:615
+#: includes/class-mcm-import.php:637
 #, php-format
 msgid "Row %1$d skipped: \"%2$s\" value \"%3$s\" is not a valid time (use 14:30 or 2:30 PM)."
 msgstr ""
 
 #. translators: %d: CSV row number.
-#: includes/class-mcm-import.php:659
+#: includes/class-mcm-import.php:681
 #, php-format
 msgid "Row %d failed."
 msgstr ""
 
-#: includes/class-mcm-import.php:896
-msgid "Medical College Manager — CSV Import / Export"
+#. translators: 1: CSV row number, 2: column name, 3: the value.
+#: includes/class-mcm-import.php:697
+#, php-format
+msgid "Row %1$d: %2$s '%3$s' not recognised – existing value kept."
 msgstr ""
 
-#: includes/class-mcm-import.php:899
-msgid "Import"
-msgstr ""
-
-#: includes/class-mcm-import.php:902
-msgid "Upload a CSV to bulk-create any content type. The first row must be the column headers. Departments, sessions, faculty and categories are created automatically from the values you provide (comma-separate multiple terms). Matching values are reused as one shared term, so content imported from different files links together automatically."
-msgstr ""
-
-#: includes/class-mcm-import.php:905
-msgid "Tip: import Timetable and Courses before Consultants/Team — a person whose name matches a Faculty entry is then auto-linked to the classes they teach. You can also add a \"faculty\" column to set this explicitly."
-msgstr ""
-
-#: includes/class-mcm-import.php:912
-#: includes/class-mcm-import.php:969
-msgid "Content Type"
-msgstr ""
-
-#: includes/class-mcm-import.php:922
-msgid "CSV File"
-msgstr ""
-
-#: includes/class-mcm-import.php:926
-msgid "Create As"
+#. translators: 1: CSV row number, 2: column name, 3: the value.
+#: includes/class-mcm-import.php:699
+#, php-format
+msgid "Row %1$d: %2$s '%3$s' not recognised – left blank."
 msgstr ""
 
 #: includes/class-mcm-import.php:929
+msgid "Medical College Manager — CSV Import / Export"
+msgstr ""
+
+#: includes/class-mcm-import.php:932
+msgid "Import"
+msgstr ""
+
+#: includes/class-mcm-import.php:935
+msgid "Upload a CSV to bulk-create any content type. The first row must be the column headers. Departments, sessions, faculty and categories are created automatically from the values you provide (comma-separate multiple terms). Matching values are reused as one shared term, so content imported from different files links together automatically."
+msgstr ""
+
+#: includes/class-mcm-import.php:938
+msgid "Tip: import Timetable and Courses before Consultants/Team — a person whose name matches a Faculty entry is then auto-linked to the classes they teach. You can also add a \"faculty\" column to set this explicitly."
+msgstr ""
+
+#: includes/class-mcm-import.php:945
+#: includes/class-mcm-import.php:1002
+msgid "Content Type"
+msgstr ""
+
+#: includes/class-mcm-import.php:955
+msgid "CSV File"
+msgstr ""
+
+#: includes/class-mcm-import.php:959
+msgid "Create As"
+msgstr ""
+
+#: includes/class-mcm-import.php:962
 #: includes/class-mcm-query.php:1914
 #: includes/class-mcm-query.php:2156
 #: includes/class-mcm-query.php:2240
 msgid "Published"
 msgstr ""
 
-#: includes/class-mcm-import.php:930
+#: includes/class-mcm-import.php:963
 msgid "Draft"
 msgstr ""
 
-#: includes/class-mcm-import.php:935
+#: includes/class-mcm-import.php:968
 msgid "Matching"
 msgstr ""
 
-#: includes/class-mcm-import.php:939
+#: includes/class-mcm-import.php:972
 msgid "Update existing entries with the same title"
 msgstr ""
 
-#: includes/class-mcm-import.php:941
+#: includes/class-mcm-import.php:974
 msgid "Rows with an \"id\" column (from an export) always update that exact entry. Leave this off when several entries legitimately share a title, such as timetable slots. Rows inside the same file are never merged."
 msgstr ""
 
-#: includes/class-mcm-import.php:945
+#: includes/class-mcm-import.php:978
 msgid "Import CSV"
 msgstr ""
 
-#: includes/class-mcm-import.php:949
+#: includes/class-mcm-import.php:982
 msgid "Sample CSV Templates"
 msgstr ""
 
-#: includes/class-mcm-import.php:950
+#: includes/class-mcm-import.php:983
 msgid "Download a ready-made sample for each type, fill it with your data, and upload it above."
 msgstr ""
 
-#: includes/class-mcm-import.php:963
+#: includes/class-mcm-import.php:996
 msgid "Export"
 msgstr ""
 
-#: includes/class-mcm-import.php:964
+#: includes/class-mcm-import.php:997
 msgid "Download every entry of a content type as a CSV — including its meta fields and its Departments / Sessions / Faculty / Categories. The columns match the import format, so you can export, edit in a spreadsheet, and re-import."
 msgstr ""
 
-#: includes/class-mcm-import.php:979
+#: includes/class-mcm-import.php:1012
 msgid "Export CSV"
 msgstr ""
 
@@ -1137,7 +1159,7 @@ msgstr ""
 #: includes/class-mcm-meta.php:411
 #: includes/class-mcm-meta.php:1145
 #: includes/class-mcm-privacy.php:68
-#: includes/class-mcm-privacy.php:78
+#: includes/class-mcm-privacy.php:79
 #: includes/class-mcm-query.php:1671
 #: includes/class-mcm-query.php:1678
 #: includes/class-mcm-query.php:2055
@@ -1165,6 +1187,8 @@ msgstr ""
 #: includes/class-mcm-meta.php:489
 #: includes/class-mcm-meta.php:895
 #: includes/class-mcm-privacy.php:54
+#: includes/class-mcm-privacy.php:71
+#: includes/class-mcm-privacy.php:83
 msgid "Gender"
 msgstr ""
 
@@ -1187,7 +1211,7 @@ msgstr ""
 #: includes/class-mcm-meta.php:883
 #: includes/class-mcm-privacy.php:51
 #: includes/class-mcm-privacy.php:70
-#: includes/class-mcm-privacy.php:80
+#: includes/class-mcm-privacy.php:81
 msgid "Phone"
 msgstr ""
 
@@ -1196,7 +1220,7 @@ msgstr ""
 #: includes/class-mcm-meta.php:879
 #: includes/class-mcm-privacy.php:50
 #: includes/class-mcm-privacy.php:69
-#: includes/class-mcm-privacy.php:79
+#: includes/class-mcm-privacy.php:80
 #: includes/class-mcm-query.php:2075
 msgid "Email"
 msgstr ""
@@ -1798,17 +1822,17 @@ msgstr ""
 msgid "Consultant Profile"
 msgstr ""
 
-#: includes/class-mcm-privacy.php:74
+#: includes/class-mcm-privacy.php:75
 msgid "Team Profile"
 msgstr ""
 
-#: includes/class-mcm-privacy.php:81
+#: includes/class-mcm-privacy.php:82
 #: includes/class-mcm-query.php:2078
 #: includes/class-mcm-social.php:66
 msgid "LinkedIn"
 msgstr ""
 
-#: includes/class-mcm-privacy.php:199
+#: includes/class-mcm-privacy.php:201
 #: includes/class-mcm-query.php:1670
 #: includes/class-mcm-query.php:1677
 #: includes/class-mcm-query.php:1710
@@ -1816,19 +1840,19 @@ msgid "Name"
 msgstr ""
 
 #. translators: %d: post ID.
-#: includes/class-mcm-privacy.php:265
+#: includes/class-mcm-privacy.php:267
 #, php-format
 msgid "Anonymised student #%d"
 msgstr ""
 
 #. translators: 1: post ID, 2: number of fields removed.
-#: includes/class-mcm-privacy.php:289
+#: includes/class-mcm-privacy.php:291
 #, php-format
 msgid "Student record #%1$d: the name was replaced and %2$d personal field(s) removed. The academic record (program, batch, status, department, session, level) was kept; delete the record manually if a full removal is required."
 msgstr ""
 
 #. translators: 1: record type label, 2: record title, 3: number of fields removed.
-#: includes/class-mcm-privacy.php:296
+#: includes/class-mcm-privacy.php:298
 #, php-format
 msgid "%1$s \"%2$s\": %3$d personal field(s) removed. The public profile, its name and designation were kept; delete the profile manually if it should be removed."
 msgstr ""

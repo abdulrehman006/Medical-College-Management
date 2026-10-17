@@ -501,21 +501,43 @@ class MCM_Import {
 			);
 		}
 
-		$html = '<p>' . esc_html( $msg ) . '</p>';
-		if ( ! empty( $result['errors'] ) ) {
-			$html .= '<ul style="list-style:disc;padding-left:20px;">';
-			foreach ( array_slice( $result['errors'], 0, 20 ) as $error ) {
-				$html .= '<li>' . esc_html( $error ) . '</li>';
-			}
-			$more = count( $result['errors'] ) - 20;
-			if ( $more > 0 ) {
-				/* translators: %d: number of further items not listed. */
-				$html .= '<li>' . esc_html( sprintf( __( '…and %d more.', 'medical-college-manager' ), $more ) ) . '</li>';
-			}
-			$html .= '</ul>';
+		$warnings = isset( $result['warnings'] ) ? (array) $result['warnings'] : array();
+		if ( $warnings ) {
+			$msg .= ' ' . sprintf(
+				/* translators: %d: number of warnings. */
+				_n( '%d warning (the row was imported).', '%d warnings (the rows were imported).', count( $warnings ), 'medical-college-manager' ),
+				count( $warnings )
+			);
 		}
-		$class        = empty( $result['errors'] ) ? 'notice-success' : 'notice-warning';
+
+		$html         = '<p>' . esc_html( $msg ) . '</p>';
+		$html        .= self::message_list( $result['errors'], __( 'Skipped rows:', 'medical-college-manager' ) );
+		$html        .= self::message_list( $warnings, __( 'Warnings:', 'medical-college-manager' ) );
+		$class        = empty( $result['errors'] ) && empty( $warnings ) ? 'notice-success' : 'notice-warning';
 		$this->notice = '<div class="notice ' . esc_attr( $class ) . ' is-dismissible">' . $html . '</div>';
+	}
+
+	/**
+	 * A titled list of import messages (first 20, then a count), or ''.
+	 *
+	 * @param string[] $items Messages.
+	 * @param string   $title List heading.
+	 * @return string
+	 */
+	private static function message_list( $items, $title ) {
+		if ( empty( $items ) ) {
+			return '';
+		}
+		$html = '<p><strong>' . esc_html( $title ) . '</strong></p><ul style="list-style:disc;padding-left:20px;">';
+		foreach ( array_slice( $items, 0, 20 ) as $item ) {
+			$html .= '<li>' . esc_html( $item ) . '</li>';
+		}
+		$more = count( $items ) - 20;
+		if ( $more > 0 ) {
+			/* translators: %d: number of further items not listed. */
+			$html .= '<li>' . esc_html( sprintf( __( '…and %d more.', 'medical-college-manager' ), $more ) ) . '</li>';
+		}
+		return $html . '</ul>';
 	}
 
 	/**
@@ -526,7 +548,7 @@ class MCM_Import {
 	 * @param array  $map         Column schema for the type.
 	 * @param string $status      Status for NEW posts.
 	 * @param bool   $match_title Update an existing entry with the same title.
-	 * @return array { created, updated, skipped, same_title, errors[] }
+	 * @return array { created, updated, skipped, same_title, errors[], warnings[] }
 	 */
 	private function import_file( $tmp, $type, $map, $status, $match_title = false ) {
 		$created    = 0;
@@ -534,6 +556,7 @@ class MCM_Import {
 		$skipped    = 0;
 		$same_title = 0;
 		$errors     = array();
+		$warnings   = array(); // Row imported, but a value was not understood.
 		// Posts created or updated by THIS file: rows of one file never merge
 		// into each other, even when title matching is on.
 		$touched = array();
@@ -544,6 +567,7 @@ class MCM_Import {
 			'skipped'    => 0,
 			'same_title' => 0,
 			'errors'     => array(),
+			'warnings'   => array(),
 		);
 
 		$handle = fopen( $tmp, 'r' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen
@@ -602,12 +626,10 @@ class MCM_Import {
 			$bad = '';
 			foreach ( $meta_keys as $mk ) {
 				$ftype = MCM_Meta::field_type( $type, self::meta_key_for( $type, $mk ) );
+				if ( 'gender' === $ftype ) {
+					continue; // Reported as a warning below; never a reason to skip the row.
+				}
 				if ( isset( $data[ $mk ] ) && '' !== $data[ $mk ] && ! MCM_Meta::is_valid( $ftype, $data[ $mk ] ) ) {
-					if ( 'gender' === $ftype ) {
-						/* translators: 1: CSV row number, 2: column name, 3: the value. */
-						$bad = sprintf( __( 'Row %1$d skipped: "%2$s" value "%3$s" is not recognised (use Male or Female, or leave it empty).', 'medical-college-manager' ), $line, $mk, $data[ $mk ] );
-						break;
-					}
 					$bad = 'date' === $ftype
 						/* translators: 1: CSV row number, 2: column name, 3: the value. */
 						? sprintf( __( 'Row %1$d skipped: "%2$s" value "%3$s" is not a valid date (use 15/10/2026 or 2026-10-15).', 'medical-college-manager' ), $line, $mk, $data[ $mk ] )
@@ -667,6 +689,16 @@ class MCM_Import {
 				}
 				$meta_key = self::meta_key_for( $type, $mk );
 				$ftype    = MCM_Meta::field_type( $type, $meta_key );
+				if ( 'gender' === $ftype && '' === MCM_Meta::normalize_gender( $data[ $mk ] ) ) {
+					// Like an empty cell: nothing is written, so an update keeps the
+					// value already stored instead of losing it to a typo.
+					$warnings[] = '' !== MCM_Safe::meta( $post_id, $meta_key )
+						/* translators: 1: CSV row number, 2: column name, 3: the value. */
+						? sprintf( __( 'Row %1$d: %2$s \'%3$s\' not recognised – existing value kept.', 'medical-college-manager' ), $line, $mk, $data[ $mk ] )
+						/* translators: 1: CSV row number, 2: column name, 3: the value. */
+						: sprintf( __( 'Row %1$d: %2$s \'%3$s\' not recognised – left blank.', 'medical-college-manager' ), $line, $mk, $data[ $mk ] );
+					continue;
+				}
 				update_post_meta( $post_id, $meta_key, '' !== $ftype ? MCM_Meta::sanitize_value( $ftype, $data[ $mk ] ) : self::sanitize_meta_value( $mk, $data[ $mk ] ) );
 			}
 
@@ -721,6 +753,7 @@ class MCM_Import {
 			'skipped'    => $skipped,
 			'same_title' => $same_title,
 			'errors'     => $errors,
+			'warnings'   => $warnings,
 		);
 	}
 

@@ -10,8 +10,13 @@ Medical College Manager — complete changelog.
 * Default photos chosen from the Media Library are now served at the right
   size with srcset, width and height (faster, no layout shift).
 * CSV import/export: gender column for consultants and team (Male, Female,
-  M, F accepted; anything else skips the row with a message). Student gender
+  M, F accepted, any case). An unrecognised value never skips the row: the row
+  is imported with gender left blank (an update keeps the stored gender) and a
+  warning is listed, e.g. "Row 12: gender 'Femal' not recognised – left blank".
+  Import results now list warnings separately from skipped rows. Student gender
   values are normalised the same way (Male / Female / Other).
+* Privacy: the personal-data exporter and eraser now include the gender of
+  consultants and team members.
 * Developers: mcm_default_avatar_url now also receives the post ID and gender.
 
 = 1.31.0 =
