@@ -31,49 +31,52 @@ class MCM_Settings {
 	 */
 	public static function default_settings() {
 		return array(
-			'primary_color'    => '#0a6b5d',
-			'accent_color'     => '#13a594',
-			'text_color'       => '#1f2933',
-			'muted_color'      => '#6b7280',
-			'card_bg'          => '#ffffff',
-			'page_bg'          => '#f5f7fa',
-			'border_color'     => '#e5e7eb',
-			'border_radius'    => '12',
-			'card_shadow'      => '1', // 0 = off, 1 = on.
-			'card_padding'     => '20',
-			'gap'              => '24',
-			'columns'          => '3',
-			'font_family'      => 'inherit',
-			'title_size'       => '18',
-			'image_height'     => '220',
-			'hover_lift'       => '1',
-			'archive_filters'  => '1', // show the filter bar on CPT/taxonomy archives.
+			'primary_color'         => '#0a6b5d',
+			'accent_color'          => '#13a594',
+			'text_color'            => '#1f2933',
+			'muted_color'           => '#6b7280',
+			'card_bg'               => '#ffffff',
+			'page_bg'               => '#f5f7fa',
+			'border_color'          => '#e5e7eb',
+			'border_radius'         => '12',
+			'card_shadow'           => '1', // 0 = off, 1 = on.
+			'card_padding'          => '20',
+			'gap'                   => '24',
+			'columns'               => '3',
+			'font_family'           => 'inherit',
+			'title_size'            => '18',
+			'image_height'          => '220',
+			'hover_lift'            => '1',
+			'archive_filters'       => '1', // show the filter bar on CPT/taxonomy archives.
 			// Public, safe-fields-only student list ([mcm_students] + AJAX).
 			// On by default so existing sites behave exactly as before.
-			'public_students'  => '1',
+			'public_students'       => '1',
 			// Extra sources on the notice ticker/board/list (notices are always in).
-			'notice_sources'   => array( 'job', 'tender' ),
+			'notice_sources'        => array( 'job', 'tender' ),
 			// A job counts as "Closing soon" this many days before its deadline.
-			'job_closing_days' => '3',
+			'job_closing_days'      => '3',
 			// Content types offering a Print button. Any type may be enabled —
 			// the print machinery is generic; these are just the sensible
 			// defaults (a timetable and a student list are what get handed out
 			// on paper). Developers can still use the mcm_print_types filter.
-			'print_types'      => array( 'mcm_timetable', 'mcm_student', 'mcm_research', 'mcm_policy', 'mcm_job' ),
+			'print_types'           => array( 'mcm_timetable', 'mcm_student', 'mcm_research', 'mcm_policy', 'mcm_job' ),
 			// Branded stand-in shown when a person has no photograph.
-			'default_avatar'   => '',
+			'default_avatar'        => '',
+			// Gender-specific default photos (fall back to default_avatar).
+			'default_avatar_male'   => '',
+			'default_avatar_female' => '',
 			// Letterhead used on printed / PDF output. Blank org name falls back
 			// to the site title, blank logo to the theme logo or site icon.
-			'print_logo'       => '',
-			'print_org'        => '',
-			'print_address'    => '',
-			'print_footnote'   => '',
-			'print_signature'  => '0',
+			'print_logo'            => '',
+			'print_org'             => '',
+			'print_address'         => '',
+			'print_footnote'        => '',
+			'print_signature'       => '0',
 			// auto | always | never - see MCM_Templates::should_show_image().
-			'single_image'     => 'auto',
+			'single_image'          => 'auto',
 			// Per-archive title banner: [ post_type => [ 'video' => url, 'image' => url ] ].
-			'archive_banners'  => array(),
-			'custom_css'       => '',
+			'archive_banners'       => array(),
+			'custom_css'            => '',
 		);
 	}
 
@@ -197,7 +200,9 @@ class MCM_Settings {
 			}
 		}
 
-		$out['default_avatar']  = isset( $input['default_avatar'] ) ? esc_url_raw( $input['default_avatar'] ) : '';
+		foreach ( array( 'default_avatar', 'default_avatar_male', 'default_avatar_female' ) as $mcm_key ) {
+			$out[ $mcm_key ] = isset( $input[ $mcm_key ] ) ? esc_url_raw( MCM_Safe::str( $input[ $mcm_key ] ) ) : '';
+		}
 		$out['print_logo']      = isset( $input['print_logo'] ) ? esc_url_raw( $input['print_logo'] ) : '';
 		$out['print_org']       = isset( $input['print_org'] ) ? sanitize_text_field( $input['print_org'] ) : '';
 		$out['print_address']   = isset( $input['print_address'] ) ? sanitize_text_field( $input['print_address'] ) : '';
@@ -572,24 +577,41 @@ class MCM_Settings {
 	 * @param array $s Settings.
 	 */
 	private function avatar_row( $s ) {
-		?>
-		<tr>
-			<th scope="row"><label for="default_avatar"><?php esc_html_e( 'Default Profile Image', 'medical-college-manager' ); ?></label></th>
-			<td>
-				<input type="url" id="default_avatar" class="regular-text mcm-media-field"
-					name="<?php echo esc_attr( self::OPTION ); ?>[default_avatar]"
-					value="<?php echo esc_attr( $s['default_avatar'] ); ?>" placeholder="https://…" />
-				<button type="button" class="button mcm-media-pick"><?php esc_html_e( 'Select Image', 'medical-college-manager' ); ?></button>
-				<button type="button" class="button-link mcm-media-clear"><?php esc_html_e( 'Clear', 'medical-college-manager' ); ?></button>
-				<p class="description"><?php esc_html_e( 'Shown for any consultant, faculty member, staff member or student without a photograph. Upload a branded placeholder carrying the college logo; leave blank for a plain silhouette. A square image works best.', 'medical-college-manager' ); ?></p>
-				<div class="mcm-media-preview">
-					<?php if ( ! empty( $s['default_avatar'] ) ) : ?>
-						<img src="<?php echo esc_url( $s['default_avatar'] ); ?>" alt="" style="max-height:80px;margin-top:8px;" />
-					<?php endif; ?>
-				</div>
-			</td>
-		</tr>
-		<?php
+		$rows = array(
+			'default_avatar_male'   => array(
+				__( 'Default Photo — Male', 'medical-college-manager' ),
+				__( 'Shown for consultants, team members and students whose Gender is Male and who have no photo.', 'medical-college-manager' ),
+			),
+			'default_avatar_female' => array(
+				__( 'Default Photo — Female', 'medical-college-manager' ),
+				__( 'Shown for consultants, team members and students whose Gender is Female and who have no photo.', 'medical-college-manager' ),
+			),
+			'default_avatar'        => array(
+				__( 'Default Profile Image', 'medical-college-manager' ),
+				__( 'Shown for anyone without a photo whose Gender is not set (or whose male/female photo above is empty). Upload a branded placeholder carrying the college logo; leave blank for a plain silhouette. Square images of at least 400 × 400 px work best.', 'medical-college-manager' ),
+			),
+		);
+		foreach ( $rows as $key => $text ) {
+			$val = isset( $s[ $key ] ) ? (string) $s[ $key ] : '';
+			?>
+			<tr>
+				<th scope="row"><label for="<?php echo esc_attr( $key ); ?>"><?php echo esc_html( $text[0] ); ?></label></th>
+				<td>
+					<input type="url" id="<?php echo esc_attr( $key ); ?>" class="regular-text mcm-media-field"
+						name="<?php echo esc_attr( self::OPTION . '[' . $key . ']' ); ?>"
+						value="<?php echo esc_attr( $val ); ?>" placeholder="https://…" />
+					<button type="button" class="button mcm-media-pick" data-type="image" data-title="<?php echo esc_attr( $text[0] ); ?>"><?php esc_html_e( 'Select Image', 'medical-college-manager' ); ?></button>
+					<button type="button" class="button-link mcm-media-clear"><?php esc_html_e( 'Clear', 'medical-college-manager' ); ?></button>
+					<p class="description"><?php echo esc_html( $text[1] ); ?></p>
+					<div class="mcm-media-preview">
+						<?php if ( '' !== $val ) : ?>
+							<img src="<?php echo esc_url( $val ); ?>" alt="" style="max-height:80px;margin-top:8px;" />
+						<?php endif; ?>
+					</div>
+				</td>
+			</tr>
+			<?php
+		}
 	}
 
 	/** Letterhead used on printed / PDF output. */

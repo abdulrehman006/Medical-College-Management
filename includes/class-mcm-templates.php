@@ -482,7 +482,7 @@ class MCM_Templates {
 		// of the details card so the single page never looks photo-less.
 		$avatar = '';
 		if ( MCM_Query::is_person( $type ) && ! has_post_thumbnail( $id ) ) {
-			$avatar = '<div class="mcm-single-avatar">' . MCM_Query::default_avatar( 'mcm-single-img', 'mcm-single-ph' ) . '</div>';
+			$avatar = '<div class="mcm-single-avatar">' . MCM_Query::default_avatar( 'mcm-single-img', 'mcm-single-ph', $id, 'large' ) . '</div>';
 		}
 
 		// A Program page lists its own curriculum, schedule and intake (matched

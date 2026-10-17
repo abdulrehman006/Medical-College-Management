@@ -1306,7 +1306,7 @@ class MCM_Query {
 				if ( $thumb ) {
 					echo $thumb; // phpcs:ignore
 				} else {
-					echo self::default_avatar( 'mcm-dir-img', 'mcm-dir-card-ph' ); // phpcs:ignore
+					echo self::default_avatar( 'mcm-dir-img', 'mcm-dir-card-ph', $id ); // phpcs:ignore
 				}
 				?>
 			</div>
@@ -1453,23 +1453,74 @@ class MCM_Query {
 	}
 
 	/**
-	 * Default avatar markup for a person with no featured image. Uses a custom
-	 * image if the site provides one via the mcm_default_avatar_url filter,
-	 * otherwise a built-in silhouette. $img_class styles the <img>; $ph_class
-	 * styles the SVG placeholder box.
+	 * Default photo markup for a person with no featured image.
+	 *
+	 * Order: the male or female default photo (Settings) matching the person's
+	 * Gender field → the general default photo → a built-in silhouette. The
+	 * mcm_default_avatar_url filter can still override the choice. $img_class
+	 * styles the <img>; $ph_class styles the SVG placeholder box.
 	 *
 	 * @param string $img_class CSS class for the image.
-	 * @param string $ph_class CSS class for the placeholder.
+	 * @param string $ph_class  CSS class for the placeholder.
+	 * @param int    $post_id   The person (0 = unknown: general default photo).
+	 * @param string $size      Image size when the photo is in the Media Library.
 	 */
-	public static function default_avatar( $img_class, $ph_class ) {
-		// A branded placeholder (the GMC roundel) set in Settings wins; the
-		// filter still overrides it for anyone doing something custom, and the
-		// generic silhouette remains the last resort.
-		$url = apply_filters( 'mcm_default_avatar_url', MCM_Settings::value( 'default_avatar' ) );
-		if ( $url ) {
-			return '<img class="' . esc_attr( $img_class ) . '" src="' . esc_url( $url ) . '" alt="" loading="lazy" />';
+	public static function default_avatar( $img_class, $ph_class, $post_id = 0, $size = 'medium' ) {
+		$gender = $post_id ? MCM_Meta::normalize_gender( MCM_Safe::meta( (int) $post_id, 'mcm_gender' ) ) : '';
+		$url    = '';
+		if ( 'Male' === $gender ) {
+			$url = MCM_Settings::value( 'default_avatar_male' );
+		} elseif ( 'Female' === $gender ) {
+			$url = MCM_Settings::value( 'default_avatar_female' );
+		}
+		if ( '' === MCM_Safe::str( $url ) ) {
+			$url = MCM_Settings::value( 'default_avatar' );
+		}
+		/**
+		 * Filters the default photo URL for a person without a photo.
+		 *
+		 * @param string $url     Chosen URL ('' = built-in silhouette).
+		 * @param int    $post_id The person's post ID (0 when unknown).
+		 * @param string $gender  "Male", "Female", "Other" or ''.
+		 */
+		$url = MCM_Safe::str( apply_filters( 'mcm_default_avatar_url', $url, (int) $post_id, $gender ) );
+		if ( '' !== $url ) {
+			// A Media Library image gets width/height and srcset (no layout
+			// shift, right-sized on phones); any other URL is used as is.
+			$att = self::attachment_id_for( $url );
+			if ( $att ) {
+				$img = wp_get_attachment_image(
+					$att,
+					$size,
+					false,
+					array(
+						'class'    => $img_class . ' mcm-default-photo',
+						'alt'      => '',
+						'loading'  => 'lazy',
+						'decoding' => 'async',
+					)
+				);
+				if ( $img ) {
+					return $img;
+				}
+			}
+			return '<img class="' . esc_attr( $img_class ) . ' mcm-default-photo" src="' . esc_url( $url ) . '" alt="" loading="lazy" decoding="async" />';
 		}
 		return '<span class="' . esc_attr( $ph_class ) . ' mcm-avatar" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M12 12.5a4.6 4.6 0 1 0-4.6-4.6 4.6 4.6 0 0 0 4.6 4.6zm0 2.3c-3.9 0-7.1 2-7.1 4.45V21h14.2v-1.75c0-2.45-3.2-4.45-7.1-4.45z"/></svg></span>';
+	}
+
+	/**
+	 * Attachment ID for a Media Library URL, cached for the request (0 if none).
+	 *
+	 * @param string $url Image URL.
+	 * @return int
+	 */
+	private static function attachment_id_for( $url ) {
+		static $cache = array();
+		if ( ! isset( $cache[ $url ] ) ) {
+			$cache[ $url ] = (int) attachment_url_to_postid( $url );
+		}
+		return $cache[ $url ];
 	}
 
 	/**
@@ -1493,7 +1544,7 @@ class MCM_Query {
 		if ( $thumb ) {
 			return $thumb;
 		}
-		return self::is_person( get_post_type( $id ) ) ? self::default_avatar( $img_class, $ph_class ) : '';
+		return self::is_person( get_post_type( $id ) ) ? self::default_avatar( $img_class, $ph_class, $id, $size ) : '';
 	}
 
 	/**
@@ -2364,7 +2415,7 @@ class MCM_Query {
 			<?php if ( has_post_thumbnail( $id ) ) : ?>
 				<div class="mcm-single-media"><?php echo get_the_post_thumbnail( $id, 'large', array( 'alt' => esc_attr( get_the_title( $id ) ) ) ); // phpcs:ignore ?></div>
 			<?php elseif ( self::is_person( $type ) ) : ?>
-				<div class="mcm-single-media"><?php echo self::default_avatar( 'mcm-single-img', 'mcm-single-ph' ); // phpcs:ignore ?></div>
+				<div class="mcm-single-media"><?php echo self::default_avatar( 'mcm-single-img', 'mcm-single-ph', $id, 'large' ); // phpcs:ignore ?></div>
 			<?php endif; ?>
 			<div class="mcm-single-body">
 				<h2 class="mcm-single-title"><?php echo esc_html( get_the_title( $id ) ); ?></h2>
