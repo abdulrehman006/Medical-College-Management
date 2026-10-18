@@ -148,6 +148,9 @@ class MCM_Assets {
 						'useImage'    => __( 'Use this image', 'medical-college-manager' ),
 						'useFile'     => __( 'Use this file', 'medical-college-manager' ),
 						'copied'      => __( 'Copied!', 'medical-college-manager' ),
+						/* translators: 1: image width in px, 2: recommended minimum width in px. */
+						'tooSmall'    => __( 'This image is %1$d px wide; at least %2$d px is recommended, or it may look blurry.', 'medical-college-manager' ),
+						'service'     => __( 'Service', 'medical-college-manager' ),
 					),
 				)
 			);

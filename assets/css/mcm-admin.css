@@ -18,3 +18,30 @@
 .mcm-relations .mcm-rel-group strong{ color: #50575e; }
 .mcm-relations .mcm-rel-more{ color: #787c82; font-style: italic; }
 .mcm-rel-empty{ color: #787c82; margin: 4px 0; }
+
+/* ---------- Departments → Edit: panels in page-template order (1.32) ---------- */
+.mcm-panel-row > td{ padding: 0 !important; }
+.mcm-panel{ margin: 0 0 14px; background: #fff; border: 1px solid #dcdcde; border-radius: 4px; }
+.mcm-panel > .mcm-panel-title{ cursor: pointer; padding: 12px 16px; font-size: 14px; font-weight: 600; color: #1d2327; list-style-position: inside; }
+.mcm-panel > .mcm-panel-title:focus-visible{ outline: 2px solid #2271b1; outline-offset: -2px; }
+.mcm-panel[open] > .mcm-panel-title{ border-bottom: 1px solid #f0f0f1; }
+.mcm-panel-table, .mcm-panel-body{ margin: 0; padding: 0 16px 8px; }
+.mcm-panel-table th{ padding-left: 0; }
+.mcm-quality-warning{ color: #996800; margin: 6px 0 0; }
+.mcm-quality-warning::before{ content: "⚠ "; }
+.mcm-vm-warning{ margin: 0 0 12px !important; }
+
+/* Services repeater */
+.mcm-rep-rows{ margin: 0 0 10px; padding: 0; list-style: none; }
+.mcm-rep-row fieldset{ border: 1px solid #dcdcde; border-radius: 4px; padding: 6px 14px 4px; margin: 0 0 10px; background: #f6f7f7; }
+.mcm-rep-legend{ font-weight: 600; padding: 0 4px; }
+.mcm-rep-row label{ display: block; font-weight: 600; margin-bottom: 3px; }
+.mcm-rep-dates label{ display: inline-block; margin-right: 6px; }
+.mcm-rep-dates input{ margin-right: 14px; }
+.mcm-rep-actions{ display: flex; gap: 8px; align-items: center; }
+.mcm-rep-actions .button-link-delete{ margin-left: auto; }
+
+/* Departments list: completeness column */
+.column-mcm_page{ width: 150px; }
+.mcm-completeness{ font-weight: 600; }
+.mcm-missing{ color: #b32d2e; }

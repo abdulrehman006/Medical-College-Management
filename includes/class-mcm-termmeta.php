@@ -7,6 +7,12 @@
  * and a short banner video of the department's activities. Terms had no fields
  * at all, so there was nowhere to put any of it.
  *
+ * 1.32 adds the content of the fixed department page template: HOD
+ * designation, introduction, vision, mission, services, address, office hours
+ * and a map. The Departments → Edit screen shows the fields as collapsible
+ * panels in the same order as the page, and the Departments list gets a
+ * completeness column ("6/8 sections · Vision missing").
+ *
  * The fields are added to the standard term add/edit screens, so they are
  * managed exactly where a department is managed — no separate settings page.
  *
@@ -18,9 +24,19 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Department fields (hero, Head of Department message, hidden sections) and department shortcodes.
+ * Department fields (hero, Head of Department, introduction, vision & mission,
+ * services, contact, hidden sections) and the department shortcodes.
  */
 class MCM_TermMeta {
+
+	/** Most service rows one department can hold. */
+	const MAX_SERVICES = 50;
+
+	/** Minimum hero width (px) before a quality warning is shown. */
+	const HERO_MIN_WIDTH = 1600;
+
+	/** Minimum portrait width (px) before a quality warning is shown. */
+	const PHOTO_MIN_WIDTH = 400;
 
 	/**
 	 * Register the hooks this module needs.
@@ -43,6 +59,10 @@ class MCM_TermMeta {
 		}
 		$this->register_meta();
 
+		// Departments list: completeness column (the client's content checklist).
+		add_filter( 'manage_edit-mcm_department_columns', array( $this, 'list_columns' ) );
+		add_filter( 'manage_mcm_department_custom_column', array( $this, 'list_column_value' ), 10, 3 );
+
 		// Shortcodes for composing a custom department template.
 		add_shortcode( 'mcm_department_hero', array( $this, 'sc_hero' ) );
 		add_shortcode( 'mcm_department_message', array( $this, 'sc_message' ) );
@@ -51,7 +71,28 @@ class MCM_TermMeta {
 	}
 
 	/**
+	 * Panels on the Departments → Edit screen, in the order of the page template.
+	 *
+	 * @return array<string,string> Group key => heading.
+	 */
+	public static function groups() {
+		return array(
+			'hero'     => __( '1. Hero', 'medical-college-manager' ),
+			'hod'      => __( '2. Message from the HOD', 'medical-college-manager' ),
+			'intro'    => __( '3. Introduction', 'medical-college-manager' ),
+			'vm'       => __( '4. Vision & Mission', 'medical-college-manager' ),
+			'services' => __( '5. Services / Facilities', 'medical-college-manager' ),
+			'contact'  => __( '8. Contact Information', 'medical-college-manager' ),
+			'sections' => __( 'Page sections', 'medical-college-manager' ),
+		);
+	}
+
+	/**
 	 * Which taxonomies get term content, and which fields.
+	 *
+	 * Field keys: label, type, desc, group (panel), and for media: size (the
+	 * image size stored: full | large | medium) and minw (quality warning
+	 * below this width). Existing meta keys are unchanged; 1.32 only adds keys.
 	 *
 	 * @return array
 	 */
@@ -60,44 +101,106 @@ class MCM_TermMeta {
 			'mcm_term_fields',
 			array(
 				'mcm_department' => array(
-					'mcm_term_video'     => array(
+					'mcm_term_video'           => array(
 						'label' => __( 'Hero Video URL', 'medical-college-manager' ),
 						'type'  => 'url',
+						'group' => 'hero',
 						'desc'  => __( 'YouTube/Vimeo link or an uploaded MP4 for the banner at the top of the page. Takes priority over the hero image. Note: some videos have embedding turned off by their owner and will show "Video unavailable" on any website — if that happens, use a different (embeddable) video or upload an MP4.', 'medical-college-manager' ),
 					),
-					'mcm_term_banner'    => array(
+					'mcm_term_banner'          => array(
 						'label' => __( 'Hero Image', 'medical-college-manager' ),
 						'type'  => 'media',
-						'desc'  => __( 'Static banner shown at the top when no hero video is set. A wide (16:9) image works best.', 'medical-college-manager' ),
+						'group' => 'hero',
+						'size'  => 'full',
+						'minw'  => self::HERO_MIN_WIDTH,
+						'desc'  => __( 'Static banner shown at the top when no hero video is set. Use a wide (16:9) image at least 1600 px wide.', 'medical-college-manager' ),
 					),
-					'mcm_term_hod'       => array(
+					'mcm_term_hod'             => array(
 						'label' => __( 'Head of Department', 'medical-college-manager' ),
 						'type'  => 'text',
-						'desc'  => __( 'Name shown with the message.', 'medical-college-manager' ),
+						'group' => 'hod',
+						'desc'  => __( 'Full name shown with the message.', 'medical-college-manager' ),
 					),
-					'mcm_term_hod_photo' => array(
+					'mcm_term_hod_designation' => array(
+						'label' => __( 'HOD Designation', 'medical-college-manager' ),
+						'type'  => 'text',
+						'group' => 'hod',
+						'desc'  => __( 'e.g. Professor & Head of Department', 'medical-college-manager' ),
+					),
+					'mcm_term_hod_photo'       => array(
 						'label' => __( 'HOD Photograph', 'medical-college-manager' ),
 						'type'  => 'media',
-						'desc'  => __( 'Shown beside the message.', 'medical-college-manager' ),
+						'group' => 'hod',
+						'size'  => 'large',
+						'minw'  => self::PHOTO_MIN_WIDTH,
+						'desc'  => __( 'Shown beside the message. A portrait at least 400 px wide.', 'medical-college-manager' ),
 					),
-					'mcm_term_message'   => array(
+					'mcm_term_message'         => array(
 						'label' => __( "Head of Department's Message", 'medical-college-manager' ),
 						'type'  => 'textarea',
-						'desc'  => __( 'The welcome / introduction message for this department page.', 'medical-college-manager' ),
+						'group' => 'hod',
+						'desc'  => __( 'The welcome message for this department page.', 'medical-college-manager' ),
 					),
-					'mcm_term_email'     => array(
+					'mcm_term_intro'           => array(
+						'label' => __( 'Introduction', 'medical-college-manager' ),
+						'type'  => 'richtext',
+						'group' => 'intro',
+						'desc'  => __( 'A short introduction to the department: what it teaches and does.', 'medical-college-manager' ),
+					),
+					'mcm_term_vision'          => array(
+						'label'    => __( 'Vision', 'medical-college-manager' ),
+						'type'     => 'textarea',
+						'group'    => 'vm',
+						'required' => true,
+						'desc'     => __( 'Required. The Vision & Mission section is shown only when both are filled in.', 'medical-college-manager' ),
+					),
+					'mcm_term_mission'         => array(
+						'label'    => __( 'Mission', 'medical-college-manager' ),
+						'type'     => 'textarea',
+						'group'    => 'vm',
+						'required' => true,
+						'desc'     => __( 'Required.', 'medical-college-manager' ),
+					),
+					'mcm_term_services'        => array(
+						'label' => __( 'Services / Facilities', 'medical-college-manager' ),
+						'type'  => 'services',
+						'group' => 'services',
+						'desc'  => __( 'One row per service or facility. Dates are optional (e.g. a workshop held 12/03/2026 – 14/03/2026). Rows without a title are ignored.', 'medical-college-manager' ),
+					),
+					'mcm_term_email'           => array(
 						'label' => __( 'Departmental Email', 'medical-college-manager' ),
 						'type'  => 'email',
+						'group' => 'contact',
 						'desc'  => __( 'e.g. anatomy@gmcdik.edu.pk', 'medical-college-manager' ),
 					),
-					'mcm_term_phone'     => array(
+					'mcm_term_phone'           => array(
 						'label' => __( 'Departmental Phone', 'medical-college-manager' ),
 						'type'  => 'text',
+						'group' => 'contact',
 						'desc'  => '',
 					),
-					'mcm_term_hidden'    => array(
+					'mcm_term_address'         => array(
+						'label' => __( 'Address', 'medical-college-manager' ),
+						'type'  => 'textarea',
+						'group' => 'contact',
+						'desc'  => __( 'Where the department is (building, floor, campus).', 'medical-college-manager' ),
+					),
+					'mcm_term_hours'           => array(
+						'label' => __( 'Office Hours', 'medical-college-manager' ),
+						'type'  => 'text',
+						'group' => 'contact',
+						'desc'  => __( 'e.g. Monday–Friday, 8:00 AM – 2:00 PM', 'medical-college-manager' ),
+					),
+					'mcm_term_map'             => array(
+						'label' => __( 'Map (Google Maps embed)', 'medical-college-manager' ),
+						'type'  => 'mapurl',
+						'group' => 'contact',
+						'desc'  => __( 'In Google Maps: Share → Embed a map → Copy HTML, then paste it here (the link is taken from it). Only Google Maps embed links are accepted.', 'medical-college-manager' ),
+					),
+					'mcm_term_hidden'          => array(
 						'label' => __( 'Hide Sections', 'medical-college-manager' ),
 						'type'  => 'sections',
+						'group' => 'sections',
 						'desc'  => __( 'Tick any sections you do NOT want on this department page (e.g. hide the timetable). Unticked sections appear automatically whenever they have content.', 'medical-college-manager' ),
 					),
 				),
@@ -154,6 +257,39 @@ class MCM_TermMeta {
 		return isset( $all[ $tax ] ) ? $all[ $tax ] : array();
 	}
 
+	/**
+	 * Fields grouped into the edit-screen panels, in panel order. Fields
+	 * without a known group (e.g. added through the mcm_term_fields filter)
+	 * come last under "More".
+	 *
+	 * @param string $tax Taxonomy name.
+	 * @return array<string,array{title:string,fields:array}>
+	 */
+	private static function grouped_fields( $tax ) {
+		$groups = self::groups();
+		$out    = array();
+		foreach ( $groups as $g => $title ) {
+			$out[ $g ] = array(
+				'title'  => $title,
+				'fields' => array(),
+			);
+		}
+		$out['more'] = array(
+			'title'  => __( 'More', 'medical-college-manager' ),
+			'fields' => array(),
+		);
+		foreach ( self::fields_for( $tax ) as $key => $field ) {
+			$g                           = ( isset( $field['group'] ) && isset( $groups[ $field['group'] ] ) ) ? $field['group'] : 'more';
+			$out[ $g ]['fields'][ $key ] = $field;
+		}
+		return array_filter(
+			$out,
+			function ( $g ) {
+				return ! empty( $g['fields'] );
+			}
+		);
+	}
+
 	/** Register the term meta so it is typed, sanitized and REST-aware. */
 	public function register_meta() {
 		foreach ( self::taxonomies() as $tax => $fields ) {
@@ -167,10 +303,7 @@ class MCM_TermMeta {
 						'single'            => true,
 						'show_in_rest'      => true,
 						'sanitize_callback' => function ( $value ) use ( $type ) {
-							if ( 'sections' === $type ) {
-								return is_scalar( $value ) ? sanitize_text_field( (string) $value ) : '';
-							}
-							return MCM_Meta::sanitize_value( $type, $value );
+							return MCM_TermMeta::sanitize_field( $type, $value );
 						},
 						'auth_callback'     => function () {
 							return current_user_can( 'manage_categories' );
@@ -182,63 +315,283 @@ class MCM_TermMeta {
 	}
 
 	/**
+	 * One sanitizer for every write path (edit screen, REST, other code).
+	 *
+	 * @param string $type  Field type.
+	 * @param mixed  $value Raw value.
+	 * @return string
+	 */
+	public static function sanitize_field( $type, $value ) {
+		switch ( $type ) {
+			case 'sections':
+				return is_scalar( $value ) ? sanitize_text_field( (string) $value ) : '';
+			case 'richtext':
+				// Script/style blocks go whole (kses would keep their text content).
+				return is_scalar( $value ) ? trim( wp_kses_post( (string) preg_replace( '#<(script|style)\b[^>]*>.*?</\1>#is', '', (string) $value ) ) ) : '';
+			case 'services':
+				return self::sanitize_services( $value );
+			case 'mapurl':
+				return self::sanitize_map( $value );
+			default:
+				return MCM_Meta::sanitize_value( $type, $value );
+		}
+	}
+
+	/**
+	 * Services repeater → JSON. Accepts the posted rows (array) or a JSON
+	 * string (REST / re-saving the stored value). Every row field is sanitized;
+	 * rows without a title are dropped; dates go through MCM_Meta::parse_date()
+	 * and an unreadable date is cleared; at most MAX_SERVICES rows.
+	 *
+	 * @param mixed $value Rows.
+	 * @return string JSON array, or '' when no row is left.
+	 */
+	public static function sanitize_services( $value ) {
+		if ( is_string( $value ) ) {
+			$decoded = json_decode( $value, true );
+			$value   = is_array( $decoded ) ? $decoded : array();
+		}
+		if ( ! is_array( $value ) ) {
+			return '';
+		}
+		$rows = array();
+		foreach ( $value as $row ) {
+			if ( ! is_array( $row ) ) {
+				continue;
+			}
+			$title = isset( $row['title'] ) ? sanitize_text_field( MCM_Safe::str( $row['title'] ) ) : '';
+			if ( '' === $title ) {
+				continue;
+			}
+			$from   = isset( $row['date_from'] ) ? MCM_Meta::parse_date( MCM_Safe::str( $row['date_from'] ) ) : false;
+			$to     = isset( $row['date_to'] ) ? MCM_Meta::parse_date( MCM_Safe::str( $row['date_to'] ) ) : false;
+			$rows[] = array(
+				'title'       => $title,
+				'description' => isset( $row['description'] ) ? sanitize_textarea_field( MCM_Safe::str( $row['description'] ) ) : '',
+				'date_from'   => false !== $from ? $from : '',
+				'date_to'     => false !== $to ? $to : '',
+				'image'       => isset( $row['image'] ) ? esc_url_raw( MCM_Safe::str( $row['image'] ) ) : '',
+			);
+			if ( count( $rows ) >= self::MAX_SERVICES ) {
+				break;
+			}
+		}
+		return $rows ? (string) wp_json_encode( $rows ) : '';
+	}
+
+	/**
+	 * The stored service rows of a department (always a clean list).
+	 *
+	 * @param int $term_id Term ID.
+	 * @return array[]
+	 */
+	public static function services( $term_id ) {
+		$json = self::sanitize_services( (string) MCM_Safe::term_meta( $term_id, 'mcm_term_services' ) );
+		$rows = '' === $json ? array() : json_decode( $json, true );
+		return is_array( $rows ) ? $rows : array();
+	}
+
+	/**
+	 * A Google Maps embed link, or ''. Accepts the bare link or the whole
+	 * <iframe> snippet Google's "Embed a map" gives (the src is extracted).
+	 * Only https://www.google.com/maps/embed… (or maps.google.com/…output=embed)
+	 * is allowed, so no other site can be framed on the department page.
+	 *
+	 * @param mixed $value Raw input.
+	 * @return string
+	 */
+	public static function sanitize_map( $value ) {
+		$raw = trim( MCM_Safe::str( $value ) );
+		if ( '' === $raw ) {
+			return '';
+		}
+		if ( preg_match( '/src\s*=\s*["\']([^"\']+)["\']/i', $raw, $m ) ) {
+			$raw = $m[1];
+		}
+		$url   = html_entity_decode( $raw, ENT_QUOTES );
+		$parts = wp_parse_url( $url );
+		if ( ! $parts || empty( $parts['host'] ) || 'https' !== strtolower( isset( $parts['scheme'] ) ? $parts['scheme'] : '' ) ) {
+			return '';
+		}
+		$host = strtolower( $parts['host'] );
+		$path = isset( $parts['path'] ) ? $parts['path'] : '';
+		$ok   = ( in_array( $host, array( 'www.google.com', 'google.com' ), true ) && 0 === strpos( $path, '/maps/embed' ) )
+			|| ( 'maps.google.com' === $host && isset( $parts['query'] ) && false !== strpos( $parts['query'], 'output=embed' ) );
+		return $ok ? esc_url_raw( $url ) : '';
+	}
+
+	/**
+	 * Original width (px) of a Media Library image given any of its URLs
+	 * (full or a resized copy), or 0 when it is not in the Media Library.
+	 *
+	 * @param string $url Image URL.
+	 * @return int
+	 */
+	public static function image_width( $url ) {
+		$url = (string) $url;
+		if ( '' === $url ) {
+			return 0;
+		}
+		$id = (int) attachment_url_to_postid( $url );
+		if ( ! $id ) {
+			// A resized copy (photo-300x200.jpg) is not matched; try the original.
+			$id = (int) attachment_url_to_postid( preg_replace( '/-\d+x\d+(?=\.[a-z0-9]+$)/i', '', $url ) );
+		}
+		if ( ! $id ) {
+			return 0;
+		}
+		$meta = wp_get_attachment_metadata( $id );
+		return isset( $meta['width'] ) ? (int) $meta['width'] : 0;
+	}
+
+	/**
 	 * The "add new term" screen has no table wrapper.
 	 *
 	 * @param string $taxonomy Taxonomy name.
 	 */
 	public function add_fields( $taxonomy ) {
-		$fields = self::fields_for( $taxonomy );
-		if ( ! $fields ) {
+		$groups = self::grouped_fields( $taxonomy );
+		if ( ! $groups ) {
 			return;
 		}
 		wp_nonce_field( 'mcm_term_save', 'mcm_term_nonce' );
-		foreach ( $fields as $key => $field ) {
-			echo '<div class="form-field">';
-			printf( '<label for="%s">%s</label>', esc_attr( $key ), esc_html( $field['label'] ) );
-			self::control( $key, '', $field );
-			if ( ! empty( $field['desc'] ) ) {
-				echo '<p>' . esc_html( $field['desc'] ) . '</p>';
+		foreach ( $groups as $group ) {
+			echo '<details class="mcm-panel" open><summary class="mcm-panel-title">' . esc_html( $group['title'] ) . '</summary><div class="mcm-panel-body">';
+			foreach ( $group['fields'] as $key => $field ) {
+				echo '<div class="form-field">';
+				printf( '<label for="%s">%s</label>', esc_attr( $key ), esc_html( $field['label'] ) );
+				self::control( $key, '', $field, false );
+				if ( ! empty( $field['desc'] ) ) {
+					echo '<p>' . esc_html( $field['desc'] ) . '</p>';
+				}
+				echo '</div>';
 			}
-			echo '</div>';
+			echo '</div></details>';
 		}
 	}
 
 	/**
-	 * The "edit term" screen is a table.
+	 * The "edit term" screen is a table: one full-width row per panel, each a
+	 * native <details> (keyboard and screen-reader friendly, no script).
 	 *
 	 * @param WP_Term $term Term object.
 	 * @param string  $taxonomy Taxonomy name.
 	 */
 	public function edit_fields( $term, $taxonomy ) {
-		$fields = self::fields_for( $taxonomy );
-		if ( ! $fields ) {
+		$groups = self::grouped_fields( $taxonomy );
+		if ( ! $groups ) {
 			return;
 		}
 		wp_nonce_field( 'mcm_term_save', 'mcm_term_nonce' );
-		foreach ( $fields as $key => $field ) {
-			$value = MCM_Safe::term_meta( $term->term_id, $key );
-			echo '<tr class="form-field">';
-			printf( '<th scope="row"><label for="%s">%s</label></th><td>', esc_attr( $key ), esc_html( $field['label'] ) );
-			self::control( $key, $value, $field );
-			if ( ! empty( $field['desc'] ) ) {
-				echo '<p class="description">' . esc_html( $field['desc'] ) . '</p>';
+
+		$notice = get_transient( 'mcm_term_notice_' . get_current_user_id() );
+		if ( $notice ) {
+			delete_transient( 'mcm_term_notice_' . get_current_user_id() );
+			echo '<tr><td colspan="2"><div class="notice notice-warning inline"><p>' . esc_html( $notice ) . '</p></div></td></tr>';
+		}
+		if ( 'mcm_department' === $taxonomy ) {
+			$missing = self::missing_required( $term->term_id );
+			if ( $missing ) {
+				echo '<tr><td colspan="2"><div class="notice notice-warning inline mcm-vm-warning"><p>' . esc_html(
+					sprintf(
+						/* translators: %s: list of missing fields, e.g. "Vision, Mission". */
+						__( 'Missing: %s. The department page does not show a Vision & Mission section until both are filled in.', 'medical-college-manager' ),
+						implode( ', ', $missing )
+					)
+				) . '</p></div></td></tr>';
 			}
-			echo '</td></tr>';
+		}
+
+		foreach ( $groups as $g => $group ) {
+			echo '<tr class="mcm-panel-row"><td colspan="2">';
+			printf( '<details class="mcm-panel" %s><summary class="mcm-panel-title">%s</summary>', 'sections' === $g ? '' : 'open', esc_html( $group['title'] ) );
+			echo '<table class="form-table mcm-panel-table" role="presentation">';
+			foreach ( $group['fields'] as $key => $field ) {
+				$value = MCM_Safe::term_meta( $term->term_id, $key );
+				echo '<tr class="form-field">';
+				printf( '<th scope="row"><label for="%s">%s</label></th><td>', esc_attr( $key ), esc_html( $field['label'] ) );
+				self::control( $key, $value, $field, true );
+				if ( ! empty( $field['desc'] ) ) {
+					echo '<p class="description">' . esc_html( $field['desc'] ) . '</p>';
+				}
+				self::quality_warning( $value, $field );
+				echo '</td></tr>';
+			}
+			echo '</table></details></td></tr>';
+		}
+	}
+
+	/**
+	 * Warn (never block) when a saved image is smaller than the field needs.
+	 *
+	 * @param mixed $value Stored URL.
+	 * @param array $field Field definition.
+	 */
+	private static function quality_warning( $value, $field ) {
+		if ( 'media' !== $field['type'] || empty( $field['minw'] ) || '' === (string) $value ) {
+			return;
+		}
+		$w = self::image_width( (string) $value );
+		if ( $w && $w < (int) $field['minw'] ) {
+			echo '<p class="mcm-quality-warning">' . esc_html(
+				sprintf(
+					/* translators: 1: image width in px, 2: recommended minimum width in px. */
+					__( 'This image is %1$d px wide; at least %2$d px is recommended, or it may look blurry.', 'medical-college-manager' ),
+					$w,
+					(int) $field['minw']
+				)
+			) . '</p>';
 		}
 	}
 
 	/**
 	 * Render one input.
 	 *
-	 * @param string $key Key.
+	 * @param string $key   Key.
 	 * @param mixed  $value Value.
 	 * @param array  $field Field definition.
+	 * @param bool   $edit  True on the edit screen (rich editor available).
 	 */
-	private static function control( $key, $value, $field ) {
+	private static function control( $key, $value, $field, $edit = true ) {
 		switch ( $field['type'] ) {
 			case 'textarea':
 				printf(
-					'<textarea id="%1$s" name="%1$s" rows="5" style="width:95%%;">%2$s</textarea>',
+					'<textarea id="%1$s" name="%1$s" rows="5" style="width:95%%;"%3$s>%2$s</textarea>',
+					esc_attr( $key ),
+					esc_textarea( $value ),
+					! empty( $field['required'] ) ? ' aria-describedby="' . esc_attr( $key ) . '-req"' : ''
+				);
+				if ( ! empty( $field['required'] ) ) {
+					printf( '<span id="%s-req" class="screen-reader-text">%s</span>', esc_attr( $key ), esc_html__( 'Required for the Vision & Mission section.', 'medical-college-manager' ) );
+				}
+				break;
+
+			case 'richtext':
+				// The add-term form is submitted by AJAX and cannot re-initialise
+				// an editor, so it gets a plain textarea (HTML allowed).
+				if ( $edit && function_exists( 'wp_editor' ) ) {
+					wp_editor(
+						(string) $value,
+						$key,
+						array(
+							'textarea_name' => $key,
+							'textarea_rows' => 8,
+							'media_buttons' => false,
+							'teeny'         => true,
+						)
+					);
+				} else {
+					printf( '<textarea id="%1$s" name="%1$s" rows="6" style="width:95%%;">%2$s</textarea>', esc_attr( $key ), esc_textarea( $value ) );
+				}
+				break;
+
+			case 'services':
+				self::services_control( $key, (string) $value );
+				break;
+
+			case 'mapurl':
+				printf(
+					'<textarea id="%1$s" name="%1$s" rows="2" style="width:95%%;" placeholder="https://www.google.com/maps/embed?pb=…">%2$s</textarea>',
 					esc_attr( $key ),
 					esc_textarea( $value )
 				);
@@ -250,9 +603,19 @@ class MCM_TermMeta {
 					esc_attr( $key ),
 					esc_attr( $value )
 				);
-				echo '<button type="button" class="button mcm-media-pick" data-type="' . esc_attr( ! empty( $field['accept'] ) ? $field['accept'] : 'image' ) . '">' . esc_html__( 'Select Image', 'medical-college-manager' ) . '</button> ';
+				printf(
+					'<button type="button" class="button mcm-media-pick" data-type="%1$s" data-size="%2$s" data-minw="%3$d">%4$s</button> ',
+					esc_attr( ! empty( $field['accept'] ) ? $field['accept'] : 'image' ),
+					esc_attr( ! empty( $field['size'] ) ? $field['size'] : 'medium' ),
+					! empty( $field['minw'] ) ? (int) $field['minw'] : 0,
+					esc_html__( 'Select Image', 'medical-college-manager' )
+				);
 				echo '<button type="button" class="button-link mcm-media-clear">' . esc_html__( 'Clear', 'medical-college-manager' ) . '</button>';
-				echo '<span class="mcm-media-preview"></span>';
+				echo '<span class="mcm-media-preview">';
+				if ( '' !== (string) $value ) {
+					echo '<img src="' . esc_url( (string) $value ) . '" alt="" style="max-height:60px;margin-top:8px;display:block;" />';
+				}
+				echo '</span>';
 				break;
 
 			case 'sections':
@@ -290,6 +653,81 @@ class MCM_TermMeta {
 	}
 
 	/**
+	 * Services repeater. Works without JavaScript (the existing rows plus one
+	 * empty row are always rendered); with it, rows can be added, removed and
+	 * moved up/down (buttons, so it is keyboard accessible). The script renames
+	 * the inputs after every change so the saved order is the order shown.
+	 *
+	 * @param string $key   Field key.
+	 * @param string $value Stored JSON.
+	 */
+	private static function services_control( $key, $value ) {
+		$rows = self::sanitize_services( $value );
+		$rows = '' === $rows ? array() : json_decode( $rows, true );
+		$rows = is_array( $rows ) ? $rows : array();
+
+		echo '<div class="mcm-repeater" data-key="' . esc_attr( $key ) . '">';
+		echo '<ol class="mcm-rep-rows">';
+		foreach ( $rows as $i => $row ) {
+			self::service_row( $key, (string) $i, $row );
+		}
+		self::service_row( $key, (string) count( $rows ), array() ); // One empty row to add to.
+		echo '</ol>';
+		echo '<template class="mcm-rep-template">';
+		self::service_row( $key, '__i__', array() );
+		echo '</template>';
+		echo '<button type="button" class="button mcm-rep-add">' . esc_html__( '+ Add a service', 'medical-college-manager' ) . '</button>';
+		echo '</div>';
+	}
+
+	/**
+	 * One repeater row.
+	 *
+	 * @param string $key Field key.
+	 * @param string $i   Row index (or the __i__ template placeholder).
+	 * @param array  $row Row values.
+	 */
+	private static function service_row( $key, $i, $row ) {
+		$v    = function ( $k ) use ( $row ) {
+			return isset( $row[ $k ] ) ? (string) $row[ $k ] : '';
+		};
+		$name = function ( $k ) use ( $key, $i ) {
+			return $key . '[' . $i . '][' . $k . ']';
+		};
+		$id   = function ( $k ) use ( $key, $i ) {
+			return $key . '-' . $i . '-' . $k;
+		};
+		echo '<li class="mcm-rep-row"><fieldset>';
+		echo '<legend class="mcm-rep-legend">' . esc_html__( 'Service', 'medical-college-manager' ) . '</legend>';
+		printf( '<p><label for="%1$s">%2$s</label><input type="text" id="%1$s" name="%3$s" value="%4$s" class="widefat" /></p>', esc_attr( $id( 'title' ) ), esc_html__( 'Title', 'medical-college-manager' ), esc_attr( $name( 'title' ) ), esc_attr( $v( 'title' ) ) );
+		printf( '<p><label for="%1$s">%2$s</label><textarea id="%1$s" name="%3$s" rows="2" class="widefat">%4$s</textarea></p>', esc_attr( $id( 'description' ) ), esc_html__( 'Description', 'medical-college-manager' ), esc_attr( $name( 'description' ) ), esc_textarea( $v( 'description' ) ) );
+		echo '<p class="mcm-rep-dates">';
+		printf( '<label for="%1$s">%2$s</label><input type="text" id="%1$s" name="%3$s" value="%4$s" placeholder="15/10/2026" size="12" /> ', esc_attr( $id( 'date_from' ) ), esc_html__( 'Date (optional)', 'medical-college-manager' ), esc_attr( $name( 'date_from' ) ), esc_attr( self::dmy( $v( 'date_from' ) ) ) );
+		printf( '<label for="%1$s">%2$s</label><input type="text" id="%1$s" name="%3$s" value="%4$s" placeholder="17/10/2026" size="12" />', esc_attr( $id( 'date_to' ) ), esc_html__( 'to (optional)', 'medical-college-manager' ), esc_attr( $name( 'date_to' ) ), esc_attr( self::dmy( $v( 'date_to' ) ) ) );
+		echo '</p><p class="mcm-rep-image">';
+		printf( '<label for="%1$s">%2$s</label><input type="url" id="%1$s" name="%3$s" value="%4$s" class="mcm-media-field" style="width:60%%;" placeholder="https://…" /> ', esc_attr( $id( 'image' ) ), esc_html__( 'Icon or image (optional)', 'medical-college-manager' ), esc_attr( $name( 'image' ) ), esc_attr( $v( 'image' ) ) );
+		echo '<button type="button" class="button mcm-media-pick" data-type="image" data-size="medium">' . esc_html__( 'Select Image', 'medical-college-manager' ) . '</button> ';
+		echo '<button type="button" class="button-link mcm-media-clear">' . esc_html__( 'Clear', 'medical-college-manager' ) . '</button><span class="mcm-media-preview"></span></p>';
+		echo '<p class="mcm-rep-actions">';
+		echo '<button type="button" class="button mcm-rep-up">' . esc_html__( 'Move up', 'medical-college-manager' ) . '</button> ';
+		echo '<button type="button" class="button mcm-rep-down">' . esc_html__( 'Move down', 'medical-college-manager' ) . '</button> ';
+		echo '<button type="button" class="button-link button-link-delete mcm-rep-remove">' . esc_html__( 'Remove', 'medical-college-manager' ) . '</button>';
+		echo '</p></fieldset></li>';
+	}
+
+	/**
+	 * A stored Y-m-d date shown as d/m/Y in an input (the format staff type and
+	 * the one MCM_Meta::parse_date() reads back), or ''.
+	 *
+	 * @param string $ymd Stored date.
+	 * @return string
+	 */
+	private static function dmy( $ymd ) {
+		$d = '' !== $ymd ? DateTime::createFromFormat( 'Y-m-d', $ymd ) : false;
+		return $d ? $d->format( 'd/m/Y' ) : '';
+	}
+
+	/**
 	 * Persist the fields.
 	 *
 	 * @param int $term_id Term ID.
@@ -307,6 +745,7 @@ class MCM_TermMeta {
 			return;
 		}
 
+		$notes = array();
 		foreach ( self::fields_for( $term->taxonomy ) as $key => $field ) {
 			// A checklist posts an array of ticked values (nothing at all when the
 			// admin unticks every box), so it is always processed — never skipped
@@ -330,17 +769,169 @@ class MCM_TermMeta {
 			}
 
 			if ( ! isset( $_POST[ $key ] ) ) {
+				// The repeater posts nothing once every row is removed (only the
+				// empty template row remains), so a missing key clears it.
+				if ( 'services' === $field['type'] ) {
+					delete_term_meta( $term_id, $key );
+				}
 				continue;
 			}
-			$raw   = wp_unslash( $_POST[ $key ] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
-			$clean = MCM_Meta::sanitize_value( $field['type'], $raw );
+			$raw   = wp_unslash( $_POST[ $key ] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput -- Sanitized by sanitize_field() per type.
+			$clean = self::sanitize_field( $field['type'], $raw );
+
+			if ( 'mapurl' === $field['type'] && '' === $clean && '' !== trim( MCM_Safe::str( $raw ) ) ) {
+				$notes[] = __( 'The map was not saved: only Google Maps embed links are accepted (Share → Embed a map).', 'medical-college-manager' );
+			}
+			if ( 'services' === $field['type'] && is_array( $raw ) ) {
+				foreach ( $raw as $row ) {
+					foreach ( array( 'date_from', 'date_to' ) as $dk ) {
+						$d = is_array( $row ) && isset( $row[ $dk ] ) ? trim( MCM_Safe::str( $row[ $dk ] ) ) : '';
+						if ( '' !== $d && false === MCM_Meta::parse_date( $d ) ) {
+							/* translators: %s: the date as typed. */
+							$notes[] = sprintf( __( 'A service date "%s" could not be read and was left empty (use 15/10/2026 or 2026-10-15).', 'medical-college-manager' ), $d );
+						}
+					}
+				}
+			}
+
 			if ( '' === $clean ) {
 				delete_term_meta( $term_id, $key );
 			} else {
 				update_term_meta( $term_id, $key, $clean );
 			}
 		}
+		if ( $notes ) {
+			set_transient( 'mcm_term_notice_' . get_current_user_id(), implode( ' ', array_unique( $notes ) ), 5 * MINUTE_IN_SECONDS );
+		}
 	}
+
+	/*
+	 * ----------------------------------------------------------------
+	 * Completeness (Departments list)
+	 * ----------------------------------------------------------------
+	 */
+
+	/**
+	 * Mandatory department fields that are empty, as labels.
+	 *
+	 * @param int $term_id Term ID.
+	 * @return string[]
+	 */
+	public static function missing_required( $term_id ) {
+		$out = array();
+		foreach ( self::fields_for( 'mcm_department' ) as $key => $field ) {
+			if ( ! empty( $field['required'] ) && '' === trim( (string) MCM_Safe::term_meta( $term_id, $key ) ) ) {
+				$out[] = $field['label'];
+			}
+		}
+		return $out;
+	}
+
+	/**
+	 * Which of the 8 template sections a department can show, keyed by
+	 * section. Faculty and Publications count when tagged content exists.
+	 *
+	 * @param WP_Term $term Department.
+	 * @return array<string,bool>
+	 */
+	public static function completeness( $term ) {
+		$id  = (int) $term->term_id;
+		$has = function ( $key ) use ( $id ) {
+			return '' !== trim( (string) MCM_Safe::term_meta( $id, $key ) );
+		};
+		$any = function ( $types ) use ( $id ) {
+			$q = get_posts(
+				array(
+					'post_type'        => $types,
+					'post_status'      => 'publish',
+					'numberposts'      => 1,
+					'fields'           => 'ids',
+					'suppress_filters' => false,
+					'tax_query'        => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query -- One-row existence check.
+						array(
+							'taxonomy' => 'mcm_department',
+							'terms'    => $id,
+						),
+					),
+				)
+			);
+			return ! empty( $q );
+		};
+		return array(
+			'hero'         => $has( 'mcm_term_banner' ) || $has( 'mcm_term_video' ),
+			'hod'          => $has( 'mcm_term_message' ) || $has( 'mcm_term_hod' ),
+			'intro'        => $has( 'mcm_term_intro' ),
+			'vm'           => $has( 'mcm_term_vision' ) && $has( 'mcm_term_mission' ),
+			'services'     => (bool) self::services( $id ),
+			'faculty'      => $any( array( 'mcm_team', 'mcm_consultant' ) ),
+			'publications' => $any( array( 'mcm_publication' ) ),
+			'contact'      => $has( 'mcm_term_phone' ) || $has( 'mcm_term_email' ) || $has( 'mcm_term_address' ) || $has( 'mcm_term_hours' ) || $has( 'mcm_term_map' ),
+		);
+	}
+
+	/**
+	 * Add the "Page" column to the Departments list.
+	 *
+	 * @param array $columns Columns.
+	 * @return array
+	 */
+	public function list_columns( $columns ) {
+		$out = array();
+		foreach ( $columns as $k => $v ) {
+			$out[ $k ] = $v;
+			if ( 'name' === $k ) {
+				$out['mcm_page'] = __( 'Page', 'medical-college-manager' );
+			}
+		}
+		if ( ! isset( $out['mcm_page'] ) ) {
+			$out['mcm_page'] = __( 'Page', 'medical-college-manager' );
+		}
+		return $out;
+	}
+
+	/**
+	 * "6/8 sections" plus the missing mandatory fields, e.g. "Vision missing".
+	 *
+	 * @param string $content Existing content.
+	 * @param string $column  Column key.
+	 * @param int    $term_id Term ID.
+	 * @return string
+	 */
+	public function list_column_value( $content, $column, $term_id ) {
+		if ( 'mcm_page' !== $column ) {
+			return $content;
+		}
+		$term = get_term( (int) $term_id, 'mcm_department' );
+		if ( ! $term instanceof WP_Term ) {
+			return $content;
+		}
+		$c     = self::completeness( $term );
+		$count = count( array_filter( $c ) );
+		$html  = '<span class="mcm-completeness">' . esc_html(
+			sprintf(
+				/* translators: 1: sections that can be shown, 2: total sections. */
+				__( '%1$d/%2$d sections', 'medical-college-manager' ),
+				$count,
+				count( $c )
+			)
+		) . '</span>';
+		foreach ( self::missing_required( (int) $term_id ) as $label ) {
+			$html .= '<br /><span class="mcm-missing">' . esc_html(
+				sprintf(
+					/* translators: %s: field name, e.g. "Vision". */
+					__( '%s missing', 'medical-college-manager' ),
+					$label
+				)
+			) . '</span>';
+		}
+		return $html;
+	}
+
+	/*
+	 * ----------------------------------------------------------------
+	 * Front end (existing department page parts)
+	 * ----------------------------------------------------------------
+	 */
 
 	/**
 	 * Resolve which Department term a shortcode targets: the `department` (or
@@ -396,6 +987,7 @@ class MCM_TermMeta {
 			return '';
 		}
 		$hod     = trim( (string) MCM_Safe::term_meta( $term->term_id, 'mcm_term_hod' ) );
+		$role    = trim( (string) MCM_Safe::term_meta( $term->term_id, 'mcm_term_hod_designation' ) );
 		$photo   = trim( (string) MCM_Safe::term_meta( $term->term_id, 'mcm_term_hod_photo' ) );
 		$message = trim( (string) MCM_Safe::term_meta( $term->term_id, 'mcm_term_message' ) );
 		$email   = trim( (string) MCM_Safe::term_meta( $term->term_id, 'mcm_term_email' ) );
@@ -412,7 +1004,7 @@ class MCM_TermMeta {
 				<div class="mcm-hod-photo"><img src="<?php echo esc_url( $photo ); ?>" alt="<?php echo esc_attr( $hod ); ?>" loading="lazy" /></div>
 			<?php endif; ?>
 			<div class="mcm-hod-body">
-				<span class="mcm-hod-eyebrow"><?php esc_html_e( 'Head of Department', 'medical-college-manager' ); ?></span>
+				<span class="mcm-hod-eyebrow"><?php echo esc_html( '' !== $role ? $role : __( 'Head of Department', 'medical-college-manager' ) ); ?></span>
 				<?php if ( '' !== $hod ) : ?>
 					<h2 class="mcm-hod-name"><?php echo esc_html( $hod ); ?></h2>
 				<?php endif; ?>
