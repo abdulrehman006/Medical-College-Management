@@ -18,6 +18,9 @@ Medical College Manager — complete changelog.
 * Privacy: the personal-data exporter and eraser now include the gender of
   consultants and team members.
 * Developers: mcm_default_avatar_url now also receives the post ID and gender.
+* Display corrections (below) apply as soon as you update: they change how
+  existing pages look, never what is stored. Tested: every post, field, term,
+  department setting and plugin setting is identical before and after updating.
 * Fixed: the table view of notices, tenders, scholarships, publications,
   research projects and policies showed only a Title column. Each now has its
   own columns (e.g. tenders: reference, category, closing date, department).
