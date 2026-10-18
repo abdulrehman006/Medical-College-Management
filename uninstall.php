@@ -28,6 +28,7 @@ function mcm_uninstall_site() {
 		'mcm_error_log',
 		'mcm_dates_migration',
 		'mcm_job_installed',
+		'mcm_staff_type_installed',
 	);
 	foreach ( $options as $option ) {
 		delete_option( $option );

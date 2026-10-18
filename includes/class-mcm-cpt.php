@@ -20,6 +20,7 @@ class MCM_CPT {
 	public function __construct() {
 		add_action( 'init', array( $this, 'register_post_types' ) );
 		add_action( 'init', array( $this, 'register_taxonomies' ) );
+		add_action( 'restrict_manage_posts', array( $this, 'staff_type_filter' ) );
 		// Force the simple classic editor for every plugin CPT (keeps the REST
 		// API on for meta/Elementor, but no block editor — easier data entry).
 		add_filter( 'use_block_editor_for_post_type', array( $this, 'force_classic_editor' ), 10, 2 );
@@ -289,6 +290,15 @@ class MCM_CPT {
 				'slug'         => 'research-area',
 				'hierarchical' => true,
 			),
+			// Team: Teaching & Technical Staff / Support Staff (1.32). Groups faculty on
+			// department pages; seeded once by install_staff_types().
+			'mcm_staff_type'      => array(
+				'post_types'   => array( 'mcm_team' ),
+				'singular'     => __( 'Staff Type', 'medical-college-manager' ),
+				'plural'       => __( 'Staff Types', 'medical-college-manager' ),
+				'slug'         => 'staff-type',
+				'hierarchical' => true,
+			),
 			'mcm_policy_cat'      => array(
 				'post_types'   => array( 'mcm_policy' ),
 				'singular'     => __( 'Policy Category', 'medical-college-manager' ),
@@ -436,5 +446,64 @@ class MCM_CPT {
 
 			register_taxonomy( $key, $cfg['post_types'], apply_filters( "mcm_tax_args_{$key}", $args ) );
 		}
+	}
+	/** Option recording that the default staff types were created. */
+	const STAFF_TYPES_INSTALLED = 'mcm_staff_type_installed';
+
+	/**
+	 * Create the two default staff types once (activation / upgrade). Admins
+	 * can rename them or add more; they are never re-created after that.
+	 */
+	public static function install_staff_types() {
+		if ( get_option( self::STAFF_TYPES_INSTALLED ) || ! taxonomy_exists( 'mcm_staff_type' ) ) {
+			return;
+		}
+		$types = array(
+			'teaching-technical-staff' => array(
+				__( 'Teaching & Technical Staff', 'medical-college-manager' ),
+				__( 'Professors, lecturers, demonstrators, laboratory and technical staff.', 'medical-college-manager' ),
+			),
+			'support-staff'            => array(
+				__( 'Support Staff', 'medical-college-manager' ),
+				__( 'Non-technical roles such as office assistants, security and attendants.', 'medical-college-manager' ),
+			),
+		);
+		foreach ( $types as $slug => $t ) {
+			if ( ! term_exists( $slug, 'mcm_staff_type' ) ) {
+				wp_insert_term(
+					$t[0],
+					'mcm_staff_type',
+					array(
+						'slug'        => $slug,
+						'description' => $t[1],
+					)
+				);
+			}
+		}
+		update_option( self::STAFF_TYPES_INSTALLED, defined( 'MCM_VERSION' ) ? MCM_VERSION : '1', false );
+	}
+
+	/**
+	 * Team list (wp-admin): a "Staff Type" filter dropdown next to the date filter.
+	 *
+	 * @param string $post_type Post type of the list screen.
+	 */
+	public function staff_type_filter( $post_type ) {
+		if ( 'mcm_team' !== $post_type || ! taxonomy_exists( 'mcm_staff_type' ) ) {
+			return;
+		}
+		$current = isset( $_GET['mcm_staff_type'] ) ? sanitize_title( wp_unslash( $_GET['mcm_staff_type'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only list filter.
+		wp_dropdown_categories(
+			array(
+				'taxonomy'        => 'mcm_staff_type',
+				'name'            => 'mcm_staff_type',
+				'value_field'     => 'slug',
+				'selected'        => $current,
+				'show_option_all' => __( 'All staff types', 'medical-college-manager' ),
+				'hide_empty'      => false,
+				'hierarchical'    => true,
+				'orderby'         => 'name',
+			)
+		);
 	}
 }

@@ -168,6 +168,10 @@ final class Medical_College_Manager {
 		if ( class_exists( 'MCM_Job' ) ) {
 			MCM_Safe::run( array( 'MCM_Job', 'install' ), 'upgrade: jobs install' );
 		}
+		// 1.32.0: default staff types (once).
+		if ( class_exists( 'MCM_CPT' ) ) {
+			MCM_Safe::run( array( 'MCM_CPT', 'install_staff_types' ), 'upgrade: staff types' );
+		}
 		// 1.30.2: normalise dates/times saved before validation existed (once).
 		if ( class_exists( 'MCM_Upgrade' ) ) {
 			MCM_Safe::run( array( 'MCM_Upgrade', 'maybe_migrate_dates' ), 'upgrade: date normalisation' );

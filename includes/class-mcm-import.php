@@ -236,6 +236,7 @@ class MCM_Import {
 				'meta' => array( 'designation', 'qualifications', 'experience', 'phone', 'email', 'linkedin', 'joining_date', 'orcid', 'scholar', 'pubmed', 'gender' ),
 				'tax'  => array(
 					'department'    => 'mcm_department',
+					'staff_type'    => 'mcm_staff_type',
 					'specialty'     => 'mcm_specialty',
 					'faculty'       => 'mcm_teacher',
 					'research_area' => 'mcm_research_area',

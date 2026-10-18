@@ -175,6 +175,7 @@ function mcm_activate() {
 		require_once MCM_PATH . 'includes/class-mcm-safe.php';
 		require_once MCM_PATH . 'includes/class-mcm-job.php';
 		MCM_Job::install();
+		MCM_CPT::install_staff_types();
 
 		update_option( 'mcm_version', MCM_VERSION );
 		flush_rewrite_rules();

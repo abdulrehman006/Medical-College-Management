@@ -1,6 +1,6 @@
-title,content,department,specialty,designation,qualifications,experience,phone,email,linkedin,gender
-Dr. Sara Khan,"Heads the cardiology team and faculty research.",Cardiology,Interventional Cardiology,Professor & Head,"MBBS, FCPS, FACC",18 years,+92-300-1234567,sara.khan@example.edu,https://linkedin.com/in/sarakhan,Female
-Mr. Usman Tariq,"Administrative lead for academic operations.",Administration,Academic Affairs,Registrar,"MBA, MPhil",15 years,+92-305-1112223,usman.tariq@example.edu,https://linkedin.com/in/usmantariq,Male
-Ms. Fatima Sheikh,"Coordinates the nursing faculty.",Nursing,Critical Care Nursing,Principal,"BSN, MSN",14 years,+92-306-2223334,fatima.sheikh@example.edu,https://linkedin.com/in/fatimasheikh,Female
-Dr. Ayesha Noor,"Pediatrics faculty member and clinical mentor.",Pediatrics,Neonatology,Associate Professor,"MBBS, MD",9 years,+92-302-3456789,ayesha.noor@example.edu,https://linkedin.com/in/ayeshanoor,Female
-Dr. Kamran Shah,"Dean of academics overseeing curriculum.",Administration,Medical Education,Dean,"MBBS, MHPE, PhD",22 years,+92-307-3334445,kamran.shah@example.edu,https://linkedin.com/in/kamranshah,Male
+title,content,department,specialty,designation,qualifications,experience,phone,email,linkedin,gender,staff_type
+Dr. Sara Khan,"Heads the cardiology team and faculty research.",Cardiology,Interventional Cardiology,Professor & Head,"MBBS, FCPS, FACC",18 years,+92-300-1234567,sara.khan@example.edu,https://linkedin.com/in/sarakhan,Female,Teaching & Technical Staff
+Mr. Usman Tariq,"Administrative lead for academic operations.",Administration,Academic Affairs,Registrar,"MBA, MPhil",15 years,+92-305-1112223,usman.tariq@example.edu,https://linkedin.com/in/usmantariq,Male,Support Staff
+Ms. Fatima Sheikh,"Coordinates the nursing faculty.",Nursing,Critical Care Nursing,Principal,"BSN, MSN",14 years,+92-306-2223334,fatima.sheikh@example.edu,https://linkedin.com/in/fatimasheikh,Female,Teaching & Technical Staff
+Dr. Ayesha Noor,"Pediatrics faculty member and clinical mentor.",Pediatrics,Neonatology,Associate Professor,"MBBS, MD",9 years,+92-302-3456789,ayesha.noor@example.edu,https://linkedin.com/in/ayeshanoor,Female,Teaching & Technical Staff
+Dr. Kamran Shah,"Dean of academics overseeing curriculum.",Administration,Medical Education,Dean,"MBBS, MHPE, PhD",22 years,+92-307-3334445,kamran.shah@example.edu,https://linkedin.com/in/kamranshah,Male,Teaching & Technical Staff

@@ -28,7 +28,7 @@ class MCM_Query {
 			'mcm_course'      => array( 'mcm_program_link', 'mcm_department', 'mcm_teacher', 'mcm_session', 'mcm_course_cat' ),
 			'mcm_event'       => array( 'mcm_event_cat', 'mcm_department' ),
 			'mcm_consultant'  => array( 'mcm_department', 'mcm_specialty', 'mcm_teacher', 'mcm_research_area' ),
-			'mcm_team'        => array( 'mcm_department', 'mcm_specialty', 'mcm_teacher', 'mcm_research_area' ),
+			'mcm_team'        => array( 'mcm_department', 'mcm_staff_type', 'mcm_specialty', 'mcm_teacher', 'mcm_research_area' ),
 			'mcm_publication' => array( 'mcm_research_area', 'mcm_department', 'mcm_teacher' ),
 			'mcm_research'    => array( 'mcm_research_area', 'mcm_department', 'mcm_teacher' ),
 			'mcm_policy'      => array( 'mcm_policy_cat', 'mcm_department' ),
@@ -130,6 +130,7 @@ class MCM_Query {
 			'level'         => '',
 			'research_area' => '',
 			'program'       => '',
+			'staff_type'    => '',
 			// Alias: editors think "professor", the taxonomy is mcm_teacher.
 			'professor'     => '',
 			// Locked taxonomy term (e.g. on a taxonomy archive) — always applied
@@ -203,6 +204,7 @@ class MCM_Query {
 			'level'         => 'mcm_level',
 			'research_area' => 'mcm_research_area',
 			'program'       => 'mcm_program_link',   // the Program spine connector.
+			'staff_type'    => 'mcm_staff_type',     // Team: Teaching & Technical / Support.
 		);
 	}
 
@@ -1701,6 +1703,7 @@ class MCM_Query {
 				array( __( 'Name', 'medical-college-manager' ), 'title', '' ),
 				array( __( 'Designation', 'medical-college-manager' ), 'meta', 'mcm_designation' ),
 				array( __( 'Department', 'medical-college-manager' ), 'tax', 'mcm_department' ),
+				array( __( 'Staff Type', 'medical-college-manager' ), 'tax', 'mcm_staff_type' ),
 				array( __( 'Specialty', 'medical-college-manager' ), 'tax', 'mcm_specialty' ),
 			),
 			'mcm_program'     => array(

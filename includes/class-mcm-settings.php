@@ -428,7 +428,7 @@ class MCM_Settings {
 		return array(
 			__( 'Content lists — drop on any page or Elementor Shortcode block', 'medical-college-manager' ) => array(
 				array( '[mcm_consultants]', __( 'Doctors & consultants directory — photo cards with a left-side search & filter sidebar.', 'medical-college-manager' ) ),
-				array( '[mcm_team]', __( 'Staff / team member directory, in the same layout as consultants.', 'medical-college-manager' ) ),
+				array( '[mcm_team]', __( 'Staff / team member directory, in the same layout as consultants. staff_type="support-staff" (or "teaching-technical-staff") lists one staff type.', 'medical-college-manager' ) ),
 				array( '[mcm_programs]', __( 'Degree programmes (MBBS, BDS, Nursing…) as cards.', 'medical-college-manager' ) ),
 				array( '[mcm_courses]', __( 'Course listing — code, credit hours, semester, lead.', 'medical-college-manager' ) ),
 				array( '[mcm_timetable]', __( 'Class timetable as a clean, printable table.', 'medical-college-manager' ) ),
