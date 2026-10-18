@@ -316,7 +316,6 @@ class MCM_Settings {
 					$this->number_row( 'border_radius', __( 'Border Radius (px)', 'medical-college-manager' ), $s, 0, 50 );
 					$this->number_row( 'title_size', __( 'Title Font Size (px)', 'medical-college-manager' ), $s, 12, 40 );
 					$this->number_row( 'image_height', __( 'Image Height (px)', 'medical-college-manager' ), $s, 80, 500 );
-					$this->avatar_row( $s );
 					$this->toggle_row( 'card_shadow', __( 'Card Shadow', 'medical-college-manager' ), $s );
 					$this->toggle_row( 'hover_lift', __( 'Hover Lift Effect', 'medical-college-manager' ), $s );
 					$this->toggle_row( 'archive_filters', __( 'Filterable Archive Pages', 'medical-college-manager' ), $s );
@@ -329,6 +328,12 @@ class MCM_Settings {
 							<p class="description"><?php esc_html_e( 'e.g. "Poppins", sans-serif — or leave as "inherit".', 'medical-college-manager' ); ?></p>
 						</td>
 					</tr>
+				</table>
+
+				<h2 class="title" id="mcm-default-photos"><?php esc_html_e( 'Default Photos', 'medical-college-manager' ); ?></h2>
+				<p class="description"><?php esc_html_e( 'Shown for consultants and team members who have no photo of their own: the photo for their Gender first (set Gender on each profile), then the general default photo, then a plain silhouette.', 'medical-college-manager' ); ?></p>
+				<table class="form-table" role="presentation">
+					<?php $this->avatar_row( $s ); ?>
 				</table>
 
 				<h2 class="title"><?php esc_html_e( 'Printing & Letterhead', 'medical-college-manager' ); ?></h2>
@@ -580,11 +585,11 @@ class MCM_Settings {
 		$rows = array(
 			'default_avatar_male'   => array(
 				__( 'Default Photo — Male', 'medical-college-manager' ),
-				__( 'Shown for consultants, team members and students whose Gender is Male and who have no photo.', 'medical-college-manager' ),
+				__( 'Shown for consultants and team members whose Gender is Male and who have no photo.', 'medical-college-manager' ),
 			),
 			'default_avatar_female' => array(
 				__( 'Default Photo — Female', 'medical-college-manager' ),
-				__( 'Shown for consultants, team members and students whose Gender is Female and who have no photo.', 'medical-college-manager' ),
+				__( 'Shown for consultants and team members whose Gender is Female and who have no photo.', 'medical-college-manager' ),
 			),
 			'default_avatar'        => array(
 				__( 'Default Profile Image', 'medical-college-manager' ),
