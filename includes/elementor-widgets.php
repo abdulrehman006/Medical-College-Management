@@ -1596,3 +1596,413 @@ class MCM_Widget_Notices extends MCM_Widget_Notice_Base {
 		echo MCM_Notice::render_list( $this->mcm_atts() ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 }
+
+/*
+ * ----------------------------------------------------------------
+ * Department page sections (1.32) — one widget per fixed section.
+ * ----------------------------------------------------------------
+ */
+
+/**
+ * Shared base for the department section widgets: pick the department (or
+ * use the department being viewed) and restyle the colours.
+ */
+abstract class MCM_Widget_Department_Base extends \Elementor\Widget_Base {
+
+	/** Section key (see MCM_Department_Page::SECTIONS). */
+	abstract protected function mcm_section();
+
+	/**
+	 * Elementor panel category.
+	 */
+	public function get_categories() {
+		return array( 'medical-college-manager' );
+	}
+
+	/**
+	 * Stylesheets this widget needs.
+	 */
+	public function get_style_depends() {
+		return array( 'mcm-frontend' );
+	}
+
+	/**
+	 * Scripts this widget needs.
+	 */
+	public function get_script_depends() {
+		return array( 'mcm-frontend' );
+	}
+
+	/**
+	 * Search keywords for the Elementor panel.
+	 */
+	public function get_keywords() {
+		return array( 'department', 'hod', 'faculty', 'medical-college-manager' );
+	}
+
+	/**
+	 * Register the widget controls.
+	 */
+	protected function register_controls() {
+		$this->start_controls_section( 'mcm_dept', array( 'label' => __( 'Department', 'medical-college-manager' ) ) );
+		$options = array( '' => __( '— The department being viewed —', 'medical-college-manager' ) );
+		$terms   = get_terms(
+			array(
+				'taxonomy'   => 'mcm_department',
+				'hide_empty' => false,
+			)
+		);
+		if ( ! is_wp_error( $terms ) ) {
+			foreach ( $terms as $t ) {
+				$options[ $t->slug ] = $t->name;
+			}
+		}
+		$this->add_control(
+			'department',
+			array(
+				'label'       => __( 'Department', 'medical-college-manager' ),
+				'type'        => \Elementor\Controls_Manager::SELECT,
+				'default'     => '',
+				'options'     => $options,
+				'description' => __( 'Content comes from Departments → Edit. Section titles, the empty-section rule and the faculty layout come from College Manager → Department Page.', 'medical-college-manager' ),
+			)
+		);
+		if ( 'hero' === $this->mcm_section() ) {
+			$this->add_control(
+				'title_tag',
+				array(
+					'label'   => __( 'Name tag', 'medical-college-manager' ),
+					'type'    => \Elementor\Controls_Manager::SELECT,
+					'default' => 'h1',
+					'options' => array(
+						'h1'  => 'H1',
+						'h2'  => 'H2',
+						'div' => 'div',
+					),
+				)
+			);
+		}
+		$this->end_controls_section();
+
+		$this->start_controls_section(
+			'mcm_dept_style',
+			array(
+				'label' => __( 'Colours & Text', 'medical-college-manager' ),
+				'tab'   => \Elementor\Controls_Manager::TAB_STYLE,
+			)
+		);
+		// The colour settings are written inline on .mcm-dept, so the widget
+		// overrides them one level down, where they are inherited from.
+		$vars = array(
+			'heading' => __( 'Heading colour', 'medical-college-manager' ),
+			'accent'  => __( 'Accent colour', 'medical-college-manager' ),
+			'card'    => __( 'Card background', 'medical-college-manager' ),
+			'text'    => __( 'Text colour', 'medical-college-manager' ),
+		);
+		foreach ( $vars as $var => $label ) {
+			$this->add_control(
+				'mcm_' . $var,
+				array(
+					'label'     => $label,
+					'type'      => \Elementor\Controls_Manager::COLOR,
+					'selectors' => array( '{{WRAPPER}} .mcm-dept > *' => '--mcm-dept-' . $var . ': {{VALUE}};' ),
+				)
+			);
+		}
+		$this->add_group_control(
+			\Elementor\Group_Control_Typography::get_type(),
+			array(
+				'name'     => 'mcm_heading_type',
+				'label'    => __( 'Heading typography', 'medical-college-manager' ),
+				'selector' => '{{WRAPPER}} .mcm-dept-h, {{WRAPPER}} .mcm-dept-title',
+			)
+		);
+		$this->add_group_control(
+			\Elementor\Group_Control_Typography::get_type(),
+			array(
+				'name'     => 'mcm_body_type',
+				'label'    => __( 'Text typography', 'medical-college-manager' ),
+				'selector' => '{{WRAPPER}} .mcm-dept',
+			)
+		);
+		$this->add_responsive_control(
+			'mcm_padding',
+			array(
+				'label'      => __( 'Section padding', 'medical-college-manager' ),
+				'type'       => \Elementor\Controls_Manager::DIMENSIONS,
+				'size_units' => array( 'px', 'em', '%' ),
+				'selectors'  => array( '{{WRAPPER}} .mcm-dept-section' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};' ),
+			)
+		);
+		$this->end_controls_section();
+	}
+
+	/**
+	 * Is this the Elementor editor preview?
+	 *
+	 * @return bool
+	 */
+	private function mcm_editing() {
+		return class_exists( '\Elementor\Plugin' ) && isset( \Elementor\Plugin::$instance->preview ) && is_object( \Elementor\Plugin::$instance->preview ) && method_exists( \Elementor\Plugin::$instance->preview, 'is_preview_mode' ) && \Elementor\Plugin::$instance->preview->is_preview_mode();
+	}
+
+	/**
+	 * Render boundary: a failing widget renders nothing for visitors (and a
+	 * short notice for administrators) instead of breaking the page.
+	 */
+	protected function render() {
+		echo MCM_Safe::render( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Built and escaped by MCM_Department_Page::part().
+			function () {
+				$s    = $this->get_settings_for_display();
+				$term = MCM_TermMeta::resolve_term( array( 'department' => isset( $s['department'] ) ? (string) $s['department'] : '' ) );
+				$html = $term ? MCM_Department_Page::part( $this->mcm_section(), $term, isset( $s['title_tag'] ) ? (string) $s['title_tag'] : 'h1' ) : '';
+				if ( '' === $html && $this->mcm_editing() ) {
+					// Nothing to show visitors; tell the editor why.
+					$html = '<p class="mcm-empty">' . esc_html( $term ? __( 'This department has nothing for this section yet (Departments → Edit).', 'medical-college-manager' ) : __( 'Choose a department, or place this widget in a department template.', 'medical-college-manager' ) ) . '</p>';
+				}
+				return $html;
+			},
+			'Elementor widget ' . $this->get_name()
+		);
+	}
+}
+
+/**
+ * Elementor widget: Department Hero.
+ */
+class MCM_Widget_Department_Hero extends MCM_Widget_Department_Base {
+	/**
+	 * Section key.
+	 */
+	protected function mcm_section() {
+		return 'hero';
+	}
+	/**
+	 * Widget machine name.
+	 */
+	public function get_name() {
+		return 'mcm_department_hero';
+	}
+	/**
+	 * Widget title shown in the Elementor panel.
+	 */
+	public function get_title() {
+		return __( 'Department Hero', 'medical-college-manager' );
+	}
+	/**
+	 * Icon shown in the Elementor panel.
+	 */
+	public function get_icon() {
+		return 'eicon-header';
+	}
+}
+
+/**
+ * Elementor widget: HOD Message.
+ */
+class MCM_Widget_Department_Hod extends MCM_Widget_Department_Base {
+	/**
+	 * Section key.
+	 */
+	protected function mcm_section() {
+		return 'hod';
+	}
+	/**
+	 * Widget machine name.
+	 */
+	public function get_name() {
+		return 'mcm_department_hod';
+	}
+	/**
+	 * Widget title shown in the Elementor panel.
+	 */
+	public function get_title() {
+		return __( 'HOD Message', 'medical-college-manager' );
+	}
+	/**
+	 * Icon shown in the Elementor panel.
+	 */
+	public function get_icon() {
+		return 'eicon-testimonial';
+	}
+}
+
+/**
+ * Elementor widget: Department Introduction.
+ */
+class MCM_Widget_Department_Introduction extends MCM_Widget_Department_Base {
+	/**
+	 * Section key.
+	 */
+	protected function mcm_section() {
+		return 'introduction';
+	}
+	/**
+	 * Widget machine name.
+	 */
+	public function get_name() {
+		return 'mcm_department_introduction';
+	}
+	/**
+	 * Widget title shown in the Elementor panel.
+	 */
+	public function get_title() {
+		return __( 'Department Introduction', 'medical-college-manager' );
+	}
+	/**
+	 * Icon shown in the Elementor panel.
+	 */
+	public function get_icon() {
+		return 'eicon-text';
+	}
+}
+
+/**
+ * Elementor widget: Vision & Mission.
+ */
+class MCM_Widget_Department_Vision_Mission extends MCM_Widget_Department_Base {
+	/**
+	 * Section key.
+	 */
+	protected function mcm_section() {
+		return 'vision_mission';
+	}
+	/**
+	 * Widget machine name.
+	 */
+	public function get_name() {
+		return 'mcm_department_vision_mission';
+	}
+	/**
+	 * Widget title shown in the Elementor panel.
+	 */
+	public function get_title() {
+		return __( 'Vision & Mission', 'medical-college-manager' );
+	}
+	/**
+	 * Icon shown in the Elementor panel.
+	 */
+	public function get_icon() {
+		return 'eicon-info-box';
+	}
+}
+
+/**
+ * Elementor widget: Department Services.
+ */
+class MCM_Widget_Department_Services extends MCM_Widget_Department_Base {
+	/**
+	 * Section key.
+	 */
+	protected function mcm_section() {
+		return 'services';
+	}
+	/**
+	 * Widget machine name.
+	 */
+	public function get_name() {
+		return 'mcm_department_services';
+	}
+	/**
+	 * Widget title shown in the Elementor panel.
+	 */
+	public function get_title() {
+		return __( 'Department Services', 'medical-college-manager' );
+	}
+	/**
+	 * Icon shown in the Elementor panel.
+	 */
+	public function get_icon() {
+		return 'eicon-gallery-grid';
+	}
+}
+
+/**
+ * Elementor widget: Department Faculty.
+ */
+class MCM_Widget_Department_Faculty extends MCM_Widget_Department_Base {
+	/**
+	 * Section key.
+	 */
+	protected function mcm_section() {
+		return 'faculty';
+	}
+	/**
+	 * Widget machine name.
+	 */
+	public function get_name() {
+		return 'mcm_department_faculty';
+	}
+	/**
+	 * Widget title shown in the Elementor panel.
+	 */
+	public function get_title() {
+		return __( 'Department Faculty', 'medical-college-manager' );
+	}
+	/**
+	 * Icon shown in the Elementor panel.
+	 */
+	public function get_icon() {
+		return 'eicon-person';
+	}
+}
+
+/**
+ * Elementor widget: Department Publications.
+ */
+class MCM_Widget_Department_Publications extends MCM_Widget_Department_Base {
+	/**
+	 * Section key.
+	 */
+	protected function mcm_section() {
+		return 'publications';
+	}
+	/**
+	 * Widget machine name.
+	 */
+	public function get_name() {
+		return 'mcm_department_publications';
+	}
+	/**
+	 * Widget title shown in the Elementor panel.
+	 */
+	public function get_title() {
+		return __( 'Department Publications', 'medical-college-manager' );
+	}
+	/**
+	 * Icon shown in the Elementor panel.
+	 */
+	public function get_icon() {
+		return 'eicon-bullet-list';
+	}
+}
+
+/**
+ * Elementor widget: Department Contact.
+ */
+class MCM_Widget_Department_Contact extends MCM_Widget_Department_Base {
+	/**
+	 * Section key.
+	 */
+	protected function mcm_section() {
+		return 'contact';
+	}
+	/**
+	 * Widget machine name.
+	 */
+	public function get_name() {
+		return 'mcm_department_contact';
+	}
+	/**
+	 * Widget title shown in the Elementor panel.
+	 */
+	public function get_title() {
+		return __( 'Department Contact', 'medical-college-manager' );
+	}
+	/**
+	 * Icon shown in the Elementor panel.
+	 */
+	public function get_icon() {
+		return 'eicon-map-pin';
+	}
+}

@@ -133,6 +133,14 @@ class MCM_Elementor {
 			'MCM_Widget_Notice_Ticker',
 			'MCM_Widget_Notice_Board',
 			'MCM_Widget_Notices',
+			'MCM_Widget_Department_Hero',
+			'MCM_Widget_Department_Hod',
+			'MCM_Widget_Department_Introduction',
+			'MCM_Widget_Department_Vision_Mission',
+			'MCM_Widget_Department_Services',
+			'MCM_Widget_Department_Faculty',
+			'MCM_Widget_Department_Publications',
+			'MCM_Widget_Department_Contact',
 		);
 	}
 }

@@ -223,7 +223,21 @@ class MCM_Templates {
 			if ( ! $term instanceof WP_Term ) {
 				return null;
 			}
-			$tax     = $term->taxonomy;
+			$tax = $term->taxonomy;
+
+			// 1.32 department page template (off by default). Rendered here,
+			// before the theme header, so its assets reach <head>. A failure
+			// falls through to the classic page below.
+			if ( 'mcm_department' === $tax && MCM_Department_Page::enabled() ) {
+				$page = MCM_Department_Page::render_or_null( $term );
+				if ( null !== $page ) {
+					return array(
+						'page_html' => $page,
+						'specific'  => array( "taxonomy-{$tax}-{$term->slug}.php", "taxonomy-{$tax}.php" ),
+					);
+				}
+			}
+
 			$blocks  = self::term_blocks( $term );
 			$tobj    = get_taxonomy( $tax );
 			$heading = ( $tobj ? $tobj->labels->singular_name . ': ' : '' ) . $term->name;

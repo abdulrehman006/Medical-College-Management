@@ -115,8 +115,10 @@ class MCM_Assets {
 	 * @param string $hook Admin page hook suffix.
 	 */
 	public function admin( $hook ) {
-		// Color picker only on our settings page.
-		if ( 'toplevel_page_mcm-settings' === $hook ) {
+		// Color picker + media on our settings screens (main settings, Department
+		// Page, Header & Footer). Submenu hooks carry a translated parent prefix,
+		// so match the suffix.
+		if ( preg_match( '/_page_mcm-(settings|department-page|site-chrome)$/', (string) $hook ) ) {
 			wp_enqueue_style( 'wp-color-picker' );
 			// Needed by the letterhead logo picker.
 			wp_enqueue_media();

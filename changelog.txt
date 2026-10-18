@@ -38,6 +38,41 @@ Medical College Manager — complete changelog.
 * The same link label in grid, list and directory views ("View details",
   "Meet the Consultant", "View Profile", "View & Apply" for jobs); developers
   can change it with the mcm_link_label filter.
+* The default photos have their own "Default Photos" section in Settings.
+* New: Staff Type for team members (Team → Staff Types). "Teaching & Technical
+  Staff" and "Support Staff" are created once and can be renamed. Filter the
+  Team list by staff type; staff_type="…" works in [mcm_team], the Team widget
+  and the CSV import/export (staff_type column).
+* New department fields (Departments → Edit), grouped in panels in page
+  order: HOD designation, Introduction (formatted text), Vision and Mission
+  (both required for that section to show; the list warns while missing),
+  Services / Facilities (title, description, optional dates and image; add,
+  reorder, remove), address, office hours and a Google Maps embed (paste the
+  link or the whole <iframe>; only Google Maps embed links are accepted). The
+  Departments list shows how complete each department page is (n/8 sections).
+  Images narrower than recommended get a warning (never a block); hero images
+  are now stored at full size.
+* New: Department page template (College Manager → Department Page), off
+  until switched on. Every department page then shows the same eight sections
+  in a fixed order — Hero, Message from the HOD, Introduction, Vision &
+  Mission, Services / Facilities, Faculty (grouped by staff type, consultants
+  included), Publications (newest first, "View all"), Contact (with map) —
+  and tabs for the department's other content. Settings: colours, hero
+  overlay, fallback hero image, HOD photo side, faculty columns and card
+  style, publications shown, empty sections hidden or "Information will be
+  available soon", and renameable section titles. If the template ever fails,
+  the previous department page is shown instead.
+* New shortcodes: [mcm_department_page], [mcm_department_introduction],
+  [mcm_department_vision_mission], [mcm_department_services],
+  [mcm_department_faculty], [mcm_department_publications] and
+  [mcm_department_contact] (department="slug", or the department being
+  viewed). The existing department shortcodes are unchanged.
+* New Elementor widgets: Department Hero, HOD Message, Department
+  Introduction, Vision & Mission, Department Services, Department Faculty,
+  Department Publications and Department Contact, with colour, typography
+  and spacing controls.
+* Department pages using the template carry CollegeOrUniversity structured
+  data (name, link, image, phone, email, address, parent college).
 
 = 1.31.0 =
 New: Jobs / Vacancies.

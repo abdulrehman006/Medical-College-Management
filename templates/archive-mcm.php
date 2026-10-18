@@ -48,7 +48,10 @@ if ( $mcm_block_theme ) {
 	get_header();
 }
 
-if ( $mcm_ctx ) :
+if ( $mcm_ctx && isset( $mcm_ctx['page_html'] ) ) :
+	// Department page template: the whole page, sections in a fixed order.
+	echo $mcm_ctx['page_html']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Built and escaped by MCM_Department_Page::render().
+elseif ( $mcm_ctx ) :
 	// Full-width hero (video/image) sits ABOVE the title and breaks out of the
 	// centred content column edge-to-edge. Hidden when nothing is set.
 	if ( ! empty( $mcm_ctx['hero'] ) ) {
