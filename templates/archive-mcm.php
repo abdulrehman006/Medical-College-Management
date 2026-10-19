@@ -49,7 +49,7 @@ if ( $mcm_block_theme ) {
 	// The page's main landmark. Hello Elementor's own templates call it
 	// #content (its skip link points there); other themes may already use that
 	// ID in header.php, so they get a neutral one.
-	echo '<main id="' . esc_attr( 'hello-elementor' === get_template() ? 'content' : 'mcm-main' ) . '" class="site-main mcm-main">';
+	echo '<main id="' . esc_attr( 'hello-elementor' === get_template() ? 'content' : 'mcm-main' ) . '" class="mcm-main">';
 }
 
 if ( $mcm_ctx && isset( $mcm_ctx['page_html'] ) ) :
