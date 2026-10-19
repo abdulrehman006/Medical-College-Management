@@ -336,7 +336,6 @@ body.mcm-hf-on:not(.elementor-page) .site-main:not(.mcm-main){ padding-top:32px;
 /* Collapsed header: the CTA moves into the menu panel; search stays beside the burger. */
 .mcm-hf.mcm-hf-collapsed .mcm-hf-actions .mcm-hf-cta { display: none; }
 .mcm-hf.mcm-hf-collapsed .mcm-hf-actions { padding-left: 0; margin-right: 6px; }
-.mcm-hf.mcm-hf-collapsed .mcm-hf-burger { margin-left: 0; }
 .mcm-hf-collapsed .mcm-hf-actions ~ .mcm-hf-burger { margin-left: 0; }
 .mcm-hf-panel-cta { margin: 16px 16px 0; }
 .mcm-hf-panel-cta .mcm-hf-cta { width: 100%; justify-content: center; }
