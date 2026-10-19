@@ -67,6 +67,23 @@ Medical College Manager — complete changelog.
   its page. Departments → Edit → Page sections also hides Faculty and
   Publications. Text in the accent colour is darkened automatically when
   needed so it stays readable.
+* New: College header & footer (College Manager → Header & Footer), off until
+  switched on. Replaces the theme's header and footer on every page without
+  editing the theme (Hello Elementor is switched through its own setting);
+  if either part ever fails, the theme's own one is shown instead. Top bar
+  with email, phone and a menu; logo and a main menu with dropdowns three
+  levels deep (keyboard: arrows, Escape; the current department is
+  highlighted); a mobile menu panel; static, sticky, smart-sticky or
+  shrinking header; a four-column footer with the college logo, two link
+  menus, contact details, the Social Bar icons, a copyright line and legal
+  links; back-to-top. Five new menu locations (Appearance → Menus). All
+  colours, sizes and texts are settings, with a warning when text would be
+  hard to read; settings can be exported, imported and reset. Optionally
+  uses your own Elementor templates instead of the built-in design. The
+  Montserrat font is bundled (no Google request). Not shown on Elementor
+  Canvas pages, chosen pages, or with block themes; steps aside where an
+  Elementor Pro Theme Builder header/footer applies. Site Health reports
+  anything that stops it from showing as set up.
 * New shortcodes: [mcm_department_page], [mcm_department_introduction],
   [mcm_department_vision_mission], [mcm_department_services],
   [mcm_department_faculty], [mcm_department_publications] and

@@ -1,0 +1,316 @@
+/*
+ * Medical College Manager — college header & footer (1.32), MCM_Site_Chrome.
+ * Scoped under .mcm-hf and driven by --mcm-hf-* custom properties; the
+ * settings (College Manager → Header & Footer) are printed inline after this
+ * file. Defaults reproduce the college's measured design.
+ */
+/* Bundled fonts (SIL OFL 1.1, see ../fonts/OFL.txt). Montserrat is one
+   variable file for weights 400–700; the brand face holds only G, M and C. */
+@font-face { font-family: "Montserrat"; font-style: normal; font-weight: 400 700; font-display: swap; src: url(../fonts/Montserrat-var.woff2) format("woff2"); }
+@font-face { font-family: "MCM Brand"; font-style: normal; font-weight: 700; font-display: swap; src: url(../fonts/NotoNaskh-GMC.woff2) format("woff2"); unicode-range: U+0043, U+0047, U+004D; }
+:root {
+	/* Layout */
+	--mcm-hf-container: 1150px;          /* 1120 content + 2 x 15 padding (live content box: x 160–1280 at 1440) */
+	--mcm-hf-pad: 15px;
+	--mcm-hf-font: "Montserrat", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+	--mcm-hf-brand-font: "MCM Brand", Georgia, "Times New Roman", serif;   /* live footer "GMC" title */
+
+	/* Top bar (live: 63px, #0A4D8C, 13px) */
+	--mcm-hf-top-h: 63px;
+	--mcm-hf-top-bg: #0A4D8C;
+	--mcm-hf-top-text: #FFFFFF;
+	--mcm-hf-top-hover: #BFE6E6;
+	--mcm-hf-top-divider: #434549;       /* live: 2px x 45px, rgb(67,69,73) */
+	--mcm-hf-top-divider-w: 2px;
+	--mcm-hf-top-divider-h: 45px;        /* brief says full height — see plan, "differences" */
+	--mcm-hf-top-size: 13px;
+
+	/* Main bar (live: 93px incl. 1px border) */
+	--mcm-hf-main-h: 92px;
+	--mcm-hf-main-bg: #FFFFFF;
+	--mcm-hf-border: #083D70;            /* live: 1px rgb(8,61,112); brief guessed #DADDE2 */
+	--mcm-hf-logo-h: 72px;
+	--mcm-hf-menu: #0A4D8C;
+	--mcm-hf-menu-size: 14px;            /* live 14px / 600 */
+	--mcm-hf-menu-weight: 600;
+	/* Item padding: 20px from 1200px up (live), shrinking fluidly to 10px at the 1024px breakpoint so the 7-item menu always fits. */
+	--mcm-hf-item-pad: clamp(10px, calc(10px + (100vw - 1024px) * .0568), 20px);
+	--mcm-hf-hover: #008080;
+	--mcm-hf-active: #008080;            /* live text rgb(0,128,128) */
+	--mcm-hf-bar: #00A6A6;               /* live bar rgb(0,166,166), 4px */
+	--mcm-hf-bar-h: 4px;
+	--mcm-hf-bar-offset: 15px;           /* live: bar sits 15px above the border; 0 = flush (brief) */
+
+	/* Dropdowns (brief values; live uses Elementor's default grey #33373D) */
+	--mcm-hf-dd-bg: #FFFFFF;
+	--mcm-hf-dd-text: #0A4D8C;
+	--mcm-hf-dd-hover: #007373;           /* 5.3:1 on the tint (#008080 was 4.33:1 — fails AA) */
+	--mcm-hf-dd-hover-bg: #EDF7F7;
+	--mcm-hf-dd-shadow: 0 8px 24px rgba(10, 43, 77, .14);
+
+	/* Footer (live) */
+	--mcm-hf-foot-bg: #0A4D8C;
+	--mcm-hf-foot-text: #FFFFFF;
+	--mcm-hf-foot-icon: #00A6A6;
+	--mcm-hf-foot-bottom-bg: #02216D;
+	--mcm-hf-foot-line: rgba(255, 255, 255, .75);
+
+	/* Behaviour */
+	--mcm-hf-adminbar: 0px;              /* JS sets 32/46 when the admin bar is present */
+	--mcm-hf-speed: .25s;
+}
+@media (prefers-reduced-motion: reduce) { :root { --mcm-hf-speed: 0s; } }
+
+/* ---------- Base (scoped; overrides Hello's reset only inside .mcm-hf) ---------- */
+.mcm-hf, .mcm-hf * { box-sizing: border-box; }
+.mcm-hf { font-family: var(--mcm-hf-font); line-height: 1.4; -webkit-font-smoothing: antialiased; }
+.mcm-hf :where(ul) { list-style: none; margin: 0; padding: 0; }
+/* Resets use :where() (zero specificity) so every component rule below wins without !important.
+   Hello's reset colours every link #c36 on hover — keep ours. */
+.mcm-hf :where(a) { text-decoration: none; color: inherit; transition: color var(--mcm-hf-speed), background-color var(--mcm-hf-speed); }
+/* Hello's reset gives buttons a pink border/background — neutralise inside the chrome only. */
+.mcm-hf :where(button) { font: inherit; color: inherit; background: none; border: 0; border-radius: 0; padding: 0; margin: 0; cursor: pointer;
+	/* Hello's reset animates `all` on buttons — that also delays the inherited
+	   visibility when the menu panel opens, so focus() on Close was ignored. */
+	transition: color var(--mcm-hf-speed), background-color var(--mcm-hf-speed); }
+.mcm-hf :focus-visible { outline: 2px solid var(--mcm-hf-bar); outline-offset: 2px; border-radius: 2px; }
+.mcm-hf :where(svg) { display: block; fill: currentColor; flex: none; }
+.mcm-hf svg.is-line { fill: none; stroke: currentColor; }
+.mcm-hf-container { width: 100%; max-width: var(--mcm-hf-container); margin: 0 auto; padding: 0 var(--mcm-hf-pad); display: flex; align-items: center; }
+.mcm-hf-sr { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+.mcm-hf-skip { position: absolute; left: 8px; top: -60px; z-index: 100000; padding: 12px 18px; background: #fff; color: #0A4D8C; font: 600 14px/1 var(--mcm-hf-font); border: 2px solid #0A4D8C; border-radius: 4px; }
+.mcm-hf-skip:focus { top: calc(8px + var(--mcm-hf-adminbar)); }
+
+/* ---------- Top bar ---------- */
+.mcm-hf-topbar { background: var(--mcm-hf-top-bg); color: var(--mcm-hf-top-text); font-size: var(--mcm-hf-top-size); }
+.mcm-hf-topbar .mcm-hf-container { height: var(--mcm-hf-top-h); justify-content: space-between; }
+.mcm-hf .mcm-hf-contact { display: flex; flex-direction: column; gap: 0; padding-left: 14px; } /* live: email icon 2px right of the logo's left edge */
+.mcm-hf-contact a { display: flex; align-items: center; gap: 8px; font-weight: 400; line-height: 24px; } /* WCAG 2.2 target size: 24px rows (live: 19px) */
+.mcm-hf-contact a:hover { color: var(--mcm-hf-top-hover); }
+.mcm-hf-contact svg { width: 14px; height: 14px; }
+.mcm-hf .mcm-hf-topmenu { display: flex; align-items: center; height: var(--mcm-hf-top-h); margin-right: calc(var(--mcm-hf-item-pad) * 4.2); } /* live: menu ends 84px before the container edge (>= 1200px) */
+.mcm-hf-topmenu > li { position: relative; display: flex; align-items: center; height: 100%; }
+.mcm-hf-topmenu > li + li::before { content: ""; position: absolute; left: 0; top: 50%; width: var(--mcm-hf-top-divider-w); height: var(--mcm-hf-top-divider-h); transform: translateY(-50%); background: var(--mcm-hf-top-divider); }
+.mcm-hf-topmenu a { display: flex; align-items: center; height: 100%; padding: 0 20px; font-weight: 600; }
+.mcm-hf-topmenu > li + li > a { margin-left: 2px; }
+.mcm-hf-topmenu a:hover, .mcm-hf-topmenu .current-menu-item > a { color: var(--mcm-hf-top-hover); }
+.mcm-hf-iconbtns { display: none; }
+
+/* ---------- Main bar ---------- */
+.mcm-hf-mainbar { background: var(--mcm-hf-main-bg); border-bottom: 1px solid var(--mcm-hf-border); }
+.mcm-hf-mainbar .mcm-hf-container { height: var(--mcm-hf-main-h); transition: height var(--mcm-hf-speed); }
+.mcm-hf-logo { display: flex; align-items: center; flex: none; margin-left: 12px; }
+.mcm-hf-logo img { display: block; height: var(--mcm-hf-logo-h); width: auto; transition: height var(--mcm-hf-speed); }
+.mcm-hf-nav { margin-left: calc(var(--mcm-hf-item-pad) + 19px); align-self: stretch; display: flex; }
+.mcm-hf-menu { display: flex; align-items: stretch; }
+.mcm-hf-menu > li { position: relative; display: flex; align-items: center; }
+.mcm-hf-menu > li > a { display: flex; align-items: center; height: 100%; padding: 0 var(--mcm-hf-item-pad); color: var(--mcm-hf-menu); font-size: var(--mcm-hf-menu-size); font-weight: var(--mcm-hf-menu-weight); white-space: nowrap; }
+.mcm-hf-menu > li.menu-item-has-children > a { padding-right: 6px; }
+/* Active/hover bar: as wide as the item incl. padding; offset from the border (live) or flush (brief). */
+.mcm-hf-menu > li::after { content: ""; position: absolute; left: 0; right: 0; bottom: var(--mcm-hf-bar-offset); height: var(--mcm-hf-bar-h); background: var(--mcm-hf-bar); transform: scaleX(0); transition: transform var(--mcm-hf-speed); }
+.mcm-hf-menu > li:hover::after, .mcm-hf-menu > li.is-open::after,
+.mcm-hf-menu > li.current-menu-item::after, .mcm-hf-menu > li.current-menu-ancestor::after { transform: scaleX(1); }
+.mcm-hf-menu > li:hover > a, .mcm-hf-menu > li.is-open > a, .mcm-hf-menu > li > a:focus-visible { color: var(--mcm-hf-hover); }
+.mcm-hf-menu > li.current-menu-item > a, .mcm-hf-menu > li.current-menu-ancestor > a { color: var(--mcm-hf-active); }
+/* Caret = the submenu toggle button (small solid down-triangle, like the live site). */
+.mcm-hf .mcm-hf-sub-toggle, .mcm-hf .mcm-hf-burger, .mcm-hf .mcm-hf-panel-close { background-color: transparent; border: 0 !important; box-shadow: none !important; text-decoration: none; }
+/* Some themes style every button with high specificity (Twenty Twenty-One: button:not(:hover):not(:active)…). */
+.mcm-hf .mcm-hf-sub-toggle, .mcm-hf .mcm-hf-panel-close { background: none !important; }
+.mcm-hf-sub-toggle { display: flex; align-items: center; justify-content: center; align-self: stretch; padding: 0 var(--mcm-hf-item-pad) 0 9px !important; color: var(--mcm-hf-menu) !important; }
+.mcm-hf-menu > li:hover > .mcm-hf-sub-toggle, .mcm-hf-menu > li.is-open > .mcm-hf-sub-toggle,
+.mcm-hf-menu > li.current-menu-ancestor > .mcm-hf-sub-toggle { color: var(--mcm-hf-hover) !important; }
+.mcm-hf-caret { width: 0; height: 0; border-left: 4.5px solid transparent; border-right: 4.5px solid transparent; border-top: 5px solid currentColor; transition: transform var(--mcm-hf-speed); }
+.is-open > .mcm-hf-sub-toggle .mcm-hf-caret { transform: rotate(180deg); }
+
+/* ---------- Dropdowns (3 levels) ---------- */
+/* Closed panels are display:none so off-screen flyouts never widen the page (no horizontal scroll). */
+.mcm-hf-menu .sub-menu { display: none; position: absolute; z-index: 50; min-width: 220px; padding: 8px 0; background: var(--mcm-hf-dd-bg); box-shadow: var(--mcm-hf-dd-shadow); border-top: 3px solid var(--mcm-hf-bar); }
+@keyframes mcm-hf-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.mcm-hf-menu > li > .sub-menu { top: 100%; left: 0; }
+.mcm-hf-menu .sub-menu .sub-menu { top: -11px; left: 100%; }
+.mcm-hf-menu .sub-menu.mcm-hf-flip { left: auto; right: 100%; }
+.mcm-hf-menu > li > .sub-menu.mcm-hf-flip { right: 0; }
+.mcm-hf-menu li:hover > .sub-menu, .mcm-hf-menu li.is-open > .sub-menu { display: block; animation: mcm-hf-in var(--mcm-hf-speed) ease-out; }
+.mcm-hf-menu .sub-menu li { position: relative; display: flex; align-items: stretch; }
+.mcm-hf-menu .sub-menu a { flex: 1; display: block; padding: 10px 20px; color: var(--mcm-hf-dd-text); font-size: 14px; font-weight: 500; line-height: 1.35; white-space: normal; }
+.mcm-hf-menu .sub-menu li:hover > a, .mcm-hf-menu .sub-menu li.is-open > a, .mcm-hf-menu .sub-menu a:focus-visible { color: var(--mcm-hf-dd-hover); background: var(--mcm-hf-dd-hover-bg); }
+.mcm-hf-menu .sub-menu .current-menu-item > a { color: var(--mcm-hf-active); }
+.mcm-hf-menu .sub-menu .mcm-hf-sub-toggle { padding: 0 14px !important; color: var(--mcm-hf-dd-text) !important; }
+.mcm-hf-menu .sub-menu .mcm-hf-caret { transform: rotate(-90deg); }
+.mcm-hf-menu .sub-menu .mcm-hf-flip-parent > .mcm-hf-sub-toggle .mcm-hf-caret { transform: rotate(90deg); }
+
+/* ---------- Burger + mobile panel ---------- */
+.mcm-hf-burger { display: none; margin-left: auto; width: 44px; height: 44px; align-items: center; justify-content: center; border-radius: 4px !important; color: var(--mcm-hf-menu) !important; background: #F1F4F8 !important; }
+.mcm-hf-burger svg { width: 24px; height: 24px; }
+.mcm-hf-panel { position: fixed; inset: var(--mcm-hf-adminbar) 0 0 0; z-index: 99990; visibility: hidden; }
+.mcm-hf-panel.is-open { visibility: visible; }
+.mcm-hf-panel-backdrop { position: absolute; inset: 0; background: rgba(2, 33, 109, .55); opacity: 0; transition: opacity var(--mcm-hf-speed); }
+.mcm-hf-panel.is-open .mcm-hf-panel-backdrop { opacity: 1; }
+.mcm-hf-panel-box { position: absolute; top: 0; bottom: 0; right: 0; width: min(360px, 88vw); background: #fff; overflow-y: auto; overscroll-behavior: contain; transform: translateX(100%); transition: transform var(--mcm-hf-speed); display: flex; flex-direction: column; }
+.mcm-hf-panel[data-side="left"] .mcm-hf-panel-box { right: auto; left: 0; transform: translateX(-100%); }
+.mcm-hf-panel.is-open .mcm-hf-panel-box { transform: none; }
+.mcm-hf-panel-head { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px 10px 16px; border-bottom: 1px solid #E3E8EF; }
+.mcm-hf-panel-head img { height: 48px; width: auto; }
+.mcm-hf-panel-close { width: 44px; height: 44px; display: flex !important; align-items: center; justify-content: center; color: var(--mcm-hf-menu) !important; }
+.mcm-hf-panel-close svg { width: 22px; height: 22px; }
+.mcm-hf-acc li { display: flex; flex-wrap: wrap; border-bottom: 1px solid #EEF1F5; }
+.mcm-hf-acc a { flex: 1; display: flex; align-items: center; min-height: 48px; padding: 12px 16px; color: var(--mcm-hf-menu); font-weight: 600; font-size: 15px; }
+.mcm-hf-acc .current-menu-item > a, .mcm-hf-acc .current-menu-ancestor > a { color: var(--mcm-hf-active); box-shadow: inset 4px 0 0 var(--mcm-hf-bar); }
+.mcm-hf-acc .mcm-hf-sub-toggle { width: 52px; min-height: 48px; display: flex !important; align-items: center; justify-content: center; border-left: 1px solid #EEF1F5 !important; color: var(--mcm-hf-menu) !important; }
+.mcm-hf-acc .sub-menu { display: none; width: 100%; background: #F6F8FB; }
+.mcm-hf-acc .is-open > .sub-menu { display: block; }
+.mcm-hf-acc .sub-menu a { font-weight: 500; font-size: 14px; padding-left: 28px; }
+.mcm-hf-acc .sub-menu .sub-menu a { padding-left: 42px; }
+.mcm-hf-panel-h { margin: 18px 16px 6px; font: 700 12px/1 var(--mcm-hf-font); letter-spacing: .08em; text-transform: uppercase; color: #5B6B7F; }
+.mcm-hf-panel-quick a { display: flex; align-items: center; min-height: 44px; padding: 10px 16px; color: var(--mcm-hf-menu); font-size: 14px; font-weight: 500; }
+.mcm-hf .mcm-hf-panel-contact { margin-top: auto; padding: 14px 16px 20px; border-top: 1px solid #E3E8EF; font-size: 14px; }
+.mcm-hf-panel-contact a { display: flex; align-items: center; gap: 10px; min-height: 44px; color: var(--mcm-hf-menu); }
+.mcm-hf-panel-contact svg { width: 16px; height: 16px; color: var(--mcm-hf-bar); }
+html.mcm-hf-locked, html.mcm-hf-locked body { overflow: hidden; }
+
+/* ---------- Sticky / smart sticky / shrink ---------- */
+.mcm-hf-header.is-fixed { position: fixed; top: var(--mcm-hf-adminbar); left: 0; right: 0; z-index: 9990; transition: transform var(--mcm-hf-speed); }
+/* Top bar slides out of view with a transform: transforms are not layout shifts (CLS stays 0). */
+.mcm-hf-header.is-stuck.mcm-hf-hide-topbar-sticky { transform: translateY(calc(-1 * var(--mcm-hf-topbar-h, 0px))); }
+.mcm-hf-header.is-fixed.is-hidden { transform: translateY(-100%); }
+.mcm-hf-header.is-stuck.mcm-hf-shrink { --mcm-hf-main-h: 68px; --mcm-hf-logo-h: 52px; --mcm-hf-bar-offset: 4px; }
+.mcm-hf-header.is-stuck { box-shadow: none; }
+.mcm-hf-spacer { display: none; }
+.mcm-hf-spacer.is-on { display: block; }
+html { scroll-padding-top: var(--mcm-hf-scroll-pad, 0px); }
+
+/* ---------- Footer ---------- */
+.mcm-hf-footer { color: var(--mcm-hf-foot-text); }
+.mcm-hf-foot-main { background: var(--mcm-hf-foot-bg); padding: 70px 0 40px; }
+.mcm-hf-foot-grid { display: grid !important; grid-template-columns: 390fr 176fr 176fr 282fr; gap: 0 32px; align-items: start; } /* live column widths */
+.mcm-hf-brand { display: flex; gap: 10px; align-items: flex-start; }
+.mcm-hf-brand img { width: 88px; height: 89px; object-fit: contain; background: #fff; flex: none; }
+.mcm-hf-brand-title { margin: -8px 0 0; font: 700 38px/62.8px var(--mcm-hf-brand-font); color: inherit; }
+.mcm-hf-brand-sub { margin: 0; font-size: 16px; font-weight: 600; line-height: 24px; }
+.mcm-hf-foot-desc { margin: 20px 0 0; font-size: 14px; line-height: 21px; max-width: 390px; }
+.mcm-hf .mcm-hf-social { display: flex; gap: 6px; margin-top: 34px; }
+.mcm-hf-social a { width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 3px; color: #fff; }
+.mcm-hf-social svg { width: 15px; height: 15px; }
+.mcm-hf-social a { background: rgba(255, 255, 255, .14); }
+.mcm-hf-social a:hover { filter: brightness(1.15); }
+.mcm-hf-foot-h { margin: -27px 0 20px; font: 700 16px/52.8px var(--mcm-hf-font); letter-spacing: .04em; text-transform: uppercase; color: inherit; }
+.mcm-hf-foot-links a { display: block; padding: 6px 0 6px 3px; font-size: 14px; font-weight: 500; line-height: 20px; }
+.mcm-hf-foot-links a:hover { color: var(--mcm-hf-top-hover); }
+.mcm-hf .mcm-hf-foot-contact { margin-top: 2px; }
+.mcm-hf-foot-contact li { display: flex; gap: 11px; font-size: 14px; line-height: 23px; padding-bottom: 12px; }
+.mcm-hf-foot-contact svg { width: 20px; height: 20px; color: var(--mcm-hf-foot-icon); margin-top: 1px; }
+.mcm-hf-foot-contact a:hover { color: var(--mcm-hf-top-hover); }
+.mcm-hf-foot-bottom { background: var(--mcm-hf-foot-bottom-bg); }
+.mcm-hf-foot-bottom .mcm-hf-container { position: relative; justify-content: space-between; min-height: 98px; padding-top: 12px; }
+.mcm-hf-foot-bottom .mcm-hf-container::before { content: ""; position: absolute; top: 11px; left: 5px; right: 5px; height: 1px; background: var(--mcm-hf-foot-line); }
+.mcm-hf-copy { margin: 0; font-size: 14px; }
+.mcm-hf .mcm-hf-legal { display: flex; align-items: center; margin: 0; font-size: 14px; }
+.mcm-hf-legal li + li { border-left: 1px solid var(--mcm-hf-foot-line); }
+.mcm-hf-legal a { display: block; padding: 2px 8px; }
+.mcm-hf-legal li:last-child a { padding-right: 0; }
+.mcm-hf-legal a:hover { color: var(--mcm-hf-top-hover); }
+.mcm-hf-totop { position: fixed; right: 16px; bottom: 16px; z-index: 9980; width: 44px; height: 44px; display: flex !important; align-items: center; justify-content: center; border-radius: 50% !important; background: var(--mcm-hf-top-bg) !important; color: #fff !important; opacity: 0; visibility: hidden; transition: opacity var(--mcm-hf-speed); }
+.mcm-hf-totop.is-on { opacity: 1; visibility: visible; }
+/* The button IS the .mcm-hf element (not inside one), so the scoped reset does not reach it. */
+.mcm-hf-totop { border: 0 !important; padding: 0 !important; margin: 0; box-shadow: none; font: inherit; cursor: pointer; }
+.mcm-hf-totop svg { width: 24px; height: 24px; }
+
+/* ---------- Tablet / mobile (default breakpoint 1024px; the plugin prints this from the setting) ---------- */
+/* ---------- Collapsed header (hamburger) ----------
+   Applied by the inline fit check printed right after the header (before first paint, so no flash/CLS):
+   below the breakpoint, OR whenever the menu does not fit at any width (extra items, long labels, no logo,
+   user text-spacing). .mcm-hf-top-collapsed does the same for the top bar (contact as icon buttons). */
+.mcm-hf.mcm-hf-collapsed .mcm-hf-topbar .mcm-hf-container { height: 48px; }
+.mcm-hf.mcm-hf-collapsed .mcm-hf-contact, .mcm-hf.mcm-hf-collapsed .mcm-hf-topnav,
+.mcm-hf.mcm-hf-top-collapsed .mcm-hf-contact { display: none; }
+.mcm-hf.mcm-hf-collapsed .mcm-hf-iconbtns, .mcm-hf.mcm-hf-top-collapsed .mcm-hf-iconbtns { display: flex; gap: 4px; margin-left: -10px; }
+.mcm-hf-iconbtns a { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border-radius: 4px; }
+.mcm-hf-iconbtns a:hover { background: rgba(255, 255, 255, .12); }
+.mcm-hf-iconbtns svg { width: 18px; height: 18px; }
+.mcm-hf.mcm-hf-collapsed .mcm-hf-mainbar .mcm-hf-container { height: 84px; }
+.mcm-hf.mcm-hf-collapsed .mcm-hf-logo { margin-left: 0; }
+.mcm-hf.mcm-hf-collapsed .mcm-hf-logo img { height: 62px; }
+.mcm-hf.mcm-hf-collapsed .mcm-hf-nav { display: none; }
+.mcm-hf.mcm-hf-collapsed .mcm-hf-burger { display: flex !important; }
+.mcm-hf.mcm-hf-collapsed.is-stuck.mcm-hf-shrink { --mcm-hf-main-h: 64px; }
+.mcm-hf.mcm-hf-collapsed.is-stuck.mcm-hf-shrink .mcm-hf-logo img { height: 46px; }
+.mcm-hf-site-title { font: 700 18px/1.2 var(--mcm-hf-font); color: var(--mcm-hf-menu); white-space: nowrap; }
+
+/* No JavaScript at all: never show a hamburger that cannot open. Below the breakpoint the menus
+   wrap as plain lists instead, so the site never loses its navigation. */
+@media (max-width: 1023.98px) {
+	html:not(.mcm-hf-js) .mcm-hf-topbar .mcm-hf-container, html:not(.mcm-hf-js) .mcm-hf-mainbar .mcm-hf-container { height: auto; flex-wrap: wrap; padding-top: 8px; padding-bottom: 8px; }
+	html:not(.mcm-hf-js) .mcm-hf-topmenu { flex-wrap: wrap; height: auto; margin-right: 0; }
+	html:not(.mcm-hf-js) .mcm-hf-topmenu a { min-height: 44px; }
+	html:not(.mcm-hf-js) .mcm-hf-topmenu > li + li::before { display: none; }
+	html:not(.mcm-hf-js) .mcm-hf-nav { margin-left: 0; width: 100%; }
+	html:not(.mcm-hf-js) .mcm-hf-menu { flex-wrap: wrap; }
+	html:not(.mcm-hf-js) .mcm-hf-menu > li > a { min-height: 44px; }
+	html:not(.mcm-hf-js) .mcm-hf-menu > li::after { bottom: 0; }
+}
+@media (max-width: 1023.98px) {
+	.mcm-hf-foot-grid, .mcm-hf-foot-grid.is-3, .mcm-hf-foot-grid.is-2 { grid-template-columns: 1fr 1fr; gap: 36px 32px; }
+	.mcm-hf-foot-grid.is-1 { grid-template-columns: 1fr; }
+	.mcm-hf-foot-brand { grid-column: 1 / -1; }
+	.mcm-hf-foot-desc { max-width: 560px; }
+	.mcm-hf-foot-h { margin-top: 0; line-height: 1.4; margin-bottom: 10px; }
+	.mcm-hf-foot-links a { min-height: 44px; display: flex; align-items: center; padding: 0 0 0 2px; }
+	.mcm-hf-foot-contact a { display: inline-flex; align-items: center; min-height: 44px; margin: -10px 0; }
+	.mcm-hf-legal a { min-height: 44px; display: flex; align-items: center; }
+	.mcm-hf-social a { width: 44px; height: 44px; }
+	.mcm-hf-social svg { width: 18px; height: 18px; }
+}
+@media (max-width: 599.98px) {
+	.mcm-hf-mainbar .mcm-hf-container { height: 72px; }
+	.mcm-hf-logo img { height: 54px; }
+	.mcm-hf-foot-main { padding: 48px 0 28px; }
+	.mcm-hf-foot-grid, .mcm-hf-foot-grid.is-3, .mcm-hf-foot-grid.is-2 { grid-template-columns: 1fr; gap: 30px; }
+	.mcm-hf-brand-title { font-size: 34px; line-height: 50px; margin-top: -8px; }
+	.mcm-hf-brand-sub { font-size: 15px; line-height: 22px; }
+	.mcm-hf-foot-links a { min-height: 44px; display: flex; align-items: center; padding: 0 0 0 2px; }
+	.mcm-hf-foot-bottom .mcm-hf-container { flex-direction: column; justify-content: center; gap: 10px; text-align: center; padding: 30px var(--mcm-hf-pad) 22px; }
+	.mcm-hf-copy { margin: 0; }
+	.mcm-hf-legal { margin: 0; }
+	.mcm-hf-legal a { min-height: 44px; display: flex; align-items: center; padding: 0 12px; }
+	.mcm-hf-legal li:last-child a { padding-right: 12px; }
+}
+
+/* Fewer footer columns (a menu location left empty). */
+.mcm-hf-foot-grid.is-3 { grid-template-columns: 390fr 176fr 282fr; }
+.mcm-hf-foot-grid.is-2 { grid-template-columns: 390fr 282fr; }
+.mcm-hf-foot-grid.is-1 { grid-template-columns: minmax(0, 560px); }
+/* "Hide the top bar on phones & tablets". */
+.mcm-hf.mcm-hf-collapsed .mcm-hf-top-hide-mobile { display: none; }
+@media (max-width: 1023.98px) { html:not(.mcm-hf-js) .mcm-hf-top-hide-mobile { display: none; } }
+/* No logo at all: the college name as text. */
+.mcm-hf-logo .mcm-hf-site-title { white-space: normal; max-width: 280px; }
+/* Elementor template parts: no extra spacing from the wrapper. */
+.mcm-hf-elementor { display: block; }
+
+/* Live footer fine-tuning: link columns start 10px into their track; the Contact heading sits 10px lower. */
+@media (min-width: 1024px) {
+	.mcm-hf-foot-grid > nav { padding-left: 10px; }
+	.mcm-hf-foot-h--contact { margin-top: -17px; }
+}
+
+/* Small screens: the MCM_Social bottom bar and the back-to-top button are fixed to the bottom edge —
+   keep the footer's last line clear of them. */
+@media (max-width: 1023.98px) {
+	.mcm-hf-foot-bottom { padding-bottom: var(--mcm-hf-bottom-safe, 60px); }
+}
+
+/* ---------- Browser print (Ctrl+P) ----------
+   A fixed header would repeat on every sheet; menus and floating buttons are useless on paper.
+   (The plugin's own letterhead print view never renders the chrome at all.) */
+@media print {
+	.mcm-hf-header, .mcm-hf-header.is-fixed { position: static !important; transform: none !important; }
+	.mcm-hf-spacer, .mcm-hf-panel, .mcm-hf-totop, .mcm-hf-skip, .mcm-hf-topbar, .mcm-hf-nav, .mcm-hf-burger,
+	.mcm-hf-iconbtns, .mcm-hf-menu .sub-menu, .mcm-hf-footer nav, .mcm-hf-social { display: none !important; }
+	.mcm-hf-mainbar { border-bottom: 1px solid #999; }
+	.mcm-hf-mainbar .mcm-hf-container { height: auto; padding-top: 6px; padding-bottom: 6px; }
+	.mcm-hf-foot-main, .mcm-hf-foot-bottom { background: none !important; color: #000; padding: 12px 0; }
+	.mcm-hf-footer, .mcm-hf-footer a { color: #000 !important; }
+	.mcm-hf-foot-grid { grid-template-columns: 1fr 1fr !important; }
+	.mcm-hf-foot-bottom .mcm-hf-container::before { background: #999; }
+	.mcm-hf-footer { break-inside: avoid; }
+}

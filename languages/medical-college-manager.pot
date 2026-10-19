@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-10-19T01:31:12+00:00\n"
+"POT-Creation-Date: 2026-10-19T03:12:21+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: medical-college-manager\n"
@@ -24,6 +24,7 @@ msgstr ""
 #: includes/class-mcm-privacy.php:97
 #: includes/class-mcm-privacy.php:110
 #: includes/class-mcm-settings.php:136
+#: includes/class-mcm-site-chrome.php:1170
 #: includes/class-mcm-upgrade.php:228
 msgid "Medical College Manager"
 msgstr ""
@@ -620,6 +621,7 @@ msgstr ""
 #: includes/class-mcm-settings.php:608
 #: includes/class-mcm-settings.php:647
 #: includes/class-mcm-settings.php:674
+#: includes/class-mcm-site-chrome-settings.php:284
 #: includes/class-mcm-termmeta.php:611
 #: includes/class-mcm-termmeta.php:709
 msgid "Select Image"
@@ -630,6 +632,7 @@ msgstr ""
 #: includes/class-mcm-settings.php:609
 #: includes/class-mcm-settings.php:648
 #: includes/class-mcm-settings.php:675
+#: includes/class-mcm-site-chrome-settings.php:284
 #: includes/class-mcm-termmeta.php:613
 #: includes/class-mcm-termmeta.php:710
 msgid "Clear"
@@ -644,11 +647,13 @@ msgid "HOD photo position"
 msgstr ""
 
 #: includes/class-mcm-department-page.php:285
+#: includes/class-mcm-site-chrome-settings.php:457
 #: includes/class-mcm-social.php:281
 msgid "Left"
 msgstr ""
 
 #: includes/class-mcm-department-page.php:285
+#: includes/class-mcm-site-chrome-settings.php:456
 #: includes/class-mcm-social.php:280
 msgid "Right"
 msgstr ""
@@ -748,6 +753,8 @@ msgstr ""
 #: includes/class-mcm-privacy.php:51
 #: includes/class-mcm-privacy.php:70
 #: includes/class-mcm-privacy.php:81
+#: includes/class-mcm-site-chrome-settings.php:360
+#: includes/class-mcm-site-chrome-settings.php:487
 msgid "Phone"
 msgstr ""
 
@@ -759,12 +766,15 @@ msgstr ""
 #: includes/class-mcm-privacy.php:69
 #: includes/class-mcm-privacy.php:80
 #: includes/class-mcm-query.php:2153
+#: includes/class-mcm-site-chrome-settings.php:359
+#: includes/class-mcm-site-chrome-settings.php:488
 msgid "Email"
 msgstr ""
 
 #: includes/class-mcm-department-page.php:885
 #: includes/class-mcm-meta.php:913
 #: includes/class-mcm-privacy.php:58
+#: includes/class-mcm-site-chrome-settings.php:486
 #: includes/class-mcm-termmeta.php:183
 msgid "Address"
 msgstr ""
@@ -1177,6 +1187,7 @@ msgid "Medical College Manager — CSV Import / Export"
 msgstr ""
 
 #: includes/class-mcm-import.php:933
+#: includes/class-mcm-site-chrome-settings.php:529
 msgid "Import"
 msgstr ""
 
@@ -1237,6 +1248,7 @@ msgid "Download a ready-made sample for each type, fill it with your data, and u
 msgstr ""
 
 #: includes/class-mcm-import.php:997
+#: includes/class-mcm-site-chrome-settings.php:523
 msgid "Export"
 msgstr ""
 
@@ -1857,6 +1869,7 @@ msgstr ""
 
 #: includes/class-mcm-meta.php:782
 #: includes/class-mcm-query.php:2323
+#: includes/class-mcm-site-chrome.php:136
 msgid "Contact"
 msgstr ""
 
@@ -2140,6 +2153,7 @@ msgid "Search by name, keyword…"
 msgstr ""
 
 #: includes/class-mcm-query.php:617
+#: includes/class-mcm-site-chrome-settings.php:536
 msgid "Reset"
 msgstr ""
 
@@ -2283,6 +2297,7 @@ msgstr ""
 #: includes/class-mcm-query.php:1725
 #: includes/class-mcm-query.php:1756
 #: includes/class-mcm-query.php:1797
+#: includes/class-mcm-site-chrome-settings.php:470
 #: includes/class-mcm-termmeta.php:702
 #: includes/elementor-widgets.php:153
 #: includes/elementor-widgets.php:1092
@@ -3008,6 +3023,674 @@ msgstr ""
 msgid "Print"
 msgstr ""
 
+#: includes/class-mcm-site-chrome-settings.php:36
+#: includes/class-mcm-site-chrome-settings.php:37
+#: includes/class-mcm-site-chrome-settings.php:147
+msgid "Header & Footer"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:64
+msgid "General"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:65
+#: includes/class-mcm-site-chrome-settings.php:358
+#: includes/class-mcm-site-chrome.php:888
+msgid "Top bar"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:66
+msgid "Header & menu"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:67
+msgid "Behaviour"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:68
+#: includes/class-mcm-site-chrome-settings.php:302
+msgid "Footer"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:69
+msgid "Import / Export"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:111
+msgid "Top bar text on the top bar"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:112
+msgid "Top bar hover colour on the top bar"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:115
+msgid "Menu text on the header"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:116
+msgid "Menu hover colour on the header"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:117
+msgid "Current-page colour on the header"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:118
+msgid "Dropdown text on the dropdown"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:119
+msgid "Dropdown hover text on its highlight"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:122
+msgid "Footer text on the footer"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:123
+msgid "Footer text on the bottom bar"
+msgstr ""
+
+#. translators: 1: colour pair, 2: contrast ratio.
+#: includes/class-mcm-site-chrome-settings.php:131
+#, php-format
+msgid "%1$s: contrast %2$s:1 (at least 4.5:1 is needed for readable text)."
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:148
+msgid "The college header and footer on every page, replacing the theme's — without editing the theme. Both are off until you switch them on below; the menus come from Appearance → Menus."
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:154
+msgid "Header & Footer sections"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:301
+msgid "Header"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:301
+msgid "Show the college header on every page"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:301
+msgid "Replaces the theme's header. If it ever fails to load, the theme's header is shown instead."
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:302
+msgid "Show the college footer on every page"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:306
+msgid "Design"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:308
+msgid "Built-in college design (set up on these tabs)"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:309
+msgid "My own Elementor templates (Templates → Saved Templates)"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:312
+msgid "— Choose a template —"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:324
+msgid "Header template"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:324
+msgid "Used when \"My own Elementor templates\" is chosen. If the template is deleted, the built-in design is shown."
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:325
+msgid "Footer template"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:338
+msgid "Hide on these pages"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:338
+msgid "Ctrl/Cmd-click to choose several (e.g. a landing page with its own header)."
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:342
+msgid "Font"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:344
+msgid "Montserrat (bundled with the plugin — no Google request)"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:345
+msgid "Same as the site"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:346
+msgid "System font"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:349
+msgid "Elementor preview"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:349
+msgid "Show the header and footer while editing pages in Elementor"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:358
+msgid "Show the top bar (contact details + top bar menu)"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:360
+msgid "As it should read, e.g. +92-966-747373."
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:364
+#: includes/class-mcm-site-chrome-settings.php:446
+msgid "On phones & tablets"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:366
+msgid "Email and phone as icon buttons"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:367
+msgid "Hide the top bar"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:370
+#: includes/class-mcm-site-chrome-settings.php:386
+#: includes/class-mcm-site-chrome-settings.php:490
+msgid "Background"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:371
+#: includes/class-mcm-site-chrome-settings.php:491
+msgid "Text"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:372
+msgid "Text on hover"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:373
+msgid "Menu dividers"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:374
+msgid "Divider width (px)"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:375
+msgid "Divider height (px)"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:375
+msgid "63 = the full height of the top bar."
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:384
+msgid "Logo"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:384
+msgid "Empty: the theme's logo (Customizer), then the letterhead logo."
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:385
+msgid "Logo height (px)"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:387
+msgid "Bottom border"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:388
+msgid "Menu text"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:389
+msgid "Menu text size (px)"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:393
+msgid "Menu text weight"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:395
+msgid "Regular"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:396
+msgid "Medium"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:397
+msgid "Semi-bold"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:398
+msgid "Bold"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:401
+msgid "Menu text on hover"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:402
+msgid "Current page text"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:403
+msgid "Active bar"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:404
+msgid "Active bar height (px)"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:408
+msgid "Active bar position"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:410
+msgid "Under the item (as on the current site)"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:411
+msgid "Flush with the bottom border"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:414
+msgid "Dropdown background"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:415
+msgid "Dropdown text"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:416
+msgid "Dropdown text on hover"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:417
+msgid "Dropdown highlight on hover"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:418
+msgid "Automatic (the first top-level item whose label contains \"Department\")"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:427
+msgid "Departments menu item"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:427
+msgid "Highlighted as the current section on every department page."
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:437
+msgid "Static (scrolls away)"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:438
+msgid "Sticky (always visible)"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:439
+msgid "Smart sticky (hides when scrolling down, returns when scrolling up)"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:440
+msgid "Sticky and shrinking"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:442
+msgid "Header on scroll"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:447
+msgid "Same as above"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:449
+msgid "Top bar when sticky"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:449
+msgid "Slide the top bar away once the page scrolls"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:450
+msgid "Hamburger menu below (px)"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:450
+msgid "The header also switches to the hamburger at any width when the menu does not fit."
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:454
+msgid "Mobile menu opens from"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:460
+#: includes/class-mcm-site-chrome.php:1041
+msgid "Back to top"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:460
+msgid "Show a back-to-top button after scrolling"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:469
+msgid "Footer logo"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:469
+msgid "Empty: the header logo."
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:470
+msgid "Large title next to the logo, e.g. GMC."
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:471
+msgid "Subtitle"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:471
+msgid "Empty: the college name from the letterhead settings."
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:472
+#: includes/class-mcm-termmeta.php:703
+msgid "Description"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:473
+msgid "Social icons"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:473
+msgid "Show the links from College Manager → Social Bar"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:477
+msgid "Icon style"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:479
+msgid "Brand colours"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:480
+msgid "Single colour"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:483
+msgid "Column 2 heading"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:483
+msgid "Links: menu location \"College footer: column 2 links\"."
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:484
+msgid "Column 3 heading"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:484
+msgid "Links: menu location \"College footer: column 3 links\"."
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:485
+msgid "Contact heading"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:487
+msgid "Empty: the top bar phone."
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:488
+msgid "Empty: the top bar email."
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:489
+msgid "Copyright line"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:489
+msgid "{year} becomes the current year, {site} the college name."
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:492
+msgid "Contact icons"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:493
+msgid "Bottom bar background"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:500
+msgid "Menus"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:501
+msgid "Location"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:501
+#: includes/class-mcm-site-chrome.php:948
+msgid "Menu"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:506
+msgid "Edit menu"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:508
+msgid "Not assigned"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:508
+msgid "Assign"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:523
+msgid "Download every Header & Footer setting as a JSON file (menus and images stay on this site)."
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:526
+msgid "Download settings"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:529
+msgid "Choose a file exported here. Every value is checked; anything unknown is ignored."
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:532
+msgid "Settings file (.json)"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:533
+msgid "Import settings"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:536
+msgid "Back to the original design. The header and footer are switched off."
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:537
+msgid "Reset every Header & Footer setting?"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:539
+msgid "Reset to defaults"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:546
+#: includes/class-mcm-site-chrome-settings.php:566
+#: includes/class-mcm-site-chrome-settings.php:588
+msgid "Sorry, you are not allowed to do that."
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:600
+msgid "Settings imported."
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:601
+msgid "Settings reset to the defaults. The header and footer are off."
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:602
+msgid "That file is not a Header & Footer settings export. Nothing was changed."
+msgstr ""
+
+#. translators: %s: menu item label.
+#: includes/class-mcm-site-chrome-walker.php:36
+#, php-format
+msgid "Show submenu for %s"
+msgstr ""
+
+#: includes/class-mcm-site-chrome.php:134
+#: includes/class-mcm-site-chrome.php:953
+msgid "Quick Links"
+msgstr ""
+
+#: includes/class-mcm-site-chrome.php:135
+msgid "For Students"
+msgstr ""
+
+#. translators: Keep {year} and {site}: they become the current year and the college name.
+#: includes/class-mcm-site-chrome.php:141
+msgid "© {year} {site} — All Rights Reserved."
+msgstr ""
+
+#: includes/class-mcm-site-chrome.php:270
+msgid "College header: main menu"
+msgstr ""
+
+#: includes/class-mcm-site-chrome.php:271
+msgid "College header: top bar menu"
+msgstr ""
+
+#: includes/class-mcm-site-chrome.php:272
+msgid "College footer: column 2 links"
+msgstr ""
+
+#: includes/class-mcm-site-chrome.php:273
+msgid "College footer: column 3 links"
+msgstr ""
+
+#: includes/class-mcm-site-chrome.php:274
+msgid "College footer: bottom bar links"
+msgstr ""
+
+#: includes/class-mcm-site-chrome.php:857
+msgid "Skip to content"
+msgstr ""
+
+#. translators: %s: email address.
+#: includes/class-mcm-site-chrome.php:876
+#, php-format
+msgid "Email %s"
+msgstr ""
+
+#. translators: %s: phone number.
+#: includes/class-mcm-site-chrome.php:881
+#, php-format
+msgid "Call %s"
+msgstr ""
+
+#. translators: %s: college name.
+#: includes/class-mcm-site-chrome.php:894
+#, php-format
+msgid "%s — home"
+msgstr ""
+
+#: includes/class-mcm-site-chrome.php:908
+msgid "Main"
+msgstr ""
+
+#: includes/class-mcm-site-chrome.php:909
+msgid "Open menu"
+msgstr ""
+
+#: includes/class-mcm-site-chrome.php:950
+msgid "Close menu"
+msgstr ""
+
+#: includes/class-mcm-site-chrome.php:951
+msgid "Main (mobile)"
+msgstr ""
+
+#: includes/class-mcm-site-chrome.php:953
+msgid "Top bar (mobile)"
+msgstr ""
+
+#: includes/class-mcm-site-chrome.php:996
+msgid "Footer links"
+msgstr ""
+
+#: includes/class-mcm-site-chrome.php:1029
+msgid "Legal"
+msgstr ""
+
+#: includes/class-mcm-site-chrome.php:1115
+msgid "Medical College Manager: header & footer"
+msgstr ""
+
+#: includes/class-mcm-site-chrome.php:1133
+msgid "The active theme is a block theme; it builds its own header and footer in the Site Editor, so the college header and footer are not shown. Use a classic theme such as Hello Elementor."
+msgstr ""
+
+#: includes/class-mcm-site-chrome.php:1135
+msgid "The active theme is not Hello Elementor, so its own header and footer may still show next to the college ones. Switch them off in the theme, or let the plugin hide them with the mcm_site_chrome_suppress_theme filter."
+msgstr ""
+
+#: includes/class-mcm-site-chrome.php:1138
+msgid "The active theme does not call wp_body_open(), so the header cannot be printed. Update the theme or use Hello Elementor."
+msgstr ""
+
+#: includes/class-mcm-site-chrome.php:1142
+msgid "header"
+msgstr ""
+
+#: includes/class-mcm-site-chrome.php:1143
+msgid "footer"
+msgstr ""
+
+#. translators: %s: "header" or "footer".
+#: includes/class-mcm-site-chrome.php:1147
+#, php-format
+msgid "The Elementor template chosen for the %s is missing, unpublished or not built with Elementor; the built-in design is shown instead."
+msgstr ""
+
+#: includes/class-mcm-site-chrome.php:1152
+msgid "No menu is assigned to \"College header: main menu\" (Appearance → Menus → Manage Locations)."
+msgstr ""
+
+#: includes/class-mcm-site-chrome.php:1165
+msgid "The college header and footer are off, or set up correctly."
+msgstr ""
+
+#: includes/class-mcm-site-chrome.php:1167
+msgid "The college header & footer need attention"
+msgstr ""
+
+#: includes/class-mcm-site-chrome.php:1167
+msgid "The college header & footer are fine"
+msgstr ""
+
+#: includes/class-mcm-site-chrome.php:1174
+msgid "Header & Footer settings"
+msgstr ""
+
 #: includes/class-mcm-social.php:46
 msgid "Facebook"
 msgstr ""
@@ -3262,10 +3945,6 @@ msgstr ""
 
 #: includes/class-mcm-termmeta.php:679
 msgid "+ Add a service"
-msgstr ""
-
-#: includes/class-mcm-termmeta.php:703
-msgid "Description"
 msgstr ""
 
 #: includes/class-mcm-termmeta.php:705
@@ -3692,12 +4371,12 @@ msgid "Medical College Manager requires PHP 7.2 or newer. This server runs PHP %
 msgstr ""
 
 #. translators: 1: required WordPress version, 2: installed version.
-#: medical-college-manager.php:111
+#: medical-college-manager.php:114
 #, php-format
 msgid "WordPress %1$s or newer is required; this site runs %2$s. Update WordPress (Dashboard → Updates)."
 msgstr ""
 
-#: medical-college-manager.php:132
+#: medical-college-manager.php:135
 msgid "Medical College Manager has not been loaded."
 msgstr ""
 
