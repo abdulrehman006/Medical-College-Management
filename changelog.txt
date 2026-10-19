@@ -35,6 +35,18 @@ Medical College Manager — complete changelog.
   last item now spans the full width. Featured images on single pages are at
   most 360 px high (220 px on phones) and timetable entries show no banner.
 * Table titles now link to the entry's page (students stay plain text).
+* Jobs: a new card in grid and directory views. Status and category on
+  top, the department, posts / scale / type, the last date with the time
+  left ("8 days left", "Closes today"; an extended date shows the old one
+  struck through), the publication date and a View & Apply button aligned
+  across the row. The whole card is clickable; the advertisement image is
+  shown on the job's page instead of filling the grid.
+* Directory filters (Jobs, Consultants, Team…): search field with an icon
+  button, filter groups clearly separated, and long lists show the first
+  six options with "Show all (n)" instead of a scrolling box (ticked options
+  stay visible). On phones and tablets the filters fold behind a
+  "Filters (n)" button so the results come first. Filter groups are
+  labelled for screen readers and the heading order is correct.
 * The same link label in grid, list and directory views ("View details",
   "Meet the Consultant", "View Profile", "View & Apply" for jobs); developers
   can change it with the mcm_link_label filter.

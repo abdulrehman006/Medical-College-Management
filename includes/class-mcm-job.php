@@ -315,6 +315,87 @@ class MCM_Job {
 		return $html;
 	}
 
+	/**
+	 * Whole days from today to the effective deadline in the site timezone
+	 * (0 = closes today, negative = past), or null without a last date.
+	 *
+	 * @param int $post_id Post ID.
+	 * @return int|null
+	 */
+	public static function days_left( $post_id ) {
+		$deadline = self::effective_deadline( $post_id );
+		if ( null === $deadline ) {
+			return null;
+		}
+		$today = new DateTimeImmutable( 'today', wp_timezone() );
+		$day   = $deadline->setTime( 0, 0 );
+		return (int) $today->diff( $day )->format( '%r%a' );
+	}
+
+	/**
+	 * Card for one job in grid and directory views: status and category on
+	 * top, title and department, posts / scale chips, the last date with the
+	 * time left, and a footer with the publication date and the button. The
+	 * advertisement image is shown on the job's own page, not in the grid.
+	 *
+	 * @param int $id Post ID.
+	 * @return string
+	 */
+	public static function card( $id ) {
+		$status = self::status( $id );
+		$link   = get_permalink( $id );
+		$cat    = implode( ', ', MCM_Query::cached_term_names( $id, 'mcm_job_cat' ) );
+		$dept   = implode( ', ', MCM_Query::cached_term_names( $id, 'mcm_department' ) );
+		$posts  = trim( (string) MCM_Safe::meta( $id, 'mcm_job_posts' ) );
+		$scale  = trim( (string) MCM_Safe::meta( $id, 'mcm_job_scale' ) );
+		$type   = trim( (string) MCM_Safe::meta( $id, 'mcm_job_type' ) );
+		$last   = self::last_date_html( $id );
+		$days   = self::days_left( $id );
+
+		// Time left, in words.
+		$left = '';
+		if ( 'closed' === $status ) {
+			$left = __( 'Applications closed', 'medical-college-manager' );
+		} elseif ( 'upcoming' === $status ) {
+			/* translators: %s: publication date. */
+			$left = sprintf( __( 'Opens %s', 'medical-college-manager' ), MCM_Query::fmt_date( self::publish_date( $id ) ) );
+		} elseif ( null !== $days && $days >= 0 ) {
+			/* translators: %d: number of days. */
+			$left = 0 === $days ? __( 'Closes today', 'medical-college-manager' ) : sprintf( _n( '%d day left', '%d days left', $days, 'medical-college-manager' ), $days );
+		}
+
+		$chips = '';
+		if ( '' !== $posts ) {
+			/* translators: %s: number of posts. */
+			$chips .= '<li>' . esc_html( sprintf( _n( '%s post', '%s posts', max( 1, (int) $posts ), 'medical-college-manager' ), $posts ) ) . '</li>';
+		}
+		foreach ( array( $scale, $type ) as $chip ) {
+			if ( '' !== $chip ) {
+				$chips .= '<li>' . esc_html( $chip ) . '</li>';
+			}
+		}
+		$excerpt = has_excerpt( $id ) ? wp_trim_words( get_the_excerpt( $id ), 22 ) : '';
+
+		$html  = '<article class="mcm-card mcm-card--job mcm-jobcard is-' . esc_attr( $status ) . '">';
+		$html .= '<div class="mcm-jobcard-body">';
+		$html .= '<div class="mcm-jobcard-top">' . self::badge( $status ) . ( '' !== $cat ? '<span class="mcm-jobcard-cat">' . esc_html( $cat ) . '</span>' : '' ) . '</div>';
+		$html .= '<h3 class="mcm-card-title mcm-jobcard-title"><a href="' . esc_url( $link ) . '">' . esc_html( get_the_title( $id ) ) . '</a></h3>';
+		$html .= '' !== $dept ? '<p class="mcm-jobcard-dept">' . esc_html( $dept ) . '</p>' : '';
+		$html .= '' !== $chips ? '<ul class="mcm-jobcard-chips">' . $chips . '</ul>' : '';
+		if ( '' !== $last || '' !== $left ) {
+			$html .= '<div class="mcm-jobcard-deadline">'
+				. ( '' !== $last ? '<span class="mcm-jobcard-label">' . esc_html__( 'Last date', 'medical-college-manager' ) . '</span><span class="mcm-jobcard-date">' . $last . '</span>' : '' )
+				. ( '' !== $left ? '<span class="mcm-jobcard-left">' . esc_html( $left ) . '</span>' : '' )
+				. '</div>';
+		}
+		$html .= '' !== $excerpt ? '<p class="mcm-card-excerpt mcm-jobcard-excerpt">' . esc_html( $excerpt ) . '</p>' : '';
+		/* translators: %s: publication date. */
+		$html .= '<p class="mcm-jobcard-pub">' . esc_html( sprintf( __( 'Published %s', 'medical-college-manager' ), MCM_Query::fmt_date( self::publish_date( $id ) ) ) ) . '</p>';
+		$html .= '</div>';
+		$html .= '<div class="mcm-jobcard-foot"><a class="mcm-jobcard-btn" href="' . esc_url( $link ) . '">' . esc_html( MCM_Query::link_label( 'mcm_job' ) ) . ' <span aria-hidden="true">&rarr;</span></a></div>';
+		return $html . '</article>';
+	}
+
 	/*
 	 * ----------------------------------------------------------------
 	 * Listings

@@ -47,6 +47,10 @@ class MCM_Assets {
 					'search'    => __( 'Search:', 'medical-college-manager' ),
 					'entry'     => __( 'entry', 'medical-college-manager' ),
 					'entries'   => __( 'entries', 'medical-college-manager' ),
+					/* translators: %d: number of filter options. */
+					'showAll'   => __( 'Show all (%d)', 'medical-college-manager' ),
+					'showFewer' => __( 'Show fewer', 'medical-college-manager' ),
+					'filters'   => __( 'Filters', 'medical-college-manager' ),
 				),
 			)
 		);

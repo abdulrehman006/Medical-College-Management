@@ -458,7 +458,8 @@
 	align-items:start;
 }
 .mcm-dir-aside{ position:sticky; top:20px; }
-.mcm-dir-search{ display:flex; flex-direction:column; gap:12px; margin-bottom:22px; }
+.mcm-dir-search{ display:flex; gap:8px; margin-bottom:22px; }
+.mcm-dir-search .mcm-search{ flex:1 1 auto; min-width:0; }
 .mcm-dir-search .mcm-search{
 	padding:12px 14px;
 	border:1px solid var(--mcm-border, #e5e7eb);
@@ -468,8 +469,8 @@
 	color:var(--mcm-text, #1f2933);
 }
 .mcm-search-btn{
-	align-self:flex-start;
-	padding:10px 24px;
+	flex:0 0 auto;
+	padding:10px 18px;
 	border:none;
 	border-radius:8px;
 	background:var(--mcm-primary, #0a6b5d);
@@ -480,8 +481,14 @@
 	transition:background .2s ease;
 }
 .mcm-search-btn:hover{ background:var(--mcm-accent, #13a594); }
-.mcm-dir-facet-title{ font-size:15px; margin:0 0 12px; color:var(--mcm-text, #1f2933); }
-.mcm-dir-checks{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:10px; max-height:520px; overflow:auto; }
+.mcm-dir-facet + .mcm-dir-facet{ margin-top:20px; padding-top:20px; border-top:1px solid var(--mcm-border, #e5e7eb); }
+.mcm-dir-facet-title{ font-size:12px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; margin:0 0 12px; color:var(--mcm-muted, #6b7280); }
+.mcm-dir-checks{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:10px; }
+/* Long lists: the script shows the first items and a "Show all" button (ticked items always stay visible). */
+.mcm-dir-checks li.is-extra{ display:none; }
+.mcm-dir-checks.is-expanded li.is-extra, .mcm-dir-checks li.is-extra.is-pinned{ display:block; }
+.mcm-wrap button.mcm-dir-more{ margin-top:10px; padding:4px 0; border:0; background:none; color:var(--mcm-primary, #0a6b5d); font-size:14px; font-weight:600; cursor:pointer; text-decoration:underline; text-underline-offset:3px; }
+.mcm-wrap button.mcm-dir-more:hover, .mcm-wrap button.mcm-dir-more:focus{ background:none; color:var(--mcm-accent, #13a594); }
 .mcm-dir-checks li{ margin:0; }
 .mcm-dir-checks label{ display:flex; align-items:flex-start; gap:9px; font-size:14px; color:var(--mcm-text, #1f2933); cursor:pointer; line-height:1.35; }
 .mcm-dir-checks input{ margin-top:2px; flex:0 0 auto; }
@@ -1354,4 +1361,65 @@ html:has(.mcm-dept:not(.mcm-dept--part)){ overflow-x:clip; }
 	.mcm-dept-section{ padding:20px 0; background:none !important; }
 	.mcm-dept-tabpanel[hidden]{ display:block; }
 	.mcm-dept.is-tabbed .mcm-dept-panel-h{ display:block; }
+}
+
+
+/* =====================================================================
+   Job card (grid / directory views of Jobs).
+   ===================================================================== */
+.mcm-jobcard{ position:relative; border-top:4px solid var(--mcm-primary, #0a6b5d); height:100%; }
+.mcm-jobcard.is-closing{ border-top-color:#d97706; }
+.mcm-jobcard.is-extended{ border-top-color:var(--mcm-accent, #13a594); }
+.mcm-jobcard.is-closed{ border-top-color:#c3c4c7; }
+.mcm-jobcard.is-upcoming{ border-top-color:#2563eb; }
+.mcm-jobcard-body{ padding:20px 20px 16px; display:flex; flex-direction:column; gap:10px; flex:1 1 auto; }
+.mcm-jobcard-top{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+.mcm-jobcard-top .mcm-badge{ margin-left:0; }
+.mcm-jobcard-cat{ font-size:12px; font-weight:600; letter-spacing:.04em; text-transform:uppercase; color:var(--mcm-muted, #6b7280); text-align:right; }
+.mcm-jobcard .mcm-jobcard-title{ font-size:19px; line-height:1.3; }
+.mcm-jobcard-dept{ margin:-4px 0 0; font-size:14px; color:var(--mcm-muted, #6b7280); }
+.mcm-jobcard-chips{ list-style:none; margin:0; padding:0; display:flex; flex-wrap:wrap; gap:6px; }
+.mcm-jobcard-chips li{ margin:0; padding:3px 10px; border-radius:6px; background:var(--mcm-page-bg, #f3f5f7); color:var(--mcm-text, #1f2933); font-size:13px; font-weight:600; }
+.mcm-jobcard-deadline{ display:grid; grid-template-columns:auto 1fr; align-items:baseline; gap:2px 10px; padding:10px 12px; border-radius:8px; background:var(--mcm-page-bg, #f3f5f7); font-size:14px; }
+.mcm-jobcard-label{ font-size:12px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--mcm-muted, #6b7280); }
+.mcm-jobcard-date{ font-weight:600; color:var(--mcm-text, #1f2933); }
+.mcm-jobcard-date .mcm-job-old-date{ display:block; font-weight:400; font-size:13px; }
+.mcm-jobcard-date .mcm-job-time{ font-weight:400; color:var(--mcm-muted, #6b7280); }
+.mcm-jobcard-left{ grid-column:1 / -1; font-size:13px; font-weight:600; color:var(--mcm-primary, #0a6b5d); }
+.mcm-jobcard.is-closing .mcm-jobcard-left{ color:#8a4b00; }
+.mcm-jobcard.is-closed .mcm-jobcard-left{ color:#50575e; }
+.mcm-jobcard.is-upcoming .mcm-jobcard-left{ color:#1d3f8a; }
+.mcm-jobcard-excerpt{ margin:0; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.mcm-jobcard-foot{ display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; padding:14px 20px; border-top:1px solid var(--mcm-border, #e5e7eb); }
+.mcm-jobcard-pub{ font-size:13px; color:var(--mcm-muted, #6b7280); }
+a.mcm-jobcard-btn, a.mcm-jobcard-btn:visited{ display:inline-flex; align-items:center; gap:6px; min-height:40px; padding:8px 16px; border-radius:8px; background:var(--mcm-primary, #0a6b5d); color:#fff; font-size:14px; font-weight:600; text-decoration:none; }
+a.mcm-jobcard-btn:hover, a.mcm-jobcard-btn:focus{ background:var(--mcm-accent, #13a594); color:#fff; }
+.mcm-jobcard.is-closed a.mcm-jobcard-btn{ background:#fff; color:var(--mcm-text, #1f2933); border:1px solid var(--mcm-border, #e5e7eb); }
+/* The whole card is easier to hit: the title link covers it (button stays on top). */
+.mcm-jobcard-title a::after{ content:""; position:absolute; inset:0; }
+a.mcm-jobcard-btn{ position:relative; z-index:1; }
+.mcm-jobcard-title a:focus-visible{ outline:none; }
+.mcm-jobcard:focus-within{ box-shadow:0 0 0 3px var(--mcm-accent, #13a594); }
+@media print{
+	.mcm-jobcard{ border-top-width:1px; }
+	.mcm-jobcard-foot{ padding:8px 12px; }
+	a.mcm-jobcard-btn{ display:none; }
+}
+
+/* Screen-reader-only text. */
+.mcm-sr-only{ position:absolute !important; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0, 0, 0, 0); white-space:nowrap; border:0; }
+/* Icon search button beside the field. */
+.mcm-wrap .mcm-search-btn--icon{ display:inline-flex; align-items:center; justify-content:center; width:48px; min-height:48px; padding:0; }
+.mcm-wrap .mcm-search-btn--icon svg{ flex:none; width:20px; height:20px; }
+/* Phones/tablets: the filters fold behind one "Filters" button (the script
+   adds it; without script every filter is shown). */
+.mcm-wrap button.mcm-dir-toggle{ display:none; }
+@media (max-width:880px){
+	.mcm-wrap button.mcm-dir-toggle{ display:flex; align-items:center; justify-content:space-between; width:100%; min-height:48px; margin:0 0 4px; padding:10px 14px; border:1px solid var(--mcm-border, #e5e7eb); border-radius:8px; background:#fff; color:var(--mcm-text, #1f2933); font-size:15px; font-weight:600; cursor:pointer; }
+	.mcm-wrap button.mcm-dir-toggle:hover, .mcm-wrap button.mcm-dir-toggle:focus{ background:var(--mcm-page-bg, #f5f7fa); color:var(--mcm-text, #1f2933); }
+	.mcm-dir-toggle .mcm-dir-toggle-caret{ transition:transform .2s ease; }
+	.mcm-dir-filters.is-open .mcm-dir-toggle-caret{ transform:rotate(180deg); }
+	.mcm-dir-filters.is-foldable:not(.is-open) .mcm-dir-facet,
+	.mcm-dir-filters.is-foldable:not(.is-open) .mcm-dir-reset{ display:none; }
+	.mcm-dir-filters.is-foldable.is-open .mcm-dir-toggle + .mcm-dir-facet{ margin-top:16px; }
 }

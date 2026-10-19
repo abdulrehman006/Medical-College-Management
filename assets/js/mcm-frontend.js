@@ -317,6 +317,89 @@
 		$scope.find( '.mcm-dept-tabs' ).each( function () {
 			deptTabs( $( this ) );
 		} );
+		$scope.find( '.mcm-dir-checks' ).each( function () {
+			facetMore( $( this ) );
+		} );
+		$scope.find( '.mcm-dir-filters' ).each( function () {
+			filterToggle( $( this ) );
+		} );
+	}
+
+	// Phones/tablets: fold the filter groups behind one "Filters (n)" button
+	// (CSS shows it only on narrow screens). n = filters currently ticked.
+	function filterToggle( $f ) {
+		if ( $f.data( 'mcmFold' ) || ! $f.find( '.mcm-dir-facet' ).length ) {
+			return;
+		}
+		$f.data( 'mcmFold', true ).addClass( 'is-foldable' );
+		if ( ! $f.attr( 'id' ) ) {
+			$f.attr( 'id', 'mcm-filters-' + Math.random().toString( 36 ).slice( 2, 9 ) );
+		}
+		var $btn = $( '<button type="button" class="mcm-dir-toggle" aria-expanded="false"><span class="mcm-dir-toggle-label"></span><span class="mcm-dir-toggle-caret" aria-hidden="true">&#9662;</span></button>' ).attr( 'aria-controls', $f.attr( 'id' ) );
+		var label = function () {
+			var n = $f.find( '.mcm-filter-check:checked' ).length;
+			$btn.find( '.mcm-dir-toggle-label' ).text( i18n( 'filters', 'Filters' ) + ( n ? ' (' + n + ')' : '' ) );
+		};
+		$btn.on( 'click', function () {
+			var open = ! $f.hasClass( 'is-open' );
+			$f.toggleClass( 'is-open', open );
+			$btn.attr( 'aria-expanded', open ? 'true' : 'false' );
+		} );
+		$f.on( 'change', '.mcm-filter-check', label );
+		$f.on( 'click', '.mcm-dir-reset', function () {
+			setTimeout( label, 0 );
+		} );
+		label();
+		var $search = $f.find( '.mcm-dir-search' );
+		if ( $search.length ) {
+			$btn.insertAfter( $search );
+		} else {
+			$f.prepend( $btn );
+		}
+	}
+
+	// Directory filters: a long list shows its first items and a "Show all"
+	// button instead of an inner scrollbar. Ticked items always stay visible.
+	// Without script every option is simply listed.
+	var FACET_VISIBLE = 6;
+	function facetMore( $list ) {
+		if ( $list.data( 'mcmMore' ) ) {
+			return;
+		}
+		var $items = $list.children( 'li' );
+		if ( $items.length <= FACET_VISIBLE + 2 ) {
+			return;
+		}
+		$list.data( 'mcmMore', true );
+		if ( ! $list.attr( 'id' ) ) {
+			$list.attr( 'id', 'mcm-facet-list-' + Math.random().toString( 36 ).slice( 2, 9 ) );
+		}
+		$items.slice( FACET_VISIBLE ).addClass( 'is-extra' );
+		var $btn = $( '<button type="button" class="mcm-dir-more" aria-expanded="false"></button>' ).attr( 'aria-controls', $list.attr( 'id' ) );
+		var label = function () {
+			var open = $list.hasClass( 'is-expanded' );
+			$btn.text( open ? i18n( 'showFewer', 'Show fewer' ) : i18n( 'showAll', 'Show all (%d)' ).replace( '%d', $items.length ) ).attr( 'aria-expanded', open ? 'true' : 'false' );
+		};
+		var keepChecked = function () {
+			$items.filter( '.is-extra' ).each( function () {
+				$( this ).toggleClass( 'is-pinned', $( this ).find( 'input' ).is( ':checked' ) );
+			} );
+		};
+		$btn.on( 'click', function () {
+			var opening = ! $list.hasClass( 'is-expanded' );
+			$list.toggleClass( 'is-expanded', opening );
+			label();
+			if ( opening ) {
+				$items.eq( FACET_VISIBLE ).find( 'input' ).trigger( 'focus' );
+			}
+		} );
+		$list.on( 'change', 'input', keepChecked );
+		$list.closest( '.mcm-wrap' ).on( 'click', '.mcm-dir-reset', function () {
+			setTimeout( keepChecked, 0 );
+		} );
+		keepChecked();
+		label();
+		$btn.insertAfter( $list );
 	}
 
 	// Department page "More from this department": WAI-ARIA tabs with

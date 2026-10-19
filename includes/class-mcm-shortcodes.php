@@ -160,10 +160,13 @@ class MCM_Shortcodes {
 		// Directory layout: filters live in a left sidebar, results on the right.
 		if ( 'directory' === $a['view'] ) {
 			echo '<div class="mcm-wrap mcm-directory ' . esc_attr( $a['class_css'] ) . '" id="' . esc_attr( $uid ) . '" data-config="' . esc_attr( wp_json_encode( $data ) ) . '">';
-			echo '<aside class="mcm-dir-aside">';
+			echo '<aside class="mcm-dir-aside" aria-label="' . esc_attr__( 'Filters', 'medical-college-manager' ) . '">';
 			echo MCM_Query::render_sidebar( $a ); // phpcs:ignore
 			echo '</aside>';
 			echo '<div class="mcm-dir-main">';
+			// Keeps the heading outline intact (page h1 → filter h2s → card h3s),
+			// also on phones where the filters are folded away.
+			echo '<h2 class="mcm-sr-only">' . esc_html__( 'Results', 'medical-college-manager' ) . '</h2>';
 			if ( $show_print ) {
 				echo '<div class="mcm-toolbar"><button type="button" class="mcm-print-btn" aria-label="' . esc_attr__( 'Print', 'medical-college-manager' ) . '">&#128424; ' . esc_html__( 'Print', 'medical-college-manager' ) . '</button></div>';
 				echo MCM_Query::print_header( $a ); // phpcs:ignore

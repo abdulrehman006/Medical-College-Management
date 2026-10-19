@@ -1027,7 +1027,7 @@ class MCM_Query {
 		<div class="mcm-dir-filters" data-type="<?php echo esc_attr( $a['type'] ); ?>">
 			<div class="mcm-dir-search">
 				<input type="search" class="mcm-search" aria-label="<?php echo esc_attr( $placeholder ); ?>" placeholder="<?php echo esc_attr( $placeholder ); ?>" value="<?php echo esc_attr( $a['search'] ); ?>" />
-				<button type="button" class="mcm-search-btn"><?php esc_html_e( 'Search', 'medical-college-manager' ); ?></button>
+				<button type="button" class="mcm-search-btn mcm-search-btn--icon"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path fill="currentColor" d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 10-.7.7l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0a4.5 4.5 0 110-9 4.5 4.5 0 010 9z"/></svg><span class="mcm-sr-only"><?php esc_html_e( 'Search', 'medical-college-manager' ); ?></span></button>
 			</div>
 			<?php
 			foreach ( $taxes as $tax ) {
@@ -1043,8 +1043,9 @@ class MCM_Query {
 					continue;
 				}
 				?>
-				<div class="mcm-dir-facet">
-					<h4 class="mcm-dir-facet-title"><?php echo esc_html( $tobj->labels->name ); ?></h4>
+				<?php $facet_id = wp_unique_id( 'mcm-facet-' ); ?>
+				<div class="mcm-dir-facet" role="group" aria-labelledby="<?php echo esc_attr( $facet_id ); ?>">
+					<h2 class="mcm-dir-facet-title" id="<?php echo esc_attr( $facet_id ); ?>"><?php echo esc_html( $tobj->labels->name ); ?></h2>
 					<ul class="mcm-dir-checks">
 						<?php foreach ( $terms as $term ) : ?>
 							<li>
@@ -1579,6 +1580,10 @@ class MCM_Query {
 		// the profile card.
 		if ( in_array( $type, array( 'mcm_consultant', 'mcm_team' ), true ) ) {
 			return self::directory_card( $id );
+		}
+		// Jobs get their own card: status, deadline and time left come first.
+		if ( 'mcm_job' === $type && class_exists( 'MCM_Job' ) ) {
+			return MCM_Job::card( $id );
 		}
 		$title = get_the_title( $id );
 		// Only link to a front-end single when the type is publicly viewable
