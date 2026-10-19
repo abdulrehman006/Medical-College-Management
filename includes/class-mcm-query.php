@@ -1569,6 +1569,111 @@ class MCM_Query {
 	}
 
 	/**
+	 * Where a dated entry stands today (site timezone): admissions (opening /
+	 * closing date), scholarships and tenders (deadline), events (event date).
+	 * Null for other types or when the dates are missing.
+	 *
+	 * @param int    $id   Post ID.
+	 * @param string $type Post type.
+	 * @return array|null { status, badge (CSS modifier), label, left }.
+	 */
+	public static function date_status( $id, $type ) {
+		$keys = array(
+			'mcm_admission'   => array( 'mcm_open_date', 'mcm_close_date' ),
+			'mcm_scholarship' => array( '', 'mcm_scholarship_deadline' ),
+			'mcm_tender'      => array( '', 'mcm_tender_close' ),
+			'mcm_event'       => array( 'mcm_event_date', '' ),
+		);
+		if ( ! isset( $keys[ $type ] ) ) {
+			return null;
+		}
+		$day   = function ( $key ) use ( $id ) {
+			$d = '' !== $key ? MCM_Meta::parse_date( MCM_Safe::meta( $id, $key ) ) : false;
+			return false !== $d ? new DateTimeImmutable( $d, wp_timezone() ) : null;
+		};
+		$from  = $day( $keys[ $type ][0] );
+		$to    = $day( $keys[ $type ][1] );
+		$today = new DateTimeImmutable( 'today', wp_timezone() );
+		$diff  = function ( $d ) use ( $today ) {
+			return (int) $today->diff( $d )->format( '%r%a' );
+		};
+		$soon  = class_exists( 'MCM_Job' ) ? MCM_Job::closing_soon_days() : 3;
+
+		if ( 'mcm_event' === $type ) {
+			if ( ! $from ) {
+				return null;
+			}
+			$n = $diff( $from );
+			if ( $n < 0 ) {
+				return array(
+					'status' => 'past',
+					'badge'  => 'closed',
+					'label'  => __( 'Past event', 'medical-college-manager' ),
+					'left'   => '',
+				);
+			}
+			if ( 0 === $n ) {
+				return array(
+					'status' => 'today',
+					'badge'  => 'closing',
+					'label'  => __( 'Today', 'medical-college-manager' ),
+					'left'   => '',
+				);
+			}
+			/* translators: %d: number of days. */
+			$in = sprintf( _n( 'In %d day', 'In %d days', $n, 'medical-college-manager' ), $n );
+			return array(
+				'status' => 'upcoming',
+				'badge'  => 'open',
+				'label'  => __( 'Upcoming', 'medical-college-manager' ),
+				'left'   => 1 === $n ? __( 'Tomorrow', 'medical-college-manager' ) : $in,
+			);
+		}
+		if ( $from && $diff( $from ) > 0 ) {
+			$n = $diff( $from );
+			/* translators: %d: number of days. */
+			$in = sprintf( _n( 'Opens in %d day', 'Opens in %d days', $n, 'medical-college-manager' ), $n );
+			return array(
+				'status' => 'upcoming',
+				'badge'  => 'upcoming',
+				'label'  => __( 'Upcoming', 'medical-college-manager' ),
+				'left'   => 1 === $n ? __( 'Opens tomorrow', 'medical-college-manager' ) : $in,
+			);
+		}
+		if ( ! $to ) {
+			return $from ? array(
+				'status' => 'open',
+				'badge'  => 'open',
+				'label'  => __( 'Open', 'medical-college-manager' ),
+				'left'   => '',
+			) : null;
+		}
+		$n = $diff( $to );
+		if ( $n < 0 ) {
+			return array(
+				'status' => 'closed',
+				'badge'  => 'closed',
+				'label'  => __( 'Closed', 'medical-college-manager' ),
+				'left'   => '',
+			);
+		}
+		/* translators: %d: number of days. */
+		$left = 0 === $n ? __( 'Closes today', 'medical-college-manager' ) : sprintf( _n( '%d day left', '%d days left', $n, 'medical-college-manager' ), $n );
+		return $n <= $soon
+			? array(
+				'status' => 'closing',
+				'badge'  => 'closing',
+				'label'  => __( 'Closing soon', 'medical-college-manager' ),
+				'left'   => $left,
+			)
+			: array(
+				'status' => 'open',
+				'badge'  => 'open',
+				'label'  => __( 'Open', 'medical-college-manager' ),
+				'left'   => $left,
+			);
+	}
+	/**
 	 * Grid card for one entry.
 	 *
 	 * @param int $id Post ID.
@@ -1591,17 +1696,26 @@ class MCM_Query {
 		$link  = is_post_type_viewable( $type ) ? get_permalink( $id ) : '';
 		$media = self::media_html( $id, 'large', 'mcm-card-img', 'mcm-card-ph' );
 
+		$when = self::date_status( $id, $type );
+
 		ob_start();
 		?>
-		<article class="mcm-card mcm-card--<?php echo esc_attr( str_replace( 'mcm_', '', $type ) ); ?>">
+		<article class="mcm-card mcm-card--<?php echo esc_attr( str_replace( 'mcm_', '', $type ) ); ?><?php echo $when ? ' mcm-card--dated is-' . esc_attr( $when['status'] ) : ''; ?>">
 			<?php if ( $media ) : ?>
 				<?php if ( $link ) : ?>
-					<a class="mcm-card-media" href="<?php echo esc_url( $link ); ?>"><?php echo $media; // phpcs:ignore ?></a>
+					<a class="mcm-card-media" href="<?php echo esc_url( $link ); ?>" tabindex="-1" aria-hidden="true"><?php echo $media; // phpcs:ignore ?></a>
 				<?php else : ?>
 					<span class="mcm-card-media"><?php echo $media; // phpcs:ignore ?></span>
 				<?php endif; ?>
 			<?php endif; ?>
 			<div class="mcm-card-body">
+				<?php if ( $when ) : ?>
+					<div class="mcm-card-status"><span class="mcm-badge mcm-badge--<?php echo esc_attr( $when['badge'] ); ?>"><?php echo esc_html( $when['label'] ); ?></span>
+					<?php
+					if ( '' !== $when['left'] ) :
+						?>
+						<span class="mcm-card-left"><?php echo esc_html( $when['left'] ); ?></span><?php endif; ?></div>
+				<?php endif; ?>
 				<h3 class="mcm-card-title">
 					<?php if ( $link ) : ?>
 						<a href="<?php echo esc_url( $link ); ?>"><?php echo esc_html( $title ); ?></a>
@@ -1636,17 +1750,26 @@ class MCM_Query {
 		$link  = is_post_type_viewable( $type ) ? get_permalink( $id ) : '';
 		$media = self::media_html( $id, 'thumbnail', 'mcm-list-img', 'mcm-list-ph' );
 
+		$when = self::date_status( $id, $type );
+
 		ob_start();
 		?>
-		<div class="mcm-list-item mcm-list-item--<?php echo esc_attr( str_replace( 'mcm_', '', $type ) ); ?>">
+		<div class="mcm-list-item mcm-list-item--<?php echo esc_attr( str_replace( 'mcm_', '', $type ) ); ?><?php echo $when ? ' is-' . esc_attr( $when['status'] ) : ''; ?>">
 			<?php if ( $media ) : ?>
 				<?php if ( $link ) : ?>
-					<a class="mcm-list-media" href="<?php echo esc_url( $link ); ?>"><?php echo $media; // phpcs:ignore ?></a>
+					<a class="mcm-list-media" href="<?php echo esc_url( $link ); ?>" tabindex="-1" aria-hidden="true"><?php echo $media; // phpcs:ignore ?></a>
 				<?php else : ?>
 					<span class="mcm-list-media"><?php echo $media; // phpcs:ignore ?></span>
 				<?php endif; ?>
 			<?php endif; ?>
 			<div class="mcm-list-body">
+				<?php if ( $when ) : ?>
+					<div class="mcm-card-status"><span class="mcm-badge mcm-badge--<?php echo esc_attr( $when['badge'] ); ?>"><?php echo esc_html( $when['label'] ); ?></span>
+					<?php
+					if ( '' !== $when['left'] ) :
+						?>
+						<span class="mcm-card-left"><?php echo esc_html( $when['left'] ); ?></span><?php endif; ?></div>
+				<?php endif; ?>
 				<h3 class="mcm-list-title">
 					<?php if ( $link ) : ?>
 						<a href="<?php echo esc_url( $link ); ?>"><?php echo esc_html( $title ); ?></a>
@@ -1940,7 +2063,8 @@ class MCM_Query {
 
 			case 'mcm_notice':
 				$rows[] = self::tax_pair( __( 'Category', 'medical-college-manager' ), $id, 'mcm_notice_cat' );
-				$rows[] = self::meta_pair( __( 'Priority', 'medical-college-manager' ), MCM_Safe::meta( $id, 'mcm_notice_priority' ) );
+				$prio   = trim( (string) MCM_Safe::meta( $id, 'mcm_notice_priority' ) );
+				$rows[] = '' !== $prio ? '<span class="mcm-meta-line"><span class="mcm-meta-label">' . esc_html__( 'Priority', 'medical-college-manager' ) . ':</span> <span class="mcm-prio mcm-prio--' . esc_attr( sanitize_html_class( strtolower( $prio ) ) ) . '">' . esc_html( $prio ) . '</span></span>' : '';
 				$rows[] = self::meta_pair( __( 'Date', 'medical-college-manager' ), self::fmt_date( MCM_Safe::meta( $id, 'mcm_notice_date' ) ) );
 				break;
 
@@ -2353,7 +2477,7 @@ class MCM_Query {
 				}
 				$how = MCM_Safe::meta( $id, 'mcm_job_how_to_apply' );
 				if ( '' !== trim( $how ) ) {
-					$after .= '<div class="mcm-job-how"><h4 class="mcm-job-how-title">' . esc_html__( 'How to apply', 'medical-college-manager' ) . '</h4><p>' . nl2br( esc_html( $how ) ) . '</p></div>';
+					$after .= '<div class="mcm-job-how"><h3 class="mcm-job-how-title">' . esc_html__( 'How to apply', 'medical-college-manager' ) . '</h3><p>' . nl2br( esc_html( $how ) ) . '</p></div>';
 				}
 				// The newspaper advertisement, linked to the full-size image.
 				if ( has_post_thumbnail( $id ) ) {
@@ -2425,10 +2549,19 @@ class MCM_Query {
 			return '';
 		}
 
+		// Dated entries (admissions, scholarships, tenders, events) show where
+		// they stand, as jobs do.
+		if ( '' === $badge ) {
+			$when = self::date_status( $id, $type );
+			if ( $when ) {
+				$badge = '<span class="mcm-badge mcm-badge--' . esc_attr( $when['badge'] ) . '">' . esc_html( $when['label'] ) . '</span>' . ( '' !== $when['left'] ? ' <span class="mcm-sd-left">' . esc_html( $when['left'] ) . '</span>' : '' );
+			}
+		}
+
 		ob_start();
 		echo '<div class="mcm-single-details mcm-single-details--' . esc_attr( str_replace( 'mcm_', '', $type ) ) . '">';
 		if ( $heading ) {
-			echo '<h3 class="mcm-sd-heading">' . esc_html( $heading ) . ( '' !== $badge ? ' ' . $badge : '' ) . '</h3>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- $badge is built escaped by MCM_Job::badge().
+			echo '<h2 class="mcm-sd-heading">' . esc_html( $heading ) . ( '' !== $badge ? ' ' . $badge : '' ) . '</h2>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- $badge is built escaped above / by MCM_Job::badge().
 		}
 		if ( $rows ) {
 			echo '<div class="mcm-sd-grid">';

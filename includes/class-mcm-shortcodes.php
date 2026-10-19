@@ -166,7 +166,7 @@ class MCM_Shortcodes {
 			echo '<div class="mcm-dir-main">';
 			// Keeps the heading outline intact (page h1 → filter h2s → card h3s),
 			// also on phones where the filters are folded away.
-			echo '<h2 class="mcm-sr-only">' . esc_html__( 'Results', 'medical-college-manager' ) . '</h2>';
+			echo self::results_heading( $a['type'] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped in results_heading().
 			if ( $show_print ) {
 				echo '<div class="mcm-toolbar"><button type="button" class="mcm-print-btn" aria-label="' . esc_attr__( 'Print', 'medical-college-manager' ) . '">&#128424; ' . esc_html__( 'Print', 'medical-college-manager' ) . '</button></div>';
 				echo MCM_Query::print_header( $a ); // phpcs:ignore
@@ -200,11 +200,25 @@ class MCM_Shortcodes {
 			echo MCM_Query::print_footer(); // phpcs:ignore
 		}
 
+		// Card and list titles are h3: a hidden h2 keeps the outline valid
+		// wherever the block is placed (straight under a page's h1 too).
+		echo self::results_heading( $a['type'] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped in results_heading().
 		echo '<div class="mcm-results" aria-live="polite" aria-busy="false">';
 		echo MCM_Query::render_results( $a ); // phpcs:ignore
 		echo '</div>';
 		echo '</div>';
 		return ob_get_clean();
+	}
+
+	/**
+	 * Visually hidden h2 naming the listed content (e.g. "Vacancies").
+	 *
+	 * @param string $type Post type.
+	 * @return string
+	 */
+	private static function results_heading( $type ) {
+		$obj = get_post_type_object( $type );
+		return '<h2 class="mcm-sr-only">' . esc_html( $obj ? $obj->labels->name : __( 'Results', 'medical-college-manager' ) ) . '</h2>';
 	}
 
 	/**

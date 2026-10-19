@@ -46,6 +46,10 @@ if ( $mcm_block_theme ) {
 	echo '<main class="wp-block-group mcm-block-theme-main">';
 } else {
 	get_header();
+	// The page's main landmark. Hello Elementor's own templates call it
+	// #content (its skip link points there); other themes may already use that
+	// ID in header.php, so they get a neutral one.
+	echo '<main id="' . esc_attr( 'hello-elementor' === get_template() ? 'content' : 'mcm-main' ) . '" class="site-main mcm-main">';
 }
 
 if ( $mcm_ctx && isset( $mcm_ctx['page_html'] ) ) :
@@ -91,6 +95,9 @@ elseif ( $mcm_ctx ) :
 	<?php
 endif; // Defensive: with no context only the theme chrome is printed, never a blank page.
 
+if ( ! $mcm_block_theme ) {
+	echo '</main>';
+}
 if ( $mcm_block_theme ) {
 	echo '</main>';
 	echo $mcm_footer_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Rendered blocks from the active theme.

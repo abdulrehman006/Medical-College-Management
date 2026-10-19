@@ -47,6 +47,25 @@ Medical College Manager — complete changelog.
   stay visible). On phones and tablets the filters fold behind a
   "Filters (n)" button so the results come first. Filter groups are
   labelled for screen readers and the heading order is correct.
+* Admissions, scholarships, tenders and events show where they stand, in
+  cards, list rows and on their own page: Upcoming / Open / Closing soon /
+  Closed (events: Upcoming / Today / Past event) with the time left
+  ("Opens in 5 days", "12 days left", "Tomorrow"), and a coloured top edge
+  on cards.
+* Cards: "View details" sits on the bottom edge of every card in a row.
+* Notices: the priority is a badge; Urgent stands out in red.
+* Fixed: on normal pages the theme underlined every link inside listings
+  (titles, "View details", even white button text); single-page buttons
+  were underlined too.
+* Fixed: no space between the college header and the title of classic
+  pages and posts.
+* Accessibility: archive pages have a main landmark (the archive title no
+  longer counts as a second site banner); correct heading order on single
+  pages, archives and pages using the shortcodes; the photo link repeated
+  next to each title is no longer a nameless tab stop; links in the hidden
+  looping copy of the notice ticker and board are no longer focusable;
+  larger filter checkboxes; the blog "Read More" link meets contrast.
+* Tables: no stray gap under the table inside its frame.
 * The same link label in grid, list and directory views ("View details",
   "Meet the Consultant", "View Profile", "View & Apply" for jobs); developers
   can change it with the mcm_link_label filter.

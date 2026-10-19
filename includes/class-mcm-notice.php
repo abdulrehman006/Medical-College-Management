@@ -603,7 +603,8 @@ class MCM_Notice {
 		echo '<span class="mcm-ticker-label">&#128226; ' . esc_html( $label ) . '</span>';
 		echo '<div class="mcm-ticker-viewport"><div class="mcm-ticker-track" style="animation-duration:' . (int) $dur . 's">';
 		echo '<span class="mcm-ticker-group">' . $items . '</span>'; // phpcs:ignore
-		echo '<span class="mcm-ticker-group mcm-dup" aria-hidden="true">' . $items . '</span>'; // phpcs:ignore
+		// The looping copy is hidden from screen readers, so it must not take keyboard focus either.
+		echo '<span class="mcm-ticker-group mcm-dup" aria-hidden="true">' . self::unfocusable( $items ) . '</span>'; // phpcs:ignore
 		echo '</div></div>';
 		echo '<button type="button" class="mcm-scroll-pause" aria-label="' . esc_attr__( 'Pause', 'medical-college-manager' ) . '" aria-pressed="false">&#10073;&#10073;</button>';
 		echo '</div>';
@@ -662,12 +663,23 @@ class MCM_Notice {
 		echo '<div class="mcm-board-viewport" style="--mcm-board-h:' . absint( $a['height'] ) . 'px;">';
 		echo '<div class="mcm-board-track" style="animation-duration:' . (int) $dur . 's">';
 		echo '<ul class="mcm-board-group">' . $items . '</ul>'; // phpcs:ignore
-		echo '<ul class="mcm-board-group mcm-dup" aria-hidden="true">' . $items . '</ul>'; // phpcs:ignore
+		echo '<ul class="mcm-board-group mcm-dup" aria-hidden="true">' . self::unfocusable( $items ) . '</ul>'; // phpcs:ignore
 		echo '</div></div>';
 		if ( 'yes' === $a['more'] && $archive ) {
 			echo '<a class="mcm-board-more" href="' . esc_url( $archive ) . '">' . esc_html__( 'View all notices', 'medical-college-manager' ) . ' &rarr;</a>';
 		}
 		echo '</div>';
 		return ob_get_clean();
+	}
+
+	/**
+	 * Take links and buttons out of the tab order (for the aria-hidden copy
+	 * that makes the ticker and board scroll seamlessly).
+	 *
+	 * @param string $html Escaped item markup.
+	 * @return string
+	 */
+	private static function unfocusable( $html ) {
+		return (string) preg_replace( '/<(a|button)\b/i', '<$1 tabindex="-1"', $html );
 	}
 }

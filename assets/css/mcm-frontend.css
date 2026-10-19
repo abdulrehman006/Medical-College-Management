@@ -625,7 +625,7 @@
 .mcm-post-title a{ color:inherit; text-decoration:none; transition:color .2s ease; }
 .mcm-post-title a:hover{ color:var(--mcm-blog-navy); }
 .mcm-post-excerpt{ font-size:17px; color:var(--mcm-blog-body); margin:0; }
-.mcm-read-more{ margin-top:22px; align-self:flex-end; display:inline-flex; align-items:center; gap:6px; color:var(--mcm-blog-muted); font-weight:600; font-size:15px; text-decoration:none; transition:color .2s ease; }
+.mcm-read-more{ margin-top:22px; align-self:flex-end; display:inline-flex; align-items:center; gap:6px; color:#5b6270; /* --mcm-blog-muted was 3.2:1 on white */ font-weight:600; font-size:15px; text-decoration:none; transition:color .2s ease; }
 .mcm-read-more:hover{ color:var(--mcm-blog-navy); }
 .mcm-read-more svg{ width:14px; height:14px; fill:currentColor; }
 
@@ -1423,3 +1423,41 @@ a.mcm-jobcard-btn{ position:relative; z-index:1; }
 	.mcm-dir-filters.is-foldable:not(.is-open) .mcm-dir-reset{ display:none; }
 	.mcm-dir-filters.is-foldable.is-open .mcm-dir-toggle + .mcm-dir-facet{ margin-top:16px; }
 }
+
+/* =====================================================================
+   UI QA round (1.32): consistent cards, dated entries, notices, filters.
+   ===================================================================== */
+/* Cards: the body fills the card, so "View details" sits on the bottom edge
+   in every card of a row. */
+.mcm-card-body{ flex:1 1 auto; }
+/* Dated entries (admissions, scholarships, tenders, events): status + time left. */
+.mcm-card--dated{ border-top:4px solid var(--mcm-primary, #0a6b5d); }
+.mcm-card--dated.is-closing, .mcm-card--dated.is-today{ border-top-color:#d97706; }
+.mcm-card--dated.is-closed, .mcm-card--dated.is-past{ border-top-color:#c3c4c7; }
+.mcm-card--dated.is-upcoming{ border-top-color:#2563eb; }
+.mcm-card--event.mcm-card--dated.is-upcoming{ border-top-color:var(--mcm-primary, #0a6b5d); }
+.mcm-card-status{ display:flex; align-items:center; flex-wrap:wrap; gap:6px 10px; }
+.mcm-card-status .mcm-badge{ margin-left:0; }
+.mcm-card-left{ font-size:13px; font-weight:600; color:var(--mcm-primary, #0a6b5d); }
+.mcm-card--dated.is-closing .mcm-card-left, .mcm-card--dated.is-today .mcm-card-left{ color:#8a4b00; }
+.mcm-card--dated.is-upcoming .mcm-card-left{ color:#1d3f8a; }
+.mcm-card--event.mcm-card--dated.is-upcoming .mcm-card-left{ color:var(--mcm-primary, #0a6b5d); }
+/* Notice priority. */
+.mcm-prio{ display:inline-block; padding:1px 8px; border-radius:999px; font-size:12px; font-weight:700; line-height:1.5; border:1px solid var(--mcm-border, #e5e7eb); color:var(--mcm-text, #1f2933); background:var(--mcm-card-bg, #fff); }
+.mcm-prio--important{ border-color:#d97706; background:#fff4e5; color:#8a4b00; }
+.mcm-prio--urgent{ border-color:#b91c1c; background:#b91c1c; color:#fff; }
+/* Filter checkboxes: bigger, in the site colour. */
+.mcm-dir-checks input[type="checkbox"]{ width:18px; height:18px; margin-top:0; accent-color:var(--mcm-primary, #0a6b5d); }
+.mcm-dir-checks label{ align-items:center; min-height:24px; }
+/* Tables: no theme margin inside the rounded frame. */
+.mcm-table-wrap .mcm-table{ margin:0; }
+/* Theme / Elementor kit link styles must not underline the detail buttons. */
+.mcm-single-details a.mcm-sd-btn, .mcm-single-details a.mcm-sd-btn:hover, .mcm-single-details a.mcm-sd-btn:focus{ text-decoration:none; }
+.mcm-sd-left{ font-size:14px; font-weight:600; color:var(--mcm-muted, #6b7280); }
+/* Inside listings, links are titles and buttons: no underline, even when the
+   theme underlines every link in page content (Hello: .page-content a). */
+.mcm-wrap a:not(.mcm-underline){ text-decoration:none; }
+.mcm-list-body .mcm-card-status{ margin-bottom:4px; }
+.mcm-list-item.is-closing .mcm-card-left, .mcm-list-item.is-today .mcm-card-left{ color:#8a4b00; }
+.mcm-list-item.is-upcoming .mcm-card-left{ color:#1d3f8a; }
+.mcm-list-item--event.is-upcoming .mcm-card-left{ color:var(--mcm-primary, #0a6b5d); }

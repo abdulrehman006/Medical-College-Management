@@ -314,3 +314,7 @@ html { scroll-padding-top: var(--mcm-hf-scroll-pad, 0px); }
 	.mcm-hf-foot-bottom .mcm-hf-container::before { background: #999; }
 	.mcm-hf-footer { break-inside: avoid; }
 }
+
+/* Classic single pages and posts (not Elementor-built ones): room between the
+   college header and the page title, as the theme's own header had. */
+body.mcm-hf-on:not(.elementor-page) .site-main:not(.mcm-main){ padding-top:32px; }
