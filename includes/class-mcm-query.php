@@ -1535,7 +1535,7 @@ class MCM_Query {
 	 * @param string $url Image URL.
 	 * @return int
 	 */
-	private static function attachment_id_for( $url ) {
+	public static function attachment_id_for( $url ) {
 		static $cache = array();
 		if ( ! isset( $cache[ $url ] ) ) {
 			$cache[ $url ] = (int) attachment_url_to_postid( $url );

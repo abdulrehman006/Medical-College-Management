@@ -61,7 +61,12 @@ Medical College Manager — complete changelog.
   overlay, fallback hero image, HOD photo side, faculty columns and card
   style, publications shown, empty sections hidden or "Information will be
   available soon", and renameable section titles. If the template ever fails,
-  the previous department page is shown instead.
+  the previous department page is shown instead. The template works whether
+  or not "Filterable Archive Pages" is on; a theme with its own
+  taxonomy-mcm_department.php or its own copy of mcm/archive-mcm.php keeps
+  its page. Departments → Edit → Page sections also hides Faculty and
+  Publications. Text in the accent colour is darkened automatically when
+  needed so it stays readable.
 * New shortcodes: [mcm_department_page], [mcm_department_introduction],
   [mcm_department_vision_mission], [mcm_department_services],
   [mcm_department_faculty], [mcm_department_publications] and

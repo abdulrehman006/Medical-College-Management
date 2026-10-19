@@ -328,8 +328,14 @@
 		}
 		$list.data( 'mcmReady', true );
 		var $tabs = $list.find( '[role="tab"]' );
+		// Panels are siblings of this tab list — never look them up page-wide,
+		// so a second department block on the page cannot be affected.
+		var $panels = $list.siblings( '.mcm-dept-tabpanel' );
 		var panel = function ( $tab ) {
-			return $( document.getElementById( $tab.attr( 'aria-controls' ) ) );
+			var id = $tab.attr( 'aria-controls' );
+			return $panels.filter( function () {
+				return this.id === id;
+			} );
 		};
 		var select = function ( $tab, focus ) {
 			$tabs.each( function () {

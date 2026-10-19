@@ -1231,6 +1231,7 @@ html:has(.mcm-dept:not(.mcm-dept--part)){ overflow-x:clip; }
 .mcm-dept-hero:not(.has-image)::after{ background:none; }
 .mcm-dept-hero-text{ position:relative; z-index:1; width:100%; }
 .mcm-dept-hero .mcm-dept-wrap{ padding-bottom:46px; }
+.mcm-dept--part .mcm-dept-hero .mcm-dept-wrap{ padding-left:clamp(16px, 4vw, 40px); padding-right:clamp(16px, 4vw, 40px); }
 .mcm-dept .mcm-dept-title{ margin:0; font-size:46px; line-height:1.1; font-weight:700; color:#fff; }
 .mcm-dept-hero-tag{ display:inline-block; margin-bottom:14px; padding:5px 12px; border-radius:3px; background:#006B6B; font-size:12px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; }
 /* A video hero: the player full width, the name on a colour band below it. */
@@ -1242,6 +1243,9 @@ html:has(.mcm-dept:not(.mcm-dept--part)){ overflow-x:clip; }
 /* 2. HOD message */
 .mcm-dept-hod{ display:grid; grid-template-columns:300px 1fr; gap:48px; align-items:start; }
 .mcm-dept-hod.is-right{ grid-template-columns:1fr 300px; }
+.mcm-dept .mcm-dept-hod.no-photo{ grid-template-columns:1fr; max-width:860px; }
+.mcm-dept-hod.no-photo .mcm-dept-quote{ padding-top:44px; }
+.mcm-dept-hod.no-photo .mcm-dept-quote::before{ top:-14px; }
 .mcm-dept-hod.is-right .mcm-dept-hod-photo{ order:2; }
 .mcm-dept-hod-photo{ margin:0; }
 .mcm-dept .mcm-dept-photo{ display:block; width:100%; height:auto; aspect-ratio:4 / 5; object-fit:cover; border-radius:6px; background:#DCE3EB; }

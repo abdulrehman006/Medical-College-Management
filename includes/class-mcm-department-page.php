@@ -32,6 +32,29 @@ class MCM_Department_Page {
 	const SECTIONS = array( 'hero', 'hod', 'introduction', 'vision_mission', 'services', 'faculty', 'publications', 'contact' );
 
 	/**
+	 * ID prefix of the instance being rendered. The first instance on a page
+	 * gets the plain prefix (so #mcm-dept-publications links work); later ones
+	 * (a second shortcode or widget) get a numbered one, so IDs never repeat.
+	 *
+	 * @var string
+	 */
+	private static $uid = 'mcm-dept-';
+
+	/**
+	 * Instances rendered in this request.
+	 *
+	 * @var int
+	 */
+	private static $instances = 0;
+
+	/**
+	 * Did the full template render as this request's department page?
+	 *
+	 * @var bool
+	 */
+	private static $is_page = false;
+
+	/**
 	 * Register the hooks this module needs.
 	 */
 	public function __construct() {
@@ -39,6 +62,32 @@ class MCM_Department_Page {
 		add_action( 'admin_init', array( $this, 'register_setting' ) );
 		add_action( 'init', array( $this, 'shortcodes' ) );
 		add_action( 'wp_head', array( $this, 'json_ld' ), 21 );
+	}
+
+	/**
+	 * Start a new instance: pick its ID prefix.
+	 */
+	private static function begin_instance() {
+		++self::$instances;
+		self::$uid = 1 === self::$instances ? 'mcm-dept-' : 'mcm-dept-' . self::$instances . '-';
+	}
+
+	/**
+	 * An element ID within the current instance.
+	 *
+	 * @param string $key Suffix.
+	 * @return string
+	 */
+	private static function id( $key ) {
+		return self::$uid . $key;
+	}
+
+	/**
+	 * Called by MCM_Templates once the template is this request's page (the
+	 * structured data is printed only then).
+	 */
+	public static function mark_page() {
+		self::$is_page = true;
 	}
 
 	/*
@@ -73,13 +122,20 @@ class MCM_Department_Page {
 	}
 
 	/**
-	 * Saved settings merged over the defaults.
+	 * Saved settings merged over the defaults — sanitized again on read, so a
+	 * value written outside the settings screen (WP-CLI, an import) can never
+	 * reach the page unchecked. Cached until the option changes.
 	 *
 	 * @return array
 	 */
 	public static function settings() {
-		$saved = get_option( self::OPTION, array() );
-		return wp_parse_args( is_array( $saved ) ? $saved : array(), self::defaults() );
+		static $raw = null, $clean = null;
+		$saved      = get_option( self::OPTION, array() );
+		if ( null === $clean || $saved !== $raw ) {
+			$raw   = $saved;
+			$clean = self::sanitize( wp_parse_args( is_array( $saved ) ? $saved : array(), self::defaults() ) );
+		}
+		return $clean;
 	}
 
 	/**
@@ -199,7 +255,7 @@ class MCM_Department_Page {
 			return '<label><input type="checkbox" name="' . esc_attr( $opt . '[' . $key . ']' ) . '" value="1" ' . checked( '1', (string) $s[ $key ], false ) . ' /> ' . esc_html( $label ) . '</label>';
 		};
 		$color = function ( $key ) use ( $s, $opt ) {
-			return '<input type="text" class="mcm-color-field" name="' . esc_attr( $opt . '[' . $key . ']' ) . '" value="' . esc_attr( $s[ $key ] ) . '" />';
+			return '<input type="text" id="' . esc_attr( 'mcm-dp-' . $key ) . '" class="mcm-color-field" name="' . esc_attr( $opt . '[' . $key . ']' ) . '" value="' . esc_attr( $s[ $key ] ) . '" />';
 		};
 		?>
 		<div class="wrap">
@@ -211,9 +267,9 @@ class MCM_Department_Page {
 				<table class="form-table" role="presentation">
 					<?php
 					$row( esc_html__( 'Template', 'medical-college-manager' ), $check( 'enabled', __( 'Enable the department page template', 'medical-college-manager' ) ), __( 'Off: department pages keep their current layout.', 'medical-college-manager' ) );
-					$row( esc_html__( 'Section heading colour', 'medical-college-manager' ), $color( 'heading_color' ) );
-					$row( esc_html__( 'Accent colour', 'medical-college-manager' ), $color( 'accent_color' ) );
-					$row( esc_html__( 'Card background', 'medical-college-manager' ), $color( 'card_bg' ) );
+					$row( '<label for="mcm-dp-heading_color">' . esc_html__( 'Section heading colour', 'medical-college-manager' ) . '</label>', $color( 'heading_color' ) );
+					$row( '<label for="mcm-dp-accent_color">' . esc_html__( 'Accent colour', 'medical-college-manager' ) . '</label>', $color( 'accent_color' ), __( 'Bars, borders and icons. Text in the accent colour uses a darker shade so it stays readable.', 'medical-college-manager' ) );
+					$row( '<label for="mcm-dp-card_bg">' . esc_html__( 'Card background', 'medical-college-manager' ) . '</label>', $color( 'card_bg' ), __( 'Also the background of every other section.', 'medical-college-manager' ) );
 					$row(
 						'<label for="mcm-dp-overlay">' . esc_html__( 'Hero overlay (%)', 'medical-college-manager' ) . '</label>',
 						'<input type="number" id="mcm-dp-overlay" min="0" max="90" class="small-text" name="' . esc_attr( $opt . '[overlay]' ) . '" value="' . esc_attr( $s['overlay'] ) . '" />',
@@ -304,32 +360,125 @@ class MCM_Department_Page {
 		if ( ! $term instanceof WP_Term || 'mcm_department' !== $term->taxonomy ) {
 			return '';
 		}
-		MCM_Assets::need();
-		$s    = self::settings();
-		$vars = sprintf(
-			'--mcm-dept-heading:%1$s;--mcm-dept-accent:%2$s;--mcm-dept-card:%3$s;--mcm-dept-overlay:%4$s;--mcm-dept-cols:%5$d;',
-			esc_attr( $s['heading_color'] ),
-			esc_attr( $s['accent_color'] ),
-			esc_attr( $s['card_bg'] ),
-			esc_attr( number_format( (int) $s['overlay'] / 100, 2, '.', '' ) ),
-			(int) $s['faculty_cols']
-		);
-		$html = '';
-		foreach ( self::SECTIONS as $i => $key ) {
-			$html .= self::section( $key, $term, $i );
-		}
-		if ( '1' === (string) $s['related_tabs'] ) {
-			$html .= self::related( $term );
-		}
-		return '<div class="mcm-dept" style="' . $vars . '">' . $html . '</div>';
+		return self::keep_post( array( __CLASS__, 'build' ), array( $term ) );
 	}
 
 	/**
-	 * One section's HTML ('' when it is empty and the setting hides empties).
+	 * Run a renderer and put the global $post back afterwards — the section
+	 * queries loop with the_post(), and wp_reset_postdata() alone cannot restore
+	 * it where there is no main query (AJAX, REST, WP-CLI).
+	 *
+	 * @param callable $cb   Renderer.
+	 * @param array    $args Arguments.
+	 * @return string
+	 */
+	private static function keep_post( $cb, $args ) {
+		$saved = isset( $GLOBALS['post'] ) ? $GLOBALS['post'] : null;
+		try {
+			return (string) call_user_func_array( $cb, $args );
+		} finally {
+			$GLOBALS['post'] = $saved; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Restoring the caller's post.
+			if ( $saved instanceof WP_Post ) {
+				setup_postdata( $saved );
+			}
+		}
+	}
+
+	/**
+	 * The page body; see render().
+	 *
+	 * @internal
+	 * @param WP_Term $term Department.
+	 * @return string
+	 */
+	public static function build( $term ) {
+		MCM_Assets::need();
+		self::begin_instance();
+		$s     = self::settings();
+		$html  = '';
+		$shown = 0; // Tint every other section that is actually shown.
+		foreach ( self::SECTIONS as $key ) {
+			$part = self::section( $key, $term, $shown );
+			if ( '' !== $part ) {
+				$html .= $part;
+				++$shown;
+			}
+		}
+		if ( '1' === (string) $s['related_tabs'] ) {
+			$html .= self::related( $term, 1 === $shown % 2 );
+		}
+		return '<div class="mcm-dept" style="' . esc_attr( self::vars() ) . '">' . $html . '</div>';
+	}
+
+	/**
+	 * The colour/layout settings as CSS custom properties (values sanitized
+	 * by settings(); hex colours and numbers only).
+	 *
+	 * @return string
+	 */
+	private static function vars() {
+		$s = self::settings();
+		return sprintf(
+			'--mcm-dept-heading:%1$s;--mcm-dept-accent:%2$s;--mcm-dept-accent-text:%3$s;--mcm-dept-card:%4$s;--mcm-dept-overlay:%5$s;--mcm-dept-cols:%6$d;',
+			$s['heading_color'],
+			$s['accent_color'],
+			self::readable( $s['accent_color'], $s['card_bg'] ),
+			$s['card_bg'],
+			number_format( (int) $s['overlay'] / 100, 2, '.', '' ),
+			(int) $s['faculty_cols']
+		);
+	}
+
+	/**
+	 * The colour, darkened just enough to be readable as small text (WCAG AA,
+	 * 4.5:1) on both white and the card background.
+	 *
+	 * @param string $hex Colour (#rgb or #rrggbb).
+	 * @param string $bg  Card background colour.
+	 * @return string #rrggbb
+	 */
+	public static function readable( $hex, $bg ) {
+		$rgb = function ( $h ) {
+			$h = ltrim( (string) $h, '#' );
+			if ( 3 === strlen( $h ) ) {
+				$h = $h[0] . $h[0] . $h[1] . $h[1] . $h[2] . $h[2];
+			}
+			return 6 === strlen( $h ) && ctype_xdigit( $h ) ? array_map( 'hexdec', str_split( $h, 2 ) ) : array( 0, 0, 0 );
+		};
+		$lum = function ( $c ) {
+			$l = array();
+			foreach ( $c as $v ) {
+				$v   = $v / 255;
+				$l[] = $v <= 0.03928 ? $v / 12.92 : pow( ( $v + 0.055 ) / 1.055, 2.4 );
+			}
+			return 0.2126 * $l[0] + 0.7152 * $l[1] + 0.0722 * $l[2];
+		};
+		// Text sits on white or on the card colour: check against the darker.
+		$light = min( 1.0, $lum( $rgb( $bg ) ) );
+		$c     = $rgb( $hex );
+		// Darken in 7% steps until 4.5:1 (40 steps reach black from anything).
+		for ( $i = 0; $i < 40; $i++ ) {
+			if ( ( $light + 0.05 ) / ( $lum( $c ) + 0.05 ) >= 4.5 ) {
+				break;
+			}
+			$c = array_map(
+				function ( $v ) {
+					return (int) floor( $v * 0.93 );
+				},
+				$c
+			);
+		}
+		return sprintf( '#%02x%02x%02x', $c[0], $c[1], $c[2] );
+	}
+
+	/**
+	 * One section's HTML ('' when it is empty and the setting hides empties,
+	 * or when the department hides that content under Page sections).
+	 * Building block: use part() or render(), which also restore the global $post.
 	 *
 	 * @param string  $key  Section key (see SECTIONS).
 	 * @param WP_Term $term Department.
-	 * @param int     $i    Position (tints every other section).
+	 * @param int     $i    Position among the shown sections (odd = tinted).
 	 * @param string  $tag  Hero title tag (h1 on the page; a widget may choose).
 	 * @return string
 	 */
@@ -340,6 +489,11 @@ class MCM_Department_Page {
 		if ( 'hero' === $key ) {
 			return self::hero( $term, $tag );
 		}
+		// Departments → Edit → Page sections can hide a content type.
+		$hidden = MCM_TermMeta::hidden_sections( $term->term_id );
+		if ( ( 'publications' === $key && isset( $hidden['mcm_publication'] ) ) || ( 'faculty' === $key && isset( $hidden['mcm_team'], $hidden['mcm_consultant'] ) ) ) {
+			return '';
+		}
 		$method = 'body_' . $key;
 		$body   = method_exists( __CLASS__, $method ) ? (string) self::$method( $term ) : '';
 		if ( '' === $body ) {
@@ -349,7 +503,7 @@ class MCM_Department_Page {
 			}
 			$body = '<p class="mcm-dept-soon">' . esc_html__( 'Information will be available soon.', 'medical-college-manager' ) . '</p>';
 		}
-		$id = 'mcm-dept-' . $key;
+		$id = self::id( $key );
 		return '<section class="mcm-dept-section mcm-dept-section--' . esc_attr( $key ) . ( 1 === $i % 2 ? ' is-tinted' : '' ) . '" aria-labelledby="' . esc_attr( $id ) . '"><div class="mcm-dept-wrap"><h2 class="mcm-dept-h" id="' . esc_attr( $id ) . '">' . esc_html( self::title( $key ) ) . '</h2>' . $body . '</div></section>';
 	}
 
@@ -367,9 +521,9 @@ class MCM_Department_Page {
 		if ( '' === $url ) {
 			return '';
 		}
-		$id = (int) attachment_url_to_postid( $url );
+		$id = MCM_Query::attachment_id_for( $url );
 		if ( ! $id ) {
-			$id = (int) attachment_url_to_postid( preg_replace( '/-\d+x\d+(?=\.[a-z0-9]+$)/i', '', $url ) );
+			$id = MCM_Query::attachment_id_for( (string) preg_replace( '/-\d+x\d+(?=\.[a-z0-9]+$)/i', '', $url ) );
 		}
 		if ( $id ) {
 			$img = wp_get_attachment_image( $id, $size, false, $attrs );
@@ -419,8 +573,9 @@ class MCM_Department_Page {
 			}
 		}
 		$cls = 'mcm-dept-hero' . ( '' !== $embed ? ' has-video' : ( '' !== $media ? ' has-image' : '' ) );
-		return '<section class="' . esc_attr( $cls ) . '" aria-labelledby="mcm-dept-title">' . $media
-			. '<div class="mcm-dept-hero-text"><div class="mcm-dept-wrap">' . $eyebrow . '<' . $tag . ' class="mcm-dept-title" id="mcm-dept-title">' . esc_html( $term->name ) . '</' . $tag . '></div></div></section>';
+		$tid = self::id( 'title' );
+		return '<section class="' . esc_attr( $cls ) . '" aria-labelledby="' . esc_attr( $tid ) . '">' . $media
+			. '<div class="mcm-dept-hero-text"><div class="mcm-dept-wrap">' . $eyebrow . '<' . $tag . ' class="mcm-dept-title" id="' . esc_attr( $tid ) . '">' . esc_html( $term->name ) . '</' . $tag . '></div></div></section>';
 	}
 
 	/**
@@ -439,19 +594,23 @@ class MCM_Department_Page {
 			return '';
 		}
 		$right = 'right' === self::settings()['hod_layout'];
-		$fig   = '<figure class="mcm-dept-hod-photo">' . ( '' !== $photo ? self::image(
-			$photo,
-			'large',
-			array(
-				'class'   => 'mcm-dept-photo',
-				'alt'     => $name,
-				'loading' => 'lazy',
-			)
-		) : '<span class="mcm-dept-photo mcm-dept-photo--empty" aria-hidden="true"></span>' )
-			. ( '' !== $name || '' !== $role ? '<figcaption>' . ( '' !== $name ? '<span class="mcm-dept-hod-name">' . esc_html( $name ) . '</span>' : '' ) . ( '' !== $role ? '<span class="mcm-dept-hod-role">' . esc_html( $role ) . '</span>' : '' ) . '</figcaption>' : '' )
-			. '</figure>';
+		$fig   = '';
+		if ( '' !== $photo || '' !== $name || '' !== $role ) {
+			// The caption names the person, so the photo itself has an empty alt.
+			$fig = '<figure class="mcm-dept-hod-photo">' . ( '' !== $photo ? self::image(
+				$photo,
+				'large',
+				array(
+					'class'   => 'mcm-dept-photo',
+					'alt'     => '',
+					'loading' => 'lazy',
+				)
+			) : '<span class="mcm-dept-photo mcm-dept-photo--empty" aria-hidden="true"></span>' )
+				. ( '' !== $name || '' !== $role ? '<figcaption>' . ( '' !== $name ? '<span class="mcm-dept-hod-name">' . esc_html( $name ) . '</span>' : '' ) . ( '' !== $role ? '<span class="mcm-dept-hod-role">' . esc_html( $role ) . '</span>' : '' ) . '</figcaption>' : '' )
+				. '</figure>';
+		}
 		$quote = '' !== $message ? '<blockquote class="mcm-dept-quote">' . wpautop( esc_html( $message ) ) . '</blockquote>' : '';
-		return '<div class="mcm-dept-hod' . ( $right ? ' is-right' : '' ) . '">' . $fig . $quote . '</div>';
+		return '<div class="mcm-dept-hod' . ( $right ? ' is-right' : '' ) . ( '' === $fig ? ' no-photo' : '' ) . '">' . $fig . $quote . '</div>';
 	}
 
 	/**
@@ -531,17 +690,22 @@ class MCM_Department_Page {
 	 * @return string
 	 */
 	private static function body_faculty( $term ) {
-		$people = get_posts(
+		$hidden = MCM_TermMeta::hidden_sections( $term->term_id );
+		$types  = array_values( array_diff( array( 'mcm_team', 'mcm_consultant' ), array_keys( $hidden ) ) );
+		if ( ! $types ) {
+			return '';
+		}
+		$q      = new WP_Query(
 			array(
-				'post_type'        => array( 'mcm_team', 'mcm_consultant' ),
-				'post_status'      => 'publish',
-				'numberposts'      => 200, // phpcs:ignore WordPress.WP.PostsPerPage.posts_per_page_numberposts -- A department's whole faculty on one page.
-				'orderby'          => array(
+				'post_type'      => $types,
+				'post_status'    => 'publish',
+				'posts_per_page' => 200, // phpcs:ignore WordPress.WP.PostsPerPage.posts_per_page_posts_per_page -- A department's whole faculty on one page.
+				'no_found_rows'  => true,
+				'orderby'        => array(
 					'menu_order' => 'ASC',
 					'title'      => 'ASC',
 				),
-				'suppress_filters' => false,
-				'tax_query'        => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query -- Department faculty list.
+				'tax_query'      => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query -- Department faculty list.
 					array(
 						'taxonomy'         => 'mcm_department',
 						'terms'            => $term->term_id,
@@ -550,10 +714,12 @@ class MCM_Department_Page {
 				),
 			)
 		);
+		$people = $q->posts;
 		if ( ! $people ) {
 			return '';
 		}
-		update_object_term_cache( wp_list_pluck( $people, 'ID' ), array( 'mcm_team', 'mcm_consultant' ) );
+		// One query for every photo instead of two per person.
+		update_post_thumbnail_cache( $q );
 
 		// Group order: the two seeded types first, then any others by name.
 		$order  = array(
@@ -638,11 +804,13 @@ class MCM_Department_Page {
 	 */
 	private static function body_publications( $term ) {
 		$limit = (int) self::settings()['pubs_limit'];
-		$all   = isset( $_GET['all_publications'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only display switch.
-		$args  = array(
+		$max   = 200;
+		// Read-only display switch (?all_publications=1); no nonce needed.
+		$all  = isset( $_GET['all_publications'] ) && '1' === sanitize_key( wp_unslash( $_GET['all_publications'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$args = array(
 			'post_type'      => 'mcm_publication',
 			'post_status'    => 'publish',
-			'posts_per_page' => $all ? 200 : $limit,
+			'posts_per_page' => $all ? $max : $limit,
 			'tax_query'      => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query -- Department publications.
 				array(
 					'taxonomy'         => 'mcm_department',
@@ -651,22 +819,39 @@ class MCM_Department_Page {
 				),
 			),
 		);
-		$args  = MCM_Query::order_by_optional_meta( $args, 'mcm_pub_year', 'SIGNED', 'DESC' );
-		$q     = new WP_Query( $args );
+		$args = MCM_Query::order_by_optional_meta( $args, 'mcm_pub_year', 'SIGNED', 'DESC' );
+		$q    = new WP_Query( $args );
 		if ( ! $q->have_posts() ) {
 			return '';
 		}
-		$html = MCM_Query::render_citation_list( $q );
-		if ( ! $all && $q->found_posts > $limit ) {
-			$html .= '<p><a class="mcm-dept-more" href="' . esc_url( add_query_arg( 'all_publications', '1', get_term_link( $term ) ) . '#mcm-dept-publications' ) . '">' . esc_html(
+		try {
+			$html = MCM_Query::render_citation_list( $q );
+		} finally {
+			wp_reset_postdata();
+		}
+		$total = (int) $q->found_posts;
+		$link  = get_term_link( $term );
+		if ( ! $all && $total > $limit && ! is_wp_error( $link ) ) {
+			// The full list is a feature of the template; with the template
+			// off the department page itself lists every publication.
+			$href  = self::enabled() ? add_query_arg( 'all_publications', '1', $link ) . '#mcm-dept-publications' : $link;
+			$html .= '<p><a class="mcm-dept-more" href="' . esc_url( $href ) . '">' . esc_html(
 				sprintf(
 					/* translators: %d: number of publications. */
-					__( 'View all %d publications', 'medical-college-manager' ),
-					(int) $q->found_posts
+					_n( 'View all %d publication', 'View all %d publications', $total, 'medical-college-manager' ),
+					$total
 				)
 			) . ' &rarr;</a></p>';
+		} elseif ( $all && $total > $max ) {
+			$html .= '<p class="mcm-dept-soon">' . esc_html(
+				sprintf(
+					/* translators: 1: number shown, 2: total number of publications. */
+					__( 'Showing the newest %1$d of %2$d publications.', 'medical-college-manager' ),
+					$max,
+					$total
+				)
+			) . '</p>';
 		}
-		wp_reset_postdata();
 		return $html;
 	}
 
@@ -691,10 +876,10 @@ class MCM_Department_Page {
 		};
 		$list = '';
 		if ( '' !== $phone ) {
-			$list .= $row( __( 'Phone', 'medical-college-manager' ), '<a href="tel:' . esc_attr( preg_replace( '/[^0-9+]/', '', $phone ) ) . '">' . esc_html( $phone ) . '</a>' );
+			$list .= $row( __( 'Phone', 'medical-college-manager' ), '<a href="' . esc_url( 'tel:' . preg_replace( '/[^0-9+]/', '', $phone ) ) . '">' . esc_html( $phone ) . '</a>' );
 		}
 		if ( '' !== $email && is_email( $email ) ) {
-			$list .= $row( __( 'Email', 'medical-college-manager' ), '<a href="mailto:' . esc_attr( $email ) . '">' . esc_html( $email ) . '</a>' );
+			$list .= $row( __( 'Email', 'medical-college-manager' ), '<a href="' . esc_url( 'mailto:' . antispambot( $email ) ) . '">' . esc_html( antispambot( $email ) ) . '</a>' );
 		}
 		if ( '' !== $addr ) {
 			$list .= $row( __( 'Address', 'medical-college-manager' ), nl2br( esc_html( $addr ) ) );
@@ -717,10 +902,11 @@ class MCM_Department_Page {
 	 * (faculty and publications are shown above), honouring Hide Sections.
 	 * Without JavaScript every panel is simply shown in turn.
 	 *
-	 * @param WP_Term $term Department.
+	 * @param WP_Term $term   Department.
+	 * @param bool    $tinted Continue the section tint alternation.
 	 * @return string
 	 */
-	private static function related( $term ) {
+	private static function related( $term, $tinted = false ) {
 		$skip   = array( 'mcm_team', 'mcm_consultant', 'mcm_publication' );
 		$blocks = array();
 		foreach ( MCM_Templates::term_blocks( $term ) as $b ) {
@@ -733,16 +919,17 @@ class MCM_Department_Page {
 		}
 		$tabs   = '';
 		$panels = '';
+		$rid    = self::id( 'related' );
 		foreach ( $blocks as $i => $b ) {
-			$tid   = 'mcm-dept-tab-' . sanitize_key( $b['atts']['type'] );
+			$tid   = self::id( 'tab-' . sanitize_key( $b['atts']['type'] ) );
 			$pid   = $tid . '-panel';
 			$tabs .= '<button type="button" role="tab" id="' . esc_attr( $tid ) . '" aria-controls="' . esc_attr( $pid ) . '" aria-selected="' . ( 0 === $i ? 'true' : 'false' ) . '" tabindex="' . ( 0 === $i ? '0' : '-1' ) . '">' . esc_html( $b['label'] ) . '</button>';
 			// Without JavaScript the tab list stays hidden and every panel shows
 			// under its own heading; the script turns them into tabs.
 			$panels .= '<div class="mcm-dept-tabpanel" id="' . esc_attr( $pid ) . '" data-mcm-tab="' . esc_attr( $tid ) . '"><h3 class="mcm-dept-panel-h">' . esc_html( $b['label'] ) . '</h3>' . MCM_Shortcodes::render_block( $b['atts'] ) . '</div>';
 		}
-		return '<section class="mcm-dept-section mcm-dept-section--related is-tinted" aria-labelledby="mcm-dept-related"><div class="mcm-dept-wrap"><h2 class="mcm-dept-h" id="mcm-dept-related">' . esc_html( self::title( 'related' ) ) . '</h2>'
-			. '<div class="mcm-dept-tabs" role="tablist" aria-labelledby="mcm-dept-related" hidden>' . $tabs . '</div>' . $panels . '</div></section>';
+		return '<section class="mcm-dept-section mcm-dept-section--related' . ( $tinted ? ' is-tinted' : '' ) . '" aria-labelledby="' . esc_attr( $rid ) . '"><div class="mcm-dept-wrap"><h2 class="mcm-dept-h" id="' . esc_attr( $rid ) . '">' . esc_html( self::title( 'related' ) ) . '</h2>'
+			. '<div class="mcm-dept-tabs" role="tablist" aria-labelledby="' . esc_attr( $rid ) . '" hidden>' . $tabs . '</div>' . $panels . '</div></section>';
 	}
 
 	/*
@@ -801,12 +988,12 @@ class MCM_Department_Page {
 	 */
 	public static function part( $key, $term, $tag = 'h1' ) {
 		MCM_Assets::need();
-		$html = self::section( $key, $term, 0, $tag );
+		self::begin_instance();
+		$html = self::keep_post( array( __CLASS__, 'section' ), array( $key, $term, 0, $tag ) );
 		if ( '' === $html ) {
 			return '';
 		}
-		$s = self::settings();
-		return '<div class="mcm-dept mcm-dept--part" style="--mcm-dept-heading:' . esc_attr( $s['heading_color'] ) . ';--mcm-dept-accent:' . esc_attr( $s['accent_color'] ) . ';--mcm-dept-card:' . esc_attr( $s['card_bg'] ) . ';--mcm-dept-overlay:' . esc_attr( number_format( (int) $s['overlay'] / 100, 2, '.', '' ) ) . ';--mcm-dept-cols:' . (int) $s['faculty_cols'] . ';">' . $html . '</div>';
+		return '<div class="mcm-dept mcm-dept--part" style="' . esc_attr( self::vars() ) . '">' . $html . '</div>';
 	}
 
 	/*
@@ -817,7 +1004,9 @@ class MCM_Department_Page {
 
 	/** CollegeOrUniversity JSON-LD on department pages (template enabled). */
 	public function json_ld() {
-		if ( ! self::enabled() || ! is_tax( 'mcm_department' ) ) {
+		// Only when the template really is this page (not a theme's own
+		// template, a disabled archive or the classic fallback).
+		if ( ! self::$is_page || ! is_tax( 'mcm_department' ) ) {
 			return;
 		}
 		echo MCM_Safe::render( array( __CLASS__, 'json_ld_html' ), 'department JSON-LD' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Encoded in json_ld_html().
@@ -833,19 +1022,24 @@ class MCM_Department_Page {
 		if ( ! $term instanceof WP_Term ) {
 			return '';
 		}
-		$id    = $term->term_id;
-		$lh    = MCM_Query::letterhead();
-		$data  = array(
+		$id   = $term->term_id;
+		$lh   = MCM_Query::letterhead();
+		$link = get_term_link( $term );
+		// Names are stored HTML-encoded ("Obstetrics &amp; Gynaecology");
+		// JSON-LD wants the plain text.
+		$data = array(
 			'@context'           => 'https://schema.org',
 			'@type'              => 'CollegeOrUniversity',
-			'name'               => $term->name,
-			'url'                => get_term_link( $term ),
+			'name'               => wp_specialchars_decode( $term->name, ENT_QUOTES ),
 			'parentOrganization' => array(
 				'@type' => 'CollegeOrUniversity',
-				'name'  => $lh['org'],
+				'name'  => wp_specialchars_decode( (string) $lh['org'], ENT_QUOTES ),
 				'url'   => home_url( '/' ),
 			),
 		);
+		if ( ! is_wp_error( $link ) ) {
+			$data['url'] = $link;
+		}
 		$image = trim( (string) MCM_Safe::term_meta( $id, 'mcm_term_banner' ) );
 		if ( '' !== $image ) {
 			$data['image'] = $image;

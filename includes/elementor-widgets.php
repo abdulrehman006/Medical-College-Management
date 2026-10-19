@@ -1691,21 +1691,23 @@ abstract class MCM_Widget_Department_Base extends \Elementor\Widget_Base {
 				'tab'   => \Elementor\Controls_Manager::TAB_STYLE,
 			)
 		);
-		// The colour settings are written inline on .mcm-dept, so the widget
-		// overrides them one level down, where they are inherited from.
-		$vars = array(
-			'heading' => __( 'Heading colour', 'medical-college-manager' ),
-			'accent'  => __( 'Accent colour', 'medical-college-manager' ),
-			'card'    => __( 'Card background', 'medical-college-manager' ),
-			'text'    => __( 'Text colour', 'medical-college-manager' ),
+		// The colour settings are written inline on .mcm-dept as custom
+		// properties, so the widget overrides them one level down, where the
+		// sections inherit them from. Text colour is set directly.
+		$controls = array(
+			'heading' => array( __( 'Heading colour', 'medical-college-manager' ), '{{WRAPPER}} .mcm-dept > *', '--mcm-dept-heading: {{VALUE}};', '' ),
+			'accent'  => array( __( 'Accent colour', 'medical-college-manager' ), '{{WRAPPER}} .mcm-dept > *', '--mcm-dept-accent: {{VALUE}}; --mcm-dept-accent-text: {{VALUE}};', __( 'Also used for small text (the HOD designation): pick a shade dark enough to read.', 'medical-college-manager' ) ),
+			'card'    => array( __( 'Card background', 'medical-college-manager' ), '{{WRAPPER}} .mcm-dept > *', '--mcm-dept-card: {{VALUE}};', '' ),
+			'text'    => array( __( 'Text colour', 'medical-college-manager' ), '{{WRAPPER}} .mcm-dept', 'color: {{VALUE}};', '' ),
 		);
-		foreach ( $vars as $var => $label ) {
+		foreach ( $controls as $key => $c ) {
 			$this->add_control(
-				'mcm_' . $var,
+				'mcm_' . $key,
 				array(
-					'label'     => $label,
-					'type'      => \Elementor\Controls_Manager::COLOR,
-					'selectors' => array( '{{WRAPPER}} .mcm-dept > *' => '--mcm-dept-' . $var . ': {{VALUE}};' ),
+					'label'       => $c[0],
+					'type'        => \Elementor\Controls_Manager::COLOR,
+					'description' => $c[3],
+					'selectors'   => array( $c[1] => $c[2] ),
 				)
 			);
 		}
@@ -1743,7 +1745,15 @@ abstract class MCM_Widget_Department_Base extends \Elementor\Widget_Base {
 	 * @return bool
 	 */
 	private function mcm_editing() {
-		return class_exists( '\Elementor\Plugin' ) && isset( \Elementor\Plugin::$instance->preview ) && is_object( \Elementor\Plugin::$instance->preview ) && method_exists( \Elementor\Plugin::$instance->preview, 'is_preview_mode' ) && \Elementor\Plugin::$instance->preview->is_preview_mode();
+		if ( ! class_exists( '\Elementor\Plugin' ) || ! isset( \Elementor\Plugin::$instance ) ) {
+			return false;
+		}
+		$el = \Elementor\Plugin::$instance;
+		// The editor renders widgets over AJAX (edit mode) and in the preview
+		// frame (preview mode); either counts.
+		$edit    = isset( $el->editor ) && is_object( $el->editor ) && method_exists( $el->editor, 'is_edit_mode' ) && $el->editor->is_edit_mode();
+		$preview = isset( $el->preview ) && is_object( $el->preview ) && method_exists( $el->preview, 'is_preview_mode' ) && $el->preview->is_preview_mode();
+		return $edit || $preview;
 	}
 
 	/**

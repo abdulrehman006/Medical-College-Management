@@ -114,7 +114,10 @@ class MCM_Templates {
 		if ( is_admin() || is_feed() ) {
 			return $template;
 		}
-		if ( '1' !== MCM_Settings::value( 'archive_filters' ) ) {
+		// The department page template is its own switch: it works even when
+		// the filterable archive pages are turned off.
+		$dept_page = is_tax( 'mcm_department' ) && MCM_Department_Page::enabled();
+		if ( '1' !== MCM_Settings::value( 'archive_filters' ) && ! $dept_page ) {
 			return $template;
 		}
 
@@ -134,10 +137,27 @@ class MCM_Templates {
 			return $template;
 		}
 
-		self::$context = $ctx;
-
 		// Allow a child/parent theme to override the plugin template via /mcm/.
 		$override = locate_template( array( 'mcm/archive-mcm.php' ) );
+
+		// 1.32 department page template — only with the plugin's own template
+		// file (a theme's copy may predate it and keeps the classic page).
+		// Rendered now, before the theme header, so its assets reach <head>;
+		// if it fails, the classic context below is used instead.
+		$page = null;
+		if ( $dept_page && ! $override ) {
+			$page = MCM_Department_Page::render_or_null( get_queried_object() );
+			if ( null !== $page ) {
+				$ctx['page_html'] = $page;
+				MCM_Department_Page::mark_page();
+			}
+		}
+		// Archive pages switched off: without the template, the theme's own page.
+		if ( null === $page && '1' !== MCM_Settings::value( 'archive_filters' ) ) {
+			return $template;
+		}
+
+		self::$context = $ctx;
 		return $override ? $override : MCM_PATH . 'templates/archive-mcm.php';
 	}
 
@@ -223,21 +243,7 @@ class MCM_Templates {
 			if ( ! $term instanceof WP_Term ) {
 				return null;
 			}
-			$tax = $term->taxonomy;
-
-			// 1.32 department page template (off by default). Rendered here,
-			// before the theme header, so its assets reach <head>. A failure
-			// falls through to the classic page below.
-			if ( 'mcm_department' === $tax && MCM_Department_Page::enabled() ) {
-				$page = MCM_Department_Page::render_or_null( $term );
-				if ( null !== $page ) {
-					return array(
-						'page_html' => $page,
-						'specific'  => array( "taxonomy-{$tax}-{$term->slug}.php", "taxonomy-{$tax}.php" ),
-					);
-				}
-			}
-
+			$tax     = $term->taxonomy;
 			$blocks  = self::term_blocks( $term );
 			$tobj    = get_taxonomy( $tax );
 			$heading = ( $tobj ? $tobj->labels->singular_name . ': ' : '' ) . $term->name;
