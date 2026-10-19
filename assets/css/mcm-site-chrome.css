@@ -67,7 +67,9 @@
 .mcm-hf :where(ul) { list-style: none; margin: 0; padding: 0; }
 /* Resets use :where() (zero specificity) so every component rule below wins without !important.
    Hello's reset colours every link #c36 on hover — keep ours. */
-.mcm-hf :where(a) { text-decoration: none; color: inherit; transition: color var(--mcm-hf-speed), background-color var(--mcm-hf-speed); }
+.mcm-hf :where(a) { text-decoration: none; color: inherit; }
+/* Colour transitions only after the first paint (html.mcm-hf-ready): otherwise links fade in from the theme's link colour while the page loads. */
+html.mcm-hf-ready .mcm-hf :where(a) { transition: color var(--mcm-hf-speed), background-color var(--mcm-hf-speed); }
 /* Hello's reset gives buttons a pink border/background — neutralise inside the chrome only. */
 .mcm-hf :where(button) { font: inherit; color: inherit; background: none; border: 0; border-radius: 0; padding: 0; margin: 0; cursor: pointer;
 	/* Hello's reset animates `all` on buttons — that also delays the inherited
@@ -193,7 +195,7 @@ html { scroll-padding-top: var(--mcm-hf-scroll-pad, 0px); }
 .mcm-hf-social svg { width: 15px; height: 15px; }
 .mcm-hf-social a { background: rgba(255, 255, 255, .14); }
 .mcm-hf-social a:hover { filter: brightness(1.15); }
-.mcm-hf-foot-h { margin: -27px 0 20px; font: 700 16px/52.8px var(--mcm-hf-font); letter-spacing: .04em; text-transform: uppercase; color: inherit; }
+.mcm-hf-foot-h { margin: -27px 0 20px; font: 700 var(--mcm-hf-foot-h-size, 16px)/52.8px var(--mcm-hf-font); letter-spacing: .04em; text-transform: uppercase; color: inherit; }
 .mcm-hf-foot-links a { display: block; padding: 6px 0 6px 3px; font-size: 14px; font-weight: 500; line-height: 20px; }
 .mcm-hf-foot-links a:hover { color: var(--mcm-hf-top-hover); }
 .mcm-hf .mcm-hf-foot-contact { margin-top: 2px; }
@@ -229,7 +231,7 @@ html { scroll-padding-top: var(--mcm-hf-scroll-pad, 0px); }
 .mcm-hf-iconbtns svg { width: 18px; height: 18px; }
 .mcm-hf.mcm-hf-collapsed .mcm-hf-mainbar .mcm-hf-container { height: 84px; }
 .mcm-hf.mcm-hf-collapsed .mcm-hf-logo { margin-left: 0; }
-.mcm-hf.mcm-hf-collapsed .mcm-hf-logo img { height: 62px; }
+.mcm-hf.mcm-hf-collapsed .mcm-hf-logo img { height: var(--mcm-hf-logo-h-t, 62px); }
 .mcm-hf.mcm-hf-collapsed .mcm-hf-nav { display: none; }
 .mcm-hf.mcm-hf-collapsed .mcm-hf-burger { display: flex !important; }
 .mcm-hf.mcm-hf-collapsed.is-stuck.mcm-hf-shrink { --mcm-hf-main-h: 64px; }
@@ -262,7 +264,7 @@ html { scroll-padding-top: var(--mcm-hf-scroll-pad, 0px); }
 }
 @media (max-width: 599.98px) {
 	.mcm-hf-mainbar .mcm-hf-container { height: 72px; }
-	.mcm-hf-logo img { height: 54px; }
+	.mcm-hf.mcm-hf-collapsed .mcm-hf-logo img { height: var(--mcm-hf-logo-h-m, 54px); }
 	.mcm-hf-foot-main { padding: 48px 0 28px; }
 	.mcm-hf-foot-grid, .mcm-hf-foot-grid.is-3, .mcm-hf-foot-grid.is-2 { grid-template-columns: 1fr; gap: 30px; }
 	.mcm-hf-brand-title { font-size: 34px; line-height: 50px; margin-top: -8px; }
@@ -318,3 +320,46 @@ html { scroll-padding-top: var(--mcm-hf-scroll-pad, 0px); }
 /* Classic single pages and posts (not Elementor-built ones): room between the
    college header and the page title, as the theme's own header had. */
 body.mcm-hf-on:not(.elementor-page) .site-main:not(.mcm-main){ padding-top:32px; }
+
+/* ---------- Optional header actions: search + call-to-action (off by default) ---------- */
+.mcm-hf-actions { display: flex; align-items: center; gap: 10px; margin-left: auto; padding-left: 12px; }
+.mcm-hf .mcm-hf-cta { display: inline-flex; align-items: center; min-height: 44px; padding: 0 18px; border-radius: 4px; background: var(--mcm-hf-bar); color: #fff; font-size: var(--mcm-hf-menu-size); font-weight: 700; white-space: nowrap; }
+.mcm-hf .mcm-hf-cta:hover, .mcm-hf .mcm-hf-cta:focus-visible { background: var(--mcm-hf-menu); color: #fff; }
+.mcm-hf-search { position: relative; }
+.mcm-hf-search > summary { list-style: none; display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 4px; color: var(--mcm-hf-menu); cursor: pointer; }
+.mcm-hf-search > summary::-webkit-details-marker { display: none; }
+.mcm-hf-search > summary:hover, .mcm-hf-search[open] > summary { background: #F1F4F8; color: var(--mcm-hf-hover); }
+.mcm-hf-search > summary svg { width: 22px; height: 22px; }
+.mcm-hf-search-form { position: absolute; right: 0; top: calc(100% + 8px); z-index: 60; display: flex; gap: 6px; width: min(340px, 86vw); padding: 10px; background: #fff; box-shadow: var(--mcm-hf-dd-shadow); border-top: 3px solid var(--mcm-hf-bar); }
+.mcm-hf-search-form input { flex: 1 1 auto; min-width: 0; min-height: 44px; padding: 0 12px; border: 1px solid #CBD3DD; border-radius: 4px; font: inherit; font-size: 15px; }
+.mcm-hf .mcm-hf-search-form button { min-height: 44px; padding: 0 16px; border-radius: 4px; background: var(--mcm-hf-menu); color: #fff; font-weight: 700; }
+/* Collapsed header: the CTA moves into the menu panel; search stays beside the burger. */
+.mcm-hf.mcm-hf-collapsed .mcm-hf-actions .mcm-hf-cta { display: none; }
+.mcm-hf.mcm-hf-collapsed .mcm-hf-actions { padding-left: 0; margin-right: 6px; }
+.mcm-hf.mcm-hf-collapsed .mcm-hf-burger { margin-left: 0; }
+.mcm-hf-collapsed .mcm-hf-actions ~ .mcm-hf-burger { margin-left: 0; }
+.mcm-hf-panel-cta { margin: 16px 16px 0; }
+.mcm-hf-panel-cta .mcm-hf-cta { width: 100%; justify-content: center; }
+
+/* ---------- Top bar "full" on phones & tablets: contact and menu stay, wrapped ---------- */
+.mcm-hf.mcm-hf-collapsed .mcm-hf-top-full .mcm-hf-container { height: auto; flex-wrap: wrap; gap: 0 12px; padding-top: 6px; padding-bottom: 6px; }
+.mcm-hf.mcm-hf-collapsed .mcm-hf-top-full .mcm-hf-contact { display: flex; padding-left: 0; }
+.mcm-hf.mcm-hf-collapsed .mcm-hf-top-full .mcm-hf-iconbtns { display: none; }
+.mcm-hf.mcm-hf-collapsed .mcm-hf-top-full .mcm-hf-topnav { display: block; }
+.mcm-hf.mcm-hf-collapsed .mcm-hf-top-full .mcm-hf-topmenu { flex-wrap: wrap; height: auto; margin-right: 0; }
+.mcm-hf.mcm-hf-collapsed .mcm-hf-top-full .mcm-hf-topmenu a { min-height: 44px; padding: 0 12px 0 0; }
+.mcm-hf.mcm-hf-collapsed .mcm-hf-top-full .mcm-hf-topmenu > li + li::before { display: none; }
+.mcm-hf.mcm-hf-collapsed .mcm-hf-top-full .mcm-hf-contact a { min-height: 44px; }
+
+/* ---------- Reveal footer: the footer stays fixed and is uncovered by the page
+   scrolling away (clip-path keeps it inside its wrapper, so no theme wrapper
+   needs a background). The script switches it on only when the page is long
+   enough and the footer fits the screen. ---------- */
+.mcm-hf-reveal-wrap.is-reveal { position: relative; clip-path: inset(0); height: var(--mcm-hf-reveal-h, auto); }
+.mcm-hf-reveal-wrap.is-reveal > .mcm-hf-footer { position: fixed; left: 0; right: 0; bottom: 0; }
+@media (prefers-reduced-motion: reduce) { .mcm-hf-reveal-wrap.is-reveal { clip-path: none; height: auto; } .mcm-hf-reveal-wrap.is-reveal > .mcm-hf-footer { position: static; } }
+@media print {
+	.mcm-hf-actions { display: none !important; }
+	.mcm-hf-reveal-wrap.is-reveal { clip-path: none; height: auto; }
+	.mcm-hf-reveal-wrap.is-reveal > .mcm-hf-footer { position: static; }
+}

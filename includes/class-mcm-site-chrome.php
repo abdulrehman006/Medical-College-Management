@@ -102,6 +102,12 @@ class MCM_Site_Chrome {
 			// Header.
 			'logo'               => '',
 			'logo_h'             => '72',
+			'logo_h_t'           => '62',
+			'logo_h_m'           => '54',
+			'cta_show'           => '0',
+			'cta_label'          => __( 'Apply Now', 'medical-college-manager' ),
+			'cta_url'            => '',
+			'search_show'        => '0',
 			'main_bg'            => '#FFFFFF',
 			'border'             => '#083D70',
 			'menu_color'         => '#0A4D8C',
@@ -143,6 +149,9 @@ class MCM_Site_Chrome {
 			'foot_text'          => '#FFFFFF',
 			'foot_icon'          => '#00A6A6',
 			'foot_bottom_bg'     => '#02216D',
+			'foot_cols'          => '4',
+			'foot_mode'          => 'normal',
+			'foot_h_size'        => '16',
 		);
 	}
 
@@ -153,11 +162,12 @@ class MCM_Site_Chrome {
 	 */
 	public static function tabs() {
 		return array(
-			'general'   => array( 'enabled_header', 'enabled_footer', 'source', 'template_header', 'template_footer', 'hide_on', 'font', 'preview' ),
-			'topbar'    => array( 'top_show', 'top_email', 'top_phone', 'top_bg', 'top_text', 'top_hover', 'top_divider', 'top_divider_w', 'top_divider_h', 'top_mobile' ),
-			'header'    => array( 'logo', 'logo_h', 'main_bg', 'border', 'menu_color', 'menu_size', 'menu_weight', 'hover', 'active', 'bar', 'bar_h', 'bar_position', 'dd_bg', 'dd_text', 'dd_hover', 'dd_hover_bg', 'departments_item' ),
-			'behaviour' => array( 'mode', 'mode_mobile', 'hide_topbar_sticky', 'breakpoint', 'panel_side', 'back_to_top' ),
-			'footer'    => array( 'foot_logo', 'foot_title', 'foot_subtitle', 'foot_desc', 'foot_social', 'social_style', 'col2_heading', 'col3_heading', 'contact_heading', 'address', 'phone', 'email', 'copyright', 'foot_bg', 'foot_text', 'foot_icon', 'foot_bottom_bg' ),
+			'general'    => array( 'enabled_header', 'enabled_footer', 'source', 'template_header', 'template_footer', 'hide_on', 'preview' ),
+			'topbar'     => array( 'top_show', 'top_email', 'top_phone', 'top_bg', 'top_text', 'top_hover', 'top_divider', 'top_divider_w', 'top_divider_h', 'top_mobile' ),
+			'header'     => array( 'logo', 'logo_h', 'logo_h_t', 'logo_h_m', 'cta_show', 'cta_label', 'cta_url', 'search_show', 'main_bg', 'border', 'menu_color', 'hover', 'active', 'bar', 'bar_h', 'bar_position', 'dd_bg', 'dd_text', 'dd_hover', 'dd_hover_bg', 'departments_item' ),
+			'behaviour'  => array( 'mode', 'mode_mobile', 'hide_topbar_sticky', 'breakpoint', 'panel_side', 'back_to_top' ),
+			'footer'     => array( 'foot_cols', 'foot_mode', 'foot_logo', 'foot_title', 'foot_subtitle', 'foot_desc', 'foot_social', 'social_style', 'col2_heading', 'col3_heading', 'contact_heading', 'address', 'phone', 'email', 'copyright', 'foot_bg', 'foot_text', 'foot_icon', 'foot_bottom_bg' ),
+			'typography' => array( 'font', 'menu_size', 'menu_weight', 'foot_h_size' ),
 		);
 	}
 
@@ -198,7 +208,7 @@ class MCM_Site_Chrome {
 			$v = $str( $k );
 			return in_array( $v, $allowed, true ) ? $v : $d[ $k ];
 		};
-		foreach ( array( 'enabled_header', 'enabled_footer', 'preview', 'top_show', 'hide_topbar_sticky', 'back_to_top', 'foot_social' ) as $k ) {
+		foreach ( array( 'enabled_header', 'enabled_footer', 'preview', 'top_show', 'hide_topbar_sticky', 'back_to_top', 'foot_social', 'cta_show', 'search_show' ) as $k ) {
 			$out[ $k ] = ( isset( $in[ $k ] ) && ( '1' === MCM_Safe::str( $in[ $k ] ) || true === $in[ $k ] ) ) ? '1' : '0';
 		}
 		foreach ( array( 'top_bg', 'top_text', 'top_hover', 'top_divider', 'main_bg', 'border', 'menu_color', 'hover', 'active', 'bar', 'dd_bg', 'dd_text', 'dd_hover', 'dd_hover_bg', 'foot_bg', 'foot_text', 'foot_icon', 'foot_bottom_bg' ) as $k ) {
@@ -214,9 +224,16 @@ class MCM_Site_Chrome {
 		$out['top_phone']        = sanitize_text_field( $str( 'top_phone' ) );
 		$out['top_divider_w']    = $int( 'top_divider_w', 0, 6 );
 		$out['top_divider_h']    = $int( 'top_divider_h', 0, 63 );
-		$out['top_mobile']       = $pick( 'top_mobile', array( 'icons', 'hidden' ) );
+		$out['top_mobile']       = $pick( 'top_mobile', array( 'icons', 'full', 'hidden' ) );
 		$out['logo']             = esc_url_raw( $str( 'logo' ) );
 		$out['logo_h']           = $int( 'logo_h', 24, 120 );
+		$out['logo_h_t']         = $int( 'logo_h_t', 24, 120 );
+		$out['logo_h_m']         = $int( 'logo_h_m', 24, 100 );
+		$out['cta_label']        = sanitize_text_field( $str( 'cta_label' ) );
+		$out['cta_url']          = esc_url_raw( $str( 'cta_url' ) );
+		$out['foot_cols']        = $pick( 'foot_cols', array( '4', '3', '2' ) );
+		$out['foot_mode']        = $pick( 'foot_mode', array( 'normal', 'reveal' ) );
+		$out['foot_h_size']      = $int( 'foot_h_size', 12, 28 );
 		$out['menu_size']        = $int( 'menu_size', 11, 22 );
 		$out['menu_weight']      = $pick( 'menu_weight', array( '400', '500', '600', '700' ) );
 		$out['bar_h']            = $int( 'bar_h', 0, 8 );
@@ -581,6 +598,9 @@ class MCM_Site_Chrome {
 			'main-bg'        => $s['main_bg'],
 			'border'         => $s['border'],
 			'logo-h'         => $s['logo_h'] . 'px',
+			'logo-h-t'       => $s['logo_h_t'] . 'px',
+			'logo-h-m'       => $s['logo_h_m'] . 'px',
+			'foot-h-size'    => $s['foot_h_size'] . 'px',
 			'menu'           => $s['menu_color'],
 			'menu-size'      => $s['menu_size'] . 'px',
 			'menu-weight'    => $s['menu_weight'],
@@ -883,7 +903,11 @@ class MCM_Site_Chrome {
 		$topmenu = self::menu( 'mcm-college-quick', 'mcm-hf-topmenu', 1, false );
 		$topbar  = '';
 		if ( '1' === $s['top_show'] && ( '' !== $contact || '' !== $topmenu ) ) {
-			$topbar = '<div class="mcm-hf-topbar' . ( 'hidden' === $s['top_mobile'] ? ' mcm-hf-top-hide-mobile' : '' ) . '"><div class="mcm-hf-container">'
+			$tmods  = array(
+				'hidden' => ' mcm-hf-top-hide-mobile',
+				'full'   => ' mcm-hf-top-full',
+			);
+			$topbar = '<div class="mcm-hf-topbar' . ( isset( $tmods[ $s['top_mobile'] ] ) ? $tmods[ $s['top_mobile'] ] : '' ) . '"><div class="mcm-hf-container">'
 				. ( '' !== $contact ? '<ul class="mcm-hf-contact">' . $contact . '</ul><div class="mcm-hf-iconbtns">' . $icons . '</div>' : '<span></span>' )
 				. ( '' !== $topmenu ? '<nav class="mcm-hf-topnav" aria-label="' . esc_attr__( 'Top bar', 'medical-college-manager' ) . '">' . $topmenu . '</nav>' : '' )
 				. '</div></div>';
@@ -906,6 +930,7 @@ class MCM_Site_Chrome {
 		$html .= '<div class="mcm-hf-mainbar"><div class="mcm-hf-container">';
 		$html .= '<a class="mcm-hf-logo" href="' . esc_url( $home ) . '" rel="home">' . $logo . '</a>';
 		$html .= '' !== $main ? '<nav class="mcm-hf-nav" aria-label="' . esc_attr__( 'Main', 'medical-college-manager' ) . '">' . $main . '</nav>' : '';
+		$html .= self::actions_html( $s );
 		$html .= $burger ? '<button class="mcm-hf-burger" type="button" aria-controls="mcm-hf-panel" aria-expanded="false" aria-label="' . esc_attr__( 'Open menu', 'medical-college-manager' ) . '">' . self::icon( 'menu' ) . '</button>' : '';
 		$html .= '</div></div></header>';
 		$html .= self::fit_script();
@@ -914,6 +939,37 @@ class MCM_Site_Chrome {
 			$html .= self::panel_html( $s, $org, $contact );
 		}
 		return $html;
+	}
+
+	/**
+	 * Is the optional call-to-action button switched on and complete?
+	 *
+	 * @param array $s Settings.
+	 * @return bool
+	 */
+	private static function cta_on( $s ) {
+		return '1' === $s['cta_show'] && '' !== $s['cta_url'] && '' !== $s['cta_label'];
+	}
+
+	/**
+	 * Optional search (a disclosure that works without script) and CTA
+	 * button after the main menu. Both are off by default.
+	 *
+	 * @param array $s Settings.
+	 * @return string
+	 */
+	private static function actions_html( $s ) {
+		$out = '';
+		if ( '1' === $s['search_show'] ) {
+			$out .= '<details class="mcm-hf-search"><summary aria-label="' . esc_attr__( 'Search', 'medical-college-manager' ) . '"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 10-.7.7l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0a4.5 4.5 0 110-9 4.5 4.5 0 010 9z"/></svg></summary>'
+				. '<form class="mcm-hf-search-form" role="search" method="get" action="' . esc_url( home_url( '/' ) ) . '"><label class="mcm-hf-sr" for="mcm-hf-s">' . esc_html__( 'Search for:', 'medical-college-manager' ) . '</label>'
+				. '<input type="search" id="mcm-hf-s" name="s" placeholder="' . esc_attr__( 'Search…', 'medical-college-manager' ) . '" />'
+				. '<button type="submit">' . esc_html__( 'Search', 'medical-college-manager' ) . '</button></form></details>';
+		}
+		if ( self::cta_on( $s ) ) {
+			$out .= '<a class="mcm-hf-cta" href="' . esc_url( $s['cta_url'] ) . '">' . esc_html( $s['cta_label'] ) . '</a>';
+		}
+		return '' !== $out ? '<div class="mcm-hf-actions">' . $out . '</div>' : '';
 	}
 
 	/**
@@ -927,7 +983,7 @@ class MCM_Site_Chrome {
 		$js = "(function(){var d=document.documentElement,h=document.querySelector('.mcm-hf-header');d.classList.add('mcm-hf-js');if(!h){return;}"
 			. "window.mcmHfFit=function(){h.classList.remove('mcm-hf-collapsed','mcm-hf-top-collapsed');if(window.innerWidth<(+h.getAttribute('data-breakpoint')||1024)){h.classList.add('mcm-hf-collapsed');return;}"
 			. 'var edge=function(c){var r=c.getBoundingClientRect();return r.right-parseFloat(getComputedStyle(c).paddingRight)+0.5;};'
-			. "var mc=h.querySelector('.mcm-hf-mainbar .mcm-hf-container'),m=h.querySelector('.mcm-hf-menu');if(m&&mc&&m.getBoundingClientRect().right>edge(mc)){h.classList.add('mcm-hf-collapsed');return;}"
+			. "var mc=h.querySelector('.mcm-hf-mainbar .mcm-hf-container'),m=h.querySelector('.mcm-hf-menu'),ac=h.querySelector('.mcm-hf-actions'),rr=Math.max(m?m.getBoundingClientRect().right:0,ac?ac.getBoundingClientRect().right:0);if(mc&&m&&rr>edge(mc)){h.classList.add('mcm-hf-collapsed');return;}"
 			. "var tc=h.querySelector('.mcm-hf-topbar .mcm-hf-container'),tm=h.querySelector('.mcm-hf-topmenu'),ct=h.querySelector('.mcm-hf-contact');if(tc&&tm&&ct&&(tm.getBoundingClientRect().right>edge(tc)||ct.getBoundingClientRect().right>tm.getBoundingClientRect().left)){h.classList.add('mcm-hf-top-collapsed');}};"
 			. 'window.mcmHfFit();})();';
 		return wp_get_inline_script_tag( $js );
@@ -951,6 +1007,9 @@ class MCM_Site_Chrome {
 		$html .= '' !== $main ? '<nav aria-label="' . esc_attr__( 'Main (mobile)', 'medical-college-manager' ) . '">' . $main . '</nav>' : '';
 		if ( '' !== $quick ) {
 			$html .= '<p class="mcm-hf-panel-h">' . esc_html__( 'Quick Links', 'medical-college-manager' ) . '</p><nav aria-label="' . esc_attr__( 'Top bar (mobile)', 'medical-college-manager' ) . '">' . $quick . '</nav>';
+		}
+		if ( self::cta_on( $s ) ) {
+			$html .= '<p class="mcm-hf-panel-cta"><a class="mcm-hf-cta" href="' . esc_url( $s['cta_url'] ) . '">' . esc_html( $s['cta_label'] ) . '</a></p>';
 		}
 		if ( '' !== $contact ) {
 			$html .= '<ul class="mcm-hf-panel-contact">' . $contact . '</ul>';
@@ -981,11 +1040,15 @@ class MCM_Site_Chrome {
 			. ( '1' === $s['foot_social'] ? self::social( $s ) : '' )
 			. '</div>';
 
-		$cols = array( $brand );
-		foreach ( array(
+		// Columns: 4 = brand, two link menus, contact; 3 = brand, first menu,
+		// contact; 2 = brand, contact. An empty menu location drops its column.
+		$cols  = array( $brand );
+		$menus = array(
 			'mcm-college-links-a' => $s['col2_heading'],
 			'mcm-college-links-b' => $s['col3_heading'],
-		) as $loc => $heading ) {
+		);
+		$menus = array_slice( $menus, 0, max( 0, (int) $s['foot_cols'] - 2 ), true );
+		foreach ( $menus as $loc => $heading ) {
 			$links = self::menu( $loc, 'mcm-hf-foot-links', 1, false );
 			if ( '' === $links ) {
 				continue;
@@ -1022,12 +1085,14 @@ class MCM_Site_Chrome {
 		);
 		$legal = self::menu( 'mcm-college-legal', 'mcm-hf-legal', 1, false );
 
-		$html  = '<footer class="mcm-hf mcm-hf-footer">';
+		$html  = 'reveal' === $s['foot_mode'] ? '<div class="mcm-hf-reveal-wrap" data-mcm-reveal="1">' : '';
+		$html .= '<footer class="mcm-hf mcm-hf-footer">';
 		$html .= '<div class="mcm-hf-foot-main"><div class="mcm-hf-container mcm-hf-foot-grid is-' . count( $cols ) . '">' . implode( '', $cols ) . '</div></div>';
 		$html .= '<div class="mcm-hf-foot-bottom"><div class="mcm-hf-container">'
 			. ( '' !== $copy ? '<p class="mcm-hf-copy">' . esc_html( $copy ) . '</p>' : '<span></span>' )
 			. ( '' !== $legal ? '<nav aria-label="' . esc_attr__( 'Legal', 'medical-college-manager' ) . '">' . $legal . '</nav>' : '' )
 			. '</div></div></footer>';
+		$html .= 'reveal' === $s['foot_mode'] ? '</div>' : '';
 		return $html . self::to_top( $s );
 	}
 

@@ -24,6 +24,8 @@
 	}
 
 	var root = document.documentElement;
+	// Enable colour transitions only after the first paint (see the CSS).
+	window.requestAnimationFrame(function () { window.requestAnimationFrame(function () { root.classList.add('mcm-hf-ready'); }); });
 	var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 	/* ---------- Back to top (part of the footer; works without the header) ---------- */
@@ -32,6 +34,34 @@
 		window.addEventListener('scroll', function () { top.classList.toggle('is-on', window.scrollY > 600); }, { passive: true });
 		top.addEventListener('click', function () { window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' }); });
 	}
+
+	/* ---------- Reveal footer: only when the page is long enough and the footer fits ---------- */
+	var reveal = document.querySelector('[data-mcm-reveal]');
+	if (reveal) {
+		var revealFoot = reveal.querySelector('.mcm-hf-footer');
+		var fitReveal = function () {
+			reveal.classList.remove('is-reveal');
+			reveal.style.removeProperty('--mcm-hf-reveal-h');
+			var fh = revealFoot ? revealFoot.offsetHeight : 0;
+			var longPage = document.documentElement.scrollHeight > window.innerHeight + fh * 1.5;
+			if (!reduce && fh && longPage && fh < window.innerHeight * 0.85) {
+				reveal.style.setProperty('--mcm-hf-reveal-h', fh + 'px');
+				reveal.classList.add('is-reveal');
+			}
+		};
+		fitReveal();
+		window.addEventListener('resize', fitReveal);
+		window.addEventListener('load', fitReveal);
+	}
+
+	/* ---------- Header search (a <details>): focus the field, Escape / outside click close it ---------- */
+	document.querySelectorAll('.mcm-hf-search').forEach(function (d) {
+		d.addEventListener('toggle', function () { if (d.open) { var i = d.querySelector('input'); if (i) { i.focus(); } } });
+		d.addEventListener('keydown', function (e) { if (e.key === 'Escape' && d.open) { d.open = false; d.querySelector('summary').focus(); } });
+	});
+	document.addEventListener('click', function (e) {
+		document.querySelectorAll('.mcm-hf-search[open]').forEach(function (d) { if (!d.contains(e.target)) { d.open = false; } });
+	});
 
 	var header = document.querySelector('.mcm-hf-header');
 	if (!header) { return; }

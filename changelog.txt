@@ -1,6 +1,6 @@
 Medical College Manager — complete changelog.
 
-= 1.32.0 (in development) =
+= 1.32.0 =
 * New: Gender field (Male / Female) for consultants and team members. It is
   never shown on the website and never sent through the REST API.
 * New: Settings → Default Photo — Male and Default Photo — Female. A person

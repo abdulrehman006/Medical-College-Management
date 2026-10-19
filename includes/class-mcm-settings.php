@@ -447,6 +447,13 @@ class MCM_Settings {
 				array( '[mcm_department_message]', __( 'The Head of Department’s message card (photo, name, message, contact).', 'medical-college-manager' ) ),
 				array( '[mcm_department_intro]', __( 'Hero banner + HOD message together.', 'medical-college-manager' ) ),
 				array( '[mcm_department_sections]', __( 'Every section the department actually has — courses, faculty, timetable, publications… built automatically.', 'medical-college-manager' ) ),
+				array( '[mcm_department_page]', __( 'The whole department page template: the eight sections in their fixed order plus the related tabs (College Manager → Department Page).', 'medical-college-manager' ) ),
+				array( '[mcm_department_introduction]', __( 'Introduction section (Departments → Edit → Introduction).', 'medical-college-manager' ) ),
+				array( '[mcm_department_vision_mission]', __( 'Vision & Mission cards (shown once both are filled in).', 'medical-college-manager' ) ),
+				array( '[mcm_department_services]', __( 'Services / Facilities cards, with dates where set.', 'medical-college-manager' ) ),
+				array( '[mcm_department_faculty]', __( 'Faculty: team and consultants of the department, grouped by Staff Type.', 'medical-college-manager' ) ),
+				array( '[mcm_department_publications]', __( 'The department’s publications, newest first, with “View all”.', 'medical-college-manager' ) ),
+				array( '[mcm_department_contact]', __( 'Contact details: phone, email, address, office hours and map.', 'medical-college-manager' ) ),
 			),
 			__( 'Notice board & homepage pieces', 'medical-college-manager' ) => array(
 				array( '[mcm_notice_ticker]', __( 'Scrolling headline strip — great just under the header.', 'medical-college-manager' ) ),

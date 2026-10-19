@@ -61,12 +61,13 @@ class MCM_Site_Chrome_Settings {
 	 */
 	private static function tab_labels() {
 		return array(
-			'general'   => __( 'General', 'medical-college-manager' ),
-			'topbar'    => __( 'Top bar', 'medical-college-manager' ),
-			'header'    => __( 'Header & menu', 'medical-college-manager' ),
-			'behaviour' => __( 'Behaviour', 'medical-college-manager' ),
-			'footer'    => __( 'Footer', 'medical-college-manager' ),
-			'tools'     => __( 'Import / Export', 'medical-college-manager' ),
+			'general'    => __( 'General', 'medical-college-manager' ),
+			'topbar'     => __( 'Top bar', 'medical-college-manager' ),
+			'header'     => __( 'Header & menu', 'medical-college-manager' ),
+			'behaviour'  => __( 'Behaviour', 'medical-college-manager' ),
+			'footer'     => __( 'Footer', 'medical-college-manager' ),
+			'typography' => __( 'Typography', 'medical-college-manager' ),
+			'tools'      => __( 'Import / Export', 'medical-college-manager' ),
 		);
 	}
 
@@ -336,16 +337,6 @@ class MCM_Site_Chrome_Settings {
 		}
 		// Posts an array of page IDs; MCM_Site_Chrome::sanitize() joins it.
 		self::row( 'hide_on', __( 'Hide on these pages', 'medical-college-manager' ), '<select id="mcm-hf-hide_on" multiple size="6" style="min-width:320px;" name="' . esc_attr( self::name( 'hide_on' ) ) . '[]">' . $opts . '</select>', __( 'Ctrl/Cmd-click to choose several (e.g. a landing page with its own header).', 'medical-college-manager' ) );
-		self::select(
-			$s,
-			'font',
-			__( 'Font', 'medical-college-manager' ),
-			array(
-				'montserrat' => __( 'Montserrat (bundled with the plugin — no Google request)', 'medical-college-manager' ),
-				'inherit'    => __( 'Same as the site', 'medical-college-manager' ),
-				'system'     => __( 'System font', 'medical-college-manager' ),
-			)
-		);
 		self::check( $s, 'preview', __( 'Elementor preview', 'medical-college-manager' ), __( 'Show the header and footer while editing pages in Elementor', 'medical-college-manager' ) );
 	}
 
@@ -364,6 +355,7 @@ class MCM_Site_Chrome_Settings {
 			__( 'On phones & tablets', 'medical-college-manager' ),
 			array(
 				'icons'  => __( 'Email and phone as icon buttons', 'medical-college-manager' ),
+				'full'   => __( 'Everything, wrapped onto several lines', 'medical-college-manager' ),
 				'hidden' => __( 'Hide the top bar', 'medical-college-manager' ),
 			)
 		);
@@ -382,22 +374,16 @@ class MCM_Site_Chrome_Settings {
 	 */
 	private function tab_header( $s ) {
 		self::image( $s, 'logo', __( 'Logo', 'medical-college-manager' ), __( 'Empty: the theme\'s logo (Customizer), then the letterhead logo.', 'medical-college-manager' ) );
-		self::input( $s, 'logo_h', __( 'Logo height (px)', 'medical-college-manager' ), 'number', '', 'min="24" max="120"' );
+		self::input( $s, 'logo_h', __( 'Logo height on desktops (px)', 'medical-college-manager' ), 'number', '', 'min="24" max="120"' );
+		self::input( $s, 'logo_h_t', __( 'Logo height on tablets (px)', 'medical-college-manager' ), 'number', __( 'Also used whenever the header shows the menu button.', 'medical-college-manager' ), 'min="24" max="120"' );
+		self::input( $s, 'logo_h_m', __( 'Logo height on phones (px)', 'medical-college-manager' ), 'number', '', 'min="24" max="100"' );
+		self::check( $s, 'search_show', __( 'Search', 'medical-college-manager' ), __( 'Show a search button after the menu', 'medical-college-manager' ) );
+		self::check( $s, 'cta_show', __( 'Button', 'medical-college-manager' ), __( 'Show a button after the menu (e.g. Apply Now)', 'medical-college-manager' ) );
+		self::input( $s, 'cta_label', __( 'Button text', 'medical-college-manager' ) );
+		self::input( $s, 'cta_url', __( 'Button link', 'medical-college-manager' ), 'url', __( 'The button shows only when it has both a text and a link. With a long main menu, the search and the button may not fit on the bar; the header then switches to the menu button, and the button appears in the menu panel.', 'medical-college-manager' ) );
 		self::color( $s, 'main_bg', __( 'Background', 'medical-college-manager' ) );
 		self::color( $s, 'border', __( 'Bottom border', 'medical-college-manager' ) );
 		self::color( $s, 'menu_color', __( 'Menu text', 'medical-college-manager' ) );
-		self::input( $s, 'menu_size', __( 'Menu text size (px)', 'medical-college-manager' ), 'number', '', 'min="11" max="22"' );
-		self::select(
-			$s,
-			'menu_weight',
-			__( 'Menu text weight', 'medical-college-manager' ),
-			array(
-				'400' => __( 'Regular', 'medical-college-manager' ),
-				'500' => __( 'Medium', 'medical-college-manager' ),
-				'600' => __( 'Semi-bold', 'medical-college-manager' ),
-				'700' => __( 'Bold', 'medical-college-manager' ),
-			)
-		);
 		self::color( $s, 'hover', __( 'Menu text on hover', 'medical-college-manager' ) );
 		self::color( $s, 'active', __( 'Current page text', 'medical-college-manager' ) );
 		self::color( $s, 'bar', __( 'Active bar', 'medical-college-manager' ) );
@@ -466,6 +452,26 @@ class MCM_Site_Chrome_Settings {
 	 * @param array $s Settings.
 	 */
 	private function tab_footer( $s ) {
+		self::select(
+			$s,
+			'foot_cols',
+			__( 'Columns', 'medical-college-manager' ),
+			array(
+				'4' => __( '4: brand, two link columns, contact', 'medical-college-manager' ),
+				'3' => __( '3: brand, one link column, contact', 'medical-college-manager' ),
+				'2' => __( '2: brand, contact', 'medical-college-manager' ),
+			)
+		);
+		self::select(
+			$s,
+			'foot_mode',
+			__( 'Footer style', 'medical-college-manager' ),
+			array(
+				'normal' => __( 'Normal', 'medical-college-manager' ),
+				'reveal' => __( 'Reveal (the page scrolls up to uncover a fixed footer)', 'medical-college-manager' ),
+			),
+			__( 'Reveal switches itself off on short pages, on small screens where the footer is taller than the screen, and for visitors who prefer reduced motion.', 'medical-college-manager' )
+		);
 		self::image( $s, 'foot_logo', __( 'Footer logo', 'medical-college-manager' ), __( 'Empty: the header logo.', 'medical-college-manager' ) );
 		self::input( $s, 'foot_title', __( 'Title', 'medical-college-manager' ), 'text', __( 'Large title next to the logo, e.g. GMC.', 'medical-college-manager' ) );
 		self::input( $s, 'foot_subtitle', __( 'Subtitle', 'medical-college-manager' ), 'text', __( 'Empty: the college name from the letterhead settings.', 'medical-college-manager' ) );
@@ -491,6 +497,37 @@ class MCM_Site_Chrome_Settings {
 		self::color( $s, 'foot_text', __( 'Text', 'medical-college-manager' ) );
 		self::color( $s, 'foot_icon', __( 'Contact icons', 'medical-college-manager' ) );
 		self::color( $s, 'foot_bottom_bg', __( 'Bottom bar background', 'medical-college-manager' ) );
+	}
+
+	/**
+	 * Typography tab.
+	 *
+	 * @param array $s Settings.
+	 */
+	private function tab_typography( $s ) {
+		self::select(
+			$s,
+			'font',
+			__( 'Font', 'medical-college-manager' ),
+			array(
+				'montserrat' => __( 'Montserrat (bundled with the plugin — no Google request)', 'medical-college-manager' ),
+				'inherit'    => __( 'Same as the site', 'medical-college-manager' ),
+				'system'     => __( 'System font', 'medical-college-manager' ),
+			)
+		);
+		self::input( $s, 'menu_size', __( 'Menu text size (px)', 'medical-college-manager' ), 'number', '', 'min="11" max="22"' );
+		self::select(
+			$s,
+			'menu_weight',
+			__( 'Menu text weight', 'medical-college-manager' ),
+			array(
+				'400' => __( 'Regular', 'medical-college-manager' ),
+				'500' => __( 'Medium', 'medical-college-manager' ),
+				'600' => __( 'Semi-bold', 'medical-college-manager' ),
+				'700' => __( 'Bold', 'medical-college-manager' ),
+			)
+		);
+		self::input( $s, 'foot_h_size', __( 'Footer heading size (px)', 'medical-college-manager' ), 'number', '', 'min="12" max="28"' );
 	}
 
 	/** Menu locations: what is assigned, with links to fix it. */
@@ -520,7 +557,7 @@ class MCM_Site_Chrome_Settings {
 
 	/** The Import / Export tab. */
 	private function tools() {
-		echo '<h2>' . esc_html__( 'Export', 'medical-college-manager' ) . '</h2><p>' . esc_html__( 'Download every Header & Footer setting as a JSON file (menus and images stay on this site).', 'medical-college-manager' ) . '</p>';
+		echo '<h2>' . esc_html__( 'Export', 'medical-college-manager' ) . '</h2><p>' . esc_html__( 'Download every Header & Footer and Department Page setting as one JSON file, e.g. to copy the design from a staging site to the live site (menus, images and department content stay on this site).', 'medical-college-manager' ) . '</p>';
 		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '"><input type="hidden" name="action" value="mcm_hf_export" />';
 		wp_nonce_field( 'mcm_hf_export' );
 		submit_button( __( 'Download settings', 'medical-college-manager' ), 'secondary', 'submit', false );
@@ -547,10 +584,12 @@ class MCM_Site_Chrome_Settings {
 		}
 		check_admin_referer( 'mcm_hf_export' );
 		$data = array(
-			'plugin'   => 'medical-college-manager',
-			'type'     => 'site-chrome',
-			'version'  => MCM_VERSION,
-			'settings' => MCM_Site_Chrome::settings(),
+			'plugin'     => 'medical-college-manager',
+			'type'       => 'site-chrome',
+			'version'    => MCM_VERSION,
+			'settings'   => MCM_Site_Chrome::settings(),
+			// The department page design travels with it (since 1.32.0).
+			'department' => class_exists( 'MCM_Department_Page' ) ? MCM_Department_Page::settings() : array(),
 		);
 		nocache_headers();
 		header( 'Content-Type: application/json; charset=utf-8' );
@@ -575,6 +614,10 @@ class MCM_Site_Chrome_Settings {
 			if ( is_array( $json ) && isset( $json['type'], $json['settings'] ) && 'site-chrome' === $json['type'] && is_array( $json['settings'] ) ) {
 				$known = array_intersect_key( $json['settings'], MCM_Site_Chrome::defaults() );
 				update_option( MCM_Site_Chrome::OPTION, MCM_Site_Chrome::clean( wp_parse_args( $known, MCM_Site_Chrome::defaults() ) ) );
+				if ( isset( $json['department'] ) && is_array( $json['department'] ) && class_exists( 'MCM_Department_Page' ) ) {
+					$dept = array_intersect_key( $json['department'], MCM_Department_Page::defaults() );
+					update_option( MCM_Department_Page::OPTION, MCM_Department_Page::sanitize( wp_parse_args( $dept, MCM_Department_Page::defaults() ) ) );
+				}
 				$result = 'ok';
 			}
 		}
