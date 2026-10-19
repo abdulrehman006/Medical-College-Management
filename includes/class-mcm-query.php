@@ -935,7 +935,7 @@ class MCM_Query {
 		}
 		$image = trim( (string) $image );
 		if ( '' !== $image ) {
-			return '<div class="mcm-hero mcm-hero--image mcm-wrap"><img src="' . esc_url( $image ) . '" alt="' . esc_attr( $alt ) . '" loading="lazy" /></div>';
+			return '<div class="mcm-hero mcm-hero--image mcm-wrap"><img src="' . esc_url( $image ) . '" alt="' . esc_attr( $alt ) . '" fetchpriority="high" decoding="async" /></div>'; // Top-of-page banner: the largest image on screen, so never lazy-loaded.
 		}
 		return '';
 	}
@@ -1799,7 +1799,8 @@ class MCM_Query {
 			'mcm_timetable'   => array(
 				array( __( 'Day', 'medical-college-manager' ), 'meta', 'mcm_day' ),
 				array( __( 'Time', 'medical-college-manager' ), 'time', '' ),
-				array( __( 'Subject', 'medical-college-manager' ), 'meta', 'mcm_subject' ),
+				// Index 4 = true: this column links to the entry (the timetable has no title column).
+				array( __( 'Subject', 'medical-college-manager' ), 'meta', 'mcm_subject', null, true ),
 				array( __( 'Professor', 'medical-college-manager' ), 'tax', 'mcm_teacher' ),
 				array( __( 'Department', 'medical-college-manager' ), 'tax', 'mcm_department' ),
 				array( __( 'Room', 'medical-college-manager' ), 'meta', 'mcm_room' ),
@@ -1955,7 +1956,7 @@ class MCM_Query {
 					$cell = esc_html( self::cell_value( $id, $col ) );
 					// Display standard §4: the title links to the single page for
 					// public types. Students (not publicly viewable) stay plain text.
-					if ( 'title' === $col[1] && '' !== $cell && $title_links ) {
+					if ( ( 'title' === $col[1] || ! empty( $col[4] ) ) && '' !== $cell && $title_links ) {
 						$cell = '<a class="mcm-table-link" href="' . esc_url( get_permalink( $id ) ) . '">' . $cell . '</a>';
 					}
 					echo '<td data-label="' . esc_attr( $col[0] ) . '"' . $cls . '>' . $cell . '</td>'; // phpcs:ignore
