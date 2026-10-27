@@ -108,57 +108,5 @@
 			$scope.find( '.mcm-media-preview' ).first().empty();
 			$scope.find( '.mcm-quality-warning' ).remove();
 		} );
-
-		// Services repeater (Departments → Edit): add / remove / move rows.
-		// Inputs are renamed after every change so the saved order is the order
-		// on screen. Without this script the rows still work (one empty row is
-		// always rendered to add to).
-		function renumber( $rep ) {
-			var key = $rep.data( 'key' );
-			$rep.find( '.mcm-rep-rows > .mcm-rep-row' ).each( function ( i ) {
-				var $row = $( this );
-				$row.find( '.mcm-rep-legend' ).text( ( ( window.MCMAdmin && MCMAdmin.i18n && MCMAdmin.i18n.service ) || 'Service' ) + ' ' + ( i + 1 ) );
-				$row.find( '[name]' ).each( function () {
-					this.name = this.name.replace( new RegExp( '^' + key + '\\[[^\\]]*\\]' ), key + '[' + i + ']' );
-				} );
-				$row.find( '[id]' ).each( function () {
-					var old = this.id;
-					this.id = old.replace( new RegExp( '^' + key + '-[^-]+-' ), key + '-' + i + '-' );
-					$row.find( 'label[for="' + old + '"]' ).attr( 'for', this.id );
-				} );
-				$row.find( '.mcm-rep-up' ).prop( 'disabled', 0 === i );
-				$row.find( '.mcm-rep-down' ).prop( 'disabled', i === $row.siblings().length );
-			} );
-		}
-		$( '.mcm-repeater' ).each( function () { renumber( $( this ) ); } );
-		$( document ).on( 'click', '.mcm-rep-add', function () {
-			var $rep = $( this ).closest( '.mcm-repeater' );
-			var tpl  = $rep.find( 'template.mcm-rep-template' )[ 0 ];
-			var $row = $( tpl.innerHTML );
-			$rep.find( '.mcm-rep-rows' ).append( $row );
-			renumber( $rep );
-			$row.find( 'input[type="text"]' ).first().trigger( 'focus' );
-		} );
-		$( document ).on( 'click', '.mcm-rep-remove', function () {
-			var $row = $( this ).closest( '.mcm-rep-row' );
-			var $rep = $row.closest( '.mcm-repeater' );
-			var $to  = $row.next( '.mcm-rep-row' ).length ? $row.next() : $row.prev();
-			$row.remove();
-			renumber( $rep );
-			( $to.length ? $to.find( 'input' ).first() : $rep.find( '.mcm-rep-add' ) ).trigger( 'focus' );
-		} );
-		$( document ).on( 'click', '.mcm-rep-up, .mcm-rep-down', function () {
-			var $btn = $( this );
-			var $row = $btn.closest( '.mcm-rep-row' );
-			if ( $btn.hasClass( 'mcm-rep-up' ) ) {
-				$row.insertBefore( $row.prev( '.mcm-rep-row' ) );
-			} else {
-				$row.insertAfter( $row.next( '.mcm-rep-row' ) );
-			}
-			renumber( $btn.closest( '.mcm-repeater' ) );
-			// Keep keyboard focus on the moved row; a button that just became
-			// disabled (row now first/last) cannot hold focus, so use its partner.
-			( $btn.prop( 'disabled' ) ? $row.find( $btn.hasClass( 'mcm-rep-up' ) ? '.mcm-rep-down' : '.mcm-rep-up' ) : $btn ).trigger( 'focus' );
-		} );
 	} );
 } )( jQuery );

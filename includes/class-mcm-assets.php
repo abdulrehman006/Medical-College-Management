@@ -119,10 +119,10 @@ class MCM_Assets {
 	 * @param string $hook Admin page hook suffix.
 	 */
 	public function admin( $hook ) {
-		// Color picker + media on our settings screens (main settings, Department
-		// Page, Header & Footer). Submenu hooks carry a translated parent prefix,
-		// so match the suffix.
-		if ( preg_match( '/_page_mcm-(settings|department-page|site-chrome)$/', (string) $hook ) ) {
+		// Color picker + media on our settings screens (main settings, Header &
+		// Footer). Submenu hooks carry a translated parent prefix, so match the
+		// suffix.
+		if ( preg_match( '/_page_mcm-(settings|site-chrome)$/', (string) $hook ) ) {
 			wp_enqueue_style( 'wp-color-picker' );
 			// Needed by the letterhead logo picker.
 			wp_enqueue_media();
@@ -156,7 +156,6 @@ class MCM_Assets {
 						'copied'      => __( 'Copied!', 'medical-college-manager' ),
 						/* translators: 1: image width in px, 2: recommended minimum width in px. */
 						'tooSmall'    => __( 'This image is %1$d px wide; at least %2$d px is recommended, or it may look blurry.', 'medical-college-manager' ),
-						'service'     => __( 'Service', 'medical-college-manager' ),
 					),
 				)
 			);

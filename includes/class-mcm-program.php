@@ -210,7 +210,8 @@ class MCM_Program {
 					'lock_tax'  => self::TAX,
 					'lock_term' => $term->slug,
 					'count'     => 50,
-				)
+				),
+				false
 			);
 			$out .= '</section>';
 		}

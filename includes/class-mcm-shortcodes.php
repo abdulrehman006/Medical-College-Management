@@ -79,13 +79,15 @@ class MCM_Shortcodes {
 	 * department pages, program pages) comes through here, so this is the
 	 * render boundary: a failure becomes an empty block, never a broken page.
 	 *
-	 * @param array|string $atts Shortcode attributes.
+	 * @param array|string $atts    Shortcode attributes.
+	 * @param bool         $heading False when the caller already prints a visible
+	 *                              heading for this block (no hidden duplicate).
 	 */
-	public static function render_block( $atts ) {
+	public static function render_block( $atts, $heading = true ) {
 		$type = ( is_array( $atts ) && isset( $atts['type'] ) ) ? MCM_Safe::str( $atts['type'] ) : '';
 		return MCM_Safe::render(
-			function () use ( $atts ) {
-				return MCM_Shortcodes::build_block( $atts );
+			function () use ( $atts, $heading ) {
+				return MCM_Shortcodes::build_block( $atts, $heading );
 			},
 			'listing ' . $type
 		);
@@ -95,10 +97,11 @@ class MCM_Shortcodes {
 	 * The unguarded block builder. Call render_block() instead.
 	 *
 	 * @internal
-	 * @param array $atts Attributes.
+	 * @param array $atts    Attributes.
+	 * @param bool  $heading Print the hidden results heading.
 	 * @return string
 	 */
-	public static function build_block( $atts ) {
+	public static function build_block( $atts, $heading = true ) {
 		// Backstop: whatever rendered this block (shortcode, Elementor widget,
 		// archive template) now needs the CSS/JS, even if detection missed it.
 		MCM_Assets::need();
@@ -166,7 +169,7 @@ class MCM_Shortcodes {
 			echo '<div class="mcm-dir-main">';
 			// Keeps the heading outline intact (page h1 → filter h2s → card h3s),
 			// also on phones where the filters are folded away.
-			echo self::results_heading( $a['type'] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped in results_heading().
+			echo $heading ? self::results_heading( $a['type'] ) : ''; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped in results_heading().
 			if ( $show_print ) {
 				echo '<div class="mcm-toolbar"><button type="button" class="mcm-print-btn" aria-label="' . esc_attr__( 'Print', 'medical-college-manager' ) . '">&#128424; ' . esc_html__( 'Print', 'medical-college-manager' ) . '</button></div>';
 				echo MCM_Query::print_header( $a ); // phpcs:ignore
@@ -202,7 +205,7 @@ class MCM_Shortcodes {
 
 		// Card and list titles are h3: a hidden h2 keeps the outline valid
 		// wherever the block is placed (straight under a page's h1 too).
-		echo self::results_heading( $a['type'] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped in results_heading().
+		echo $heading ? self::results_heading( $a['type'] ) : ''; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped in results_heading().
 		echo '<div class="mcm-results" aria-live="polite" aria-busy="false">';
 		echo MCM_Query::render_results( $a ); // phpcs:ignore
 		echo '</div>';

@@ -10,7 +10,7 @@
 	   #content, point it at the page's main area instead. */
 	var skip = document.querySelector('.mcm-hf-skip');
 	if (skip && !document.getElementById('content')) {
-		var target = document.querySelector('main, [role="main"], .mcm-dept, .mcm-archive, .site-main');
+		var target = document.querySelector('main, [role="main"], .mcm-archive, .site-main');
 		if (target) {
 			if (!target.id) { target.id = 'mcm-hf-content'; }
 			skip.setAttribute('href', '#' + target.id);

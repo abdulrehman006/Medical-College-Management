@@ -91,7 +91,6 @@ function mcm_modules() {
 		'class-mcm-caps.php'                 => '',
 		'class-mcm-privacy.php'              => 'MCM_Privacy',
 		'class-mcm-termmeta.php'             => 'MCM_TermMeta',
-		'class-mcm-department-page.php'      => 'MCM_Department_Page',
 		'class-mcm-site-chrome-walker.php'   => '',
 		'class-mcm-site-chrome.php'          => 'MCM_Site_Chrome',
 		'class-mcm-site-chrome-settings.php' => 'MCM_Site_Chrome_Settings',

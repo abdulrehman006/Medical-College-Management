@@ -314,9 +314,6 @@
 			$wrap.find( '.mcm-results' ).removeClass( 'mcm-loading' ).attr( 'aria-busy', 'false' );
 			$wrap.trigger( 'mcm:ready' );
 		} );
-		$scope.find( '.mcm-dept-tabs' ).each( function () {
-			deptTabs( $( this ) );
-		} );
 		$scope.find( '.mcm-dir-checks' ).each( function () {
 			facetMore( $( this ) );
 		} );
@@ -400,62 +397,6 @@
 		keepChecked();
 		label();
 		$btn.insertAfter( $list );
-	}
-
-	// Department page "More from this department": WAI-ARIA tabs with
-	// automatic activation (arrows, Home, End). The markup works without
-	// script — every panel shows under its own heading.
-	function deptTabs( $list ) {
-		if ( $list.data( 'mcmReady' ) ) {
-			return;
-		}
-		$list.data( 'mcmReady', true );
-		var $tabs = $list.find( '[role="tab"]' );
-		// Panels are siblings of this tab list — never look them up page-wide,
-		// so a second department block on the page cannot be affected.
-		var $panels = $list.siblings( '.mcm-dept-tabpanel' );
-		var panel = function ( $tab ) {
-			var id = $tab.attr( 'aria-controls' );
-			return $panels.filter( function () {
-				return this.id === id;
-			} );
-		};
-		var select = function ( $tab, focus ) {
-			$tabs.each( function () {
-				var $t = $( this );
-				var on = $t[ 0 ] === $tab[ 0 ];
-				$t.attr( { 'aria-selected': on ? 'true' : 'false', tabindex: on ? '0' : '-1' } );
-				panel( $t ).prop( 'hidden', ! on );
-			} );
-			if ( focus ) {
-				$tab.trigger( 'focus' );
-			}
-		};
-		$tabs.each( function () {
-			panel( $( this ) ).attr( { role: 'tabpanel', 'aria-labelledby': this.id, tabindex: '0' } );
-		} );
-		$list.prop( 'hidden', false ).closest( '.mcm-dept' ).addClass( 'is-tabbed' );
-		select( $tabs.filter( '[aria-selected="true"]' ).first().length ? $tabs.filter( '[aria-selected="true"]' ).first() : $tabs.first(), false );
-		$tabs.on( 'click', function () {
-			select( $( this ), false );
-		} );
-		$list.on( 'keydown', '[role="tab"]', function ( e ) {
-			var i    = $tabs.index( this );
-			var next = null;
-			if ( 'ArrowRight' === e.key ) {
-				next = ( i + 1 ) % $tabs.length;
-			} else if ( 'ArrowLeft' === e.key ) {
-				next = ( i - 1 + $tabs.length ) % $tabs.length;
-			} else if ( 'Home' === e.key ) {
-				next = 0;
-			} else if ( 'End' === e.key ) {
-				next = $tabs.length - 1;
-			}
-			if ( null !== next ) {
-				e.preventDefault();
-				select( $tabs.eq( next ), true );
-			}
-		} );
 	}
 
 	$( function () {

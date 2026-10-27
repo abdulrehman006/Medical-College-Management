@@ -52,10 +52,7 @@ if ( $mcm_block_theme ) {
 	echo '<main id="' . esc_attr( 'hello-elementor' === get_template() ? 'content' : 'mcm-main' ) . '" class="mcm-main">';
 }
 
-if ( $mcm_ctx && isset( $mcm_ctx['page_html'] ) ) :
-	// Department page template: the whole page, sections in a fixed order.
-	echo $mcm_ctx['page_html']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Built and escaped by MCM_Department_Page::render().
-elseif ( $mcm_ctx ) :
+if ( $mcm_ctx ) :
 	// Full-width hero (video/image) sits ABOVE the title and breaks out of the
 	// centred content column edge-to-edge. Hidden when nothing is set.
 	if ( ! empty( $mcm_ctx['hero'] ) ) {
@@ -82,10 +79,11 @@ elseif ( $mcm_ctx ) :
 			foreach ( $mcm_ctx['blocks'] as $mcm_block ) :
 				?>
 				<section class="mcm-archive-block">
-					<?php if ( $mcm_multi && '' !== $mcm_block['label'] ) : ?>
+					<?php $mcm_titled = $mcm_multi && '' !== $mcm_block['label']; ?>
+					<?php if ( $mcm_titled ) : ?>
 						<h2 class="mcm-archive-section"><?php echo esc_html( $mcm_block['label'] ); ?></h2>
 					<?php endif; ?>
-					<?php echo MCM_Shortcodes::render_block( $mcm_block['atts'] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Render boundary output. ?>
+					<?php echo MCM_Shortcodes::render_block( $mcm_block['atts'], ! $mcm_titled ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Render boundary output. ?>
 				</section>
 				<?php
 			endforeach;

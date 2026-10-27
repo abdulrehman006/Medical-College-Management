@@ -470,9 +470,8 @@ class MCM_Import {
 		if ( function_exists( 'finfo_open' ) ) {
 			$finfo    = finfo_open( FILEINFO_MIME_TYPE );
 			$detected = $finfo ? finfo_file( $finfo, $tmp ) : false;
-			if ( $finfo ) {
-				finfo_close( $finfo );
-			}
+			// unset() frees it on every PHP version; finfo_close() is deprecated in PHP 8.5.
+			unset( $finfo );
 			$allowed_mimes = array( 'text/csv', 'text/plain', 'application/csv', 'application/vnd.ms-excel', 'application/octet-stream' );
 			if ( $detected && ! in_array( $detected, $allowed_mimes, true ) ) {
 				$this->notice = $this->error_html( __( 'The uploaded file does not look like a CSV.', 'medical-college-manager' ) );

@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-10-19T10:09:39+00:00\n"
+"POT-Creation-Date: 2026-10-27T08:31:31+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: medical-college-manager\n"
@@ -105,14 +105,8 @@ msgstr ""
 
 #. translators: 1: image width in px, 2: recommended minimum width in px.
 #: includes/class-mcm-assets.php:158
-#: includes/class-mcm-termmeta.php:539
 #, php-format
 msgid "This image is %1$d px wide; at least %2$d px is recommended, or it may look blurry."
-msgstr ""
-
-#: includes/class-mcm-assets.php:159
-#: includes/class-mcm-termmeta.php:701
-msgid "Service"
 msgstr ""
 
 #: includes/class-mcm-blog.php:144
@@ -250,7 +244,6 @@ msgid "Publication"
 msgstr ""
 
 #: includes/class-mcm-cpt.php:129
-#: includes/class-mcm-department-page.php:162
 #: includes/class-mcm-import.php:375
 #: includes/elementor-widgets.php:976
 msgid "Publications"
@@ -326,8 +319,6 @@ msgstr ""
 #: includes/class-mcm-query.php:2510
 #: includes/class-mcm-query.php:2532
 #: includes/elementor-widgets.php:1318
-#: includes/elementor-widgets.php:1647
-#: includes/elementor-widgets.php:1663
 msgid "Department"
 msgstr ""
 
@@ -360,7 +351,6 @@ msgstr ""
 
 #: includes/class-mcm-cpt.php:228
 #: includes/class-mcm-cpt.php:229
-#: includes/class-mcm-department-page.php:161
 msgid "Faculty"
 msgstr ""
 
@@ -527,7 +517,6 @@ msgid "New %s Name"
 msgstr ""
 
 #: includes/class-mcm-cpt.php:463
-#: includes/class-mcm-department-page.php:753
 msgid "Teaching & Technical Staff"
 msgstr ""
 
@@ -546,262 +535,6 @@ msgstr ""
 
 #: includes/class-mcm-cpt.php:502
 msgid "All staff types"
-msgstr ""
-
-#: includes/class-mcm-department-page.php:157
-msgid "Message from the HOD"
-msgstr ""
-
-#: includes/class-mcm-department-page.php:158
-#: includes/class-mcm-termmeta.php:145
-msgid "Introduction"
-msgstr ""
-
-#: includes/class-mcm-department-page.php:159
-#: includes/elementor-widgets.php:1890
-msgid "Vision & Mission"
-msgstr ""
-
-#: includes/class-mcm-department-page.php:160
-msgid "Services & Facilities"
-msgstr ""
-
-#: includes/class-mcm-department-page.php:163
-msgid "Contact Information"
-msgstr ""
-
-#: includes/class-mcm-department-page.php:164
-#: includes/class-mcm-department-page.php:305
-msgid "More from this department"
-msgstr ""
-
-#: includes/class-mcm-department-page.php:185
-#: includes/class-mcm-department-page.php:186
-#: includes/class-mcm-department-page.php:262
-msgid "Department Page"
-msgstr ""
-
-#: includes/class-mcm-department-page.php:263
-msgid "One fixed layout for every department page (/department/…/): Hero, Message from the HOD, Introduction, Vision & Mission, Services / Facilities, Faculty, Publications and Contact, then tabs for the department's other content. The content is entered under Departments → Edit."
-msgstr ""
-
-#: includes/class-mcm-department-page.php:269
-msgid "Template"
-msgstr ""
-
-#: includes/class-mcm-department-page.php:269
-msgid "Enable the department page template"
-msgstr ""
-
-#: includes/class-mcm-department-page.php:269
-msgid "Off: department pages keep their current layout."
-msgstr ""
-
-#: includes/class-mcm-department-page.php:270
-msgid "Section heading colour"
-msgstr ""
-
-#: includes/class-mcm-department-page.php:271
-#: includes/elementor-widgets.php:1699
-msgid "Accent colour"
-msgstr ""
-
-#: includes/class-mcm-department-page.php:271
-msgid "Bars, borders and icons. Text in the accent colour uses a darker shade so it stays readable."
-msgstr ""
-
-#: includes/class-mcm-department-page.php:272
-#: includes/elementor-widgets.php:340
-#: includes/elementor-widgets.php:1700
-msgid "Card background"
-msgstr ""
-
-#: includes/class-mcm-department-page.php:272
-msgid "Also the background of every other section."
-msgstr ""
-
-#: includes/class-mcm-department-page.php:274
-msgid "Hero overlay (%)"
-msgstr ""
-
-#: includes/class-mcm-department-page.php:276
-msgid "Darkens the bottom of the hero image so the department name stays readable."
-msgstr ""
-
-#: includes/class-mcm-department-page.php:279
-msgid "Fallback hero image"
-msgstr ""
-
-#: includes/class-mcm-department-page.php:280
-#: includes/class-mcm-settings.php:615
-#: includes/class-mcm-settings.php:654
-#: includes/class-mcm-settings.php:681
-#: includes/class-mcm-site-chrome-settings.php:285
-#: includes/class-mcm-termmeta.php:611
-#: includes/class-mcm-termmeta.php:709
-msgid "Select Image"
-msgstr ""
-
-#: includes/class-mcm-department-page.php:280
-#: includes/class-mcm-meta.php:1011
-#: includes/class-mcm-settings.php:616
-#: includes/class-mcm-settings.php:655
-#: includes/class-mcm-settings.php:682
-#: includes/class-mcm-site-chrome-settings.php:285
-#: includes/class-mcm-termmeta.php:613
-#: includes/class-mcm-termmeta.php:710
-msgid "Clear"
-msgstr ""
-
-#: includes/class-mcm-department-page.php:281
-msgid "Used for departments without their own hero image. Leave empty for a plain colour band."
-msgstr ""
-
-#: includes/class-mcm-department-page.php:284
-msgid "HOD photo position"
-msgstr ""
-
-#: includes/class-mcm-department-page.php:285
-#: includes/class-mcm-site-chrome-settings.php:443
-#: includes/class-mcm-social.php:281
-msgid "Left"
-msgstr ""
-
-#: includes/class-mcm-department-page.php:285
-#: includes/class-mcm-site-chrome-settings.php:442
-#: includes/class-mcm-social.php:280
-msgid "Right"
-msgstr ""
-
-#: includes/class-mcm-department-page.php:288
-msgid "Faculty columns"
-msgstr ""
-
-#: includes/class-mcm-department-page.php:292
-msgid "Faculty card style"
-msgstr ""
-
-#: includes/class-mcm-department-page.php:293
-msgid "Card (border)"
-msgstr ""
-
-#: includes/class-mcm-department-page.php:293
-msgid "Flat"
-msgstr ""
-
-#: includes/class-mcm-department-page.php:293
-msgid "Show designation"
-msgstr ""
-
-#: includes/class-mcm-department-page.php:293
-msgid "Show department"
-msgstr ""
-
-#: includes/class-mcm-department-page.php:296
-msgid "Publications shown"
-msgstr ""
-
-#: includes/class-mcm-department-page.php:298
-msgid "Newest first; a \"View all\" link appears when there are more."
-msgstr ""
-
-#: includes/class-mcm-department-page.php:301
-msgid "Empty sections"
-msgstr ""
-
-#: includes/class-mcm-department-page.php:302
-msgid "Hide them"
-msgstr ""
-
-#: includes/class-mcm-department-page.php:302
-msgid "Show \"Information will be available soon\""
-msgstr ""
-
-#: includes/class-mcm-department-page.php:303
-msgid "The order never changes. Vision & Mission stays hidden until both are filled in."
-msgstr ""
-
-#: includes/class-mcm-department-page.php:305
-msgid "Show tabs for the department's other content (courses, timetable, events, notices, tenders, jobs…)"
-msgstr ""
-
-#: includes/class-mcm-department-page.php:308
-msgid "Section titles"
-msgstr ""
-
-#: includes/class-mcm-department-page.php:309
-msgid "Leave a box empty to use the default (translated) title."
-msgstr ""
-
-#: includes/class-mcm-department-page.php:504
-msgid "Information will be available soon."
-msgstr ""
-
-#: includes/class-mcm-department-page.php:644
-#: includes/class-mcm-termmeta.php:151
-msgid "Vision"
-msgstr ""
-
-#: includes/class-mcm-department-page.php:644
-#: includes/class-mcm-termmeta.php:158
-msgid "Mission"
-msgstr ""
-
-#. translators: %d: number of publications.
-#: includes/class-mcm-department-page.php:841
-#, php-format
-msgid "View all %d publication"
-msgid_plural "View all %d publications"
-msgstr[0] ""
-msgstr[1] ""
-
-#. translators: 1: number shown, 2: total number of publications.
-#: includes/class-mcm-department-page.php:849
-#, php-format
-msgid "Showing the newest %1$d of %2$d publications."
-msgstr ""
-
-#: includes/class-mcm-department-page.php:879
-#: includes/class-mcm-meta.php:444
-#: includes/class-mcm-meta.php:498
-#: includes/class-mcm-meta.php:883
-#: includes/class-mcm-privacy.php:51
-#: includes/class-mcm-privacy.php:70
-#: includes/class-mcm-privacy.php:81
-#: includes/class-mcm-site-chrome-settings.php:351
-#: includes/class-mcm-site-chrome-settings.php:493
-msgid "Phone"
-msgstr ""
-
-#: includes/class-mcm-department-page.php:882
-#: includes/class-mcm-meta.php:448
-#: includes/class-mcm-meta.php:502
-#: includes/class-mcm-meta.php:879
-#: includes/class-mcm-privacy.php:50
-#: includes/class-mcm-privacy.php:69
-#: includes/class-mcm-privacy.php:80
-#: includes/class-mcm-query.php:2283
-#: includes/class-mcm-site-chrome-settings.php:350
-#: includes/class-mcm-site-chrome-settings.php:494
-msgid "Email"
-msgstr ""
-
-#: includes/class-mcm-department-page.php:885
-#: includes/class-mcm-meta.php:913
-#: includes/class-mcm-privacy.php:58
-#: includes/class-mcm-site-chrome-settings.php:492
-#: includes/class-mcm-termmeta.php:183
-msgid "Address"
-msgstr ""
-
-#: includes/class-mcm-department-page.php:888
-msgid "Office hours"
-msgstr ""
-
-#. translators: %s: department name.
-#: includes/class-mcm-department-page.php:893
-#, php-format
-msgid "Map: %s"
 msgstr ""
 
 #: includes/class-mcm-elementor.php:62
@@ -1363,7 +1096,7 @@ msgid "Published %s"
 msgstr ""
 
 #: includes/class-mcm-job.php:492
-#: includes/class-mcm-templates.php:360
+#: includes/class-mcm-templates.php:340
 msgid "Vacancies"
 msgstr ""
 
@@ -1581,6 +1314,29 @@ msgstr ""
 #: includes/class-mcm-meta.php:440
 #: includes/class-mcm-query.php:2270
 msgid "OPD Timing"
+msgstr ""
+
+#: includes/class-mcm-meta.php:444
+#: includes/class-mcm-meta.php:498
+#: includes/class-mcm-meta.php:883
+#: includes/class-mcm-privacy.php:51
+#: includes/class-mcm-privacy.php:70
+#: includes/class-mcm-privacy.php:81
+#: includes/class-mcm-site-chrome-settings.php:351
+#: includes/class-mcm-site-chrome-settings.php:493
+msgid "Phone"
+msgstr ""
+
+#: includes/class-mcm-meta.php:448
+#: includes/class-mcm-meta.php:502
+#: includes/class-mcm-meta.php:879
+#: includes/class-mcm-privacy.php:50
+#: includes/class-mcm-privacy.php:69
+#: includes/class-mcm-privacy.php:80
+#: includes/class-mcm-query.php:2283
+#: includes/class-mcm-site-chrome-settings.php:350
+#: includes/class-mcm-site-chrome-settings.php:494
+msgid "Email"
 msgstr ""
 
 #: includes/class-mcm-meta.php:452
@@ -2044,6 +1800,12 @@ msgstr ""
 msgid "Blood Group"
 msgstr ""
 
+#: includes/class-mcm-meta.php:913
+#: includes/class-mcm-privacy.php:58
+#: includes/class-mcm-site-chrome-settings.php:492
+msgid "Address"
+msgstr ""
+
 #: includes/class-mcm-meta.php:917
 msgid "Guardian Name"
 msgstr ""
@@ -2067,6 +1829,15 @@ msgstr ""
 
 #: includes/class-mcm-meta.php:1010
 msgid "Upload / Select"
+msgstr ""
+
+#: includes/class-mcm-meta.php:1011
+#: includes/class-mcm-settings.php:609
+#: includes/class-mcm-settings.php:648
+#: includes/class-mcm-settings.php:675
+#: includes/class-mcm-site-chrome-settings.php:285
+#: includes/class-mcm-termmeta.php:256
+msgid "Clear"
 msgstr ""
 
 #. translators: %s: the stored value.
@@ -2395,7 +2166,6 @@ msgstr ""
 #: includes/class-mcm-query.php:1885
 #: includes/class-mcm-query.php:1926
 #: includes/class-mcm-site-chrome-settings.php:476
-#: includes/class-mcm-termmeta.php:702
 #: includes/elementor-widgets.php:153
 #: includes/elementor-widgets.php:1092
 msgid "Title"
@@ -2931,208 +2701,188 @@ msgstr ""
 msgid "Every section the department actually has — courses, faculty, timetable, publications… built automatically."
 msgstr ""
 
-#: includes/class-mcm-settings.php:450
-msgid "The whole department page template: the eight sections in their fixed order plus the related tabs (College Manager → Department Page)."
-msgstr ""
-
 #: includes/class-mcm-settings.php:451
-msgid "Introduction section (Departments → Edit → Introduction)."
-msgstr ""
-
-#: includes/class-mcm-settings.php:452
-msgid "Vision & Mission cards (shown once both are filled in)."
-msgstr ""
-
-#: includes/class-mcm-settings.php:453
-msgid "Services / Facilities cards, with dates where set."
-msgstr ""
-
-#: includes/class-mcm-settings.php:454
-msgid "Faculty: team and consultants of the department, grouped by Staff Type."
-msgstr ""
-
-#: includes/class-mcm-settings.php:455
-msgid "The department’s publications, newest first, with “View all”."
-msgstr ""
-
-#: includes/class-mcm-settings.php:456
-msgid "Contact details: phone, email, address, office hours and map."
-msgstr ""
-
-#: includes/class-mcm-settings.php:458
 msgid "Notice board & homepage pieces"
 msgstr ""
 
-#: includes/class-mcm-settings.php:459
+#: includes/class-mcm-settings.php:452
 msgid "Scrolling headline strip — great just under the header."
 msgstr ""
 
-#: includes/class-mcm-settings.php:460
+#: includes/class-mcm-settings.php:453
 msgid "Vertical auto-scrolling notices panel for a sidebar or homepage column."
 msgstr ""
 
-#: includes/class-mcm-settings.php:461
+#: includes/class-mcm-settings.php:454
 msgid "Static, filterable notices list."
 msgstr ""
 
-#: includes/class-mcm-settings.php:462
+#: includes/class-mcm-settings.php:455
 msgid "Choose what a ticker/board/list shows: notices, open jobs and/or open tenders (default: notices plus the sources ticked in Settings)."
 msgstr ""
 
-#: includes/class-mcm-settings.php:463
+#: includes/class-mcm-settings.php:456
 msgid "Floating social-media icon bar (also settable site-wide from Settings)."
 msgstr ""
 
-#: includes/class-mcm-settings.php:464
+#: includes/class-mcm-settings.php:457
 msgid "Latest blog posts in a date-badge card layout."
 msgstr ""
 
-#: includes/class-mcm-settings.php:466
+#: includes/class-mcm-settings.php:459
 msgid "Generic & advanced"
 msgstr ""
 
-#: includes/class-mcm-settings.php:467
+#: includes/class-mcm-settings.php:460
 msgid "Any content type as a grid of cards."
 msgstr ""
 
-#: includes/class-mcm-settings.php:468
+#: includes/class-mcm-settings.php:461
 msgid "Any content type as a stacked list."
 msgstr ""
 
-#: includes/class-mcm-settings.php:469
+#: includes/class-mcm-settings.php:462
 msgid "Any content type as a table."
 msgstr ""
 
-#: includes/class-mcm-settings.php:470
+#: includes/class-mcm-settings.php:463
 msgid "A single entry by its ID."
 msgstr ""
 
-#: includes/class-mcm-settings.php:478
+#: includes/class-mcm-settings.php:471
 msgid "Shortcodes — copy & paste anywhere"
 msgstr ""
 
-#: includes/class-mcm-settings.php:480
+#: includes/class-mcm-settings.php:473
 msgid "Click a shortcode to copy it, then paste it into any page, post, or an Elementor “Shortcode” widget. Every list accepts optional attributes:"
 msgstr ""
 
-#: includes/class-mcm-settings.php:482
+#: includes/class-mcm-settings.php:475
 msgid "and filter by a connector using its term slug —"
 msgstr ""
 
-#: includes/class-mcm-settings.php:493
+#: includes/class-mcm-settings.php:486
 msgid "Copy to clipboard"
 msgstr ""
 
-#: includes/class-mcm-settings.php:506
+#: includes/class-mcm-settings.php:499
 msgid "Tip: taxonomy attribute values use the term “slug” (lowercase, hyphenated) — e.g. fall-2025, dr-sara-khan. On the front end, visitors filter with the dropdowns and search box automatically; slugs are only needed when you pre-filter inside a shortcode."
 msgstr ""
 
-#: includes/class-mcm-settings.php:560
-#: includes/class-mcm-settings.php:563
+#: includes/class-mcm-settings.php:553
+#: includes/class-mcm-settings.php:556
 msgid "Printable Content Types"
 msgstr ""
 
-#: includes/class-mcm-settings.php:578
+#: includes/class-mcm-settings.php:571
 msgid "Adds a Print button to those listings. The printout keeps whatever filters and search the visitor applied, and prints only the list — not the surrounding page."
 msgstr ""
 
-#: includes/class-mcm-settings.php:594
+#: includes/class-mcm-settings.php:587
 msgid "Default Photo — Male"
 msgstr ""
 
-#: includes/class-mcm-settings.php:595
+#: includes/class-mcm-settings.php:588
 msgid "Shown for consultants and team members whose Gender is Male and who have no photo."
 msgstr ""
 
-#: includes/class-mcm-settings.php:598
+#: includes/class-mcm-settings.php:591
 msgid "Default Photo — Female"
 msgstr ""
 
-#: includes/class-mcm-settings.php:599
+#: includes/class-mcm-settings.php:592
 msgid "Shown for consultants and team members whose Gender is Female and who have no photo."
 msgstr ""
 
-#: includes/class-mcm-settings.php:602
+#: includes/class-mcm-settings.php:595
 msgid "Default Profile Image"
 msgstr ""
 
-#: includes/class-mcm-settings.php:603
+#: includes/class-mcm-settings.php:596
 msgid "Shown for anyone without a photo whose Gender is not set (or whose male/female photo above is empty). Upload a branded placeholder carrying the college logo; leave blank for a plain silhouette. Square images of at least 400 × 400 px work best."
 msgstr ""
 
-#: includes/class-mcm-settings.php:650
+#: includes/class-mcm-settings.php:608
+#: includes/class-mcm-settings.php:647
+#: includes/class-mcm-settings.php:674
+#: includes/class-mcm-site-chrome-settings.php:285
+#: includes/class-mcm-termmeta.php:255
+msgid "Select Image"
+msgstr ""
+
+#: includes/class-mcm-settings.php:643
 msgid "Video URL (optional)"
 msgstr ""
 
-#: includes/class-mcm-settings.php:653
+#: includes/class-mcm-settings.php:646
 msgid "Or an image URL"
 msgstr ""
 
-#: includes/class-mcm-settings.php:676
+#: includes/class-mcm-settings.php:669
 msgid "Letterhead Logo"
 msgstr ""
 
-#: includes/class-mcm-settings.php:683
+#: includes/class-mcm-settings.php:676
 msgid "Shown top-left of every printed sheet. Leave blank to fall back to your theme logo, then the site icon. A wide transparent PNG works best."
 msgstr ""
 
-#: includes/class-mcm-settings.php:692
+#: includes/class-mcm-settings.php:685
 msgid "Institution Name"
 msgstr ""
 
-#: includes/class-mcm-settings.php:698
+#: includes/class-mcm-settings.php:691
 msgid "Leave blank to use the site title."
 msgstr ""
 
-#: includes/class-mcm-settings.php:702
+#: includes/class-mcm-settings.php:695
 msgid "Address / Contact Line"
 msgstr ""
 
-#: includes/class-mcm-settings.php:707
+#: includes/class-mcm-settings.php:700
 msgid "e.g. Dera Ismail Khan, KP, Pakistan · +92 966 000000 · info@example.edu.pk"
 msgstr ""
 
-#: includes/class-mcm-settings.php:708
+#: includes/class-mcm-settings.php:701
 msgid "Printed under the institution name."
 msgstr ""
 
-#: includes/class-mcm-settings.php:712
+#: includes/class-mcm-settings.php:705
 msgid "Footer Note"
 msgstr ""
 
-#: includes/class-mcm-settings.php:717
+#: includes/class-mcm-settings.php:710
 msgid "e.g. This is a computer-generated document."
 msgstr ""
 
-#: includes/class-mcm-settings.php:718
+#: includes/class-mcm-settings.php:711
 msgid "Printed bottom-left. The generation date is added bottom-right automatically."
 msgstr ""
 
-#: includes/class-mcm-settings.php:722
+#: includes/class-mcm-settings.php:715
 msgid "Signature Block"
 msgstr ""
 
-#: includes/class-mcm-settings.php:733
+#: includes/class-mcm-settings.php:726
 msgid "Auto — show it only if the theme does not (recommended)"
 msgstr ""
 
-#: includes/class-mcm-settings.php:734
+#: includes/class-mcm-settings.php:727
 msgid "Always show it"
 msgstr ""
 
-#: includes/class-mcm-settings.php:735
+#: includes/class-mcm-settings.php:728
 msgid "Never — leave it entirely to the theme"
 msgstr ""
 
-#: includes/class-mcm-settings.php:739
+#: includes/class-mcm-settings.php:732
 msgid "Featured Image on Single Pages"
 msgstr ""
 
-#: includes/class-mcm-settings.php:747
+#: includes/class-mcm-settings.php:740
 msgid "Many themes only show a featured image for blog posts, so an image set on a Consultant or Event can end up invisible. Auto fills that gap without ever showing the picture twice. Choose \"Always\" if your theme shows it below the content instead of above."
 msgstr ""
 
-#: includes/class-mcm-settings.php:768
+#: includes/class-mcm-settings.php:761
 msgid "Enable"
 msgstr ""
 
@@ -3504,6 +3254,16 @@ msgstr ""
 msgid "Mobile menu opens from"
 msgstr ""
 
+#: includes/class-mcm-site-chrome-settings.php:442
+#: includes/class-mcm-social.php:280
+msgid "Right"
+msgstr ""
+
+#: includes/class-mcm-site-chrome-settings.php:443
+#: includes/class-mcm-social.php:281
+msgid "Left"
+msgstr ""
+
 #: includes/class-mcm-site-chrome-settings.php:446
 #: includes/class-mcm-site-chrome.php:1106
 msgid "Back to top"
@@ -3568,7 +3328,6 @@ msgid "Empty: the college name from the letterhead settings."
 msgstr ""
 
 #: includes/class-mcm-site-chrome-settings.php:478
-#: includes/class-mcm-termmeta.php:703
 msgid "Description"
 msgstr ""
 
@@ -3706,7 +3465,7 @@ msgid "Assign"
 msgstr ""
 
 #: includes/class-mcm-site-chrome-settings.php:560
-msgid "Download every Header & Footer and Department Page setting as one JSON file, e.g. to copy the design from a staging site to the live site (menus, images and department content stay on this site)."
+msgid "Download every Header & Footer setting as a JSON file, e.g. to copy the design from a staging site to the live site (menus and images stay on this site)."
 msgstr ""
 
 #: includes/class-mcm-site-chrome-settings.php:563
@@ -3738,20 +3497,20 @@ msgid "Reset to defaults"
 msgstr ""
 
 #: includes/class-mcm-site-chrome-settings.php:583
-#: includes/class-mcm-site-chrome-settings.php:605
-#: includes/class-mcm-site-chrome-settings.php:631
+#: includes/class-mcm-site-chrome-settings.php:603
+#: includes/class-mcm-site-chrome-settings.php:625
 msgid "Sorry, you are not allowed to do that."
 msgstr ""
 
-#: includes/class-mcm-site-chrome-settings.php:643
+#: includes/class-mcm-site-chrome-settings.php:637
 msgid "Settings imported."
 msgstr ""
 
-#: includes/class-mcm-site-chrome-settings.php:644
+#: includes/class-mcm-site-chrome-settings.php:638
 msgid "Settings reset to the defaults. The header and footer are off."
 msgstr ""
 
-#: includes/class-mcm-site-chrome-settings.php:645
+#: includes/class-mcm-site-chrome-settings.php:639
 msgid "That file is not a Header & Footer settings export. Nothing was changed."
 msgstr ""
 
@@ -4000,214 +3759,69 @@ msgstr ""
 msgid "The bar is fixed/floating, so it appears over the page wherever the shortcode is placed. If \"Show on whole website\" is on, the shortcode is not needed (and duplicates are prevented automatically)."
 msgstr ""
 
-#: includes/class-mcm-termmeta.php:80
-msgid "1. Hero"
-msgstr ""
-
-#: includes/class-mcm-termmeta.php:81
-msgid "2. Message from the HOD"
-msgstr ""
-
-#: includes/class-mcm-termmeta.php:82
-msgid "3. Introduction"
-msgstr ""
-
-#: includes/class-mcm-termmeta.php:83
-msgid "4. Vision & Mission"
-msgstr ""
-
-#: includes/class-mcm-termmeta.php:84
-msgid "5. Services / Facilities"
-msgstr ""
-
-#: includes/class-mcm-termmeta.php:85
-msgid "8. Contact Information"
-msgstr ""
-
-#: includes/class-mcm-termmeta.php:86
-msgid "Page sections"
-msgstr ""
-
-#: includes/class-mcm-termmeta.php:105
+#: includes/class-mcm-termmeta.php:64
 msgid "Hero Video URL"
 msgstr ""
 
-#: includes/class-mcm-termmeta.php:108
+#: includes/class-mcm-termmeta.php:66
 msgid "YouTube/Vimeo link or an uploaded MP4 for the banner at the top of the page. Takes priority over the hero image. Note: some videos have embedding turned off by their owner and will show \"Video unavailable\" on any website — if that happens, use a different (embeddable) video or upload an MP4."
 msgstr ""
 
-#: includes/class-mcm-termmeta.php:111
+#: includes/class-mcm-termmeta.php:69
 msgid "Hero Image"
 msgstr ""
 
-#: includes/class-mcm-termmeta.php:116
-msgid "Static banner shown at the top when no hero video is set. Use a wide (16:9) image at least 1600 px wide."
+#: includes/class-mcm-termmeta.php:72
+msgid "Static banner shown at the top when no hero video is set. A wide (16:9) image works best."
 msgstr ""
 
-#: includes/class-mcm-termmeta.php:119
-#: includes/class-mcm-termmeta.php:1007
+#: includes/class-mcm-termmeta.php:75
+#: includes/class-mcm-termmeta.php:417
 msgid "Head of Department"
 msgstr ""
 
-#: includes/class-mcm-termmeta.php:122
-msgid "Full name shown with the message."
+#: includes/class-mcm-termmeta.php:77
+msgid "Name shown with the message."
 msgstr ""
 
-#: includes/class-mcm-termmeta.php:125
-msgid "HOD Designation"
-msgstr ""
-
-#: includes/class-mcm-termmeta.php:128
-msgid "e.g. Professor & Head of Department"
-msgstr ""
-
-#: includes/class-mcm-termmeta.php:131
+#: includes/class-mcm-termmeta.php:80
 msgid "HOD Photograph"
 msgstr ""
 
-#: includes/class-mcm-termmeta.php:136
-msgid "Shown beside the message. A portrait at least 400 px wide."
+#: includes/class-mcm-termmeta.php:83
+msgid "Shown beside the message."
 msgstr ""
 
-#: includes/class-mcm-termmeta.php:139
+#: includes/class-mcm-termmeta.php:86
 msgid "Head of Department's Message"
 msgstr ""
 
-#: includes/class-mcm-termmeta.php:142
-msgid "The welcome message for this department page."
+#: includes/class-mcm-termmeta.php:88
+msgid "The welcome / introduction message for this department page."
 msgstr ""
 
-#: includes/class-mcm-termmeta.php:148
-msgid "A short introduction to the department: what it teaches and does."
-msgstr ""
-
-#: includes/class-mcm-termmeta.php:155
-msgid "Required. The Vision & Mission section is shown only when both are filled in."
-msgstr ""
-
-#: includes/class-mcm-termmeta.php:162
-msgid "Required."
-msgstr ""
-
-#: includes/class-mcm-termmeta.php:165
-msgid "Services / Facilities"
-msgstr ""
-
-#: includes/class-mcm-termmeta.php:168
-msgid "One row per service or facility. Dates are optional (e.g. a workshop held 12/03/2026 – 14/03/2026). Rows without a title are ignored."
-msgstr ""
-
-#: includes/class-mcm-termmeta.php:171
+#: includes/class-mcm-termmeta.php:91
 msgid "Departmental Email"
 msgstr ""
 
-#: includes/class-mcm-termmeta.php:174
+#: includes/class-mcm-termmeta.php:93
 msgid "e.g. anatomy@gmcdik.edu.pk"
 msgstr ""
 
-#: includes/class-mcm-termmeta.php:177
+#: includes/class-mcm-termmeta.php:96
 msgid "Departmental Phone"
 msgstr ""
 
-#: includes/class-mcm-termmeta.php:186
-msgid "Where the department is (building, floor, campus)."
-msgstr ""
-
-#: includes/class-mcm-termmeta.php:189
-msgid "Office Hours"
-msgstr ""
-
-#: includes/class-mcm-termmeta.php:192
-msgid "e.g. Monday–Friday, 8:00 AM – 2:00 PM"
-msgstr ""
-
-#: includes/class-mcm-termmeta.php:195
-msgid "Map (Google Maps embed)"
-msgstr ""
-
-#: includes/class-mcm-termmeta.php:198
-msgid "In Google Maps: Share → Embed a map → Copy HTML, then paste it here (the link is taken from it). Only Google Maps embed links are accepted."
-msgstr ""
-
-#: includes/class-mcm-termmeta.php:201
+#: includes/class-mcm-termmeta.php:101
 msgid "Hide Sections"
 msgstr ""
 
-#: includes/class-mcm-termmeta.php:204
+#: includes/class-mcm-termmeta.php:103
 msgid "Tick any sections you do NOT want on this department page (e.g. hide the timetable). Unticked sections appear automatically whenever they have content."
 msgstr ""
 
-#: includes/class-mcm-termmeta.php:278
-msgid "More"
-msgstr ""
-
-#. translators: %s: list of missing fields, e.g. "Vision, Mission".
-#: includes/class-mcm-termmeta.php:498
-#, php-format
-msgid "Missing: %s. The department page does not show a Vision & Mission section until both are filled in."
-msgstr ""
-
-#: includes/class-mcm-termmeta.php:565
-msgid "Required for the Vision & Mission section."
-msgstr ""
-
-#: includes/class-mcm-termmeta.php:628
+#: includes/class-mcm-termmeta.php:267
 msgid "No sections available."
-msgstr ""
-
-#: includes/class-mcm-termmeta.php:679
-msgid "+ Add a service"
-msgstr ""
-
-#: includes/class-mcm-termmeta.php:705
-msgid "Date (optional)"
-msgstr ""
-
-#: includes/class-mcm-termmeta.php:706
-msgid "to (optional)"
-msgstr ""
-
-#: includes/class-mcm-termmeta.php:708
-msgid "Icon or image (optional)"
-msgstr ""
-
-#: includes/class-mcm-termmeta.php:712
-msgid "Move up"
-msgstr ""
-
-#: includes/class-mcm-termmeta.php:713
-msgid "Move down"
-msgstr ""
-
-#: includes/class-mcm-termmeta.php:714
-msgid "Remove"
-msgstr ""
-
-#: includes/class-mcm-termmeta.php:783
-msgid "The map was not saved: only Google Maps embed links are accepted (Share → Embed a map)."
-msgstr ""
-
-#. translators: %s: the date as typed.
-#: includes/class-mcm-termmeta.php:791
-#, php-format
-msgid "A service date \"%s\" could not be read and was left empty (use 15/10/2026 or 2026-10-15)."
-msgstr ""
-
-#: includes/class-mcm-termmeta.php:883
-#: includes/class-mcm-termmeta.php:887
-msgid "Page"
-msgstr ""
-
-#. translators: 1: sections that can be shown, 2: total sections.
-#: includes/class-mcm-termmeta.php:913
-#, php-format
-msgid "%1$d/%2$d sections"
-msgstr ""
-
-#. translators: %s: field name, e.g. "Vision".
-#: includes/class-mcm-termmeta.php:922
-#, php-format
-msgid "%s missing"
 msgstr ""
 
 #. translators: 1: number of dates/times converted, 2: number checked.
@@ -4355,6 +3969,10 @@ msgstr ""
 msgid "Secondary / meta text"
 msgstr ""
 
+#: includes/elementor-widgets.php:340
+msgid "Card background"
+msgstr ""
+
 #: includes/elementor-widgets.php:341
 msgid "Borders"
 msgstr ""
@@ -4492,82 +4110,6 @@ msgstr ""
 msgid "Notices List"
 msgstr ""
 
-#: includes/elementor-widgets.php:1648
-msgid "— The department being viewed —"
-msgstr ""
-
-#: includes/elementor-widgets.php:1667
-msgid "Content comes from Departments → Edit. Section titles, the empty-section rule and the faculty layout come from College Manager → Department Page."
-msgstr ""
-
-#: includes/elementor-widgets.php:1674
-msgid "Name tag"
-msgstr ""
-
-#: includes/elementor-widgets.php:1690
-msgid "Colours & Text"
-msgstr ""
-
-#: includes/elementor-widgets.php:1698
-msgid "Heading colour"
-msgstr ""
-
-#: includes/elementor-widgets.php:1699
-msgid "Also used for small text (the HOD designation): pick a shade dark enough to read."
-msgstr ""
-
-#: includes/elementor-widgets.php:1701
-msgid "Text colour"
-msgstr ""
-
-#: includes/elementor-widgets.php:1718
-msgid "Heading typography"
-msgstr ""
-
-#: includes/elementor-widgets.php:1726
-msgid "Text typography"
-msgstr ""
-
-#: includes/elementor-widgets.php:1733
-msgid "Section padding"
-msgstr ""
-
-#: includes/elementor-widgets.php:1771
-msgid "This department has nothing for this section yet (Departments → Edit)."
-msgstr ""
-
-#: includes/elementor-widgets.php:1771
-msgid "Choose a department, or place this widget in a department template."
-msgstr ""
-
-#: includes/elementor-widgets.php:1800
-msgid "Department Hero"
-msgstr ""
-
-#: includes/elementor-widgets.php:1830
-msgid "HOD Message"
-msgstr ""
-
-#: includes/elementor-widgets.php:1860
-msgid "Department Introduction"
-msgstr ""
-
-#: includes/elementor-widgets.php:1920
-msgid "Department Services"
-msgstr ""
-
-#: includes/elementor-widgets.php:1950
-msgid "Department Faculty"
-msgstr ""
-
-#: includes/elementor-widgets.php:1980
-msgid "Department Publications"
-msgstr ""
-
-#: includes/elementor-widgets.php:2010
-msgid "Department Contact"
-msgstr ""
-
 #. translators: %s: current PHP version.
 #: medical-college-manager.php:41
 #, php-format
@@ -4575,15 +4117,15 @@ msgid "Medical College Manager requires PHP 7.2 or newer. This server runs PHP %
 msgstr ""
 
 #. translators: 1: required WordPress version, 2: installed version.
-#: medical-college-manager.php:114
+#: medical-college-manager.php:113
 #, php-format
 msgid "WordPress %1$s or newer is required; this site runs %2$s. Update WordPress (Dashboard → Updates)."
 msgstr ""
 
-#: medical-college-manager.php:135
+#: medical-college-manager.php:134
 msgid "Medical College Manager has not been loaded."
 msgstr ""
 
-#: templates/archive-mcm.php:78
+#: templates/archive-mcm.php:75
 msgid "There is nothing to show here yet."
 msgstr ""

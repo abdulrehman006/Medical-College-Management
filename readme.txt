@@ -92,16 +92,6 @@ Per-type (recommended):
 
 Team by staff type: [mcm_team staff_type="support-staff"] (or "teaching-technical-staff").
 
-Department sections (department="anatomy", or the department being viewed):
-
-  [mcm_department_page]            the whole department template
-  [mcm_department_introduction]    [mcm_department_vision_mission]
-  [mcm_department_services]        [mcm_department_faculty]
-  [mcm_department_publications]    [mcm_department_contact]
-
-The earlier [mcm_department_hero], [mcm_department_message], [mcm_department_intro]
-and [mcm_department_sections] keep working as before.
-
 Jobs / Vacancies: [mcm_jobs] (alias [mcm_vacancies]) lists open jobs, soonest last
 date first. status="closed" or status="all" lists past jobs too; category="…" and
 department="…" pre-filter. A job is Open, Closing soon, Extended or Closed by its
@@ -248,16 +238,6 @@ relevant taxonomy (e.g. Department, Session, Teacher for timetable; Department, 
 consultants/team). Filtering is AJAX — no page reload. On the Timetable, adding
 print="yes" shows a Print button that prints just the (filtered) timetable.
 
-== Department pages ==
-
-College Manager > Department Page > "Enable the department page template" (off until
-you switch it on). Every department page then shows, in this order: Hero, Message from
-the HOD, Introduction, Vision & Mission, Services / Facilities, Faculty (grouped by Staff
-Type), Publications and Contact, followed by tabs for the department's other content.
-Fill the sections under Departments > Edit (panels in the same order); the Departments
-list shows how complete each page is. Empty sections are hidden, or show "Information
-will be available soon". If the template ever fails, the previous page is shown.
-
 == Header & Footer ==
 
 College Manager > Header & Footer. Switch on the header and/or footer (both off by
@@ -282,10 +262,6 @@ Events, Timetable or Admissions. Configure everything visually:
   Pre-filter     — optionally limit the widget to a Department, Session, Faculty,
                    Specialty or Category. (For a fixed list, turn the Filter bar
                    off when you pre-filter.)
-
-Department sections have their own widgets (Department Hero, HOD Message, Introduction,
-Vision & Mission, Services, Faculty, Publications, Contact): each uses the department
-being viewed, or one picked from a list.
 
 No shortcodes or term slugs are needed — terms are picked from dropdowns. The
 widgets use the same renderer as the shortcodes, so styling from the Design panel
@@ -318,11 +294,9 @@ shadow + hover toggles, font family, and a raw Custom CSS box. Generated CSS use
 == Changelog ==
 
 = 1.32.0 =
-New: college header & footer, department page template, Staff Type.
+New: college header & footer, Staff Type.
 * College header & footer (College Manager > Header & Footer): replaces the theme's
   header and footer without editing the theme; off until switched on.
-* Department page template (College Manager > Department Page): eight fixed sections
-  and related tabs, new department fields, completeness column; off until switched on.
 * Staff Type for team members; gender and male/female default photos.
 * Redesigned job cards and directory filters; status and time left on admissions,
   scholarships, tenders and events; display and accessibility fixes across listings.

@@ -557,7 +557,7 @@ class MCM_Site_Chrome_Settings {
 
 	/** The Import / Export tab. */
 	private function tools() {
-		echo '<h2>' . esc_html__( 'Export', 'medical-college-manager' ) . '</h2><p>' . esc_html__( 'Download every Header & Footer and Department Page setting as one JSON file, e.g. to copy the design from a staging site to the live site (menus, images and department content stay on this site).', 'medical-college-manager' ) . '</p>';
+		echo '<h2>' . esc_html__( 'Export', 'medical-college-manager' ) . '</h2><p>' . esc_html__( 'Download every Header & Footer setting as a JSON file, e.g. to copy the design from a staging site to the live site (menus and images stay on this site).', 'medical-college-manager' ) . '</p>';
 		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '"><input type="hidden" name="action" value="mcm_hf_export" />';
 		wp_nonce_field( 'mcm_hf_export' );
 		submit_button( __( 'Download settings', 'medical-college-manager' ), 'secondary', 'submit', false );
@@ -584,12 +584,10 @@ class MCM_Site_Chrome_Settings {
 		}
 		check_admin_referer( 'mcm_hf_export' );
 		$data = array(
-			'plugin'     => 'medical-college-manager',
-			'type'       => 'site-chrome',
-			'version'    => MCM_VERSION,
-			'settings'   => MCM_Site_Chrome::settings(),
-			// The department page design travels with it (since 1.32.0).
-			'department' => class_exists( 'MCM_Department_Page' ) ? MCM_Department_Page::settings() : array(),
+			'plugin'   => 'medical-college-manager',
+			'type'     => 'site-chrome',
+			'version'  => MCM_VERSION,
+			'settings' => MCM_Site_Chrome::settings(),
 		);
 		nocache_headers();
 		header( 'Content-Type: application/json; charset=utf-8' );
@@ -614,10 +612,6 @@ class MCM_Site_Chrome_Settings {
 			if ( is_array( $json ) && isset( $json['type'], $json['settings'] ) && 'site-chrome' === $json['type'] && is_array( $json['settings'] ) ) {
 				$known = array_intersect_key( $json['settings'], MCM_Site_Chrome::defaults() );
 				update_option( MCM_Site_Chrome::OPTION, MCM_Site_Chrome::clean( wp_parse_args( $known, MCM_Site_Chrome::defaults() ) ) );
-				if ( isset( $json['department'] ) && is_array( $json['department'] ) && class_exists( 'MCM_Department_Page' ) ) {
-					$dept = array_intersect_key( $json['department'], MCM_Department_Page::defaults() );
-					update_option( MCM_Department_Page::OPTION, MCM_Department_Page::sanitize( wp_parse_args( $dept, MCM_Department_Page::defaults() ) ) );
-				}
 				$result = 'ok';
 			}
 		}
