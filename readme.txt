@@ -298,6 +298,14 @@ everything visually:
                      button and the empty message. Every option applies to
                      that widget only.
 
+Testimonial / Message: a heading, a message (rich text), a photo and the
+person's name, designation and organisation, e.g. "Message from Head of
+Department". The photo sits left, right or on top, chosen per device (by
+default right on desktop and tablet, on top on phones), with width, spacing
+and vertical alignment controls; optional quotation mark and profile link.
+Style tab: box, heading, message (incl. justified text), quotation mark,
+photo (border, shadow, filters) and the name lines.
+
 Blog Posts adds a Grid layout, columns, show/hide image, date and read-more,
 exclude categories, tags, author and offset, with its own Style tab (cards,
 image, date badge, title, excerpt, read more, intro). The notice widgets add a
@@ -342,7 +350,8 @@ New: college header & footer, Staff Type, full Elementor widget options.
 * Redesigned job cards and directory filters; status and time left on admissions,
   scholarships, tenders and events; display and accessibility fixes across listings.
 * Elementor widgets: status, include/exclude, order by field, offset, pagination and
-  filter-bar options, plus full Style tabs (Normal/Hover) on all 17 widgets.
+  filter-bar options, plus full Style tabs (Normal/Hover) on all widgets.
+* New Elementor widget: Testimonial / Message (photo left, right or on top).
 * Full list: changelog.txt.
 
 = 1.31.0 =

@@ -124,6 +124,13 @@ Medical College Manager — complete changelog.
     and read-more; exclude categories, tags, author, offset; full Style tab.
   - Notice Ticker / Board / List: "only from the last N days"; full Style tabs.
   The same options are available as shortcode attributes (see readme).
+* New Elementor widget: Testimonial / Message — heading (tag of your choice,
+  across the full width or beside the photo), rich-text message, photo with
+  image size, name, designation, organisation, optional profile link and
+  quotation mark. Photo left, right or on top per device (default: right on
+  desktop and tablet, top on phones). Full Style tab. Accessible: a labelled
+  region, the message is a blockquote, the photo's alt text falls back to the
+  name and a linked photo is not a second tab stop.
 * Fixed: a paginated list on an ordinary page ([mcm_events paginate="yes"])
   showed page 1 again on /page/2/.
 * Accessibility: the "Last date" label and old dates on job cards now meet

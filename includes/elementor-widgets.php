@@ -3175,3 +3175,537 @@ class MCM_Widget_Notices extends MCM_Widget_Notice_Base {
 		echo MCM_Notice::render_list( $this->mcm_atts() ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 }
+
+/**
+ * Elementor widget: Testimonial / Message — a heading, a message, a photo and
+ * the person's name, designation and organisation (e.g. "Message from the
+ * Head of Department"). The photo sits left, right or on top, per device.
+ */
+class MCM_Widget_Testimonial extends \Elementor\Widget_Base {
+
+	use MCM_Elementor_Style;
+
+	/**
+	 * Widget machine name.
+	 */
+	public function get_name() {
+		return 'mcm_testimonial';
+	}
+	/**
+	 * Widget title shown in the Elementor panel.
+	 */
+	public function get_title() {
+		return __( 'Testimonial / Message', 'medical-college-manager' );
+	}
+	/**
+	 * Icon shown in the Elementor panel.
+	 */
+	public function get_icon() {
+		return 'eicon-testimonial';
+	}
+	/**
+	 * Elementor panel category.
+	 */
+	public function get_categories() {
+		return array( 'medical-college-manager' );
+	}
+	/**
+	 * Search keywords for the Elementor panel.
+	 */
+	public function get_keywords() {
+		return array( 'testimonial', 'message', 'quote', 'head of department', 'hod', 'chairperson', 'principal', 'medical-college-manager' );
+	}
+	/**
+	 * Stylesheets this widget needs.
+	 */
+	public function get_style_depends() {
+		return array( 'mcm-frontend' );
+	}
+
+	/**
+	 * Register the widget controls.
+	 */
+	protected function register_controls() {
+		/* ---- Content ---- */
+		$this->start_controls_section( 'mcm_testi_content', array( 'label' => __( 'Message', 'medical-college-manager' ) ) );
+
+		$this->add_control(
+			'title',
+			array(
+				'label'       => __( 'Heading', 'medical-college-manager' ),
+				'type'        => \Elementor\Controls_Manager::TEXT,
+				'default'     => __( 'Message from Head of Department', 'medical-college-manager' ),
+				'label_block' => true,
+				'dynamic'     => array( 'active' => true ),
+			)
+		);
+		$this->add_control(
+			'title_tag',
+			array(
+				'label'     => __( 'Heading HTML tag', 'medical-college-manager' ),
+				'type'      => \Elementor\Controls_Manager::SELECT,
+				'default'   => 'h2',
+				'options'   => array(
+					'h1'  => 'H1',
+					'h2'  => 'H2',
+					'h3'  => 'H3',
+					'h4'  => 'H4',
+					'h5'  => 'H5',
+					'h6'  => 'H6',
+					'div' => 'div',
+					'p'   => 'p',
+				),
+				'condition' => array( 'title!' => '' ),
+			)
+		);
+		$this->add_control(
+			'title_full',
+			array(
+				'label'        => __( 'Heading across the full width', 'medical-college-manager' ),
+				'description'  => __( 'Off: the heading sits beside the photo, above the message.', 'medical-college-manager' ),
+				'type'         => \Elementor\Controls_Manager::SWITCHER,
+				'return_value' => 'yes',
+				'default'      => 'yes',
+				'condition'    => array( 'title!' => '' ),
+			)
+		);
+
+		$this->add_control(
+			'message',
+			array(
+				'label'     => __( 'Message', 'medical-college-manager' ),
+				'type'      => \Elementor\Controls_Manager::WYSIWYG,
+				'default'   => '<p>' . __( 'Welcome to our department. Write the message here.', 'medical-college-manager' ) . '</p>',
+				'dynamic'   => array( 'active' => true ),
+				'separator' => 'before',
+			)
+		);
+		$this->add_control(
+			'quote',
+			array(
+				'label'        => __( 'Quotation mark', 'medical-college-manager' ),
+				'type'         => \Elementor\Controls_Manager::SWITCHER,
+				'return_value' => 'yes',
+				'default'      => '',
+			)
+		);
+
+		$this->add_control(
+			'image',
+			array(
+				'label'     => __( 'Photo', 'medical-college-manager' ),
+				'type'      => \Elementor\Controls_Manager::MEDIA,
+				'default'   => array( 'url' => '' ),
+				'dynamic'   => array( 'active' => true ),
+				'separator' => 'before',
+			)
+		);
+		$this->add_group_control(
+			\Elementor\Group_Control_Image_Size::get_type(),
+			array(
+				'name'      => 'image',
+				'default'   => 'medium_large',
+				'condition' => array( 'image[url]!' => '' ),
+			)
+		);
+
+		$this->add_control(
+			'name',
+			array(
+				'label'       => __( 'Name', 'medical-college-manager' ),
+				'type'        => \Elementor\Controls_Manager::TEXT,
+				'placeholder' => __( 'Prof. Dr. Name', 'medical-college-manager' ),
+				'label_block' => true,
+				'dynamic'     => array( 'active' => true ),
+				'separator'   => 'before',
+			)
+		);
+		$this->add_control(
+			'designation',
+			array(
+				'label'       => __( 'Designation', 'medical-college-manager' ),
+				'type'        => \Elementor\Controls_Manager::TEXT,
+				'placeholder' => __( 'Chairperson, Department of Pathology', 'medical-college-manager' ),
+				'label_block' => true,
+				'dynamic'     => array( 'active' => true ),
+			)
+		);
+		$this->add_control(
+			'organization',
+			array(
+				'label'       => __( 'Organisation / place', 'medical-college-manager' ),
+				'type'        => \Elementor\Controls_Manager::TEXT,
+				'placeholder' => __( 'Gomal Medical College, Dera Ismail Khan', 'medical-college-manager' ),
+				'label_block' => true,
+				'dynamic'     => array( 'active' => true ),
+			)
+		);
+		$this->add_control(
+			'link',
+			array(
+				'label'       => __( 'Link (name and photo)', 'medical-college-manager' ),
+				'type'        => \Elementor\Controls_Manager::URL,
+				'placeholder' => __( 'https://… e.g. the profile page', 'medical-college-manager' ),
+				'dynamic'     => array( 'active' => true ),
+			)
+		);
+		$this->end_controls_section();
+
+		/* ---- Layout ---- */
+		$this->start_controls_section( 'mcm_testi_layout', array( 'label' => __( 'Layout', 'medical-college-manager' ) ) );
+		$this->add_responsive_control(
+			'image_position',
+			array(
+				'label'          => __( 'Photo position', 'medical-college-manager' ),
+				'type'           => \Elementor\Controls_Manager::CHOOSE,
+				'default'        => 'right',
+				'tablet_default' => 'right',
+				'mobile_default' => 'top',
+				'options'        => array(
+					'left'  => array(
+						'title' => __( 'Left', 'medical-college-manager' ),
+						'icon'  => 'eicon-h-align-left',
+					),
+					'top'   => array(
+						'title' => __( 'Top', 'medical-college-manager' ),
+						'icon'  => 'eicon-v-align-top',
+					),
+					'right' => array(
+						'title' => __( 'Right', 'medical-college-manager' ),
+						'icon'  => 'eicon-h-align-right',
+					),
+				),
+				'prefix_class'   => 'mcm-testi-pos%s-',
+				'toggle'         => false,
+			)
+		);
+		$this->add_responsive_control(
+			'image_valign',
+			array(
+				'label'     => __( 'Vertical alignment (photo left/right)', 'medical-college-manager' ),
+				'type'      => \Elementor\Controls_Manager::CHOOSE,
+				'options'   => array(
+					'flex-start' => array(
+						'title' => __( 'Top', 'medical-college-manager' ),
+						'icon'  => 'eicon-v-align-top',
+					),
+					'center'     => array(
+						'title' => __( 'Middle', 'medical-college-manager' ),
+						'icon'  => 'eicon-v-align-middle',
+					),
+					'flex-end'   => array(
+						'title' => __( 'Bottom', 'medical-college-manager' ),
+						'icon'  => 'eicon-v-align-bottom',
+					),
+				),
+				'selectors' => array( '{{WRAPPER}} .mcm-testi' => '--mcm-testi-valign: {{VALUE}};' ),
+			)
+		);
+		$this->add_responsive_control(
+			'image_halign',
+			array(
+				'label'     => __( 'Photo alignment (photo on top)', 'medical-college-manager' ),
+				'type'      => \Elementor\Controls_Manager::CHOOSE,
+				'options'   => array(
+					'flex-start' => array(
+						'title' => __( 'Left', 'medical-college-manager' ),
+						'icon'  => 'eicon-h-align-left',
+					),
+					'center'     => array(
+						'title' => __( 'Centre', 'medical-college-manager' ),
+						'icon'  => 'eicon-h-align-center',
+					),
+					'flex-end'   => array(
+						'title' => __( 'Right', 'medical-college-manager' ),
+						'icon'  => 'eicon-h-align-right',
+					),
+				),
+				'selectors' => array( '{{WRAPPER}} .mcm-testi' => '--mcm-testi-halign: {{VALUE}};' ),
+			)
+		);
+		$this->add_responsive_control(
+			'image_width',
+			array(
+				'label'          => __( 'Photo width', 'medical-college-manager' ),
+				'type'           => \Elementor\Controls_Manager::SLIDER,
+				'size_units'     => array( '%', 'px' ),
+				'range'          => array(
+					'%'  => array(
+						'min' => 10,
+						'max' => 100,
+					),
+					'px' => array(
+						'min' => 60,
+						'max' => 800,
+					),
+				),
+				'default'        => array(
+					'unit' => '%',
+					'size' => 28,
+				),
+				'mobile_default' => array(
+					'unit' => '%',
+					'size' => 70,
+				),
+				'selectors'      => array( '{{WRAPPER}} .mcm-testi' => '--mcm-testi-img-w: {{SIZE}}{{UNIT}};' ),
+			)
+		);
+		$this->add_responsive_control(
+			'gap',
+			array(
+				'label'      => __( 'Space between photo and text', 'medical-college-manager' ),
+				'type'       => \Elementor\Controls_Manager::SLIDER,
+				'size_units' => array( 'px', 'em' ),
+				'range'      => array(
+					'px' => array(
+						'min' => 0,
+						'max' => 120,
+					),
+				),
+				'selectors'  => array( '{{WRAPPER}} .mcm-testi' => '--mcm-testi-gap: {{SIZE}}{{UNIT}};' ),
+			)
+		);
+		$this->end_controls_section();
+
+		$this->register_style_controls();
+	}
+
+	/**
+	 * Style tab.
+	 */
+	protected function register_style_controls() {
+		$this->mcm_style_section( 'mcm_testi_style_box', __( 'Box', 'medical-college-manager' ) );
+		$this->mcm_box_style( 'st_box', '.mcm-testi' );
+		$this->end_controls_section();
+
+		$this->mcm_style_section( 'mcm_testi_style_title', __( 'Heading', 'medical-college-manager' ), array( 'condition' => array( 'title!' => '' ) ) );
+		$this->mcm_text_style(
+			'st_title',
+			'.mcm-testi-title',
+			array(
+				'align'   => true,
+				'spacing' => true,
+			)
+		);
+		$this->end_controls_section();
+
+		$this->mcm_style_section( 'mcm_testi_style_message', __( 'Message', 'medical-college-manager' ) );
+		$this->mcm_text_style( 'st_msg', '.mcm-testi-message', array( 'spacing' => true ) );
+		$this->add_responsive_control(
+			'st_msg_align',
+			array(
+				'label'     => __( 'Alignment', 'medical-college-manager' ),
+				'type'      => \Elementor\Controls_Manager::CHOOSE,
+				'options'   => $this->mcm_align_options() + array(
+					'justify' => array(
+						'title' => __( 'Justified', 'medical-college-manager' ),
+						'icon'  => 'eicon-text-align-justify',
+					),
+				),
+				'selectors' => array( '{{WRAPPER}} .mcm-testi-message' => 'text-align: {{VALUE}};' ),
+			)
+		);
+		$this->add_responsive_control(
+			'st_msg_para',
+			array(
+				'label'      => __( 'Space between paragraphs', 'medical-college-manager' ),
+				'type'       => \Elementor\Controls_Manager::SLIDER,
+				'size_units' => array( 'px', 'em' ),
+				'range'      => array(
+					'px' => array(
+						'min' => 0,
+						'max' => 60,
+					),
+				),
+				'selectors'  => array( '{{WRAPPER}} .mcm-testi-message p' => 'margin-bottom: {{SIZE}}{{UNIT}};' ),
+			)
+		);
+		$this->add_control(
+			'st_link_color',
+			array(
+				'label'     => __( 'Link colour in the message', 'medical-college-manager' ),
+				'type'      => \Elementor\Controls_Manager::COLOR,
+				'selectors' => array( '{{WRAPPER}} .mcm-testi-message a' => 'color: {{VALUE}};' ),
+			)
+		);
+		$this->end_controls_section();
+
+		$this->mcm_style_section( 'mcm_testi_style_quote', __( 'Quotation Mark', 'medical-college-manager' ), array( 'condition' => array( 'quote' => 'yes' ) ) );
+		$this->add_control(
+			'st_quote_color',
+			array(
+				'label'     => __( 'Colour', 'medical-college-manager' ),
+				'type'      => \Elementor\Controls_Manager::COLOR,
+				'selectors' => array( '{{WRAPPER}} .mcm-testi-quote' => 'color: {{VALUE}};' ),
+			)
+		);
+		$this->add_responsive_control(
+			'st_quote_size',
+			array(
+				'label'      => __( 'Size', 'medical-college-manager' ),
+				'type'       => \Elementor\Controls_Manager::SLIDER,
+				'size_units' => array( 'px' ),
+				'range'      => array(
+					'px' => array(
+						'min' => 20,
+						'max' => 200,
+					),
+				),
+				'selectors'  => array( '{{WRAPPER}} .mcm-testi-quote' => 'font-size: {{SIZE}}{{UNIT}};' ),
+			)
+		);
+		$this->end_controls_section();
+
+		$this->mcm_style_section( 'mcm_testi_style_image', __( 'Photo', 'medical-college-manager' ), array( 'condition' => array( 'image[url]!' => '' ) ) );
+		$this->add_responsive_control(
+			'st_img_h',
+			array(
+				'label'      => __( 'Height (empty = natural)', 'medical-college-manager' ),
+				'type'       => \Elementor\Controls_Manager::SLIDER,
+				'size_units' => array( 'px', 'vh' ),
+				'range'      => array(
+					'px' => array(
+						'min' => 60,
+						'max' => 800,
+					),
+				),
+				'selectors'  => array( '{{WRAPPER}} .mcm-testi-media img' => 'height: {{SIZE}}{{UNIT}};' ),
+			)
+		);
+		$this->mcm_image_style( 'st_img', '.mcm-testi-media img', '.mcm-testi-media:hover img' );
+		$this->add_group_control(
+			\Elementor\Group_Control_Border::get_type(),
+			array(
+				'name'      => 'st_img_border',
+				'selector'  => '{{WRAPPER}} .mcm-testi-media img',
+				'separator' => 'before',
+			)
+		);
+		$this->add_group_control(
+			\Elementor\Group_Control_Box_Shadow::get_type(),
+			array(
+				'name'     => 'st_img_shadow',
+				'selector' => '{{WRAPPER}} .mcm-testi-media img',
+			)
+		);
+		$this->end_controls_section();
+
+		$this->mcm_style_section( 'mcm_testi_style_author', __( 'Name & Designation', 'medical-college-manager' ) );
+		$this->add_responsive_control(
+			'st_author_align',
+			array(
+				'label'     => __( 'Alignment', 'medical-college-manager' ),
+				'type'      => \Elementor\Controls_Manager::CHOOSE,
+				'options'   => $this->mcm_align_options(),
+				'selectors' => array( '{{WRAPPER}} .mcm-testi-author' => 'text-align: {{VALUE}};' ),
+			)
+		);
+		$this->add_responsive_control(
+			'st_author_space',
+			array(
+				'label'      => __( 'Space above', 'medical-college-manager' ),
+				'type'       => \Elementor\Controls_Manager::SLIDER,
+				'size_units' => array( 'px', 'em' ),
+				'range'      => array(
+					'px' => array(
+						'min' => 0,
+						'max' => 80,
+					),
+				),
+				'selectors'  => array( '{{WRAPPER}} .mcm-testi-author' => 'margin-top: {{SIZE}}{{UNIT}};' ),
+			)
+		);
+		$this->mcm_text_style(
+			'st_name',
+			'.mcm-testi-name',
+			array(
+				'heading' => __( 'Name', 'medical-college-manager' ),
+				'hover'   => array( '.mcm-testi-name a:hover', '.mcm-testi-name a:focus-visible' ),
+			)
+		);
+		$this->mcm_text_style( 'st_desig', '.mcm-testi-designation', array( 'heading' => __( 'Designation', 'medical-college-manager' ) ) );
+		$this->mcm_text_style( 'st_org', '.mcm-testi-org', array( 'heading' => __( 'Organisation', 'medical-college-manager' ) ) );
+		$this->end_controls_section();
+	}
+
+	/**
+	 * Render boundary: a failing widget renders nothing for visitors (and a
+	 * short notice for administrators) instead of breaking the page.
+	 */
+	protected function render() {
+		echo MCM_Safe::render( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Built and escaped by mcm_output().
+			function () {
+				ob_start();
+				$this->mcm_output();
+				return ob_get_clean();
+			},
+			'Elementor widget ' . $this->get_name()
+		);
+	}
+
+	/** Unguarded widget output; see render(). */
+	protected function mcm_output() {
+		$s     = $this->get_settings_for_display();
+		$s     = is_array( $s ) ? $s : array();
+		$text  = function ( $key ) use ( $s ) {
+			return isset( $s[ $key ] ) ? trim( wp_strip_all_tags( MCM_Safe::str( $s[ $key ] ) ) ) : '';
+		};
+		$title = $text( 'title' );
+		$name  = $text( 'name' );
+		$tag   = isset( $s['title_tag'] ) && in_array( $s['title_tag'], array( 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'div', 'p' ), true ) ? $s['title_tag'] : 'h2';
+		$full  = ! isset( $s['title_full'] ) || 'yes' === $s['title_full'];
+		$msg   = isset( $s['message'] ) ? MCM_Safe::str( $s['message'] ) : '';
+		$url   = ( isset( $s['link']['url'] ) && '' !== $s['link']['url'] ) ? $s['link'] : null;
+		$uid   = 'mcm-testi-' . $this->get_id();
+
+		// The photo: chosen size with srcset; alt text from the Media Library,
+		// else the person's name.
+		$img = '';
+		if ( ! empty( $s['image']['url'] ) ) {
+			$img = \Elementor\Group_Control_Image_Size::get_attachment_image_html( $s, 'image', 'image' );
+			if ( '' !== $name && false !== strpos( $img, 'alt=""' ) ) {
+				$img = str_replace( 'alt=""', 'alt="' . esc_attr( $name ) . '"', $img );
+			}
+		}
+		if ( $url ) {
+			$this->add_link_attributes( 'mcm_link', $url );
+		}
+		$link = function ( $inner, $extra = '' ) use ( $url ) {
+			return $url ? '<a ' . $this->get_render_attribute_string( 'mcm_link' ) . $extra . '>' . $inner . '</a>' : $inner;
+		};
+
+		$heading = '' !== $title ? sprintf( '<%1$s class="mcm-testi-title" id="%3$s">%2$s</%1$s>', $tag, esc_html( $title ), esc_attr( $uid ) ) : '';
+
+		$out  = '<section class="mcm-testi"' . ( '' !== $heading ? ' aria-labelledby="' . esc_attr( $uid ) . '"' : '' ) . '>';
+		$out .= $full ? $heading : '';
+		$out .= '<div class="mcm-testi-inner">';
+		if ( '' !== $img ) {
+			// The linked photo repeats the name link: hidden from tab order and screen readers.
+			$out .= '<div class="mcm-testi-media">' . $link( $img, ' tabindex="-1" aria-hidden="true"' ) . '</div>';
+		}
+		$out .= '<div class="mcm-testi-content">';
+		$out .= $full ? '' : $heading;
+		if ( isset( $s['quote'] ) && 'yes' === $s['quote'] ) {
+			$out .= '<span class="mcm-testi-quote" aria-hidden="true">&ldquo;</span>';
+		}
+		if ( '' !== trim( wp_strip_all_tags( $msg ) ) ) {
+			$out .= '<blockquote class="mcm-testi-message">' . wp_kses_post( wpautop( $msg ) ) . '</blockquote>';
+		}
+		$lines = array(
+			'name'        => '' !== $name ? $link( esc_html( $name ) ) : '',
+			'designation' => esc_html( $text( 'designation' ) ),
+			'org'         => esc_html( $text( 'organization' ) ),
+		);
+		$lines = array_filter( $lines );
+		if ( $lines ) {
+			$out .= '<div class="mcm-testi-author">';
+			foreach ( $lines as $key => $html ) {
+				$out .= '<p class="mcm-testi-' . $key . '">' . $html . '</p>';
+			}
+			$out .= '</div>';
+		}
+		$out .= '</div></div></section>';
+
+		echo $out; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Every part escaped above (esc_html, wp_kses_post, Elementor's image and link helpers).
+	}
+}
