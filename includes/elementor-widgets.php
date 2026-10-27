@@ -233,7 +233,7 @@ trait MCM_Elementor_Style {
 			array(
 				'name'     => $id . '_bg',
 				'types'    => array( 'classic', 'gradient' ),
-				'exclude'  => array( 'image' ),
+				'exclude'  => array( 'image' ), // phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_exclude -- Elementor control option (hides the image type), not a query.
 				'selector' => $sel,
 			)
 		);
@@ -259,7 +259,7 @@ trait MCM_Elementor_Style {
 				array(
 					'name'     => $id . '_bg_hover',
 					'types'    => array( 'classic', 'gradient' ),
-					'exclude'  => array( 'image' ),
+					'exclude'  => array( 'image' ), // phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_exclude -- Elementor control option (hides the image type), not a query.
 					'selector' => $hsel,
 				)
 			);
