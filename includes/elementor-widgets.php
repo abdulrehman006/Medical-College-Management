@@ -23,10 +23,665 @@ if ( ! class_exists( '\Elementor\Widget_Base' ) ) {
 }
 
 /**
+ * Shared Style-tab builders, used by every widget so each one offers the same
+ * Elementor-standard design options (typography, colours, background,
+ * border, radius, padding, shadow, Normal/Hover). Every control is scoped to
+ * {{WRAPPER}}: it styles this widget only and overrides the global design.
+ */
+trait MCM_Elementor_Style {
+
+	/**
+	 * Prefix each selector with {{WRAPPER}}, optionally adding a suffix (":hover").
+	 *
+	 * @param string|string[] $selectors Selectors inside the widget.
+	 * @param string          $suffix    Appended to each selector.
+	 * @return string
+	 */
+	protected function mcm_sel( $selectors, $suffix = '' ) {
+		$out = array();
+		foreach ( (array) $selectors as $s ) {
+			$out[] = '{{WRAPPER}} ' . $s . $suffix;
+		}
+		return implode( ', ', $out );
+	}
+
+	/**
+	 * Open a Style-tab section.
+	 *
+	 * @param string $id    Section ID.
+	 * @param string $label Section label.
+	 * @param array  $extra Extra section arguments (condition, conditions).
+	 */
+	protected function mcm_style_section( $id, $label, $extra = array() ) {
+		$this->start_controls_section(
+			$id,
+			array_merge(
+				array(
+					'label' => $label,
+					'tab'   => \Elementor\Controls_Manager::TAB_STYLE,
+				),
+				$extra
+			)
+		);
+	}
+
+	/**
+	 * Responsive four-side dimensions control (padding, margin, radius).
+	 *
+	 * @param string $id        Control ID.
+	 * @param string $label     Label.
+	 * @param string $selector  Full selector (already wrapped).
+	 * @param string $property  CSS property.
+	 */
+	protected function mcm_dimensions( $id, $label, $selector, $property ) {
+		$this->add_responsive_control(
+			$id,
+			array(
+				'label'      => $label,
+				'type'       => \Elementor\Controls_Manager::DIMENSIONS,
+				'size_units' => array( 'px', '%', 'em', 'rem' ),
+				'selectors'  => array( $selector => $property . ': {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};' ),
+			)
+		);
+	}
+
+	/**
+	 * Small heading inside a section.
+	 *
+	 * @param string $id    Control ID.
+	 * @param string $label Heading text.
+	 */
+	protected function mcm_heading( $id, $label ) {
+		$this->add_control(
+			$id,
+			array(
+				'label'     => $label,
+				'type'      => \Elementor\Controls_Manager::HEADING,
+				'separator' => 'before',
+			)
+		);
+	}
+
+	/**
+	 * Typography, colour and (optionally) hover colour, alignment and bottom
+	 * spacing for one text element.
+	 *
+	 * @param string          $id        Control ID prefix.
+	 * @param string|string[] $selectors Element selectors.
+	 * @param array           $opts      hover (selectors), align, spacing, heading.
+	 */
+	protected function mcm_text_style( $id, $selectors, $opts = array() ) {
+		$opts = wp_parse_args(
+			$opts,
+			array(
+				'heading' => '',
+				'hover'   => array(),
+				'align'   => false,
+				'spacing' => false,
+				'color'   => true,
+			)
+		);
+		$sel  = $this->mcm_sel( $selectors );
+		if ( '' !== $opts['heading'] ) {
+			$this->mcm_heading( $id . '_heading', $opts['heading'] );
+		}
+		$this->add_group_control(
+			\Elementor\Group_Control_Typography::get_type(),
+			array(
+				'name'     => $id . '_typo',
+				'selector' => $sel,
+			)
+		);
+		if ( $opts['color'] ) {
+			$this->add_control(
+				$id . '_color',
+				array(
+					'label'     => __( 'Colour', 'medical-college-manager' ),
+					'type'      => \Elementor\Controls_Manager::COLOR,
+					'selectors' => array( $sel => 'color: {{VALUE}};' ),
+				)
+			);
+		}
+		if ( $opts['hover'] ) {
+			$this->add_control(
+				$id . '_hover',
+				array(
+					'label'     => __( 'Hover colour', 'medical-college-manager' ),
+					'type'      => \Elementor\Controls_Manager::COLOR,
+					'selectors' => array( $this->mcm_sel( $opts['hover'] ) => 'color: {{VALUE}};' ),
+				)
+			);
+		}
+		if ( $opts['align'] ) {
+			$this->add_responsive_control(
+				$id . '_align',
+				array(
+					'label'     => __( 'Alignment', 'medical-college-manager' ),
+					'type'      => \Elementor\Controls_Manager::CHOOSE,
+					'options'   => $this->mcm_align_options(),
+					'selectors' => array( $sel => 'text-align: {{VALUE}};' ),
+				)
+			);
+		}
+		if ( $opts['spacing'] ) {
+			$this->add_responsive_control(
+				$id . '_space',
+				array(
+					'label'      => __( 'Spacing below', 'medical-college-manager' ),
+					'type'       => \Elementor\Controls_Manager::SLIDER,
+					'size_units' => array( 'px', 'em' ),
+					'range'      => array(
+						'px' => array(
+							'min' => 0,
+							'max' => 60,
+						),
+					),
+					'selectors'  => array( $sel => 'margin-bottom: {{SIZE}}{{UNIT}};' ),
+				)
+			);
+		}
+	}
+
+	/**
+	 * Left / centre / right choices for a CHOOSE control.
+	 *
+	 * @return array
+	 */
+	protected function mcm_align_options() {
+		return array(
+			'left'   => array(
+				'title' => __( 'Left', 'medical-college-manager' ),
+				'icon'  => 'eicon-text-align-left',
+			),
+			'center' => array(
+				'title' => __( 'Centre', 'medical-college-manager' ),
+				'icon'  => 'eicon-text-align-center',
+			),
+			'right'  => array(
+				'title' => __( 'Right', 'medical-college-manager' ),
+				'icon'  => 'eicon-text-align-right',
+			),
+		);
+	}
+
+	/**
+	 * A box: Normal/Hover background, border, shadow; radius and padding.
+	 *
+	 * @param string          $id        Control ID prefix.
+	 * @param string|string[] $selectors Box selectors.
+	 * @param array           $opts      hover (bool), lift (bool), padding (bool), shadow_name.
+	 */
+	protected function mcm_box_style( $id, $selectors, $opts = array() ) {
+		$opts = wp_parse_args(
+			$opts,
+			array(
+				'hover'       => true,
+				'lift'        => false,
+				'padding'     => true,
+				'shadow_name' => $id . '_shadow',
+			)
+		);
+		$sel  = $this->mcm_sel( $selectors );
+		$hsel = $this->mcm_sel( $selectors, ':hover' );
+
+		if ( $opts['hover'] ) {
+			$this->start_controls_tabs( $id . '_tabs' );
+			$this->start_controls_tab( $id . '_tab_normal', array( 'label' => __( 'Normal', 'medical-college-manager' ) ) );
+		}
+		$this->add_group_control(
+			\Elementor\Group_Control_Background::get_type(),
+			array(
+				'name'     => $id . '_bg',
+				'types'    => array( 'classic', 'gradient' ),
+				'exclude'  => array( 'image' ),
+				'selector' => $sel,
+			)
+		);
+		$this->add_group_control(
+			\Elementor\Group_Control_Border::get_type(),
+			array(
+				'name'     => $id . '_border',
+				'selector' => $sel,
+			)
+		);
+		$this->add_group_control(
+			\Elementor\Group_Control_Box_Shadow::get_type(),
+			array(
+				'name'     => $opts['shadow_name'],
+				'selector' => $sel,
+			)
+		);
+		if ( $opts['hover'] ) {
+			$this->end_controls_tab();
+			$this->start_controls_tab( $id . '_tab_hover', array( 'label' => __( 'Hover', 'medical-college-manager' ) ) );
+			$this->add_group_control(
+				\Elementor\Group_Control_Background::get_type(),
+				array(
+					'name'     => $id . '_bg_hover',
+					'types'    => array( 'classic', 'gradient' ),
+					'exclude'  => array( 'image' ),
+					'selector' => $hsel,
+				)
+			);
+			$this->add_control(
+				$id . '_border_hover',
+				array(
+					'label'     => __( 'Border colour', 'medical-college-manager' ),
+					'type'      => \Elementor\Controls_Manager::COLOR,
+					'selectors' => array( $hsel => 'border-color: {{VALUE}};' ),
+				)
+			);
+			$this->add_group_control(
+				\Elementor\Group_Control_Box_Shadow::get_type(),
+				array(
+					'name'     => $id . '_shadow_hover',
+					'selector' => $hsel,
+				)
+			);
+			if ( $opts['lift'] ) {
+				$this->add_control(
+					$id . '_lift',
+					array(
+						'label'      => __( 'Lift on hover', 'medical-college-manager' ),
+						'type'       => \Elementor\Controls_Manager::SLIDER,
+						'size_units' => array( 'px' ),
+						'range'      => array(
+							'px' => array(
+								'min' => 0,
+								'max' => 20,
+							),
+						),
+						'selectors'  => array( $sel => '--mcm-lift: translateY(-{{SIZE}}{{UNIT}});' ),
+					)
+				);
+			}
+			$this->add_control(
+				$id . '_duration',
+				array(
+					'label'     => __( 'Transition (ms)', 'medical-college-manager' ),
+					'type'      => \Elementor\Controls_Manager::SLIDER,
+					'range'     => array(
+						'px' => array(
+							'min' => 0,
+							'max' => 1000,
+						),
+					),
+					'selectors' => array( $sel => 'transition-duration: {{SIZE}}ms;' ),
+				)
+			);
+			$this->end_controls_tab();
+			$this->end_controls_tabs();
+		}
+		$this->add_responsive_control(
+			$id . '_radius',
+			array(
+				'label'      => __( 'Border radius', 'medical-college-manager' ),
+				'type'       => \Elementor\Controls_Manager::DIMENSIONS,
+				'size_units' => array( 'px', '%', 'em' ),
+				'separator'  => 'before',
+				'selectors'  => array( $sel => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}}; overflow: hidden;' ),
+			)
+		);
+		if ( $opts['padding'] ) {
+			$this->mcm_dimensions( $id . '_padding', __( 'Padding', 'medical-college-manager' ), $sel, 'padding' );
+		}
+	}
+
+	/**
+	 * A button or link styled as one: typography, padding, radius, border and
+	 * Normal/Hover text, background and border colours.
+	 *
+	 * @param string          $id        Control ID prefix.
+	 * @param string|string[] $selectors Button selectors.
+	 */
+	protected function mcm_button_style( $id, $selectors ) {
+		$sel  = $this->mcm_sel( $selectors );
+		$hsel = $this->mcm_sel( $selectors, ':hover' ) . ', ' . $this->mcm_sel( $selectors, ':focus-visible' );
+		$this->add_group_control(
+			\Elementor\Group_Control_Typography::get_type(),
+			array(
+				'name'     => $id . '_typo',
+				'selector' => $sel,
+			)
+		);
+		$this->start_controls_tabs( $id . '_tabs' );
+		foreach ( array(
+			'normal' => array( __( 'Normal', 'medical-college-manager' ), $sel ),
+			'hover'  => array( __( 'Hover', 'medical-college-manager' ), $hsel ),
+		) as $state => $cfg ) {
+			$this->start_controls_tab( $id . '_tab_' . $state, array( 'label' => $cfg[0] ) );
+			$this->add_control(
+				$id . '_color_' . $state,
+				array(
+					'label'     => __( 'Text colour', 'medical-college-manager' ),
+					'type'      => \Elementor\Controls_Manager::COLOR,
+					'selectors' => array( $cfg[1] => 'color: {{VALUE}};' ),
+				)
+			);
+			$this->add_control(
+				$id . '_bg_' . $state,
+				array(
+					'label'     => __( 'Background colour', 'medical-college-manager' ),
+					'type'      => \Elementor\Controls_Manager::COLOR,
+					'selectors' => array( $cfg[1] => 'background-color: {{VALUE}};' ),
+				)
+			);
+			$this->add_control(
+				$id . '_bc_' . $state,
+				array(
+					'label'     => __( 'Border colour', 'medical-college-manager' ),
+					'type'      => \Elementor\Controls_Manager::COLOR,
+					'selectors' => array( $cfg[1] => 'border-color: {{VALUE}};' ),
+				)
+			);
+			$this->end_controls_tab();
+		}
+		$this->end_controls_tabs();
+		$this->add_group_control(
+			\Elementor\Group_Control_Border::get_type(),
+			array(
+				'name'      => $id . '_border',
+				'selector'  => $sel,
+				'separator' => 'before',
+			)
+		);
+		$this->add_responsive_control(
+			$id . '_radius',
+			array(
+				'label'      => __( 'Border radius', 'medical-college-manager' ),
+				'type'       => \Elementor\Controls_Manager::DIMENSIONS,
+				'size_units' => array( 'px', '%', 'em' ),
+				'selectors'  => array( $sel => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};' ),
+			)
+		);
+		$this->mcm_dimensions( $id . '_padding', __( 'Padding', 'medical-college-manager' ), $sel, 'padding' );
+	}
+
+	/**
+	 * A badge or label: typography, text, background and border colour,
+	 * radius and padding.
+	 *
+	 * @param string          $id        Control ID prefix.
+	 * @param string|string[] $selectors Badge selectors.
+	 * @param string          $heading   Optional heading above the controls.
+	 */
+	protected function mcm_badge_style( $id, $selectors, $heading = '' ) {
+		$sel = $this->mcm_sel( $selectors );
+		if ( '' !== $heading ) {
+			$this->mcm_heading( $id . '_heading', $heading );
+		}
+		$this->add_group_control(
+			\Elementor\Group_Control_Typography::get_type(),
+			array(
+				'name'     => $id . '_typo',
+				'selector' => $sel,
+			)
+		);
+		foreach ( array(
+			'color' => array( __( 'Text colour', 'medical-college-manager' ), 'color' ),
+			'bg'    => array( __( 'Background colour', 'medical-college-manager' ), 'background-color' ),
+			'bc'    => array( __( 'Border colour', 'medical-college-manager' ), 'border-color' ),
+		) as $key => $cfg ) {
+			$this->add_control(
+				$id . '_' . $key,
+				array(
+					'label'     => $cfg[0],
+					'type'      => \Elementor\Controls_Manager::COLOR,
+					'selectors' => array( $sel => $cfg[1] . ': {{VALUE}};' ),
+				)
+			);
+		}
+		$this->add_responsive_control(
+			$id . '_radius',
+			array(
+				'label'      => __( 'Border radius', 'medical-college-manager' ),
+				'type'       => \Elementor\Controls_Manager::DIMENSIONS,
+				'size_units' => array( 'px', '%', 'em' ),
+				'selectors'  => array( $sel => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};' ),
+			)
+		);
+		$this->mcm_dimensions( $id . '_padding', __( 'Padding', 'medical-college-manager' ), $sel, 'padding' );
+	}
+
+	/**
+	 * Form fields (search box, dropdowns): typography, colours, focus colour,
+	 * border, radius and padding.
+	 *
+	 * @param string          $id        Control ID prefix.
+	 * @param string|string[] $selectors Field selectors.
+	 */
+	protected function mcm_field_style( $id, $selectors ) {
+		$sel = $this->mcm_sel( $selectors );
+		$this->add_group_control(
+			\Elementor\Group_Control_Typography::get_type(),
+			array(
+				'name'     => $id . '_typo',
+				'selector' => $sel,
+			)
+		);
+		foreach ( array(
+			'color' => array( __( 'Text colour', 'medical-college-manager' ), $sel, 'color' ),
+			'ph'    => array( __( 'Placeholder colour', 'medical-college-manager' ), $this->mcm_sel( $selectors, '::placeholder' ), 'color' ),
+			'bg'    => array( __( 'Background colour', 'medical-college-manager' ), $sel, 'background-color' ),
+			'bc'    => array( __( 'Border colour', 'medical-college-manager' ), $sel, 'border-color' ),
+			'focus' => array( __( 'Focus border colour', 'medical-college-manager' ), $this->mcm_sel( $selectors, ':focus' ), 'border-color' ),
+		) as $key => $cfg ) {
+			$this->add_control(
+				$id . '_' . $key,
+				array(
+					'label'     => $cfg[0],
+					'type'      => \Elementor\Controls_Manager::COLOR,
+					'selectors' => array( $cfg[1] => $cfg[2] . ': {{VALUE}};' ),
+				)
+			);
+		}
+		$this->add_responsive_control(
+			$id . '_bw',
+			array(
+				'label'      => __( 'Border width', 'medical-college-manager' ),
+				'type'       => \Elementor\Controls_Manager::SLIDER,
+				'size_units' => array( 'px' ),
+				'range'      => array(
+					'px' => array(
+						'min' => 0,
+						'max' => 6,
+					),
+				),
+				'selectors'  => array( $sel => 'border-width: {{SIZE}}{{UNIT}}; border-style: solid;' ),
+			)
+		);
+		$this->add_responsive_control(
+			$id . '_radius',
+			array(
+				'label'      => __( 'Border radius', 'medical-college-manager' ),
+				'type'       => \Elementor\Controls_Manager::DIMENSIONS,
+				'size_units' => array( 'px', '%', 'em' ),
+				'selectors'  => array( $sel => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};' ),
+			)
+		);
+		$this->mcm_dimensions( $id . '_padding', __( 'Padding', 'medical-college-manager' ), $sel, 'padding' );
+	}
+
+	/**
+	 * Image: height, fit, radius, CSS filters (Normal/Hover), hover zoom.
+	 *
+	 * @param string          $id         Control ID prefix.
+	 * @param string|string[] $images     Image selectors.
+	 * @param string|string[] $hover_imgs Image selectors when the card is hovered.
+	 */
+	protected function mcm_image_style( $id, $images, $hover_imgs ) {
+		$sel  = $this->mcm_sel( $images );
+		$hsel = $this->mcm_sel( $hover_imgs );
+		$this->add_control(
+			$id . '_fit',
+			array(
+				'label'     => __( 'Image fit', 'medical-college-manager' ),
+				'type'      => \Elementor\Controls_Manager::SELECT,
+				'default'   => '',
+				'options'   => array(
+					''        => __( 'Default', 'medical-college-manager' ),
+					'cover'   => __( 'Cover (crop to fill)', 'medical-college-manager' ),
+					'contain' => __( 'Contain (whole image)', 'medical-college-manager' ),
+					'fill'    => __( 'Stretch', 'medical-college-manager' ),
+				),
+				'selectors' => array( $sel => 'object-fit: {{VALUE}};' ),
+			)
+		);
+		$this->add_responsive_control(
+			$id . '_radius',
+			array(
+				'label'      => __( 'Border radius', 'medical-college-manager' ),
+				'type'       => \Elementor\Controls_Manager::DIMENSIONS,
+				'size_units' => array( 'px', '%' ),
+				'selectors'  => array( $sel => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};' ),
+			)
+		);
+		$this->start_controls_tabs( $id . '_tabs' );
+		$this->start_controls_tab( $id . '_tab_normal', array( 'label' => __( 'Normal', 'medical-college-manager' ) ) );
+		$this->add_group_control(
+			\Elementor\Group_Control_Css_Filter::get_type(),
+			array(
+				'name'     => $id . '_filters',
+				'selector' => $sel,
+			)
+		);
+		$this->add_control(
+			$id . '_opacity',
+			array(
+				'label'     => __( 'Opacity', 'medical-college-manager' ),
+				'type'      => \Elementor\Controls_Manager::SLIDER,
+				'range'     => array(
+					'px' => array(
+						'min'  => 0.1,
+						'max'  => 1,
+						'step' => 0.05,
+					),
+				),
+				'selectors' => array( $sel => 'opacity: {{SIZE}};' ),
+			)
+		);
+		$this->end_controls_tab();
+		$this->start_controls_tab( $id . '_tab_hover', array( 'label' => __( 'Hover', 'medical-college-manager' ) ) );
+		$this->add_group_control(
+			\Elementor\Group_Control_Css_Filter::get_type(),
+			array(
+				'name'     => $id . '_filters_hover',
+				'selector' => $hsel,
+			)
+		);
+		$this->add_control(
+			$id . '_opacity_hover',
+			array(
+				'label'     => __( 'Opacity', 'medical-college-manager' ),
+				'type'      => \Elementor\Controls_Manager::SLIDER,
+				'range'     => array(
+					'px' => array(
+						'min'  => 0.1,
+						'max'  => 1,
+						'step' => 0.05,
+					),
+				),
+				'selectors' => array( $hsel => 'opacity: {{SIZE}};' ),
+			)
+		);
+		$this->add_control(
+			$id . '_zoom',
+			array(
+				'label'     => __( 'Zoom on hover', 'medical-college-manager' ),
+				'type'      => \Elementor\Controls_Manager::SLIDER,
+				'range'     => array(
+					'px' => array(
+						'min'  => 1,
+						'max'  => 1.3,
+						'step' => 0.01,
+					),
+				),
+				'selectors' => array( $hsel => 'transform: scale({{SIZE}});' ),
+			)
+		);
+		$this->end_controls_tab();
+		$this->end_controls_tabs();
+	}
+
+	/**
+	 * Typography and colour of the "nothing found" message.
+	 *
+	 * @param array $extra Section arguments (condition).
+	 */
+	protected function mcm_empty_style( $extra = array() ) {
+		$this->mcm_style_section( 'mcm_style_empty', __( 'Empty Message', 'medical-college-manager' ), $extra );
+		$this->mcm_text_style( 'st_empty', '.mcm-empty', array( 'align' => true ) );
+		$this->end_controls_section();
+	}
+
+	/**
+	 * True while the Elementor editor (or its AJAX) builds the panel. Option
+	 * lists that need database reads are only built then, never on the front end.
+	 *
+	 * @return bool
+	 */
+	protected function mcm_in_editor() {
+		return is_admin() || wp_doing_ajax() || ( defined( 'REST_REQUEST' ) && REST_REQUEST );
+	}
+
+	/**
+	 * Term slug => name options for a taxonomy.
+	 *
+	 * @param string $tax Taxonomy name.
+	 * @return array<string,string>
+	 */
+	protected function mcm_term_options( $tax ) {
+		$terms = get_terms(
+			array(
+				'taxonomy'   => $tax,
+				'hide_empty' => false,
+			)
+		);
+		if ( is_wp_error( $terms ) || empty( $terms ) ) {
+			return array();
+		}
+		$out = array();
+		foreach ( $terms as $t ) {
+			$out[ $t->slug ] = $t->name;
+		}
+		return $out;
+	}
+
+	/**
+	 * Post ID => title options for an item picker (editor only, newest 300).
+	 *
+	 * @param string $type Post type.
+	 * @return array<int,string>
+	 */
+	protected function mcm_post_options( $type ) {
+		if ( ! $this->mcm_in_editor() ) {
+			return array();
+		}
+		$ids = get_posts(
+			array(
+				'post_type'      => $type,
+				'post_status'    => 'publish',
+				'posts_per_page' => 300, // phpcs:ignore WordPress.WP.PostsPerPage.posts_per_page_posts_per_page -- Editor-only item picker, IDs only.
+				'fields'         => 'ids',
+				'no_found_rows'  => true,
+			)
+		);
+		$out = array();
+		foreach ( $ids as $id ) {
+			$title      = get_the_title( $id );
+			$out[ $id ] = '' !== $title ? $title : '#' . $id;
+		}
+		return $out;
+	}
+}
+
+/**
  * Shared base: builds the control panel and renders through the same engine
  * the shortcodes use, so views, AJAX filtering and connectors all work.
  */
 abstract class MCM_Elementor_Widget_Base extends \Elementor\Widget_Base {
+
+	use MCM_Elementor_Style;
 
 	/** The CPT this widget lists (e.g. mcm_consultant). */
 	abstract protected function mcm_type();
@@ -82,10 +737,51 @@ abstract class MCM_Elementor_Widget_Base extends \Elementor\Widget_Base {
 	}
 
 	/**
+	 * Fields of this type that a list can be ordered by (meta key => label).
+	 *
+	 * @return array<string,string>
+	 */
+	private function mcm_field_options() {
+		$fields = MCM_Meta::fields();
+		$type   = $this->mcm_type();
+		$out    = array();
+		foreach ( MCM_Query::sortable_meta_keys( $type ) as $key ) {
+			$out[ $key ] = isset( $fields[ $type ]['fields'][ $key ]['label'] ) ? $fields[ $type ]['fields'][ $key ]['label'] : $key;
+		}
+		return $out;
+	}
+
+	/**
+	 * Show a control when the filter bar or the directory sidebar is on.
+	 *
+	 * @return array Elementor "conditions".
+	 */
+	private function mcm_filters_on() {
+		return array(
+			'relation' => 'or',
+			'terms'    => array(
+				array(
+					'name'     => 'filters',
+					'operator' => '===',
+					'value'    => 'yes',
+				),
+				array(
+					'name'     => 'view',
+					'operator' => '===',
+					'value'    => 'directory',
+				),
+			),
+		);
+	}
+
+	/**
 	 * Register the widget controls.
 	 */
 	protected function register_controls() {
-		$type = $this->mcm_type();
+		$type   = $this->mcm_type();
+		$map    = MCM_Query::tax_map();
+		$taxes  = isset( $map[ $type ] ) ? $map[ $type ] : array();
+		$fields = $this->mcm_field_options();
 
 		/* ---- Content ---- */
 		$this->start_controls_section( 'mcm_query', array( 'label' => __( 'Content', 'medical-college-manager' ) ) );
@@ -142,35 +838,105 @@ abstract class MCM_Elementor_Widget_Base extends \Elementor\Widget_Base {
 			)
 		);
 
+		$status = MCM_Query::date_status_options( $type );
+		if ( $status ) {
+			$this->add_control(
+				'status',
+				array(
+					'label'       => __( 'Show', 'medical-college-manager' ),
+					'type'        => \Elementor\Controls_Manager::SELECT,
+					'default'     => '',
+					'options'     => $status,
+					'description' => 'mcm_event' === $type
+						? __( 'Events without a date are listed under All only.', 'medical-college-manager' )
+						: __( 'Items without a closing date count as open.', 'medical-college-manager' ),
+				)
+			);
+		}
+
+		$orderby = array(
+			'date'       => __( 'Date published', 'medical-college-manager' ),
+			'modified'   => __( 'Last updated', 'medical-college-manager' ),
+			'title'      => __( 'Title', 'medical-college-manager' ),
+			'menu_order' => __( 'Menu order', 'medical-college-manager' ),
+			'rand'       => __( 'Random', 'medical-college-manager' ),
+			'post__in'   => __( 'Order of the chosen items', 'medical-college-manager' ),
+		);
+		if ( $fields ) {
+			$orderby['field'] = __( 'A field (e.g. a date)', 'medical-college-manager' );
+		}
 		$this->add_control(
 			'orderby',
 			array(
 				'label'   => __( 'Order by', 'medical-college-manager' ),
 				'type'    => \Elementor\Controls_Manager::SELECT,
 				'default' => 'date',
-				'options' => array(
-					'date'       => __( 'Date', 'medical-college-manager' ),
-					'title'      => __( 'Title', 'medical-college-manager' ),
-					'menu_order' => __( 'Menu order', 'medical-college-manager' ),
-					'rand'       => __( 'Random', 'medical-college-manager' ),
-				),
+				'options' => $orderby,
 			)
 		);
+		if ( $fields ) {
+			$this->add_control(
+				'order_field',
+				array(
+					'label'       => __( 'Field', 'medical-college-manager' ),
+					'type'        => \Elementor\Controls_Manager::SELECT,
+					'default'     => (string) key( $fields ),
+					'options'     => $fields,
+					'description' => __( 'Items with this field empty are listed last.', 'medical-college-manager' ),
+					'condition'   => array( 'orderby' => 'field' ),
+				)
+			);
+		}
 
 		$this->add_control(
 			'order',
 			array(
-				'label'   => __( 'Order', 'medical-college-manager' ),
-				'type'    => \Elementor\Controls_Manager::SELECT,
-				'default' => 'DESC',
-				'options' => array(
+				'label'     => __( 'Order', 'medical-college-manager' ),
+				'type'      => \Elementor\Controls_Manager::SELECT,
+				'default'   => 'DESC',
+				'options'   => array(
 					'DESC' => __( 'Descending', 'medical-college-manager' ),
 					'ASC'  => __( 'Ascending', 'medical-college-manager' ),
 				),
+				'condition' => array( 'orderby!' => array( 'rand', 'post__in' ) ),
+			)
+		);
+
+		$this->add_control(
+			'offset',
+			array(
+				'label'       => __( 'Skip the first', 'medical-college-manager' ),
+				'type'        => \Elementor\Controls_Manager::NUMBER,
+				'min'         => 0,
+				'max'         => 100,
+				'default'     => 0,
+				'description' => __( 'Number of items to leave out at the start (e.g. ones already shown above).', 'medical-college-manager' ),
+			)
+		);
+
+		$this->add_control(
+			'paginate',
+			array(
+				'label'        => __( 'Pagination', 'medical-college-manager' ),
+				'type'         => \Elementor\Controls_Manager::SWITCHER,
+				'return_value' => 'yes',
+				'default'      => '',
+				'description'  => __( 'Numbered pages below the list; "Number of items" is the page size.', 'medical-college-manager' ),
 			)
 		);
 
 		$this->mcm_extra_controls();
+
+		$this->add_control(
+			'empty',
+			array(
+				'label'       => __( 'Message when nothing is found', 'medical-college-manager' ),
+				'type'        => \Elementor\Controls_Manager::TEXT,
+				'placeholder' => __( 'No results found.', 'medical-college-manager' ),
+				'label_block' => true,
+				'separator'   => 'before',
+			)
+		);
 
 		$this->end_controls_section();
 
@@ -188,6 +954,66 @@ abstract class MCM_Elementor_Widget_Base extends \Elementor\Widget_Base {
 				'default'      => 'yes',
 			)
 		);
+		$this->add_control(
+			'search_box',
+			array(
+				'label'        => __( 'Search box', 'medical-college-manager' ),
+				'type'         => \Elementor\Controls_Manager::SWITCHER,
+				'return_value' => 'yes',
+				'default'      => 'yes',
+				'conditions'   => $this->mcm_filters_on(),
+			)
+		);
+		$this->add_control(
+			'placeholder',
+			array(
+				'label'       => __( 'Search placeholder', 'medical-college-manager' ),
+				'type'        => \Elementor\Controls_Manager::TEXT,
+				'placeholder' => __( 'Search by name, keyword…', 'medical-college-manager' ),
+				'label_block' => true,
+				'conditions'  => $this->mcm_filters_on(),
+			)
+		);
+		if ( $taxes ) {
+			$facets = array();
+			foreach ( $taxes as $tax ) {
+				$tobj           = get_taxonomy( $tax );
+				$facets[ $tax ] = $tobj ? $tobj->labels->name : $tax;
+			}
+			$this->add_control(
+				'facets',
+				array(
+					'label'       => __( 'Filters to show', 'medical-college-manager' ),
+					'type'        => \Elementor\Controls_Manager::SELECT2,
+					'multiple'    => true,
+					'label_block' => true,
+					'options'     => $facets,
+					'default'     => array(),
+					'description' => __( 'Leave empty to show every filter.', 'medical-college-manager' ),
+					'conditions'  => $this->mcm_filters_on(),
+				)
+			);
+		}
+		$this->add_control(
+			'reset',
+			array(
+				'label'        => __( 'Reset button', 'medical-college-manager' ),
+				'type'         => \Elementor\Controls_Manager::SWITCHER,
+				'return_value' => 'yes',
+				'default'      => 'yes',
+				'conditions'   => $this->mcm_filters_on(),
+			)
+		);
+		$this->add_control(
+			'search',
+			array(
+				'label'       => __( 'Start with search keyword', 'medical-college-manager' ),
+				'type'        => \Elementor\Controls_Manager::TEXT,
+				'label_block' => true,
+				'description' => __( 'Optional. Lists only items matching this word; with the search box off it stays fixed.', 'medical-college-manager' ),
+				'separator'   => 'before',
+			)
+		);
 
 		$this->add_control(
 			'print',
@@ -196,68 +1022,108 @@ abstract class MCM_Elementor_Widget_Base extends \Elementor\Widget_Base {
 				'type'         => \Elementor\Controls_Manager::SWITCHER,
 				'return_value' => 'yes',
 				'default'      => '',
+				'separator'    => 'before',
+			)
+		);
+		$this->add_control(
+			'print_title',
+			array(
+				'label'       => __( 'Printed page heading', 'medical-college-manager' ),
+				'type'        => \Elementor\Controls_Manager::TEXT,
+				'label_block' => true,
+				'condition'   => array( 'print' => 'yes' ),
 			)
 		);
 
 		$this->end_controls_section();
 
-		/* ---- Optional pre-filter scope ---- */
-		$map   = MCM_Query::tax_map();
-		$taxes = isset( $map[ $type ] ) ? $map[ $type ] : array();
-		if ( $taxes ) {
-			$this->start_controls_section( 'mcm_scope', array( 'label' => __( 'Pre-filter (optional)', 'medical-college-manager' ) ) );
+		/* ---- Include / Exclude ---- */
+		$this->start_controls_section( 'mcm_scope', array( 'label' => __( 'Include / Exclude', 'medical-college-manager' ) ) );
 
+		$this->add_control(
+			'mcm_scope_note',
+			array(
+				'type'            => \Elementor\Controls_Manager::RAW_HTML,
+				'raw'             => __( 'Limit this widget to specific terms. With one term the list is fixed to it; with several, visitors can narrow within them using the filter bar.', 'medical-college-manager' ),
+				'content_classes' => 'elementor-descriptor',
+			)
+		);
+
+		foreach ( $taxes as $tax ) {
+			$options = $this->mcm_term_options( $tax );
+			if ( empty( $options ) ) {
+				continue;
+			}
+			$tobj  = get_taxonomy( $tax );
+			$label = $tobj ? $tobj->labels->singular_name : $tax;
 			$this->add_control(
-				'mcm_scope_note',
+				'tax_' . $tax,
 				array(
-					'type'            => \Elementor\Controls_Manager::RAW_HTML,
-					'raw'             => __( 'Limit this widget to specific terms. With one term the list is fixed to it; with several, visitors can narrow within them using the filter bar.', 'medical-college-manager' ),
-					'content_classes' => 'elementor-descriptor',
+					'label'       => $label,
+					'type'        => \Elementor\Controls_Manager::SELECT2,
+					'options'     => $options,
+					'multiple'    => true,
+					'label_block' => true,
+					'default'     => array(),
 				)
 			);
-
-			foreach ( $taxes as $tax ) {
-				$options = $this->mcm_term_options( $tax );
-				if ( empty( $options ) ) {
-					continue;
-				}
-				$tobj = get_taxonomy( $tax );
-				$this->add_control(
-					'tax_' . $tax,
-					array(
-						'label'       => $tobj ? $tobj->labels->singular_name : $tax,
-						'type'        => \Elementor\Controls_Manager::SELECT2,
-						'options'     => $options,
-						'multiple'    => true,
-						'label_block' => true,
-						'default'     => array(),
-					)
-				);
-			}
-
-			$this->end_controls_section();
+			$this->add_control(
+				'ex_' . $tax,
+				array(
+					/* translators: %s: taxonomy name, e.g. Department. */
+					'label'       => sprintf( __( 'Exclude %s', 'medical-college-manager' ), $label ),
+					'type'        => \Elementor\Controls_Manager::SELECT2,
+					'options'     => $options,
+					'multiple'    => true,
+					'label_block' => true,
+					'default'     => array(),
+				)
+			);
 		}
+
+		$items = $this->mcm_post_options( $type );
+		$this->add_control(
+			'ids',
+			array(
+				'label'       => __( 'Only these items', 'medical-college-manager' ),
+				'type'        => \Elementor\Controls_Manager::SELECT2,
+				'options'     => $items,
+				'multiple'    => true,
+				'label_block' => true,
+				'default'     => array(),
+				'separator'   => 'before',
+			)
+		);
+		$this->add_control(
+			'exclude_ids',
+			array(
+				'label'       => __( 'Leave out these items', 'medical-college-manager' ),
+				'type'        => \Elementor\Controls_Manager::SELECT2,
+				'options'     => $items,
+				'multiple'    => true,
+				'label_block' => true,
+				'default'     => array(),
+			)
+		);
+
+		$this->end_controls_section();
 
 		$this->register_style_controls();
 	}
 
 	/**
-	 * Style tab — every control writes one of the plugin's CSS variables onto
-	 * {{WRAPPER}}, so it cascades to the cards, filters and headings inside and
-	 * overrides the global design just for this widget. Fully responsive where
-	 * it matters (spacing, image height).
+	 * Style tab. The original controls write the plugin's CSS variables onto
+	 * {{WRAPPER}} (so they cascade to everything inside); the rest style one
+	 * part each. Control IDs from earlier versions are kept, so saved pages
+	 * keep their design.
 	 */
 	protected function register_style_controls() {
-		$wrapper = '{{WRAPPER}}';
+		$wrapper  = '{{WRAPPER}}';
+		$cards    = array( '.mcm-card', '.mcm-dir-card', '.mcm-list-item' );
+		$on_cards = array( 'view' => array( 'grid', 'list', 'directory' ) );
 
 		/* ---- Style: Layout & spacing ---- */
-		$this->start_controls_section(
-			'mcm_style_layout',
-			array(
-				'label' => __( 'Layout & Spacing', 'medical-college-manager' ),
-				'tab'   => \Elementor\Controls_Manager::TAB_STYLE,
-			)
-		);
+		$this->mcm_style_section( 'mcm_style_layout', __( 'Layout & Spacing', 'medical-college-manager' ) );
 
 		$this->add_responsive_control(
 			'st_gap',
@@ -320,17 +1186,21 @@ abstract class MCM_Elementor_Widget_Base extends \Elementor\Widget_Base {
 				'condition'  => array( 'view' => array( 'grid', 'directory' ) ),
 			)
 		);
+		$this->add_responsive_control(
+			'st_align',
+			array(
+				'label'     => __( 'Card text alignment', 'medical-college-manager' ),
+				'type'      => \Elementor\Controls_Manager::CHOOSE,
+				'options'   => $this->mcm_align_options(),
+				'selectors' => array( $this->mcm_sel( array( '.mcm-card-body', '.mcm-list-body', '.mcm-dir-card' ) ) => 'text-align: {{VALUE}};' ),
+				'condition' => $on_cards,
+			)
+		);
 
 		$this->end_controls_section();
 
 		/* ---- Style: Colours ---- */
-		$this->start_controls_section(
-			'mcm_style_colors',
-			array(
-				'label' => __( 'Colours', 'medical-college-manager' ),
-				'tab'   => \Elementor\Controls_Manager::TAB_STYLE,
-			)
-		);
+		$this->mcm_style_section( 'mcm_style_colors', __( 'Colours', 'medical-college-manager' ) );
 
 		$colors = array(
 			'st_primary' => array( __( 'Primary (buttons, links)', 'medical-college-manager' ), '--mcm-primary' ),
@@ -354,14 +1224,31 @@ abstract class MCM_Elementor_Widget_Base extends \Elementor\Widget_Base {
 
 		$this->end_controls_section();
 
-		/* ---- Style: Titles (real typography group — loads fonts properly) ---- */
-		$this->start_controls_section(
-			'mcm_style_type',
+		/* ---- Style: Cards ---- */
+		$this->mcm_style_section( 'mcm_style_card', __( 'Cards', 'medical-college-manager' ), array( 'condition' => $on_cards ) );
+		$this->mcm_box_style(
+			'st_card',
+			$cards,
 			array(
-				'label' => __( 'Titles', 'medical-college-manager' ),
-				'tab'   => \Elementor\Controls_Manager::TAB_STYLE,
+				'lift'        => true,
+				'padding'     => false,
+				'shadow_name' => 'st_card_shadow',
 			)
 		);
+		$this->mcm_dimensions( 'st_card_body_pad', __( 'Content padding', 'medical-college-manager' ), $this->mcm_sel( array( '.mcm-card-body', '.mcm-list-item', '.mcm-jobcard-body' ) ), 'padding' );
+		$this->end_controls_section();
+
+		/* ---- Style: Images ---- */
+		$this->mcm_style_section( 'mcm_style_image', __( 'Images', 'medical-college-manager' ), array( 'condition' => $on_cards ) );
+		$this->mcm_image_style(
+			'st_img',
+			array( '.mcm-card-media img', '.mcm-dir-card-media img', '.mcm-list-media img' ),
+			array( '.mcm-card:hover .mcm-card-media img', '.mcm-dir-card:hover .mcm-dir-card-media img', '.mcm-list-item:hover .mcm-list-media img' )
+		);
+		$this->end_controls_section();
+
+		/* ---- Style: Titles (real typography group — loads fonts properly) ---- */
+		$this->mcm_style_section( 'mcm_style_type', __( 'Titles', 'medical-college-manager' ) );
 
 		$title_sel = $wrapper . ' .mcm-card-title, ' . $wrapper . ' .mcm-card-title a, ' . $wrapper . ' .mcm-dir-card-name, '
 			. $wrapper . ' .mcm-dir-card-name a, ' . $wrapper . ' .mcm-list-title, ' . $wrapper . ' .mcm-list-title a';
@@ -374,7 +1261,6 @@ abstract class MCM_Elementor_Widget_Base extends \Elementor\Widget_Base {
 				'selector' => $title_sel,
 			)
 		);
-
 		$this->add_control(
 			'st_title_color',
 			array(
@@ -383,48 +1269,264 @@ abstract class MCM_Elementor_Widget_Base extends \Elementor\Widget_Base {
 				'selectors' => array( $title_sel => 'color: {{VALUE}};' ),
 			)
 		);
+		$this->add_control(
+			'st_title_hover',
+			array(
+				'label'     => __( 'Title hover colour', 'medical-college-manager' ),
+				'type'      => \Elementor\Controls_Manager::COLOR,
+				'selectors' => array( $this->mcm_sel( array( '.mcm-card-title a', '.mcm-dir-card-name a', '.mcm-list-title a', '.mcm-pub-title' ), ':hover' ) => 'color: {{VALUE}};' ),
+			)
+		);
+		$this->add_responsive_control(
+			'st_title_space',
+			array(
+				'label'      => __( 'Spacing below', 'medical-college-manager' ),
+				'type'       => \Elementor\Controls_Manager::SLIDER,
+				'size_units' => array( 'px', 'em' ),
+				'range'      => array(
+					'px' => array(
+						'min' => 0,
+						'max' => 40,
+					),
+				),
+				'selectors'  => array( $this->mcm_sel( array( '.mcm-card-title', '.mcm-dir-card-name', '.mcm-list-title' ) ) => 'margin-bottom: {{SIZE}}{{UNIT}};' ),
+			)
+		);
 
 		$this->end_controls_section();
 
-		/* ---- Style: Cards ---- */
-		$this->start_controls_section(
-			'mcm_style_card',
+		/* ---- Style: Details text ---- */
+		$this->mcm_style_section( 'mcm_style_text', __( 'Details Text', 'medical-college-manager' ) );
+		$this->mcm_text_style(
+			'st_meta',
+			array( '.mcm-meta', '.mcm-meta-value', '.mcm-card-excerpt', '.mcm-dir-card-desig', '.mcm-dir-card-dept', '.mcm-jobcard-dept', '.mcm-pub-meta' ),
+			array( 'heading' => __( 'Details', 'medical-college-manager' ) )
+		);
+		$this->mcm_text_style( 'st_meta_label', array( '.mcm-meta-label', '.mcm-jobcard-label' ), array( 'heading' => __( 'Field labels', 'medical-college-manager' ) ) );
+		$this->mcm_text_style( 'st_spec', array( '.mcm-dir-card-spec', '.mcm-jobcard-cat' ), array( 'heading' => __( 'Specialty / category line', 'medical-college-manager' ) ) );
+		$this->end_controls_section();
+
+		/* ---- Style: Badges ---- */
+		$this->mcm_style_section( 'mcm_style_badge', __( 'Status Badges', 'medical-college-manager' ) );
+		$this->mcm_badge_style( 'st_badge', array( '.mcm-badge', '.mcm-pub-type', '.mcm-pub-oa' ) );
+		foreach ( array(
+			'open'     => __( 'Open / Upcoming event', 'medical-college-manager' ),
+			'closing'  => __( 'Closing soon / Today', 'medical-college-manager' ),
+			'upcoming' => __( 'Opening later', 'medical-college-manager' ),
+			'closed'   => __( 'Closed / Past', 'medical-college-manager' ),
+		) as $state => $label ) {
+			$badge = $this->mcm_sel( '.mcm-badge--' . $state );
+			$this->mcm_heading( 'st_badge_' . $state . '_heading', $label );
+			$this->add_control(
+				'st_badge_' . $state,
+				array(
+					'label'     => __( 'Background colour', 'medical-college-manager' ),
+					'type'      => \Elementor\Controls_Manager::COLOR,
+					'selectors' => array( $badge => 'background-color: {{VALUE}}; border-color: {{VALUE}};' ),
+				)
+			);
+			$this->add_control(
+				'st_badge_' . $state . '_text',
+				array(
+					'label'     => __( 'Text colour', 'medical-college-manager' ),
+					'type'      => \Elementor\Controls_Manager::COLOR,
+					'selectors' => array( $badge => 'color: {{VALUE}};' ),
+				)
+			);
+		}
+		$this->end_controls_section();
+
+		/* ---- Style: Buttons ---- */
+		$this->mcm_style_section( 'mcm_style_button', __( 'Buttons & Links', 'medical-college-manager' ) );
+		$this->mcm_button_style( 'st_btn', array( '.mcm-card-link', '.mcm-list-link', '.mcm-dir-card-btn', '.mcm-jobcard-btn', '.mcm-pub-link', '.mcm-table-link' ) );
+		$this->end_controls_section();
+
+		/* ---- Style: Filter bar ---- */
+		$filters_on = array( 'conditions' => $this->mcm_filters_on() );
+		$this->mcm_style_section( 'mcm_style_filters', __( 'Filter Bar', 'medical-college-manager' ), $filters_on );
+		$this->mcm_heading( 'st_fbar_heading', __( 'Bar', 'medical-college-manager' ) );
+		$this->mcm_box_style( 'st_fbar', array( '.mcm-filters', '.mcm-dir-aside' ), array( 'hover' => false ) );
+		$this->add_responsive_control(
+			'st_fbar_gap',
 			array(
-				'label' => __( 'Cards', 'medical-college-manager' ),
-				'tab'   => \Elementor\Controls_Manager::TAB_STYLE,
+				'label'      => __( 'Gap between fields', 'medical-college-manager' ),
+				'type'       => \Elementor\Controls_Manager::SLIDER,
+				'size_units' => array( 'px' ),
+				'range'      => array(
+					'px' => array(
+						'min' => 0,
+						'max' => 40,
+					),
+				),
+				'selectors'  => array( $this->mcm_sel( '.mcm-filters' ) => 'gap: {{SIZE}}{{UNIT}};' ),
 			)
 		);
-		$this->add_group_control(
-			\Elementor\Group_Control_Box_Shadow::get_type(),
+		$this->mcm_heading( 'st_field_heading', __( 'Search box & dropdowns', 'medical-college-manager' ) );
+		$this->mcm_field_style( 'st_field', array( '.mcm-search', '.mcm-filter-tax' ) );
+		$this->mcm_heading( 'st_reset_heading', __( 'Reset & search buttons', 'medical-college-manager' ) );
+		$this->mcm_button_style( 'st_reset', array( 'button.mcm-reset', 'button.mcm-search-btn' ) );
+		$this->end_controls_section();
+
+		/* ---- Style: Directory sidebar ---- */
+		$this->mcm_style_section( 'mcm_style_sidebar', __( 'Directory Sidebar', 'medical-college-manager' ), array( 'condition' => array( 'view' => 'directory' ) ) );
+		$this->add_responsive_control(
+			'st_side_w',
 			array(
-				'name'     => 'st_card_shadow',
-				'label'    => __( 'Card shadow', 'medical-college-manager' ),
-				'selector' => $wrapper . ' .mcm-card, ' . $wrapper . ' .mcm-dir-card, ' . $wrapper . ' .mcm-list-item',
+				'label'      => __( 'Sidebar width', 'medical-college-manager' ),
+				'type'       => \Elementor\Controls_Manager::SLIDER,
+				'size_units' => array( 'px', '%' ),
+				'range'      => array(
+					'px' => array(
+						'min' => 160,
+						'max' => 480,
+					),
+					'%'  => array(
+						'min' => 15,
+						'max' => 50,
+					),
+				),
+				'selectors'  => array( $this->mcm_sel( '.mcm-directory' ) => '--mcm-side-w: {{SIZE}}{{UNIT}};' ),
+			)
+		);
+		$this->mcm_text_style( 'st_facet_title', '.mcm-dir-facet-title', array( 'heading' => __( 'Filter headings', 'medical-college-manager' ) ) );
+		$this->mcm_text_style( 'st_facet_label', '.mcm-dir-checks label', array( 'heading' => __( 'Options', 'medical-college-manager' ) ) );
+		$this->add_control(
+			'st_facet_check',
+			array(
+				'label'     => __( 'Checkbox colour', 'medical-college-manager' ),
+				'type'      => \Elementor\Controls_Manager::COLOR,
+				'selectors' => array( $this->mcm_sel( '.mcm-dir-checks input' ) => 'accent-color: {{VALUE}};' ),
 			)
 		);
 		$this->end_controls_section();
-	}
 
-	/**
-	 * Term slug => name options for a taxonomy.
-	 *
-	 * @param string $tax Taxonomy name.
-	 */
-	private function mcm_term_options( $tax ) {
-		$terms = get_terms(
+		/* ---- Style: Table ---- */
+		$this->mcm_style_section( 'mcm_style_table', __( 'Table', 'medical-college-manager' ), array( 'condition' => array( 'view' => array( 'table', 'directory' ) ) ) );
+		$this->mcm_text_style( 'st_th', '.mcm-table thead th', array( 'heading' => __( 'Header', 'medical-college-manager' ) ) );
+		$this->add_control(
+			'st_th_bg',
 			array(
-				'taxonomy'   => $tax,
-				'hide_empty' => false,
+				'label'     => __( 'Header background', 'medical-college-manager' ),
+				'type'      => \Elementor\Controls_Manager::COLOR,
+				'selectors' => array( $this->mcm_sel( '.mcm-table thead th' ) => 'background-color: {{VALUE}};' ),
 			)
 		);
-		if ( is_wp_error( $terms ) || empty( $terms ) ) {
-			return array();
+		$this->mcm_text_style( 'st_td', '.mcm-table tbody td', array( 'heading' => __( 'Rows', 'medical-college-manager' ) ) );
+		foreach ( array(
+			'st_tr_bg'     => array( __( 'Row background', 'medical-college-manager' ), '.mcm-table tbody tr', 'background-color' ),
+			'st_tr_stripe' => array( __( 'Striped row background', 'medical-college-manager' ), '.mcm-table tbody tr:nth-child(even)', 'background-color' ),
+			'st_tr_hover'  => array( __( 'Row hover background', 'medical-college-manager' ), '.mcm-table tbody tr:hover', 'background-color' ),
+			'st_td_border' => array( __( 'Line colour', 'medical-college-manager' ), '.mcm-table tbody td', 'border-color' ),
+		) as $id => $cfg ) {
+			$this->add_control(
+				$id,
+				array(
+					'label'     => $cfg[0],
+					'type'      => \Elementor\Controls_Manager::COLOR,
+					'selectors' => array( $this->mcm_sel( $cfg[1] ) => $cfg[2] . ': {{VALUE}};' ),
+				)
+			);
 		}
-		$out = array();
-		foreach ( $terms as $t ) {
-			$out[ $t->slug ] = $t->name;
+		$this->mcm_dimensions( 'st_cell_pad', __( 'Cell padding', 'medical-college-manager' ), $this->mcm_sel( array( '.mcm-table thead th', '.mcm-table tbody td' ) ), 'padding' );
+		$this->mcm_heading( 'st_table_box', __( 'Table frame', 'medical-college-manager' ) );
+		$this->mcm_box_style( 'st_tablewrap', '.mcm-table-wrap', array( 'hover' => false ) );
+		$this->end_controls_section();
+
+		/* ---- Style: Citations ---- */
+		$this->mcm_style_section( 'mcm_style_cite', __( 'Citations', 'medical-college-manager' ), array( 'condition' => array( 'view' => array( 'citation', 'directory' ) ) ) );
+		$this->mcm_text_style(
+			'st_cite_title',
+			'.mcm-pub-title',
+			array(
+				'heading' => __( 'Title', 'medical-college-manager' ),
+				'hover'   => array( '.mcm-pub-title:hover' ),
+			)
+		);
+		$this->mcm_text_style( 'st_cite_text', '.mcm-pub-cite', array( 'heading' => __( 'Citation', 'medical-college-manager' ) ) );
+		$this->mcm_text_style( 'st_cite_year', '.mcm-pub-year', array( 'heading' => __( 'Year', 'medical-college-manager' ) ) );
+		$this->mcm_heading( 'st_cite_items', __( 'Items', 'medical-college-manager' ) );
+		$this->add_control(
+			'st_cite_num',
+			array(
+				'label'     => __( 'Number colour', 'medical-college-manager' ),
+				'type'      => \Elementor\Controls_Manager::COLOR,
+				'selectors' => array( $this->mcm_sel( '.mcm-pub-item::before' ) => 'color: {{VALUE}};' ),
+			)
+		);
+		$this->add_control(
+			'st_cite_line',
+			array(
+				'label'     => __( 'Divider colour', 'medical-college-manager' ),
+				'type'      => \Elementor\Controls_Manager::COLOR,
+				'selectors' => array( $this->mcm_sel( '.mcm-pub-item' ) => 'border-color: {{VALUE}};' ),
+			)
+		);
+		$this->mcm_dimensions( 'st_cite_pad', __( 'Item padding', 'medical-college-manager' ), $this->mcm_sel( '.mcm-pub-item' ), 'padding' );
+		$this->end_controls_section();
+
+		/* ---- Style: Pagination ---- */
+		$this->mcm_style_section( 'mcm_style_pagination', __( 'Pagination', 'medical-college-manager' ), array( 'condition' => array( 'paginate' => 'yes' ) ) );
+		$this->add_responsive_control(
+			'st_pg_align',
+			array(
+				'label'     => __( 'Alignment', 'medical-college-manager' ),
+				'type'      => \Elementor\Controls_Manager::CHOOSE,
+				'options'   => array(
+					'flex-start' => array(
+						'title' => __( 'Left', 'medical-college-manager' ),
+						'icon'  => 'eicon-text-align-left',
+					),
+					'center'     => array(
+						'title' => __( 'Centre', 'medical-college-manager' ),
+						'icon'  => 'eicon-text-align-center',
+					),
+					'flex-end'   => array(
+						'title' => __( 'Right', 'medical-college-manager' ),
+						'icon'  => 'eicon-text-align-right',
+					),
+				),
+				'selectors' => array( $this->mcm_sel( '.mcm-pagination .page-numbers' ) => 'justify-content: {{VALUE}};' ),
+			)
+		);
+		$this->add_responsive_control(
+			'st_pg_space',
+			array(
+				'label'      => __( 'Space above', 'medical-college-manager' ),
+				'type'       => \Elementor\Controls_Manager::SLIDER,
+				'size_units' => array( 'px' ),
+				'range'      => array(
+					'px' => array(
+						'min' => 0,
+						'max' => 80,
+					),
+				),
+				'selectors'  => array( $this->mcm_sel( '.mcm-pagination' ) => 'margin-top: {{SIZE}}{{UNIT}};' ),
+			)
+		);
+		$this->mcm_button_style( 'st_pg', array( '.mcm-pagination a.page-numbers', '.mcm-pagination span.page-numbers' ) );
+		$this->mcm_heading( 'st_pg_current', __( 'Current page', 'medical-college-manager' ) );
+		foreach ( array(
+			'st_pg_cur_color' => array( __( 'Text colour', 'medical-college-manager' ), 'color' ),
+			'st_pg_cur_bg'    => array( __( 'Background colour', 'medical-college-manager' ), 'background-color' ),
+			'st_pg_cur_bc'    => array( __( 'Border colour', 'medical-college-manager' ), 'border-color' ),
+		) as $id => $cfg ) {
+			$this->add_control(
+				$id,
+				array(
+					'label'     => $cfg[0],
+					'type'      => \Elementor\Controls_Manager::COLOR,
+					'selectors' => array( $this->mcm_sel( '.mcm-pagination .page-numbers.current' ) => $cfg[1] . ': {{VALUE}};' ),
+				)
+			);
 		}
-		return $out;
+		$this->end_controls_section();
+
+		/* ---- Style: Print button ---- */
+		$this->mcm_style_section( 'mcm_style_print', __( 'Print Button', 'medical-college-manager' ), array( 'condition' => array( 'print' => 'yes' ) ) );
+		$this->mcm_button_style( 'st_print', 'button.mcm-print-btn' );
+		$this->end_controls_section();
+
+		$this->mcm_empty_style();
 	}
 
 	/**
@@ -445,19 +1547,47 @@ abstract class MCM_Elementor_Widget_Base extends \Elementor\Widget_Base {
 	/** Unguarded widget output; see render(). */
 	protected function mcm_output() {
 		$s    = $this->get_settings_for_display();
+		$s    = is_array( $s ) ? $s : array();
 		$type = $this->mcm_type();
 		$view = in_array( isset( $s['view'] ) ? $s['view'] : '', array( 'grid', 'list', 'table', 'directory', 'citation' ), true ) ? $s['view'] : $this->mcm_default_view();
+		$yes  = function ( $key, $fallback ) use ( $s ) {
+			if ( ! isset( $s[ $key ] ) ) {
+				return $fallback;
+			}
+			return 'yes' === $s[ $key ] ? 'yes' : 'no';
+		};
+		$text = function ( $key ) use ( $s ) {
+			return isset( $s[ $key ] ) ? sanitize_text_field( MCM_Safe::str( $s[ $key ] ) ) : '';
+		};
 
-		$atts = array(
-			'type'    => $type,
-			'view'    => $view,
-			'columns' => max( 1, min( 6, (int) ( ! empty( $s['columns'] ) ? $s['columns'] : 3 ) ) ),
-			'count'   => max( 1, (int) ( ! empty( $s['count'] ) ? $s['count'] : 12 ) ),
-			'filters' => ( isset( $s['filters'] ) && 'yes' === $s['filters'] ) ? 'yes' : 'no',
-			'print'   => ( isset( $s['print'] ) && 'yes' === $s['print'] ) ? 'yes' : 'no',
-			'orderby' => ! empty( $s['orderby'] ) ? $s['orderby'] : 'date',
-			'order'   => ( isset( $s['order'] ) && 'ASC' === $s['order'] ) ? 'ASC' : 'DESC',
+		$orderby = ! empty( $s['orderby'] ) ? sanitize_key( MCM_Safe::str( $s['orderby'] ) ) : 'date';
+		$atts    = array(
+			'type'        => $type,
+			'view'        => $view,
+			'columns'     => max( 1, min( 6, (int) ( ! empty( $s['columns'] ) ? $s['columns'] : 3 ) ) ),
+			'count'       => max( 1, (int) ( ! empty( $s['count'] ) ? $s['count'] : 12 ) ),
+			'filters'     => $yes( 'filters', 'no' ),
+			'print'       => $yes( 'print', 'no' ),
+			'orderby'     => $orderby,
+			'order'       => ( isset( $s['order'] ) && 'ASC' === $s['order'] ) ? 'ASC' : 'DESC',
+			'paginate'    => $yes( 'paginate', 'no' ),
+			'offset'      => isset( $s['offset'] ) ? absint( $s['offset'] ) : 0,
+			'search_box'  => $yes( 'search_box', 'yes' ),
+			'reset'       => $yes( 'reset', 'yes' ),
+			'placeholder' => $text( 'placeholder' ),
+			'search'      => $text( 'search' ),
+			'print_title' => $text( 'print_title' ),
+			'empty'       => $text( 'empty' ),
+			'facets'      => isset( $s['facets'] ) && is_array( $s['facets'] ) ? implode( ',', array_map( 'sanitize_key', $s['facets'] ) ) : '',
+			'ids'         => isset( $s['ids'] ) ? implode( ',', MCM_Query::id_list( $s['ids'] ) ) : '',
+			'exclude_ids' => isset( $s['exclude_ids'] ) ? implode( ',', MCM_Query::id_list( $s['exclude_ids'] ) ) : '',
 		);
+		if ( 'field' === $orderby && ! empty( $s['order_field'] ) ) {
+			$atts['meta_key'] = sanitize_key( MCM_Safe::str( $s['order_field'] ) ); // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Listing attribute (whitelisted per type in MCM_Query), not a query argument.
+		}
+		if ( MCM_Query::date_status_options( $type ) && ! empty( $s['status'] ) ) {
+			$atts['status'] = sanitize_key( MCM_Safe::str( $s['status'] ) );
+		}
 
 		$map   = MCM_Query::tax_map();
 		$taxes = isset( $map[ $type ] ) ? $map[ $type ] : array();
@@ -465,16 +1595,22 @@ abstract class MCM_Elementor_Widget_Base extends \Elementor\Widget_Base {
 		// it), not a visitor filter. A control saved before 1.30.2 holds a
 		// single slug string; newer ones hold an array — both are accepted.
 		$prefilter = array();
+		$exclude   = array();
 		foreach ( $taxes as $tax ) {
-			$key = 'tax_' . $tax;
-			if ( ! empty( $s[ $key ] ) ) {
-				$prefilter[ $tax ] = MCM_Query::normalize_slugs( $s[ $key ] );
+			if ( ! empty( $s[ 'tax_' . $tax ] ) ) {
+				$prefilter[ $tax ] = MCM_Query::normalize_slugs( $s[ 'tax_' . $tax ] );
+			}
+			if ( ! empty( $s[ 'ex_' . $tax ] ) ) {
+				$exclude[ $tax ] = MCM_Query::normalize_slugs( $s[ 'ex_' . $tax ] );
 			}
 		}
 		if ( $prefilter ) {
 			$atts['prefilter'] = $prefilter;
 		}
-		$atts = $this->mcm_extra_atts( $atts, is_array( $s ) ? $s : array() );
+		if ( $exclude ) {
+			$atts['exclude_terms'] = $exclude;
+		}
+		$atts = $this->mcm_extra_atts( $atts, $s );
 
 		echo MCM_Shortcodes::render_block( $atts ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
@@ -1007,6 +2143,8 @@ class MCM_Widget_Publications extends MCM_Elementor_Widget_Base {
  */
 class MCM_Widget_Blog extends \Elementor\Widget_Base {
 
+	use MCM_Elementor_Style;
+
 	/**
 	 * Widget machine name.
 	 */
@@ -1051,6 +2189,39 @@ class MCM_Widget_Blog extends \Elementor\Widget_Base {
 		$this->start_controls_section( 'mcm_blog', array( 'label' => __( 'Blog Posts', 'medical-college-manager' ) ) );
 
 		$this->add_control(
+			'layout',
+			array(
+				'label'   => __( 'Layout', 'medical-college-manager' ),
+				'type'    => \Elementor\Controls_Manager::SELECT,
+				'default' => 'list',
+				'options' => array(
+					'list' => __( 'List (date badge rows)', 'medical-college-manager' ),
+					'grid' => __( 'Grid (cards)', 'medical-college-manager' ),
+				),
+			)
+		);
+		$this->add_responsive_control(
+			'columns',
+			array(
+				'label'          => __( 'Columns', 'medical-college-manager' ),
+				'type'           => \Elementor\Controls_Manager::SELECT,
+				'default'        => '3',
+				'tablet_default' => '2',
+				'mobile_default' => '1',
+				'options'        => array(
+					'1' => '1',
+					'2' => '2',
+					'3' => '3',
+					'4' => '4',
+					'5' => '5',
+					'6' => '6',
+				),
+				'condition'      => array( 'layout' => 'grid' ),
+				'selectors'      => array( '{{WRAPPER}} .mcm-blog--grid' => '--mcm-blog-cols: {{VALUE}};' ),
+			)
+		);
+
+		$this->add_control(
 			'intro',
 			array(
 				'label' => __( 'Intro text (optional)', 'medical-college-manager' ),
@@ -1071,17 +2242,6 @@ class MCM_Widget_Blog extends \Elementor\Widget_Base {
 		);
 
 		$this->add_control(
-			'category',
-			array(
-				'label'       => __( 'Categories', 'medical-college-manager' ),
-				'type'        => \Elementor\Controls_Manager::SELECT2,
-				'multiple'    => true,
-				'label_block' => true,
-				'options'     => $this->mcm_category_options(),
-			)
-		);
-
-		$this->add_control(
 			'orderby',
 			array(
 				'label'   => __( 'Order by', 'medical-college-manager' ),
@@ -1089,8 +2249,10 @@ class MCM_Widget_Blog extends \Elementor\Widget_Base {
 				'default' => 'date',
 				'options' => array(
 					'date'          => __( 'Date', 'medical-college-manager' ),
+					'modified'      => __( 'Last updated', 'medical-college-manager' ),
 					'title'         => __( 'Title', 'medical-college-manager' ),
 					'comment_count' => __( 'Most commented', 'medical-college-manager' ),
+					'menu_order'    => __( 'Menu order', 'medical-college-manager' ),
 					'rand'          => __( 'Random', 'medical-college-manager' ),
 				),
 			)
@@ -1099,13 +2261,34 @@ class MCM_Widget_Blog extends \Elementor\Widget_Base {
 		$this->add_control(
 			'order',
 			array(
-				'label'   => __( 'Order', 'medical-college-manager' ),
-				'type'    => \Elementor\Controls_Manager::SELECT,
-				'default' => 'DESC',
-				'options' => array(
+				'label'     => __( 'Order', 'medical-college-manager' ),
+				'type'      => \Elementor\Controls_Manager::SELECT,
+				'default'   => 'DESC',
+				'options'   => array(
 					'DESC' => __( 'Newest first', 'medical-college-manager' ),
 					'ASC'  => __( 'Oldest first', 'medical-college-manager' ),
 				),
+				'condition' => array( 'orderby!' => 'rand' ),
+			)
+		);
+
+		$this->add_control(
+			'show_thumb',
+			array(
+				'label'        => __( 'Show image', 'medical-college-manager' ),
+				'type'         => \Elementor\Controls_Manager::SWITCHER,
+				'return_value' => 'yes',
+				'default'      => 'yes',
+				'separator'    => 'before',
+			)
+		);
+		$this->add_control(
+			'show_date',
+			array(
+				'label'        => __( 'Show date', 'medical-college-manager' ),
+				'type'         => \Elementor\Controls_Manager::SWITCHER,
+				'return_value' => 'yes',
+				'default'      => 'yes',
 			)
 		);
 
@@ -1121,33 +2304,253 @@ class MCM_Widget_Blog extends \Elementor\Widget_Base {
 		);
 
 		$this->add_control(
+			'show_more',
+			array(
+				'label'        => __( 'Show read-more link', 'medical-college-manager' ),
+				'type'         => \Elementor\Controls_Manager::SWITCHER,
+				'return_value' => 'yes',
+				'default'      => 'yes',
+			)
+		);
+		$this->add_control(
 			'read_more',
 			array(
 				'label'       => __( 'Read-more label', 'medical-college-manager' ),
 				'type'        => \Elementor\Controls_Manager::TEXT,
 				'placeholder' => __( 'Read More', 'medical-college-manager' ),
+				'condition'   => array( 'show_more' => 'yes' ),
+			)
+		);
+
+		$this->add_control(
+			'empty',
+			array(
+				'label'       => __( 'Message when there are no posts', 'medical-college-manager' ),
+				'type'        => \Elementor\Controls_Manager::TEXT,
+				'placeholder' => __( 'No posts found.', 'medical-college-manager' ),
+				'label_block' => true,
+				'separator'   => 'before',
 			)
 		);
 
 		$this->end_controls_section();
+
+		/* ---- Include / Exclude ---- */
+		$this->start_controls_section( 'mcm_blog_query', array( 'label' => __( 'Include / Exclude', 'medical-college-manager' ) ) );
+		$categories = $this->mcm_term_options( 'category' );
+		$this->add_control(
+			'category',
+			array(
+				'label'       => __( 'Categories', 'medical-college-manager' ),
+				'type'        => \Elementor\Controls_Manager::SELECT2,
+				'multiple'    => true,
+				'label_block' => true,
+				'options'     => $categories,
+			)
+		);
+		$this->add_control(
+			'exclude_category',
+			array(
+				'label'       => __( 'Exclude categories', 'medical-college-manager' ),
+				'type'        => \Elementor\Controls_Manager::SELECT2,
+				'multiple'    => true,
+				'label_block' => true,
+				'options'     => $categories,
+			)
+		);
+		$this->add_control(
+			'tag',
+			array(
+				'label'       => __( 'Tags', 'medical-college-manager' ),
+				'type'        => \Elementor\Controls_Manager::SELECT2,
+				'multiple'    => true,
+				'label_block' => true,
+				'options'     => $this->mcm_term_options( 'post_tag' ),
+			)
+		);
+		$this->add_control(
+			'author',
+			array(
+				'label'   => __( 'Author', 'medical-college-manager' ),
+				'type'    => \Elementor\Controls_Manager::SELECT,
+				'default' => '',
+				'options' => array( '' => __( 'Any', 'medical-college-manager' ) ) + $this->mcm_author_options(),
+			)
+		);
+		$this->add_control(
+			'offset',
+			array(
+				'label'       => __( 'Skip the first', 'medical-college-manager' ),
+				'type'        => \Elementor\Controls_Manager::NUMBER,
+				'min'         => 0,
+				'max'         => 50,
+				'default'     => 0,
+				'description' => __( 'Number of posts to leave out at the start.', 'medical-college-manager' ),
+			)
+		);
+		$this->end_controls_section();
+
+		$this->register_style_controls();
 	}
 
 	/**
-	 * Blog category options (slug => name).
+	 * Style tab.
 	 */
-	private function mcm_category_options() {
-		$terms = get_terms(
+	protected function register_style_controls() {
+		$grid = array( 'layout' => 'grid' );
+
+		$this->mcm_style_section( 'mcm_blog_style_layout', __( 'Layout & Spacing', 'medical-college-manager' ) );
+		$this->add_responsive_control(
+			'st_gap',
 			array(
-				'taxonomy'   => 'category',
-				'hide_empty' => false,
+				'label'      => __( 'Gap between posts', 'medical-college-manager' ),
+				'type'       => \Elementor\Controls_Manager::SLIDER,
+				'size_units' => array( 'px' ),
+				'range'      => array(
+					'px' => array(
+						'min' => 0,
+						'max' => 80,
+					),
+				),
+				'selectors'  => array(
+					'{{WRAPPER}} .mcm-blog--grid' => '--mcm-blog-gap: {{SIZE}}{{UNIT}};',
+					'{{WRAPPER}} .mcm-blog:not(.mcm-blog--grid) .mcm-post' => 'margin-bottom: {{SIZE}}{{UNIT}}; padding-bottom: {{SIZE}}{{UNIT}};',
+				),
 			)
 		);
-		if ( is_wp_error( $terms ) || empty( $terms ) ) {
+		$this->add_control(
+			'st_divider',
+			array(
+				'label'     => __( 'Divider colour', 'medical-college-manager' ),
+				'type'      => \Elementor\Controls_Manager::COLOR,
+				'selectors' => array( '{{WRAPPER}} .mcm-blog' => '--mcm-blog-line: {{VALUE}};' ),
+			)
+		);
+		$this->end_controls_section();
+
+		$this->mcm_style_section( 'mcm_blog_style_card', __( 'Cards', 'medical-college-manager' ), array( 'condition' => $grid ) );
+		$this->mcm_box_style(
+			'st_card',
+			'.mcm-blog--grid .mcm-post',
+			array(
+				'lift'    => true,
+				'padding' => false,
+			)
+		);
+		$this->mcm_dimensions( 'st_card_pad', __( 'Content padding', 'medical-college-manager' ), $this->mcm_sel( array( '.mcm-blog--grid .mcm-post-body', '.mcm-blog--grid .mcm-post-meta' ) ), 'padding' );
+		$this->end_controls_section();
+
+		$this->mcm_style_section( 'mcm_blog_style_image', __( 'Image', 'medical-college-manager' ), array( 'condition' => array( 'show_thumb' => 'yes' ) ) );
+		$this->add_responsive_control(
+			'st_img_h',
+			array(
+				'label'      => __( 'Image height', 'medical-college-manager' ),
+				'type'       => \Elementor\Controls_Manager::SLIDER,
+				'size_units' => array( 'px' ),
+				'range'      => array(
+					'px' => array(
+						'min' => 80,
+						'max' => 600,
+					),
+				),
+				'selectors'  => array( $this->mcm_sel( array( '.mcm-post-thumb img', '.mcm-post-thumb-ph' ) ) => 'height: {{SIZE}}{{UNIT}};' ),
+			)
+		);
+		$this->mcm_image_style( 'st_img', '.mcm-post-thumb img', '.mcm-post:hover .mcm-post-thumb img' );
+		$this->end_controls_section();
+
+		$this->mcm_style_section( 'mcm_blog_style_date', __( 'Date Badge', 'medical-college-manager' ), array( 'condition' => array( 'show_date' => 'yes' ) ) );
+		$this->mcm_text_style( 'st_day', '.mcm-date-badge .mcm-day', array( 'heading' => __( 'Day', 'medical-college-manager' ) ) );
+		$this->mcm_text_style( 'st_ym', '.mcm-date-badge .mcm-ym', array( 'heading' => __( 'Month & year', 'medical-college-manager' ) ) );
+		$this->mcm_heading( 'st_badge_box', __( 'Badge', 'medical-college-manager' ) );
+		$this->mcm_box_style( 'st_badge', '.mcm-date-badge', array( 'hover' => false ) );
+		$this->add_control(
+			'st_pen_hide',
+			array(
+				'label'        => __( 'Hide pen tile', 'medical-college-manager' ),
+				'type'         => \Elementor\Controls_Manager::SWITCHER,
+				'return_value' => 'yes',
+				'default'      => '',
+				'separator'    => 'before',
+				'selectors'    => array( '{{WRAPPER}} .mcm-edit-tile' => 'display: none;' ),
+			)
+		);
+		$this->add_control(
+			'st_pen_bg',
+			array(
+				'label'     => __( 'Pen tile background', 'medical-college-manager' ),
+				'type'      => \Elementor\Controls_Manager::COLOR,
+				'selectors' => array( '{{WRAPPER}} .mcm-edit-tile' => 'background-color: {{VALUE}};' ),
+				'condition' => array( 'st_pen_hide!' => 'yes' ),
+			)
+		);
+		$this->add_control(
+			'st_pen_color',
+			array(
+				'label'     => __( 'Pen colour', 'medical-college-manager' ),
+				'type'      => \Elementor\Controls_Manager::COLOR,
+				'selectors' => array( '{{WRAPPER}} .mcm-edit-tile' => 'color: {{VALUE}};' ),
+				'condition' => array( 'st_pen_hide!' => 'yes' ),
+			)
+		);
+		$this->end_controls_section();
+
+		$this->mcm_style_section( 'mcm_blog_style_title', __( 'Title', 'medical-college-manager' ) );
+		$this->mcm_text_style(
+			'st_title',
+			array( '.mcm-post-title', '.mcm-post-title a' ),
+			array(
+				'hover'   => array( '.mcm-post-title a:hover' ),
+				'align'   => true,
+				'spacing' => true,
+			)
+		);
+		$this->end_controls_section();
+
+		$this->mcm_style_section( 'mcm_blog_style_excerpt', __( 'Excerpt', 'medical-college-manager' ) );
+		$this->mcm_text_style(
+			'st_excerpt',
+			'.mcm-post-excerpt',
+			array( 'align' => true )
+		);
+		$this->end_controls_section();
+
+		$this->mcm_style_section( 'mcm_blog_style_more', __( 'Read More', 'medical-college-manager' ), array( 'condition' => array( 'show_more' => 'yes' ) ) );
+		$this->mcm_button_style( 'st_more', 'a.mcm-read-more' );
+		$this->end_controls_section();
+
+		$this->mcm_style_section( 'mcm_blog_style_intro', __( 'Intro Text', 'medical-college-manager' ) );
+		$this->mcm_text_style(
+			'st_intro',
+			'.mcm-blog-intro',
+			array(
+				'align'   => true,
+				'spacing' => true,
+			)
+		);
+		$this->end_controls_section();
+
+		$this->mcm_empty_style();
+	}
+
+	/**
+	 * User ID => name options for authors with published posts (editor only).
+	 *
+	 * @return array<int,string>
+	 */
+	private function mcm_author_options() {
+		if ( ! $this->mcm_in_editor() ) {
 			return array();
 		}
 		$out = array();
-		foreach ( $terms as $t ) {
-			$out[ $t->slug ] = $t->name;
+		foreach ( get_users(
+			array(
+				'has_published_posts' => array( 'post' ),
+				'fields'              => array( 'ID', 'display_name' ),
+				'number'              => 200,
+			)
+		) as $u ) {
+			$out[ (int) $u->ID ] = $u->display_name;
 		}
 		return $out;
 	}
@@ -1169,21 +2572,34 @@ class MCM_Widget_Blog extends \Elementor\Widget_Base {
 
 	/** Unguarded widget output; see render(). */
 	protected function mcm_output() {
-		$s   = $this->get_settings_for_display();
-		$cat = isset( $s['category'] ) ? $s['category'] : '';
-		if ( is_array( $cat ) ) {
-			$cat = implode( ',', $cat );
-		}
+		$s     = $this->get_settings_for_display();
+		$s     = is_array( $s ) ? $s : array();
+		$slugs = function ( $key ) use ( $s ) {
+			return isset( $s[ $key ] ) ? implode( ',', MCM_Query::normalize_slugs( $s[ $key ] ) ) : '';
+		};
+		$yes   = function ( $key ) use ( $s ) {
+			return ( ! isset( $s[ $key ] ) || 'yes' === $s[ $key ] ) ? 'yes' : 'no';
+		};
 
 		$html = MCM_Blog::render(
 			array(
-				'count'     => ! empty( $s['count'] ) ? (int) $s['count'] : 6,
-				'orderby'   => ! empty( $s['orderby'] ) ? $s['orderby'] : 'date',
-				'order'     => ( isset( $s['order'] ) && 'ASC' === $s['order'] ) ? 'ASC' : 'DESC',
-				'category'  => $cat,
-				'excerpt'   => isset( $s['excerpt'] ) ? (int) $s['excerpt'] : 30,
-				'intro'     => ! empty( $s['intro'] ) ? $s['intro'] : '',
-				'read_more' => ! empty( $s['read_more'] ) ? $s['read_more'] : '',
+				'count'            => ! empty( $s['count'] ) ? (int) $s['count'] : 6,
+				'orderby'          => ! empty( $s['orderby'] ) ? $s['orderby'] : 'date',
+				'order'            => ( isset( $s['order'] ) && 'ASC' === $s['order'] ) ? 'ASC' : 'DESC',
+				'category'         => $slugs( 'category' ),
+				'exclude_category' => $slugs( 'exclude_category' ),
+				'tag'              => $slugs( 'tag' ),
+				'author'           => ! empty( $s['author'] ) ? (string) absint( $s['author'] ) : '',
+				'offset'           => isset( $s['offset'] ) ? absint( $s['offset'] ) : 0,
+				'excerpt'          => isset( $s['excerpt'] ) ? (int) $s['excerpt'] : 30,
+				'intro'            => ! empty( $s['intro'] ) ? $s['intro'] : '',
+				'read_more'        => ! empty( $s['read_more'] ) ? $s['read_more'] : '',
+				'layout'           => ( isset( $s['layout'] ) && 'grid' === $s['layout'] ) ? 'grid' : 'list',
+				'columns'          => ! empty( $s['columns'] ) ? (int) $s['columns'] : 3,
+				'show_thumb'       => $yes( 'show_thumb' ),
+				'show_date'        => $yes( 'show_date' ),
+				'show_more'        => $yes( 'show_more' ),
+				'empty'            => isset( $s['empty'] ) ? sanitize_text_field( MCM_Safe::str( $s['empty'] ) ) : '',
 			)
 		);
 		echo $html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- MCM_Blog::render() escapes everything it outputs.
@@ -1194,6 +2610,8 @@ class MCM_Widget_Blog extends \Elementor\Widget_Base {
  * Base for the three notice widgets — shared controls + settings mapping.
  */
 abstract class MCM_Widget_Notice_Base extends \Elementor\Widget_Base {
+
+	use MCM_Elementor_Style;
 
 	/**
 	 * Department options (slug => name) for the department control.
@@ -1322,6 +2740,17 @@ abstract class MCM_Widget_Notice_Base extends \Elementor\Widget_Base {
 			)
 		);
 		$this->add_control(
+			'days',
+			array(
+				'label'       => __( 'Only from the last … days', 'medical-college-manager' ),
+				'type'        => \Elementor\Controls_Manager::NUMBER,
+				'min'         => 0,
+				'max'         => 365,
+				'default'     => 0,
+				'description' => __( '0 shows all current notices.', 'medical-college-manager' ),
+			)
+		);
+		$this->add_control(
 			'show_date',
 			array(
 				'label'        => __( 'Show date', 'medical-college-manager' ),
@@ -1337,6 +2766,152 @@ abstract class MCM_Widget_Notice_Base extends \Elementor\Widget_Base {
 				'type'         => \Elementor\Controls_Manager::SWITCHER,
 				'return_value' => 'yes',
 				'default'      => 'yes',
+			)
+		);
+	}
+
+	/**
+	 * Style tab for one notice widget.
+	 *
+	 * @param string $kind ticker | board | list.
+	 */
+	protected function mcm_notice_style( $kind ) {
+		if ( 'ticker' === $kind ) {
+			$this->mcm_style_section( 'mcm_ns_box', __( 'Bar', 'medical-college-manager' ) );
+			$this->mcm_box_style( 'st_box', '.mcm-ticker', array( 'hover' => false ) );
+			$this->add_responsive_control(
+				'st_bar_h',
+				array(
+					'label'      => __( 'Height', 'medical-college-manager' ),
+					'type'       => \Elementor\Controls_Manager::SLIDER,
+					'size_units' => array( 'px' ),
+					'range'      => array(
+						'px' => array(
+							'min' => 28,
+							'max' => 90,
+						),
+					),
+					'selectors'  => array( '{{WRAPPER}} .mcm-ticker-item' => 'height: {{SIZE}}{{UNIT}};' ),
+				)
+			);
+			$this->end_controls_section();
+
+			$this->mcm_style_section( 'mcm_ns_label', __( 'Label', 'medical-college-manager' ) );
+			$this->mcm_text_style( 'st_label', '.mcm-ticker-label' );
+			$this->add_control(
+				'st_label_bg',
+				array(
+					'label'     => __( 'Background colour', 'medical-college-manager' ),
+					'type'      => \Elementor\Controls_Manager::COLOR,
+					'selectors' => array( '{{WRAPPER}} .mcm-ticker-label' => 'background-color: {{VALUE}};' ),
+				)
+			);
+			$this->mcm_dimensions( 'st_label_pad', __( 'Padding', 'medical-college-manager' ), '{{WRAPPER}} .mcm-ticker-label', 'padding' );
+			$this->end_controls_section();
+
+			$this->mcm_style_section( 'mcm_ns_items', __( 'Notices', 'medical-college-manager' ) );
+			$this->mcm_text_style( 'st_item', '.mcm-ticker-text', array( 'hover' => array( '.mcm-ticker-item:hover .mcm-ticker-text', '.mcm-ticker-item:focus-visible .mcm-ticker-text' ) ) );
+			$this->mcm_dimensions( 'st_item_pad', __( 'Padding', 'medical-college-manager' ), '{{WRAPPER}} .mcm-ticker-item', 'padding' );
+			$this->end_controls_section();
+		} elseif ( 'board' === $kind ) {
+			$this->mcm_style_section( 'mcm_ns_box', __( 'Box', 'medical-college-manager' ) );
+			$this->mcm_box_style( 'st_box', '.mcm-board', array( 'hover' => false ) );
+			$this->end_controls_section();
+
+			$this->mcm_style_section( 'mcm_ns_head', __( 'Heading Bar', 'medical-college-manager' ) );
+			$this->mcm_text_style( 'st_head', '.mcm-board-title' );
+			$this->add_control(
+				'st_head_bg',
+				array(
+					'label'     => __( 'Background colour', 'medical-college-manager' ),
+					'type'      => \Elementor\Controls_Manager::COLOR,
+					'selectors' => array( '{{WRAPPER}} .mcm-board-head' => 'background-color: {{VALUE}};' ),
+				)
+			);
+			$this->add_control(
+				'st_head_icon',
+				array(
+					'label'     => __( 'Pause button colour', 'medical-college-manager' ),
+					'type'      => \Elementor\Controls_Manager::COLOR,
+					'selectors' => array( '{{WRAPPER}} .mcm-board-head .mcm-scroll-pause' => 'color: {{VALUE}}; border-color: {{VALUE}};' ),
+				)
+			);
+			$this->mcm_dimensions( 'st_head_pad', __( 'Padding', 'medical-college-manager' ), '{{WRAPPER}} .mcm-board-head', 'padding' );
+			$this->end_controls_section();
+
+			$this->mcm_style_section( 'mcm_ns_items', __( 'Notices', 'medical-college-manager' ) );
+			$this->mcm_text_style( 'st_item', '.mcm-board-item-title', array( 'hover' => array( '.mcm-board-item-title:hover', '.mcm-board-item-title:focus-visible' ) ) );
+			$this->mcm_notice_rows( '.mcm-board-item' );
+			$this->end_controls_section();
+
+			$this->mcm_style_section( 'mcm_ns_more', __( 'View All Link', 'medical-college-manager' ), array( 'condition' => array( 'more' => 'yes' ) ) );
+			$this->mcm_button_style( 'st_more', 'a.mcm-board-more' );
+			$this->end_controls_section();
+		} else {
+			$this->mcm_style_section( 'mcm_ns_box', __( 'Box', 'medical-college-manager' ) );
+			$this->mcm_box_style( 'st_box', '.mcm-notice-list', array( 'hover' => false ) );
+			$this->end_controls_section();
+
+			$this->mcm_style_section( 'mcm_ns_items', __( 'Notices', 'medical-college-manager' ) );
+			$this->mcm_text_style( 'st_item', '.mcm-notice-link', array( 'hover' => array( '.mcm-notice-link:hover', '.mcm-notice-link:focus-visible' ) ) );
+			$this->mcm_notice_rows( '.mcm-notice-row' );
+			$this->add_control(
+				'st_row_stripe',
+				array(
+					'label'     => __( 'Striped row background', 'medical-college-manager' ),
+					'type'      => \Elementor\Controls_Manager::COLOR,
+					'selectors' => array( '{{WRAPPER}} .mcm-notice-row:nth-child(even)' => 'background-color: {{VALUE}};' ),
+				)
+			);
+			$this->end_controls_section();
+		}
+
+		$this->mcm_style_section( 'mcm_ns_date', __( 'Date', 'medical-college-manager' ), array( 'condition' => array( 'show_date' => 'yes' ) ) );
+		$this->mcm_text_style( 'st_date', '.mcm-notice-date' );
+		$this->end_controls_section();
+
+		$this->mcm_style_section( 'mcm_ns_badges', __( 'Badges', 'medical-college-manager' ) );
+		$this->mcm_badge_style( 'st_badge', '.mcm-notice-badge', __( 'Category badge', 'medical-college-manager' ) );
+		$this->mcm_badge_style( 'st_new', '.mcm-notice-new', __( '"New" tag', 'medical-college-manager' ) );
+		$this->mcm_text_style( 'st_deadline', '.mcm-notice-deadline', array( 'heading' => __( 'Deadline text', 'medical-college-manager' ) ) );
+		$this->add_control(
+			'st_urgent',
+			array(
+				'label'     => __( 'Urgent colour', 'medical-college-manager' ),
+				'type'      => \Elementor\Controls_Manager::COLOR,
+				'separator' => 'before',
+				'selectors' => array(
+					'{{WRAPPER}} .mcm-notice--urgent' => 'border-left-color: {{VALUE}};',
+					'{{WRAPPER}} .mcm-notice--urgent .mcm-notice-badge' => 'background-color: {{VALUE}};',
+				),
+			)
+		);
+		$this->end_controls_section();
+
+		$this->mcm_empty_style();
+	}
+
+	/**
+	 * Row padding, divider and hover background for board and list rows.
+	 *
+	 * @param string $row Row selector.
+	 */
+	private function mcm_notice_rows( $row ) {
+		$this->mcm_dimensions( 'st_row_pad', __( 'Row padding', 'medical-college-manager' ), '{{WRAPPER}} ' . $row, 'padding' );
+		$this->add_control(
+			'st_row_line',
+			array(
+				'label'     => __( 'Divider colour', 'medical-college-manager' ),
+				'type'      => \Elementor\Controls_Manager::COLOR,
+				'selectors' => array( '{{WRAPPER}} ' . $row => 'border-bottom-color: {{VALUE}};' ),
+			)
+		);
+		$this->add_control(
+			'st_row_hover',
+			array(
+				'label'     => __( 'Row hover background', 'medical-college-manager' ),
+				'type'      => \Elementor\Controls_Manager::COLOR,
+				'selectors' => array( '{{WRAPPER}} ' . $row . ':hover' => 'background-color: {{VALUE}};' ),
 			)
 		);
 	}
@@ -1359,6 +2934,7 @@ abstract class MCM_Widget_Notice_Base extends \Elementor\Widget_Base {
 				'include'    => $include,
 				'department' => isset( $s['department'] ) ? sanitize_title( MCM_Safe::str( $s['department'] ) ) : '',
 				'priority'   => ! empty( $s['priority'] ) ? $s['priority'] : '',
+				'days'       => ! empty( $s['days'] ) ? absint( $s['days'] ) : 0,
 				'speed'      => ! empty( $s['speed'] ) ? (int) $s['speed'] : 5,
 				'label'      => ! empty( $s['label'] ) ? $s['label'] : '',
 				'title'      => ! empty( $s['title'] ) ? $s['title'] : '',
@@ -1424,6 +3000,7 @@ class MCM_Widget_Notice_Ticker extends MCM_Widget_Notice_Base {
 			)
 		);
 		$this->end_controls_section();
+		$this->mcm_notice_style( 'ticker' );
 	}
 	/**
 	 * Render boundary: a failing widget renders nothing for visitors (and a
@@ -1518,6 +3095,7 @@ class MCM_Widget_Notice_Board extends MCM_Widget_Notice_Base {
 			)
 		);
 		$this->end_controls_section();
+		$this->mcm_notice_style( 'board' );
 	}
 	/**
 	 * Render boundary: a failing widget renders nothing for visitors (and a
@@ -1575,6 +3153,7 @@ class MCM_Widget_Notices extends MCM_Widget_Notice_Base {
 		$this->start_controls_section( 'mcm_notice', array( 'label' => __( 'Notices List', 'medical-college-manager' ) ) );
 		$this->mcm_common_controls();
 		$this->end_controls_section();
+		$this->mcm_notice_style( 'list' );
 	}
 	/**
 	 * Render boundary: a failing widget renders nothing for visitors (and a

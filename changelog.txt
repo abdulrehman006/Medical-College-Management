@@ -106,6 +106,30 @@ Medical College Manager — complete changelog.
 * Accessibility: department and program pages no longer announce each section
   title twice to screen readers.
 * PHP 8.5: CSV import no longer triggers a deprecation notice.
+* Elementor widgets: every widget now has the full Elementor set of options.
+  - Content: show Upcoming / Past events and Open / Closed admissions,
+    scholarships and tenders; order by a field (e.g. event date, items
+    without it last) or by the order items were picked; skip the first N;
+    pagination; your own "nothing found" message.
+  - Filters: search box, placeholder, which dropdowns and the Reset button
+    can each be chosen; a starting search keyword (fixed when the search box
+    is off); printed page heading.
+  - Include / Exclude: leave out terms of any taxonomy; only these items or
+    leave out these items. All of these survive live filtering and paging.
+  - Style: cards, images, titles, details text, status badges, buttons, filter
+    bar and fields, directory sidebar, table, citations, pagination, print
+    button and the empty message, with Normal / Hover states where they
+    apply. Existing pages look exactly as before.
+  - Blog Posts: Grid layout with columns per device; show/hide image, date
+    and read-more; exclude categories, tags, author, offset; full Style tab.
+  - Notice Ticker / Board / List: "only from the last N days"; full Style tabs.
+  The same options are available as shortcode attributes (see readme).
+* Fixed: a paginated list on an ordinary page ([mcm_events paginate="yes"])
+  showed page 1 again on /page/2/.
+* Accessibility: the "Last date" label and old dates on job cards now meet
+  4.5:1 contrast on the grey deadline box.
+* Fixed: links in table view took the theme's hover colour (Hello Elementor);
+  they now keep the plugin's link colour.
 
 = 1.31.0 =
 New: Jobs / Vacancies.

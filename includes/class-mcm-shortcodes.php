@@ -109,6 +109,13 @@ class MCM_Shortcodes {
 		$a   = MCM_Query::parse_atts( is_array( $atts ) ? $atts : array() );
 		$uid = 'mcm-' . wp_generate_password( 6, false, false );
 
+		// A paginated list placed on a page follows the page's own /page/N/
+		// (WordPress sets "paged" on archives and "page" on single pages).
+		// Archive templates pass the page number themselves.
+		if ( MCM_Query::truthy( $a['paginate'] ) && (int) $a['paged'] <= 1 && ! wp_doing_ajax() ) {
+			$a['paged'] = max( 1, (int) get_query_var( 'paged' ), (int) get_query_var( 'page' ) );
+		}
+
 		// [mcm_students], [mcm_table type="mcm_student"]… render nothing when the
 		// public student directory is switched off and the viewer is not staff.
 		if ( 'mcm_student' === $a['type'] && ! MCM_Query::students_visible() ) {
@@ -142,6 +149,21 @@ class MCM_Shortcodes {
 			'paginate'  => $a['paginate'],
 			'paged'     => (int) $a['paged'],
 		);
+		// The author's other choices must survive AJAX too; only sent when set.
+		$extra = array(
+			'ids'           => implode( ',', MCM_Query::id_list( $a['ids'] ) ),
+			'exclude_ids'   => implode( ',', MCM_Query::id_list( $a['exclude_ids'] ) ),
+			'offset'        => absint( $a['offset'] ),
+			'exclude_terms' => MCM_Query::exclude_terms( $a ),
+			'empty'         => sanitize_text_field( MCM_Safe::str( $a['empty'] ) ),
+			// With no search box the starting keyword is fixed.
+			'fixed_search'  => self::truthy( $a['search_box'] ) ? '' : sanitize_text_field( MCM_Safe::str( $a['search'] ) ),
+		);
+		foreach ( $extra as $key => $value ) {
+			if ( ! empty( $value ) ) {
+				$data[ $key ] = 'exclude_terms' === $key ? (object) $value : $value;
+			}
+		}
 
 		$show_filters = self::truthy( $a['filters'] );
 

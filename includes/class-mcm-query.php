@@ -120,8 +120,23 @@ class MCM_Query {
 			'meta_type'     => '',            // e.g. DATE, NUMERIC, CHAR.
 			'paged'         => 1,
 			'class_css'     => '',
-			// Jobs: open (default) | closed | all.
+			// Jobs: open (default) | closed | all. Admissions: open | upcoming |
+			// closed. Scholarships, tenders: open | closed. Events: upcoming |
+			// past. Empty = all (jobs: open).
 			'status'        => '',
+			// Specific items (comma separated IDs) / items to leave out.
+			'ids'           => '',
+			'exclude_ids'   => '',
+			// Skip the first N items.
+			'offset'        => 0,
+			// Filter bar parts: search box, which dropdowns (comma separated
+			// taxonomies, empty = all), Reset button, search placeholder.
+			'search_box'    => 'yes',
+			'facets'        => '',
+			'reset'         => 'yes',
+			'placeholder'   => '',
+			// Message shown when nothing matches (empty = the default text).
+			'empty'         => '',
 			// Generic per-taxonomy attribute (slug = taxonomy without mcm_ prefix).
 			'department'    => '',
 			'session'       => '',
@@ -144,10 +159,12 @@ class MCM_Query {
 			'prefilter'     => array(),
 			// Internal: the author scope round-tripped through data-config (AJAX).
 			'scope'         => array(),
+			// Internal: taxonomy => slug(s) the AUTHOR left out (Elementor).
+			'exclude_terms' => array(),
 		);
 		$a = wp_parse_args( $atts, $defaults );
 
-		foreach ( array( 'tax_filters', 'prefilter', 'scope' ) as $key ) {
+		foreach ( array( 'tax_filters', 'prefilter', 'scope', 'exclude_terms' ) as $key ) {
 			if ( ! is_array( $a[ $key ] ) ) {
 				$a[ $key ] = array();
 			}
@@ -367,21 +384,54 @@ class MCM_Query {
 				'terms'    => $slugs,
 			);
 		}
+		// Terms the author left out always stay out.
+		foreach ( self::exclude_terms( $a ) as $tax => $slugs ) {
+			$tax_query[] = array(
+				'taxonomy' => $tax,
+				'field'    => 'slug',
+				'terms'    => $slugs,
+				'operator' => 'NOT IN',
+			);
+		}
 		if ( count( $tax_query ) > 1 ) {
 			$tax_query['relation'] = 'AND';
 		}
 
 		$paginate = self::truthy( $a['paginate'] );
+		$count    = (int) $a['count'];
+		$paged    = max( 1, (int) $a['paged'] );
+		$offset   = absint( $a['offset'] );
+		$orderby  = sanitize_key( $a['orderby'] );
+		$order    = ( 'ASC' === strtoupper( $a['order'] ) ) ? 'ASC' : 'DESC';
+		$by_field = 'field' === $orderby && '' !== $a['meta_key'];
 		$args     = array(
 			'post_type'      => $a['type'],
 			'post_status'    => 'publish',
-			'posts_per_page' => (int) $a['count'],
-			'paged'          => max( 1, (int) $a['paged'] ),
-			'orderby'        => sanitize_key( $a['orderby'] ),
-			'order'          => ( 'ASC' === strtoupper( $a['order'] ) ) ? 'ASC' : 'DESC',
+			'posts_per_page' => $count,
+			'paged'          => $paged,
+			'orderby'        => $by_field ? 'date' : $orderby,
+			'order'          => $order,
 			// Found rows are only needed when we render pagination.
 			'no_found_rows'  => ! $paginate,
 		);
+		// WordPress ignores paged once offset is set, so page through by hand.
+		if ( $offset > 0 ) {
+			$args['offset'] = $offset + ( $paged - 1 ) * max( 1, $count );
+		}
+
+		$ids = self::id_list( $a['ids'] );
+		if ( $ids ) {
+			$args['post__in'] = $ids;
+		}
+		$exclude_ids = self::id_list( $a['exclude_ids'] );
+		if ( $exclude_ids ) {
+			$args['post__not_in'] = $exclude_ids; // phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_post__not_in -- The author's short list of items to leave out.
+		}
+
+		$date_meta = self::date_status_meta_query( $a['type'], $a['status'] );
+		if ( $date_meta ) {
+			$args['meta_query'] = $date_meta; // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
+		}
 
 		if ( ! empty( $tax_query ) ) {
 			$args['tax_query'] = $tax_query; // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
@@ -395,8 +445,15 @@ class MCM_Query {
 				$args['s'] = $search;
 			}
 		}
-		// Sorting by a meta field (e.g. event date) requires a meta_key.
-		if ( '' !== $a['meta_key'] ) {
+		if ( $by_field ) {
+			// Order by one of the type's fields; items with the field empty
+			// are kept and sorted last (a bare meta_key would hide them).
+			$key = sanitize_key( $a['meta_key'] );
+			if ( in_array( $key, self::sortable_meta_keys( $a['type'] ), true ) ) {
+				$args = self::order_by_optional_meta( $args, $key, self::field_cast( $a['type'], $key ), $order );
+			}
+		} elseif ( '' !== $a['meta_key'] ) {
+			// Sorting by a meta field (e.g. event date) requires a meta_key.
 			$args['meta_key'] = sanitize_key( $a['meta_key'] ); // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
 			if ( '' !== $a['meta_type'] ) {
 				// WP_Query expects an upper-case SQL type from a fixed set.
@@ -408,7 +465,158 @@ class MCM_Query {
 			}
 		}
 
-		return new WP_Query( apply_filters( 'mcm_query_args', $args, $a ) );
+		$query = new WP_Query( apply_filters( 'mcm_query_args', $args, $a ) );
+
+		// Pages are counted from the items after the offset.
+		if ( $offset > 0 && $paginate ) {
+			$query->found_posts   = max( 0, (int) $query->found_posts - $offset );
+			$query->max_num_pages = (int) ceil( $query->found_posts / max( 1, $count ) );
+		}
+		return $query;
+	}
+
+	/**
+	 * Comma separated (or array) post IDs as a clean list of positive integers.
+	 *
+	 * @param mixed $value Raw value.
+	 * @return int[]
+	 */
+	public static function id_list( $value ) {
+		if ( is_array( $value ) ) {
+			$value = implode( ',', array_map( array( 'MCM_Safe', 'str' ), $value ) );
+		}
+		$ids = array_filter( array_map( 'absint', explode( ',', MCM_Safe::str( $value ) ) ) );
+		return array_slice( array_values( array_unique( $ids ) ), 0, 500 );
+	}
+
+	/**
+	 * The author's excluded terms: taxonomy => slugs, valid taxonomies only.
+	 *
+	 * @param array $a Parsed attributes.
+	 * @return array
+	 */
+	public static function exclude_terms( $a ) {
+		$out = array();
+		foreach ( (array) $a['exclude_terms'] as $tax => $slugs ) {
+			$tax   = sanitize_key( MCM_Safe::str( $tax ) );
+			$slugs = self::normalize_slugs( $slugs );
+			if ( $slugs && taxonomy_exists( $tax ) ) {
+				$out[ $tax ] = $slugs;
+			}
+		}
+		return $out;
+	}
+
+	/**
+	 * SQL cast for ordering by one of a type's fields.
+	 *
+	 * @param string $type Post type.
+	 * @param string $key  Meta key.
+	 * @return string DATE, SIGNED or CHAR.
+	 */
+	private static function field_cast( $type, $key ) {
+		$fields = MCM_Meta::fields();
+		$ftype  = isset( $fields[ $type ]['fields'][ $key ]['type'] ) ? $fields[ $type ]['fields'][ $key ]['type'] : '';
+		if ( 'date' === $ftype ) {
+			return 'DATE';
+		}
+		return 'number' === $ftype ? 'SIGNED' : 'CHAR';
+	}
+
+	/**
+	 * Status choices offered for a dated type (value => label); empty when the
+	 * type has no date status. Jobs keep their own Open/Closed/All control.
+	 *
+	 * @param string $type Post type.
+	 * @return array<string,string>
+	 */
+	public static function date_status_options( $type ) {
+		$all = array( '' => __( 'All', 'medical-college-manager' ) );
+		switch ( $type ) {
+			case 'mcm_event':
+				return $all + array(
+					'upcoming' => __( 'Upcoming (today and later)', 'medical-college-manager' ),
+					'past'     => __( 'Past', 'medical-college-manager' ),
+				);
+			case 'mcm_admission':
+				return $all + array(
+					'open'     => __( 'Open now', 'medical-college-manager' ),
+					'upcoming' => __( 'Opening later', 'medical-college-manager' ),
+					'closed'   => __( 'Closed', 'medical-college-manager' ),
+				);
+			case 'mcm_scholarship':
+			case 'mcm_tender':
+				return $all + array(
+					'open'   => __( 'Open', 'medical-college-manager' ),
+					'closed' => __( 'Closed', 'medical-college-manager' ),
+				);
+		}
+		return array();
+	}
+
+	/**
+	 * Meta query for a dated type's status filter, using the same dates as the
+	 * status badges (date_status()). Items with no closing date count as open;
+	 * events with no date are only listed under All.
+	 *
+	 * @param string $type   Post type.
+	 * @param string $status Status value.
+	 * @return array Empty for All or an unknown status.
+	 */
+	public static function date_status_meta_query( $type, $status ) {
+		$status = sanitize_key( MCM_Safe::str( $status ) );
+		if ( '' === $status || ! isset( self::date_status_options( $type )[ $status ] ) ) {
+			return array();
+		}
+		$today = current_time( 'Y-m-d' );
+		$cmp   = function ( $key, $compare ) use ( $today ) {
+			return array(
+				'key'     => $key,
+				'value'   => $today,
+				'compare' => $compare,
+				'type'    => 'DATE',
+			);
+		};
+		$empty = function ( $key ) {
+			return array(
+				'relation' => 'OR',
+				array(
+					'key'     => $key,
+					'compare' => 'NOT EXISTS',
+				),
+				array(
+					'key'     => $key,
+					'value'   => '',
+					'compare' => '=',
+				),
+			);
+		};
+		$or    = function ( $a, $b ) {
+			return array(
+				'relation' => 'OR',
+				$a,
+				$b,
+			);
+		};
+
+		if ( 'mcm_event' === $type ) {
+			return array( $cmp( 'mcm_event_date', 'upcoming' === $status ? '>=' : '<' ) );
+		}
+		$close = 'mcm_admission' === $type ? 'mcm_close_date' : ( 'mcm_tender' === $type ? 'mcm_tender_close' : 'mcm_scholarship_deadline' );
+		if ( 'closed' === $status ) {
+			return array( $cmp( $close, '<' ) );
+		}
+		if ( 'upcoming' === $status ) {
+			return array( $cmp( 'mcm_open_date', '>' ) );
+		}
+		$meta = array(
+			'relation' => 'AND',
+			$or( $empty( $close ), $cmp( $close, '>=' ) ),
+		);
+		if ( 'mcm_admission' === $type ) {
+			$meta[] = $or( $empty( 'mcm_open_date' ), $cmp( 'mcm_open_date', '<=' ) );
+		}
+		return $meta;
 	}
 
 	/*
@@ -581,17 +789,21 @@ class MCM_Query {
 		$placeholder = ( 'mcm_student' === $a['type'] )
 			? __( 'Search by name, ID or PMDC No.…', 'medical-college-manager' )
 			: __( 'Search by name, keyword…', 'medical-college-manager' );
+		$placeholder = self::placeholder( $a, $placeholder );
+		$facets      = self::facet_list( $a );
 
 		$scope = self::scope_terms( $a );
 
 		ob_start();
 		?>
 		<div class="mcm-filters" data-type="<?php echo esc_attr( $a['type'] ); ?>">
-			<input type="search" class="mcm-search" aria-label="<?php echo esc_attr( $placeholder ); ?>" placeholder="<?php echo esc_attr( $placeholder ); ?>" value="<?php echo esc_attr( $a['search'] ); ?>" />
+			<?php if ( self::truthy( $a['search_box'] ) ) : ?>
+				<input type="search" class="mcm-search" aria-label="<?php echo esc_attr( $placeholder ); ?>" placeholder="<?php echo esc_attr( $placeholder ); ?>" value="<?php echo esc_attr( $a['search'] ); ?>" />
+			<?php endif; ?>
 			<?php
 			foreach ( $taxes as $tax ) {
 				// The locked taxonomy is fixed by the archive context — no dropdown.
-				if ( $tax === $a['lock_tax'] ) {
+				if ( $tax === $a['lock_tax'] || ( $facets && ! in_array( $tax, $facets, true ) ) ) {
 					continue;
 				}
 				// Honour the author's pre-filter: hidden for one term, limited
@@ -614,10 +826,35 @@ class MCM_Query {
 				<?php
 			}
 			?>
-			<button type="button" class="mcm-reset"><?php esc_html_e( 'Reset', 'medical-college-manager' ); ?></button>
+			<?php if ( self::truthy( $a['reset'] ) ) : ?>
+				<button type="button" class="mcm-reset"><?php esc_html_e( 'Reset', 'medical-college-manager' ); ?></button>
+			<?php endif; ?>
 		</div>
 		<?php
 		return ob_get_clean();
+	}
+
+	/**
+	 * The search placeholder: the author's text, else the type's default.
+	 *
+	 * @param array  $a       Parsed attributes.
+	 * @param string $fallback Default text.
+	 * @return string
+	 */
+	private static function placeholder( $a, $fallback ) {
+		$own = trim( sanitize_text_field( MCM_Safe::str( $a['placeholder'] ) ) );
+		return '' !== $own ? $own : $fallback;
+	}
+
+	/**
+	 * Taxonomies the author chose to show as filters (empty = all of them).
+	 *
+	 * @param array $a Parsed attributes.
+	 * @return string[]
+	 */
+	private static function facet_list( $a ) {
+		$list = is_array( $a['facets'] ) ? $a['facets'] : explode( ',', MCM_Safe::str( $a['facets'] ) );
+		return array_values( array_filter( array_map( 'sanitize_key', array_map( array( 'MCM_Safe', 'str' ), $list ) ) ) );
 	}
 
 	/**
@@ -1019,19 +1256,23 @@ class MCM_Query {
 		$placeholder = ( 'mcm_consultant' === $a['type'] )
 			? __( 'Find a Consultant …', 'medical-college-manager' )
 			: __( 'Search by name, keyword…', 'medical-college-manager' );
+		$placeholder = self::placeholder( $a, $placeholder );
+		$facets      = self::facet_list( $a );
 
 		$scope = self::scope_terms( $a );
 
 		ob_start();
 		?>
 		<div class="mcm-dir-filters" data-type="<?php echo esc_attr( $a['type'] ); ?>">
+			<?php if ( self::truthy( $a['search_box'] ) ) : ?>
 			<div class="mcm-dir-search">
 				<input type="search" class="mcm-search" aria-label="<?php echo esc_attr( $placeholder ); ?>" placeholder="<?php echo esc_attr( $placeholder ); ?>" value="<?php echo esc_attr( $a['search'] ); ?>" />
 				<button type="button" class="mcm-search-btn mcm-search-btn--icon"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path fill="currentColor" d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 10-.7.7l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0a4.5 4.5 0 110-9 4.5 4.5 0 010 9z"/></svg><span class="mcm-sr-only"><?php esc_html_e( 'Search', 'medical-college-manager' ); ?></span></button>
 			</div>
+			<?php endif; ?>
 			<?php
 			foreach ( $taxes as $tax ) {
-				if ( ! $tax || $tax === $a['lock_tax'] ) {
+				if ( ! $tax || $tax === $a['lock_tax'] || ( $facets && ! in_array( $tax, $facets, true ) ) ) {
 					continue;
 				}
 				$terms = self::visible_facet_terms( $tax, $scope );
@@ -1060,7 +1301,9 @@ class MCM_Query {
 				<?php
 			}
 			?>
-			<button type="button" class="mcm-reset mcm-dir-reset"><?php esc_html_e( 'Reset filters', 'medical-college-manager' ); ?></button>
+			<?php if ( self::truthy( $a['reset'] ) ) : ?>
+				<button type="button" class="mcm-reset mcm-dir-reset"><?php esc_html_e( 'Reset filters', 'medical-college-manager' ); ?></button>
+			<?php endif; ?>
 		</div>
 		<?php
 		return ob_get_clean();
@@ -1371,6 +1614,12 @@ class MCM_Query {
 		}
 
 		$query = self::get_query( $a );
+
+		// The author's own "nothing found" message replaces the empty layout.
+		$empty = trim( sanitize_text_field( MCM_Safe::str( $a['empty'] ) ) );
+		if ( '' !== $empty && ! $query->have_posts() ) {
+			return '<p class="mcm-empty">' . esc_html( $empty ) . '</p>';
+		}
 
 		ob_start();
 

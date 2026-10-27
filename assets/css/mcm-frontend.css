@@ -222,7 +222,7 @@
 
 /* ---------- Table view ---------- */
 .mcm-table-link{ color:var(--mcm-primary, #0a6b5d); font-weight:600; text-decoration:none; }
-.mcm-table-link:hover, .mcm-table-link:focus{ text-decoration:underline; }
+.mcm-table-link:hover, .mcm-table-link:focus{ color:var(--mcm-primary, #0a6b5d); text-decoration:underline; }
 .mcm-table-wrap{ border:1px solid var(--mcm-border, #e5e7eb); border-radius: var(--mcm-radius, 12px); }
 .mcm-table{ width:100%; border-collapse:collapse; background: var(--mcm-card-bg, #fff); font-size:14px; }
 .mcm-table thead th{
@@ -453,7 +453,7 @@
 /* ---------- Directory (sidebar) layout ---------- */
 .mcm-directory{
 	display:grid;
-	grid-template-columns:280px 1fr;
+	grid-template-columns:var(--mcm-side-w, 280px) 1fr;
 	gap:30px;
 	align-items:start;
 }
@@ -646,6 +646,55 @@
 	.mcm-post-title{ font-size:22px; }
 	.mcm-read-more{ align-self:flex-start; }
 }
+
+/* Date hidden: thumbnail + text (list layout). */
+.mcm-post--no-date{ grid-template-columns:400px 1fr; grid-template-areas:"thumb body"; }
+.mcm-post--no-date.mcm-post--no-thumb{ grid-template-columns:1fr; grid-template-areas:"body"; }
+@media (max-width:980px){
+	.mcm-post--no-date{ grid-template-columns:240px 1fr; }
+}
+@media (max-width:640px){
+	.mcm-post--no-date{ grid-template-columns:1fr; grid-template-areas:"thumb" "body"; }
+}
+
+/* Grid layout: posts as cards. Desktop columns come from the widget or the
+   columns attribute; tablet and phone fall back to 2 and 1. */
+.mcm-blog--grid{
+	display:grid;
+	grid-template-columns:repeat(var(--mcm-blog-cols, var(--mcm-blog-cols-d, 3)), minmax(0, 1fr));
+	gap:var(--mcm-blog-gap, 30px);
+	align-items:stretch;
+}
+@media (max-width:1024px){ .mcm-blog--grid{ --mcm-blog-cols:2; } }
+@media (max-width:767px){ .mcm-blog--grid{ --mcm-blog-cols:1; } }
+.mcm-blog--grid .mcm-blog-intro, .mcm-blog--grid > .mcm-empty{ grid-column:1 / -1; margin-bottom:0; }
+.mcm-blog--grid .mcm-post,
+.mcm-blog--grid .mcm-post--no-thumb,
+.mcm-blog--grid .mcm-post--no-date{
+	grid-template-columns:1fr;
+	grid-template-areas:"thumb" "meta" "body";
+	gap:16px;
+	margin:0;
+	padding:0 0 22px;
+	border:1px solid var(--mcm-blog-line);
+	border-radius:var(--mcm-radius, 12px);
+	background:var(--mcm-card-bg, #fff);
+	overflow:hidden;
+	transition:transform .25s ease, box-shadow .25s ease;
+}
+.mcm-blog--grid .mcm-post:last-child{ border-bottom:1px solid var(--mcm-blog-line); }
+.mcm-blog--grid .mcm-post:hover{ transform:var(--mcm-lift, none); }
+.mcm-blog--grid .mcm-post--no-thumb .mcm-post-thumb{ display:none; }
+.mcm-blog--grid .mcm-post-meta{ flex-direction:row; align-items:center; padding:0 20px; }
+.mcm-blog--grid .mcm-date-badge{ padding:8px 14px; }
+.mcm-blog--grid .mcm-date-badge .mcm-day{ font-size:24px; }
+.mcm-blog--grid .mcm-date-badge .mcm-ym{ margin-top:4px; padding-top:4px; font-size:12px; }
+.mcm-blog--grid .mcm-post-thumb{ border-radius:0; }
+.mcm-blog--grid .mcm-post-thumb img, .mcm-blog--grid .mcm-post-thumb-ph{ height:var(--mcm-blog-img-h, 220px); }
+.mcm-blog--grid .mcm-post-body{ padding:0 20px; }
+.mcm-blog--grid .mcm-post-title{ font-size:21px; margin-bottom:10px; }
+.mcm-blog--grid .mcm-post-excerpt{ font-size:15px; }
+.mcm-blog--grid .mcm-read-more{ align-self:flex-start; margin-top:auto; padding-top:16px; }
 
 /* ---------- Notice Board ---------- */
 .mcm-notice-badge{ display:inline-block; padding:2px 10px; border-radius:20px; background:var(--mcm-primary, #0a6b5d); color:#fff; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.4px; white-space:nowrap; }
@@ -1220,6 +1269,8 @@ a.mcm-board-more:focus{
 .mcm-jobcard-chips li{ margin:0; padding:3px 10px; border-radius:6px; background:var(--mcm-page-bg, #f3f5f7); color:var(--mcm-text, #1f2933); font-size:13px; font-weight:600; }
 .mcm-jobcard-deadline{ display:grid; grid-template-columns:auto 1fr; align-items:baseline; gap:2px 10px; padding:10px 12px; border-radius:8px; background:var(--mcm-page-bg, #f3f5f7); font-size:14px; }
 .mcm-jobcard-label{ font-size:12px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--mcm-muted, #6b7280); }
+/* The grey deadline box needs darker small text to reach 4.5:1. */
+.mcm-jobcard-deadline .mcm-jobcard-label, .mcm-jobcard-deadline .mcm-job-old-date{ color:#4b5563; }
 .mcm-jobcard-date{ font-weight:600; color:var(--mcm-text, #1f2933); }
 .mcm-jobcard-date .mcm-job-old-date{ display:block; font-weight:400; font-size:13px; }
 .mcm-jobcard-date .mcm-job-time{ font-weight:400; color:var(--mcm-muted, #6b7280); }

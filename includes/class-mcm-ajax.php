@@ -91,6 +91,14 @@ class MCM_Ajax {
 			}
 		}
 
+		$exclude_terms = array();
+		if ( isset( $config['exclude_terms'] ) && is_array( $config['exclude_terms'] ) ) {
+			foreach ( $config['exclude_terms'] as $tax => $slugs ) {
+				$exclude_terms[ sanitize_key( (string) $tax ) ] = MCM_Query::normalize_slugs( $slugs );
+			}
+		}
+		$search = sanitize_text_field( MCM_Safe::post( 'search' ) );
+
 		$type = sanitize_key( MCM_Safe::scalar( $config, 'type', 'mcm_consultant' ) );
 
 		/*
@@ -124,27 +132,33 @@ class MCM_Ajax {
 
 		$a = MCM_Query::parse_atts(
 			array(
-				'type'        => $type,
-				'view'        => sanitize_key( MCM_Safe::scalar( $config, 'view', 'grid' ) ),
-				'columns'     => absint( MCM_Safe::scalar( $config, 'columns', '3' ) ),
+				'type'          => $type,
+				'view'          => sanitize_key( MCM_Safe::scalar( $config, 'view', 'grid' ) ),
+				'columns'       => absint( MCM_Safe::scalar( $config, 'columns', '3' ) ),
 				// Clamp so a crafted request can't ask for an unbounded result set.
-				'count'       => min( absint( MCM_Safe::scalar( $config, 'count', '12' ) ), (int) apply_filters( 'mcm_ajax_max_count', 1000 ) ),
-				'orderby'     => sanitize_key( MCM_Safe::scalar( $config, 'orderby', 'date' ) ),
-				'order'       => sanitize_text_field( MCM_Safe::scalar( $config, 'order', 'DESC' ) ),
-				'category'    => sanitize_text_field( MCM_Safe::scalar( $config, 'category' ) ),
-				'meta_key'    => $meta_key, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Shortcode attribute (whitelisted sort key), not a query argument.
-				'meta_type'   => sanitize_text_field( MCM_Safe::scalar( $config, 'meta_type' ) ),
-				'lock_tax'    => sanitize_key( MCM_Safe::scalar( $config, 'lock_tax' ) ),
-				'lock_term'   => sanitize_title( MCM_Safe::scalar( $config, 'lock_term' ) ),
+				'count'         => min( absint( MCM_Safe::scalar( $config, 'count', '12' ) ), (int) apply_filters( 'mcm_ajax_max_count', 1000 ) ),
+				'orderby'       => sanitize_key( MCM_Safe::scalar( $config, 'orderby', 'date' ) ),
+				'order'         => sanitize_text_field( MCM_Safe::scalar( $config, 'order', 'DESC' ) ),
+				'category'      => sanitize_text_field( MCM_Safe::scalar( $config, 'category' ) ),
+				'meta_key'      => $meta_key, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Shortcode attribute (whitelisted sort key), not a query argument.
+				'meta_type'     => sanitize_text_field( MCM_Safe::scalar( $config, 'meta_type' ) ),
+				'lock_tax'      => sanitize_key( MCM_Safe::scalar( $config, 'lock_tax' ) ),
+				'lock_term'     => sanitize_title( MCM_Safe::scalar( $config, 'lock_term' ) ),
 				// Pagination survives filtering: a paginated block stays
 				// paginated, and the pager loads pages in place.
-				'paginate'    => MCM_Query::truthy( MCM_Safe::scalar( $config, 'paginate', 'no' ) ) ? 'yes' : 'no',
-				'paged'       => max( 1, absint( MCM_Safe::scalar( $config, 'paged', '1' ) ) ),
-				'search'      => sanitize_text_field( MCM_Safe::post( 'search' ) ),
-				// Jobs status (open/closed/all), echoed back from data-config.
-				'status'      => sanitize_key( MCM_Safe::scalar( $config, 'status' ) ),
-				'scope'       => $scope,
-				'tax_filters' => $tax_filters,
+				'paginate'      => MCM_Query::truthy( MCM_Safe::scalar( $config, 'paginate', 'no' ) ) ? 'yes' : 'no',
+				'paged'         => max( 1, absint( MCM_Safe::scalar( $config, 'paged', '1' ) ) ),
+				'search'        => '' !== $search ? $search : sanitize_text_field( MCM_Safe::scalar( $config, 'fixed_search' ) ),
+				// Status filter (jobs, admissions, events…), echoed back from data-config.
+				'status'        => sanitize_key( MCM_Safe::scalar( $config, 'status' ) ),
+				'scope'         => $scope,
+				'tax_filters'   => $tax_filters,
+				// The author's exclusions, items and offset (normalised again in MCM_Query).
+				'ids'           => MCM_Safe::scalar( $config, 'ids' ),
+				'exclude_ids'   => MCM_Safe::scalar( $config, 'exclude_ids' ),
+				'offset'        => absint( MCM_Safe::scalar( $config, 'offset', '0' ) ),
+				'exclude_terms' => $exclude_terms,
+				'empty'         => sanitize_text_field( MCM_Safe::scalar( $config, 'empty' ) ),
 			)
 		);
 

@@ -189,6 +189,11 @@ Blog posts (standard WordPress posts, date-badge layout):
   excerpt    excerpt length in words     (default 30; 0 hides it)
   intro      optional intro line above the list
   read_more  custom read-more label
+  exclude_category  category slug(s) to leave out
+  layout     list | grid              (default list; grid shows cards)
+  columns    grid columns on desktop  (default 3; 2 on tablets, 1 on phones)
+  show_thumb / show_date / show_more   yes | no (default yes)
+  empty      message when there are no posts
   class_css  extra wrapper class
 
 Attributes (all optional):
@@ -205,7 +210,20 @@ Attributes (all optional):
   order      ASC | DESC
   meta_key   required when orderby="meta_value" (e.g. mcm_event_date)
   meta_type  DATE | NUMERIC | CHAR (optional, pairs with meta_key)
+  orderby    also: modified | post__in (order of ids) | field (with meta_key:
+             one of the type's own fields; items without it are listed last)
   search     initial search string
+  search_box / reset   yes | no      show the search box / Reset button (default yes)
+  facets     taxonomies to offer as filters, comma separated (default all)
+  placeholder  search box placeholder text
+  status     events: upcoming | past; admissions: open | upcoming | closed;
+             scholarships, tenders: open | closed  (default all; jobs keep
+             open | closed | all, default open)
+  ids        only these items (comma separated IDs)
+  exclude_ids  leave these items out
+  offset     skip the first N items
+  paginate   yes | no                 numbered pages ("count" is the page size)
+  empty      message when nothing is found
   class_css  extra wrapper class for Custom CSS targeting
 
 Examples:
@@ -254,14 +272,37 @@ The Montserrat font is bundled (SIL OFL, no Google request).
 == Elementor ==
 
 If Elementor (3.5+) is active, open any page in Elementor and look for the
-"Medical College" widget category. Drag in Consultants, Team, Programs, Courses,
-Events, Timetable or Admissions. Configure everything visually:
+"Medical College" widget category: 13 listing widgets (Consultants, Team,
+Programs, Courses, Events, Timetable, Admissions, Tenders, Scholarships, Research,
+Policies, Jobs, Publications), Blog Posts and three notice widgets. Configure
+everything visually:
 
-  Content tab    — Layout (Grid / List / Table), Columns, Number of items, Order.
-  Filters & Tools— Filter bar (AJAX search + dropdowns); Print button (Timetable only).
-  Pre-filter     — optionally limit the widget to a Department, Session, Faculty,
-                   Specialty or Category. (For a fixed list, turn the Filter bar
-                   off when you pre-filter.)
+  Content          — Layout, Columns (per device), Number of items, Show
+                     (Upcoming / Past events; Open / Closed admissions,
+                     scholarships, tenders and jobs), Order by (date, title,
+                     menu order, random, a field such as the event date, or
+                     the order you picked items in), Skip the first N,
+                     Pagination, the "nothing found" message.
+  Filters & Tools  — Filter bar on/off, search box, placeholder, which
+                     dropdowns to show, Reset button, a starting search
+                     keyword, Print button and printed heading.
+  Include / Exclude— limit to, or leave out, terms of each taxonomy
+                     (Department, Session, Faculty, Specialty, Category…);
+                     only these items / leave out these items.
+  Style            — Layout & spacing, colours, cards (Normal / Hover:
+                     background, border, radius, shadow, lift), images (fit,
+                     radius, CSS filters, hover zoom), titles, details text,
+                     status badges (colour per status), buttons (Normal /
+                     Hover), filter bar and fields (incl. focus colour),
+                     directory sidebar, table, citations, pagination, print
+                     button and the empty message. Every option applies to
+                     that widget only.
+
+Blog Posts adds a Grid layout, columns, show/hide image, date and read-more,
+exclude categories, tags, author and offset, with its own Style tab (cards,
+image, date badge, title, excerpt, read more, intro). The notice widgets add a
+"last N days" filter and Style tabs for the bar/box, heading, notices, dates,
+badges and the "View all" link.
 
 No shortcodes or term slugs are needed — terms are picked from dropdowns. The
 widgets use the same renderer as the shortcodes, so styling from the Design panel
@@ -294,12 +335,14 @@ shadow + hover toggles, font family, and a raw Custom CSS box. Generated CSS use
 == Changelog ==
 
 = 1.32.0 =
-New: college header & footer, Staff Type.
+New: college header & footer, Staff Type, full Elementor widget options.
 * College header & footer (College Manager > Header & Footer): replaces the theme's
   header and footer without editing the theme; off until switched on.
 * Staff Type for team members; gender and male/female default photos.
 * Redesigned job cards and directory filters; status and time left on admissions,
   scholarships, tenders and events; display and accessibility fixes across listings.
+* Elementor widgets: status, include/exclude, order by field, offset, pagination and
+  filter-bar options, plus full Style tabs (Normal/Hover) on all 17 widgets.
 * Full list: changelog.txt.
 
 = 1.31.0 =

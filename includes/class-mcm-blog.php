@@ -30,18 +30,25 @@ class MCM_Blog {
 	 */
 	public static function defaults() {
 		return array(
-			'count'     => 6,
-			'orderby'   => 'date',      // date | title | rand | comment_count | menu_order.
-			'order'     => 'DESC',      // ASC | DESC.
-			'category'  => '',          // category slug(s), comma separated.
-			'tag'       => '',          // tag slug(s), comma separated.
-			'author'    => '',          // author ID.
-			'post_type' => 'post',
-			'offset'    => 0,
-			'excerpt'   => 30,          // excerpt length in words (0 = hide).
-			'intro'     => '',          // optional intro line above the list.
-			'read_more' => '',          // custom read-more label.
-			'class_css' => '',          // extra wrapper class.
+			'count'            => 6,
+			'orderby'          => 'date',      // date | title | rand | comment_count | menu_order.
+			'order'            => 'DESC',      // ASC | DESC.
+			'category'         => '',          // category slug(s), comma separated.
+			'tag'              => '',          // tag slug(s), comma separated.
+			'author'           => '',          // author ID.
+			'post_type'        => 'post',
+			'offset'           => 0,
+			'excerpt'          => 30,          // excerpt length in words (0 = hide).
+			'intro'            => '',          // optional intro line above the list.
+			'read_more'        => '',          // custom read-more label.
+			'class_css'        => '',          // extra wrapper class.
+			'exclude_category' => '',   // category slug(s) to leave out.
+			'layout'           => 'list',      // list (date-badge rows) | grid (cards).
+			'columns'          => 3,           // grid columns on desktop.
+			'show_thumb'       => 'yes',
+			'show_date'        => 'yes',
+			'show_more'        => 'yes',
+			'empty'            => '',          // message when there are no posts.
 		);
 	}
 
@@ -119,6 +126,14 @@ class MCM_Blog {
 				'terms'    => array_map( 'trim', explode( ',', $a['tag'] ) ),
 			);
 		}
+		if ( '' !== $a['exclude_category'] ) {
+			$tax_query[] = array(
+				'taxonomy' => 'category',
+				'field'    => 'slug',
+				'terms'    => array_map( 'trim', explode( ',', $a['exclude_category'] ) ),
+				'operator' => 'NOT IN',
+			);
+		}
 		if ( count( $tax_query ) > 1 ) {
 			$tax_query['relation'] = 'AND';
 		}
@@ -128,8 +143,13 @@ class MCM_Blog {
 
 		$query = new WP_Query( apply_filters( 'mcm_blog_query_args', $args, $a ) );
 
+		$grid = 'grid' === $a['layout'];
+		$cols = max( 1, min( 6, (int) $a['columns'] ) );
+
 		ob_start();
-		echo '<section class="mcm-blog ' . esc_attr( $a['class_css'] ) . '">';
+		// The desktop column count goes in its own variable so the tablet and
+		// phone defaults in the stylesheet still apply.
+		echo '<section class="mcm-blog' . ( $grid ? ' mcm-blog--grid' : '' ) . ' ' . esc_attr( $a['class_css'] ) . '"' . ( $grid ? ' style="--mcm-blog-cols-d:' . (int) $cols . ';"' : '' ) . '>';
 
 		if ( '' !== $a['intro'] ) {
 			echo '<div class="mcm-blog-intro">' . esc_html( $a['intro'] ) . '</div>';
@@ -141,7 +161,8 @@ class MCM_Blog {
 				echo self::post_row( get_the_ID(), $a ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			}
 		} else {
-			echo '<p class="mcm-empty">' . esc_html__( 'No posts found.', 'medical-college-manager' ) . '</p>';
+			$empty = trim( (string) $a['empty'] );
+			echo '<p class="mcm-empty">' . esc_html( '' !== $empty ? $empty : __( 'No posts found.', 'medical-college-manager' ) ) . '</p>';
 		}
 
 		wp_reset_postdata();
@@ -160,13 +181,16 @@ class MCM_Blog {
 		$title   = get_the_title( $id );
 		$day     = get_the_date( 'j', $id );
 		$ym      = get_the_date( 'm, Y', $id );
-		$has     = has_post_thumbnail( $id );
+		$thumb   = MCM_Query::truthy( $a['show_thumb'] );
+		$date    = MCM_Query::truthy( $a['show_date'] );
+		$has     = $thumb && has_post_thumbnail( $id );
 		$excerpt = self::excerpt( $id, (int) $a['excerpt'] );
 		$rm      = '' !== $a['read_more'] ? $a['read_more'] : __( 'Read More', 'medical-college-manager' );
 
 		ob_start();
 		?>
-		<article class="mcm-post<?php echo $has ? '' : ' mcm-post--no-thumb'; ?>">
+		<article class="mcm-post<?php echo $has ? '' : ' mcm-post--no-thumb'; ?><?php echo $thumb ? '' : ' mcm-post--no-image'; ?><?php echo $date ? '' : ' mcm-post--no-date'; ?>">
+			<?php if ( $date ) : ?>
 			<div class="mcm-post-meta">
 				<div class="mcm-date-badge">
 					<span class="mcm-day"><?php echo esc_html( $day ); ?></span>
@@ -176,7 +200,9 @@ class MCM_Blog {
 					<svg viewBox="0 0 24 24" focusable="false"><path d="<?php echo self::SVG_PEN; // phpcs:ignore ?>"/></svg>
 				</span>
 			</div>
+			<?php endif; ?>
 
+			<?php if ( $thumb ) : ?>
 			<a class="mcm-post-thumb" href="<?php echo esc_url( $link ); ?>" tabindex="-1" aria-hidden="true">
 				<?php
 				if ( $has ) {
@@ -186,16 +212,19 @@ class MCM_Blog {
 				}
 				?>
 			</a>
+			<?php endif; ?>
 
 			<div class="mcm-post-body">
 				<h2 class="mcm-post-title"><a href="<?php echo esc_url( $link ); ?>"><?php echo esc_html( $title ); ?></a></h2>
 				<?php if ( '' !== $excerpt ) : ?>
 					<p class="mcm-post-excerpt"><?php echo esc_html( $excerpt ); ?></p>
 				<?php endif; ?>
+				<?php if ( MCM_Query::truthy( $a['show_more'] ) ) : ?>
 				<a class="mcm-read-more" href="<?php echo esc_url( $link ); ?>">
 					<?php echo esc_html( $rm ); ?>
 					<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="<?php echo self::SVG_ARROW; // phpcs:ignore ?>"/></svg>
 				</a>
+				<?php endif; ?>
 			</div>
 		</article>
 		<?php
