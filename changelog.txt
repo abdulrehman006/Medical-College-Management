@@ -124,6 +124,22 @@ Medical College Manager — complete changelog.
     and read-more; exclude categories, tags, author, offset; full Style tab.
   - Notice Ticker / Board / List: "only from the last N days"; full Style tabs.
   The same options are available as shortcode attributes (see readme).
+* Profile photos (consultants, team) are now square by default and sized by
+  the card's width, so they keep their shape at 4, 5 or 6 columns instead of
+  becoming tall strips; they are cropped toward the top, where faces are, and
+  use a larger image file (medium_large) so they stay sharp. Display change,
+  applies on update.
+* Elementor listing widgets: Image proportions (square, portrait 4:5 / 3:4,
+  tall 2:3, landscape 4:3 / 3:2, wide 16:9 or original, per device), crop
+  focus, and Image quality (thumbnail … full size). Image height now also
+  applies to profile photos.
+* New Elementor widget: Contact Info — title, subtitle and rows of icon +
+  label + value. Values can be clickable: phone (tel:), email (mailto:,
+  encoded against harvesters), WhatsApp, Google Maps or a custom link, with an
+  optional "number to use" when the shown text differs. Label left / value
+  right or stacked, per device; per-row icon colour; full Style tab. A
+  description list, so screen readers read each label with its value; links
+  opening a new tab say so.
 * Elementor listing widgets: new Display section. Photos: show (default photo
   when none uploaded, as before), only uploaded photos, or hide all photos
   (text-only cards) — for teams where only some staff have a photo. Show or

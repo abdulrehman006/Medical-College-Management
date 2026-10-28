@@ -116,12 +116,54 @@ class MCM_Query {
 		if ( $cols ) {
 			$out['table_cols'] = implode( ',', array_slice( $cols, 0, 20 ) );
 		}
+		$size = isset( $a['image_size'] ) ? sanitize_key( MCM_Safe::str( $a['image_size'] ) ) : '';
+		if ( '' !== $size && in_array( $size, self::image_sizes(), true ) ) {
+			$out['image_size'] = $size;
+		}
 		foreach ( array( 'show_button', 'show_specialty', 'show_designation', 'show_department', 'show_excerpt', 'show_meta', 'show_status' ) as $key ) {
 			if ( isset( $a[ $key ] ) && in_array( strtolower( MCM_Safe::str( $a[ $key ] ) ), array( 'no', '0', 'false', 'off' ), true ) ) {
 				$out[ $key ] = 'no';
 			}
 		}
 		return $out;
+	}
+
+	/**
+	 * Image sizes a listing may ask for: every registered size plus full.
+	 *
+	 * @return string[]
+	 */
+	public static function image_sizes() {
+		return array_merge( get_intermediate_image_sizes(), array( 'full' ) );
+	}
+
+	/**
+	 * Image file size for the listing being rendered: the author's choice or
+	 * the layout's own default.
+	 *
+	 * @param string $fallback The layout's default size.
+	 * @return string
+	 */
+	private static function image_size( $fallback ) {
+		return isset( self::$display['image_size'] ) ? self::$display['image_size'] : $fallback;
+	}
+
+	/**
+	 * The featured image's own proportions as a CSS variable, for the
+	 * "Original" image proportions option. Browsers only know a lazy image's
+	 * shape from its width/height attributes, and a CSS aspect-ratio
+	 * overrides those, so the shape is handed over explicitly.
+	 *
+	 * @param int    $id   Post ID.
+	 * @param string $size Image size.
+	 * @return array Attribute array (empty when unknown).
+	 */
+	private static function natural_ratio_attr( $id, $size ) {
+		$src = wp_get_attachment_image_src( (int) get_post_thumbnail_id( $id ), $size );
+		if ( ! $src || empty( $src[1] ) || empty( $src[2] ) ) {
+			return array();
+		}
+		return array( 'style' => '--mcm-nat-ratio:' . (int) $src[1] . ' / ' . (int) $src[2] );
 	}
 
 	/**
@@ -252,6 +294,8 @@ class MCM_Query {
 			'show_excerpt'     => 'yes',
 			'show_meta'        => 'yes',
 			'show_status'      => 'yes',
+			// Image file size used on cards (thumbnail … full; empty = per layout).
+			'image_size'       => '',
 			// Generic per-taxonomy attribute (slug = taxonomy without mcm_ prefix).
 			'department'       => '',
 			'session'          => '',
@@ -1660,14 +1704,15 @@ class MCM_Query {
 		$type  = get_post_type( $id );
 		$title = get_the_title( $id );
 		$link  = is_post_type_viewable( $type ) ? get_permalink( $id ) : '';
+		$size  = self::image_size( 'medium_large' );
 		$thumb = get_the_post_thumbnail(
 			$id,
-			'medium',
+			$size,
 			array(
 				'class'   => 'mcm-dir-img',
 				'loading' => 'lazy',
 				'alt'     => esc_attr( $title ),
-			)
+			) + self::natural_ratio_attr( $id, $size )
 		);
 		$desig = MCM_Safe::meta( $id, 'mcm_designation' );
 		$dept  = self::cached_term_names( $id, 'mcm_department' );
@@ -1694,7 +1739,7 @@ class MCM_Query {
 				if ( $thumb ) {
 					echo $thumb; // phpcs:ignore
 				} else {
-					echo self::default_avatar( 'mcm-dir-img', 'mcm-dir-card-ph', $id ); // phpcs:ignore
+					echo self::default_avatar( 'mcm-dir-img', 'mcm-dir-card-ph', $id, $size ); // phpcs:ignore
 				}
 				?>
 			</div>
@@ -1944,6 +1989,7 @@ class MCM_Query {
 	 * @param string $ph_class CSS class for the placeholder.
 	 */
 	private static function media_html( $id, $size, $img_class, $ph_class ) {
+		$size  = self::image_size( $size );
 		$thumb = get_the_post_thumbnail(
 			$id,
 			$size,
@@ -1951,7 +1997,7 @@ class MCM_Query {
 				'class'   => $img_class,
 				'loading' => 'lazy',
 				'alt'     => esc_attr( get_the_title( $id ) ),
-			)
+			) + self::natural_ratio_attr( $id, $size )
 		);
 		if ( 'none' === self::image_mode() ) {
 			return '';

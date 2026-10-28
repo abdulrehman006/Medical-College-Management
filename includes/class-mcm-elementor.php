@@ -134,6 +134,7 @@ class MCM_Elementor {
 			'MCM_Widget_Notice_Board',
 			'MCM_Widget_Notices',
 			'MCM_Widget_Testimonial',
+			'MCM_Widget_Contact',
 		);
 	}
 }

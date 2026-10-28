@@ -523,11 +523,16 @@
 /* The review asked for more breathing room around each portrait: the photo now
    sits inset rather than bleeding to the card edge. */
 .mcm-dir-card-media{ width:100%; padding:16px 16px 0; }
+/* Square by default and sized by the card's width, so a photo keeps its
+   shape at any column count (a fixed height turned photos into tall strips
+   at 4-6 columns). Cropped toward the top, where faces are. */
 .mcm-dir-card-media img,
 .mcm-dir-card-ph{
-	width:100%; height:290px; object-fit:cover; display:block;
+	width:100%; height:auto; aspect-ratio:1 / 1; object-fit:cover; object-position:center 25%; display:block;
 	border-radius:calc( var(--mcm-radius, 12px) - 4px );
 }
+/* "Original" proportions leave an empty placeholder no height of its own. */
+.mcm-dir-card-ph, .mcm-card-ph{ min-height:120px; }
 .mcm-dir-card-ph{ background:var(--mcm-page-bg, #f3f5f9); }
 .mcm-dir-card-name{ font-size:22px; line-height:1.25; margin:18px 20px 4px; color:var(--mcm-text, #1f2933); }
 .mcm-dir-card-name a{ color:inherit; text-decoration:none; }
@@ -1398,3 +1403,41 @@ a.mcm-jobcard-btn{ position:relative; z-index:1; }
 	.mcm-testi-pos-mobile-top .mcm-testi-media{ flex:0 0 auto; width:var(--mcm-testi-img-w); }
 	.mcm-testi-pos-mobile-top .mcm-testi-content{ align-self:stretch; }
 }
+
+/* ---------- Contact Info widget ----------
+   Rows of icon + label (left) and value (right); "stacked" puts the label
+   above the value. Layout classes come per device from Elementor
+   (mcm-contact-layout-row|stacked, -tablet-, -mobile-). */
+.mcm-contact{ --mcm-contact-label-w:32%; --mcm-contact-icon:16px; --mcm-contact-icon-box:0px; --mcm-contact-icon-gap:10px; color:var(--mcm-text, #1f2933); }
+.mcm-contact-title{ margin:0 0 8px; font-size:22px; font-weight:700; line-height:1.3; color:var(--mcm-text, #1f2933); }
+.mcm-contact-subtitle{ margin:0 0 18px; font-size:15px; line-height:1.55; color:var(--mcm-muted, #6b7280); }
+.mcm-contact .mcm-contact-list{ margin:0; padding:0; }
+.mcm-contact-item{ display:flex; align-items:baseline; gap:6px 20px; padding:12px 0; border:0 solid var(--mcm-border, #e5e7eb); transition:background-color .2s ease; }
+.mcm-contact-divider-yes .mcm-contact-item{ border-bottom-width:1px; }
+.mcm-contact-divider-yes .mcm-contact-item:last-child{ border-bottom-width:0; }
+.mcm-contact .mcm-contact-term{ flex:0 0 var(--mcm-contact-label-w); display:flex; align-items:center; gap:var(--mcm-contact-icon-gap); min-width:0; margin:0; font-weight:700; line-height:1.5; }
+.mcm-contact--no-labels .mcm-contact-term{ flex:0 0 auto; }
+.mcm-contact .mcm-contact-value{ flex:1 1 0; min-width:0; margin:0; line-height:1.55; overflow-wrap:anywhere; }
+.mcm-contact .mcm-contact-value a{ color:var(--mcm-primary, #0a6b5d); text-decoration:none; }
+.mcm-contact .mcm-contact-value a:hover, .mcm-contact .mcm-contact-value a:focus-visible{ text-decoration:underline; }
+.mcm-contact-icon{ display:inline-flex; align-items:center; justify-content:center; flex:0 0 auto; min-width:var(--mcm-contact-icon-box); min-height:var(--mcm-contact-icon-box); font-size:var(--mcm-contact-icon); line-height:1; color:var(--mcm-primary, #0a6b5d); transition:color .2s ease, background-color .2s ease; }
+.mcm-contact-icon svg{ width:1em; height:1em; fill:currentColor; }
+.mcm-contact-icon i{ font-size:inherit; }
+
+.mcm-contact-layout-stacked .mcm-contact-item{ flex-direction:column; align-items:stretch; gap:4px; }
+.mcm-contact-layout-stacked .mcm-contact-term{ flex:0 0 auto; }
+@media (max-width:1024px){
+	.mcm-contact-layout-tablet-row .mcm-contact-item{ flex-direction:row; align-items:baseline; gap:6px 20px; }
+	.mcm-contact-layout-tablet-row .mcm-contact-term{ flex:0 0 var(--mcm-contact-label-w); }
+	.mcm-contact-layout-tablet-stacked .mcm-contact-item{ flex-direction:column; align-items:stretch; gap:4px; }
+	.mcm-contact-layout-tablet-stacked .mcm-contact-term{ flex:0 0 auto; }
+}
+@media (max-width:767px){
+	.mcm-contact-layout-mobile-row .mcm-contact-item{ flex-direction:row; align-items:baseline; gap:6px 16px; }
+	.mcm-contact-layout-mobile-row .mcm-contact-term{ flex:0 0 var(--mcm-contact-label-w); }
+	.mcm-contact-layout-mobile-stacked .mcm-contact-item{ flex-direction:column; align-items:stretch; gap:4px; }
+	.mcm-contact-layout-mobile-stacked .mcm-contact-term{ flex:0 0 auto; }
+}
+/* Labels hidden: the icon sits beside its value on every layout and device. */
+.mcm-contact--no-labels .mcm-contact-item{ flex-direction:row; align-items:center; gap:6px 14px; }
+.mcm-contact--no-labels .mcm-contact-term{ flex:0 0 auto; }

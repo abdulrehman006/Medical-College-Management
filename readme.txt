@@ -297,7 +297,11 @@ everything visually:
                      only uploaded, or hide; show/hide specialty, designation,
                      department (people), status badge, details, short
                      description and the button; pick the Table columns
-                     (e.g. leave out Staff Type and Specialty).
+                     (e.g. leave out Staff Type and Specialty); Image quality
+                     (thumbnail … full size).
+  Style → Images   — Image proportions (square, portrait, landscape, wide or
+                     original): the image keeps its shape at any column count;
+                     crop focus (top / centre / bottom).
   Include / Exclude— limit to, or leave out, terms of each taxonomy
                      (Department, Session, Faculty, Specialty, Category…);
                      only these items / leave out these items.
@@ -317,6 +321,13 @@ default right on desktop and tablet, on top on phones), with width, spacing
 and vertical alignment controls; optional quotation mark and profile link.
 Style tab: box, heading, message (incl. justified text), quotation mark,
 photo (border, shadow, filters) and the name lines.
+
+Contact Info: a title, a subtitle and rows of icon + label + value (phone,
+email, address, office hours…). Each value can be clickable: phone call,
+email, WhatsApp, Google Maps or any link, with an optional "number to use"
+when the shown text differs. Label left and value right, or stacked (by
+default stacked on phones). Style tab: box, title, subtitle, rows (spacing,
+label width, lines, hover), icon (colour, size, background), label, value.
 
 Blog Posts adds a Grid layout, columns, show/hide image, date and read-more,
 exclude categories, tags, author and offset, with its own Style tab (cards,
@@ -363,7 +374,8 @@ New: college header & footer, Staff Type, full Elementor widget options.
   scholarships, tenders and events; display and accessibility fixes across listings.
 * Elementor widgets: status, include/exclude, order by field, offset, pagination and
   filter-bar options, plus full Style tabs (Normal/Hover) on all widgets.
-* New Elementor widget: Testimonial / Message (photo left, right or on top).
+* New Elementor widgets: Testimonial / Message (photo left, right or on top) and Contact Info.
+* Profile photos keep their shape at any column count; image proportions and quality options.
 * Full list: changelog.txt.
 
 = 1.31.0 =

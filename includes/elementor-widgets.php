@@ -1149,6 +1149,20 @@ abstract class MCM_Elementor_Widget_Base extends \Elementor\Widget_Base {
 			);
 		}
 
+		if ( ! $job ) {
+			$this->add_control(
+				'image_size',
+				array(
+					'label'       => __( 'Image quality (file size)', 'medical-college-manager' ),
+					'type'        => \Elementor\Controls_Manager::SELECT,
+					'default'     => '',
+					'options'     => $this->mcm_image_size_options(),
+					'description' => __( 'Larger files stay sharp in wide cards; smaller ones load faster.', 'medical-college-manager' ),
+					'condition'   => $cards + array( 'images!' => 'none' ),
+				)
+			);
+		}
+
 		$switches = array();
 		if ( $people ) {
 			$switches['show_specialty']   = __( 'Specialty', 'medical-college-manager' );
@@ -1196,6 +1210,24 @@ abstract class MCM_Elementor_Widget_Base extends \Elementor\Widget_Base {
 	}
 
 	/**
+	 * Image size options: Default, then every registered size with its pixels.
+	 *
+	 * @return array<string,string>
+	 */
+	private function mcm_image_size_options() {
+		$out   = array( '' => __( 'Default for the layout', 'medical-college-manager' ) );
+		$extra = function_exists( 'wp_get_additional_image_sizes' ) ? wp_get_additional_image_sizes() : array();
+		foreach ( get_intermediate_image_sizes() as $size ) {
+			$w            = isset( $extra[ $size ]['width'] ) ? (int) $extra[ $size ]['width'] : (int) get_option( $size . '_size_w' );
+			$h            = isset( $extra[ $size ]['height'] ) ? (int) $extra[ $size ]['height'] : (int) get_option( $size . '_size_h' );
+			$label        = ucwords( str_replace( array( '_', '-' ), ' ', $size ) );
+			$out[ $size ] = $w ? sprintf( '%1$s – %2$d × %3$s', $label, $w, $h ? (string) $h : __( 'any', 'medical-college-manager' ) ) : $label;
+		}
+		$out['full'] = __( 'Full size (original upload)', 'medical-college-manager' );
+		return $out;
+	}
+
+	/**
 	 * Display attributes from the widget settings ('' from a switched-off
 	 * control means "no"; a control saved before it existed means "yes").
 	 *
@@ -1206,6 +1238,7 @@ abstract class MCM_Elementor_Widget_Base extends \Elementor\Widget_Base {
 		$atts = array(
 			'images'     => isset( $s['images'] ) ? sanitize_key( MCM_Safe::str( $s['images'] ) ) : 'all',
 			'table_cols' => isset( $s['table_cols'] ) && is_array( $s['table_cols'] ) ? implode( ',', array_map( 'sanitize_key', $s['table_cols'] ) ) : '',
+			'image_size' => isset( $s['image_size'] ) ? sanitize_key( MCM_Safe::str( $s['image_size'] ) ) : '',
 		);
 		foreach ( array( 'show_button', 'show_specialty', 'show_designation', 'show_department', 'show_excerpt', 'show_meta', 'show_status' ) as $key ) {
 			$atts[ $key ] = ( ! isset( $s[ $key ] ) || 'yes' === $s[ $key ] ) ? 'yes' : 'no';
@@ -1275,17 +1308,21 @@ abstract class MCM_Elementor_Widget_Base extends \Elementor\Widget_Base {
 		$this->add_responsive_control(
 			'st_imgh',
 			array(
-				'label'      => __( 'Image height', 'medical-college-manager' ),
-				'type'       => \Elementor\Controls_Manager::SLIDER,
-				'size_units' => array( 'px' ),
-				'range'      => array(
+				'label'       => __( 'Image height', 'medical-college-manager' ),
+				'type'        => \Elementor\Controls_Manager::SLIDER,
+				'size_units'  => array( 'px' ),
+				'range'       => array(
 					'px' => array(
 						'min' => 100,
 						'max' => 500,
 					),
 				),
-				'selectors'  => array( $wrapper => '--mcm-img-h: {{SIZE}}{{UNIT}};' ),
-				'condition'  => array( 'view' => array( 'grid', 'directory' ) ),
+				'selectors'   => array(
+					$wrapper => '--mcm-img-h: {{SIZE}}{{UNIT}};',
+					'{{WRAPPER}} .mcm-dir-card-media img, {{WRAPPER}} .mcm-dir-card-ph' => 'height: {{SIZE}}{{UNIT}}; aspect-ratio: auto;',
+				),
+				'description' => __( 'A fixed height. Image proportions (Style → Images) keep the shape at any width instead.', 'medical-college-manager' ),
+				'condition'   => array( 'view' => array( 'grid', 'directory' ) ),
 			)
 		);
 		$this->add_responsive_control(
@@ -1342,6 +1379,48 @@ abstract class MCM_Elementor_Widget_Base extends \Elementor\Widget_Base {
 
 		/* ---- Style: Images ---- */
 		$this->mcm_style_section( 'mcm_style_image', __( 'Images', 'medical-college-manager' ), array( 'condition' => $on_cards ) );
+		$this->add_responsive_control(
+			'img_ratio',
+			array(
+				'label'                => __( 'Image proportions', 'medical-college-manager' ),
+				'type'                 => \Elementor\Controls_Manager::SELECT,
+				'default'              => '',
+				'options'              => array(
+					''       => __( 'Default', 'medical-college-manager' ),
+					'1 / 1'  => __( 'Square (1:1)', 'medical-college-manager' ),
+					'4 / 5'  => __( 'Portrait (4:5)', 'medical-college-manager' ),
+					'3 / 4'  => __( 'Portrait (3:4)', 'medical-college-manager' ),
+					'2 / 3'  => __( 'Tall (2:3)', 'medical-college-manager' ),
+					'4 / 3'  => __( 'Landscape (4:3)', 'medical-college-manager' ),
+					'3 / 2'  => __( 'Landscape (3:2)', 'medical-college-manager' ),
+					'16 / 9' => __( 'Wide (16:9)', 'medical-college-manager' ),
+					'auto'   => __( 'Original (no cropping)', 'medical-college-manager' ),
+				),
+				'description'          => __( 'The image keeps this shape at any column count; the height follows the card width.', 'medical-college-manager' ),
+				// "Original": the photo's own shape, passed by the renderer as
+				// --mcm-nat-ratio (a bare "auto" loses the width/height ratio, and
+				// Chrome then sizes lazy images from WordPress's 3000x1500 placeholder).
+				'selectors_dictionary' => array( 'auto' => 'var(--mcm-nat-ratio, 1 / 1)' ),
+				'selectors'            => array(
+					'{{WRAPPER}} .mcm-card-media img, {{WRAPPER}} .mcm-card-ph, {{WRAPPER}} .mcm-dir-card-media img, {{WRAPPER}} .mcm-dir-card-ph' => 'aspect-ratio: {{VALUE}}; height: auto;',
+				),
+			)
+		);
+		$this->add_responsive_control(
+			'img_position',
+			array(
+				'label'     => __( 'Crop focus', 'medical-college-manager' ),
+				'type'      => \Elementor\Controls_Manager::SELECT,
+				'default'   => '',
+				'options'   => array(
+					''              => __( 'Default', 'medical-college-manager' ),
+					'center top'    => __( 'Top', 'medical-college-manager' ),
+					'center center' => __( 'Centre', 'medical-college-manager' ),
+					'center bottom' => __( 'Bottom', 'medical-college-manager' ),
+				),
+				'selectors' => array( '{{WRAPPER}} .mcm-card-media img, {{WRAPPER}} .mcm-dir-card-media img' => 'object-position: {{VALUE}};' ),
+			)
+		);
 		$this->mcm_image_style(
 			'st_img',
 			array( '.mcm-card-media img', '.mcm-dir-card-media img', '.mcm-list-media img' ),
@@ -3810,5 +3889,654 @@ class MCM_Widget_Testimonial extends \Elementor\Widget_Base {
 		$out .= '</div></div></section>';
 
 		echo $out; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Every part escaped above (esc_html, wp_kses_post, Elementor's image and link helpers).
+	}
+}
+
+/**
+ * Elementor widget: Contact Info — a title, an optional subtitle and rows of
+ * icon + label + value (phone, email, address, hours…). Each value can link
+ * (call, email, WhatsApp, map or any URL). Rows are a description list, so
+ * screen readers announce each label with its value.
+ */
+class MCM_Widget_Contact extends \Elementor\Widget_Base {
+
+	use MCM_Elementor_Style;
+
+	/**
+	 * Widget machine name.
+	 */
+	public function get_name() {
+		return 'mcm_contact_info';
+	}
+	/**
+	 * Widget title shown in the Elementor panel.
+	 */
+	public function get_title() {
+		return __( 'Contact Info', 'medical-college-manager' );
+	}
+	/**
+	 * Icon shown in the Elementor panel.
+	 */
+	public function get_icon() {
+		return 'eicon-call-to-action';
+	}
+	/**
+	 * Elementor panel category.
+	 */
+	public function get_categories() {
+		return array( 'medical-college-manager' );
+	}
+	/**
+	 * Search keywords for the Elementor panel.
+	 */
+	public function get_keywords() {
+		return array( 'contact', 'phone', 'email', 'address', 'hours', 'info', 'medical-college-manager' );
+	}
+	/**
+	 * Stylesheets this widget needs.
+	 */
+	public function get_style_depends() {
+		return array( 'mcm-frontend' );
+	}
+
+	/**
+	 * Register the widget controls.
+	 */
+	protected function register_controls() {
+		$this->start_controls_section( 'mcm_contact_content', array( 'label' => __( 'Contact Info', 'medical-college-manager' ) ) );
+
+		$this->add_control(
+			'title',
+			array(
+				'label'       => __( 'Title', 'medical-college-manager' ),
+				'type'        => \Elementor\Controls_Manager::TEXT,
+				'default'     => __( 'Contact Us', 'medical-college-manager' ),
+				'label_block' => true,
+				'dynamic'     => array( 'active' => true ),
+			)
+		);
+		$this->add_control(
+			'title_tag',
+			array(
+				'label'     => __( 'Title HTML tag', 'medical-college-manager' ),
+				'type'      => \Elementor\Controls_Manager::SELECT,
+				'default'   => 'h2',
+				'options'   => array(
+					'h1'  => 'H1',
+					'h2'  => 'H2',
+					'h3'  => 'H3',
+					'h4'  => 'H4',
+					'h5'  => 'H5',
+					'h6'  => 'H6',
+					'div' => 'div',
+					'p'   => 'p',
+				),
+				'condition' => array( 'title!' => '' ),
+			)
+		);
+		$this->add_control(
+			'subtitle',
+			array(
+				'label'   => __( 'Subtitle', 'medical-college-manager' ),
+				'type'    => \Elementor\Controls_Manager::TEXTAREA,
+				'rows'    => 2,
+				'dynamic' => array( 'active' => true ),
+			)
+		);
+
+		$repeater = new \Elementor\Repeater();
+		$repeater->add_control(
+			'icon',
+			array(
+				'label'   => __( 'Icon', 'medical-college-manager' ),
+				'type'    => \Elementor\Controls_Manager::ICONS,
+				'default' => array(
+					'value'   => 'fas fa-phone-alt',
+					'library' => 'fa-solid',
+				),
+				'skin'    => 'inline',
+			)
+		);
+		$repeater->add_control(
+			'label',
+			array(
+				'label'       => __( 'Label', 'medical-college-manager' ),
+				'type'        => \Elementor\Controls_Manager::TEXT,
+				'default'     => __( 'Phone', 'medical-college-manager' ),
+				'label_block' => true,
+				'dynamic'     => array( 'active' => true ),
+			)
+		);
+		$repeater->add_control(
+			'value',
+			array(
+				'label'       => __( 'Value', 'medical-college-manager' ),
+				'type'        => \Elementor\Controls_Manager::TEXTAREA,
+				'rows'        => 2,
+				'default'     => '+92 966 000000',
+				'description' => __( 'New lines are kept (e.g. a two-line address).', 'medical-college-manager' ),
+				'dynamic'     => array( 'active' => true ),
+			)
+		);
+		$repeater->add_control(
+			'link_type',
+			array(
+				'label'   => __( 'Make it clickable', 'medical-college-manager' ),
+				'type'    => \Elementor\Controls_Manager::SELECT,
+				'default' => 'none',
+				'options' => array(
+					'none'     => __( 'No link', 'medical-college-manager' ),
+					'tel'      => __( 'Phone call (tel:)', 'medical-college-manager' ),
+					'mailto'   => __( 'Email (mailto:)', 'medical-college-manager' ),
+					'whatsapp' => __( 'WhatsApp chat', 'medical-college-manager' ),
+					'map'      => __( 'Open in Google Maps', 'medical-college-manager' ),
+					'url'      => __( 'Custom link', 'medical-college-manager' ),
+				),
+			)
+		);
+		$repeater->add_control(
+			'link_target',
+			array(
+				'label'       => __( 'Number or address to use', 'medical-college-manager' ),
+				'type'        => \Elementor\Controls_Manager::TEXT,
+				'placeholder' => __( 'Optional — defaults to the value', 'medical-college-manager' ),
+				'description' => __( 'Use this when the shown text differs, e.g. "UAN 111-222-333" dialling 111222333.', 'medical-college-manager' ),
+				'label_block' => true,
+				'condition'   => array( 'link_type' => array( 'tel', 'mailto', 'whatsapp', 'map' ) ),
+			)
+		);
+		$repeater->add_control(
+			'link',
+			array(
+				'label'       => __( 'Link', 'medical-college-manager' ),
+				'type'        => \Elementor\Controls_Manager::URL,
+				'placeholder' => 'https://',
+				'dynamic'     => array( 'active' => true ),
+				'condition'   => array( 'link_type' => 'url' ),
+			)
+		);
+		$repeater->add_control(
+			'item_icon_color',
+			array(
+				'label'     => __( 'Icon colour (this row)', 'medical-college-manager' ),
+				'type'      => \Elementor\Controls_Manager::COLOR,
+				'separator' => 'before',
+				'selectors' => array(
+					'{{WRAPPER}} {{CURRENT_ITEM}} .mcm-contact-icon'     => 'color: {{VALUE}};',
+					'{{WRAPPER}} {{CURRENT_ITEM}} .mcm-contact-icon svg' => 'fill: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'items',
+			array(
+				'label'       => __( 'Rows', 'medical-college-manager' ),
+				'type'        => \Elementor\Controls_Manager::REPEATER,
+				'fields'      => $repeater->get_controls(),
+				'separator'   => 'before',
+				'default'     => array(
+					array(
+						'icon'      => array(
+							'value'   => 'fas fa-phone-alt',
+							'library' => 'fa-solid',
+						),
+						'label'     => __( 'Phone', 'medical-college-manager' ),
+						'value'     => '+92 966 000000',
+						'link_type' => 'tel',
+					),
+					array(
+						'icon'      => array(
+							'value'   => 'fas fa-envelope',
+							'library' => 'fa-solid',
+						),
+						'label'     => __( 'Email', 'medical-college-manager' ),
+						'value'     => 'info@example.edu.pk',
+						'link_type' => 'mailto',
+					),
+					array(
+						'icon'      => array(
+							'value'   => 'fas fa-map-marker-alt',
+							'library' => 'fa-solid',
+						),
+						'label'     => __( 'Address', 'medical-college-manager' ),
+						'value'     => __( 'Medical College Road, City', 'medical-college-manager' ),
+						'link_type' => 'map',
+					),
+					array(
+						'icon'      => array(
+							'value'   => 'far fa-clock',
+							'library' => 'fa-regular',
+						),
+						'label'     => __( 'Office hours', 'medical-college-manager' ),
+						'value'     => __( 'Monday – Friday, 8:00 AM – 2:00 PM', 'medical-college-manager' ),
+						'link_type' => 'none',
+					),
+				),
+				'title_field' => '{{{ elementor.helpers.renderIcon( this, icon, {}, "i", "panel" ) || "" }}} {{{ label }}}',
+			)
+		);
+		$this->end_controls_section();
+
+		/* ---- Layout ---- */
+		$this->start_controls_section( 'mcm_contact_layout', array( 'label' => __( 'Layout', 'medical-college-manager' ) ) );
+		$this->add_responsive_control(
+			'layout',
+			array(
+				'label'          => __( 'Label and value', 'medical-college-manager' ),
+				'type'           => \Elementor\Controls_Manager::SELECT,
+				'default'        => 'row',
+				'tablet_default' => 'row',
+				'mobile_default' => 'stacked',
+				'options'        => array(
+					'row'     => __( 'Side by side (label left, value right)', 'medical-college-manager' ),
+					'stacked' => __( 'Stacked (label above value)', 'medical-college-manager' ),
+				),
+				'prefix_class'   => 'mcm-contact-layout%s-',
+			)
+		);
+		$this->add_control(
+			'show_icons',
+			array(
+				'label'        => __( 'Icons', 'medical-college-manager' ),
+				'type'         => \Elementor\Controls_Manager::SWITCHER,
+				'label_on'     => __( 'Show', 'medical-college-manager' ),
+				'label_off'    => __( 'Hide', 'medical-college-manager' ),
+				'return_value' => 'yes',
+				'default'      => 'yes',
+			)
+		);
+		$this->add_control(
+			'show_labels',
+			array(
+				'label'        => __( 'Labels', 'medical-college-manager' ),
+				'description'  => __( 'Hidden labels are still read out by screen readers.', 'medical-college-manager' ),
+				'type'         => \Elementor\Controls_Manager::SWITCHER,
+				'label_on'     => __( 'Show', 'medical-college-manager' ),
+				'label_off'    => __( 'Hide', 'medical-college-manager' ),
+				'return_value' => 'yes',
+				'default'      => 'yes',
+			)
+		);
+		$this->add_control(
+			'divider',
+			array(
+				'label'        => __( 'Lines between rows', 'medical-college-manager' ),
+				'type'         => \Elementor\Controls_Manager::SWITCHER,
+				'label_on'     => __( 'Show', 'medical-college-manager' ),
+				'label_off'    => __( 'Hide', 'medical-college-manager' ),
+				'return_value' => 'yes',
+				'default'      => 'yes',
+				'prefix_class' => 'mcm-contact-divider-',
+			)
+		);
+		$this->add_control(
+			'new_tab',
+			array(
+				'label'        => __( 'Open map and WhatsApp links in a new tab', 'medical-college-manager' ),
+				'type'         => \Elementor\Controls_Manager::SWITCHER,
+				'return_value' => 'yes',
+				'default'      => 'yes',
+			)
+		);
+		$this->end_controls_section();
+
+		$this->register_style_controls();
+	}
+
+	/**
+	 * Style tab.
+	 */
+	protected function register_style_controls() {
+		$this->mcm_style_section( 'mcm_contact_style_box', __( 'Box', 'medical-college-manager' ) );
+		$this->mcm_box_style( 'st_box', '.mcm-contact' );
+		$this->end_controls_section();
+
+		$this->mcm_style_section( 'mcm_contact_style_title', __( 'Title', 'medical-college-manager' ), array( 'condition' => array( 'title!' => '' ) ) );
+		$this->mcm_text_style(
+			'st_title',
+			'.mcm-contact-title',
+			array(
+				'align'   => true,
+				'spacing' => true,
+			)
+		);
+		$this->end_controls_section();
+
+		$this->mcm_style_section( 'mcm_contact_style_sub', __( 'Subtitle', 'medical-college-manager' ), array( 'condition' => array( 'subtitle!' => '' ) ) );
+		$this->mcm_text_style(
+			'st_sub',
+			'.mcm-contact-subtitle',
+			array(
+				'align'   => true,
+				'spacing' => true,
+			)
+		);
+		$this->end_controls_section();
+
+		$this->mcm_style_section( 'mcm_contact_style_rows', __( 'Rows', 'medical-college-manager' ) );
+		$this->add_responsive_control(
+			'st_row_pad',
+			array(
+				'label'      => __( 'Space between rows', 'medical-college-manager' ),
+				'type'       => \Elementor\Controls_Manager::SLIDER,
+				'size_units' => array( 'px', 'em' ),
+				'range'      => array(
+					'px' => array(
+						'min' => 0,
+						'max' => 50,
+					),
+				),
+				'selectors'  => array( '{{WRAPPER}} .mcm-contact-item' => 'padding-top: {{SIZE}}{{UNIT}}; padding-bottom: {{SIZE}}{{UNIT}};' ),
+			)
+		);
+		$this->add_responsive_control(
+			'st_label_w',
+			array(
+				'label'      => __( 'Label column width', 'medical-college-manager' ),
+				'type'       => \Elementor\Controls_Manager::SLIDER,
+				'size_units' => array( 'px', '%' ),
+				'range'      => array(
+					'px' => array(
+						'min' => 60,
+						'max' => 400,
+					),
+					'%'  => array(
+						'min' => 10,
+						'max' => 70,
+					),
+				),
+				'selectors'  => array( '{{WRAPPER}} .mcm-contact' => '--mcm-contact-label-w: {{SIZE}}{{UNIT}};' ),
+			)
+		);
+		$this->add_responsive_control(
+			'st_valign',
+			array(
+				'label'     => __( 'Vertical alignment', 'medical-college-manager' ),
+				'type'      => \Elementor\Controls_Manager::CHOOSE,
+				'options'   => array(
+					'start'    => array(
+						'title' => __( 'Top', 'medical-college-manager' ),
+						'icon'  => 'eicon-v-align-top',
+					),
+					'center'   => array(
+						'title' => __( 'Middle', 'medical-college-manager' ),
+						'icon'  => 'eicon-v-align-middle',
+					),
+					'baseline' => array(
+						'title' => __( 'Text line', 'medical-college-manager' ),
+						'icon'  => 'eicon-v-align-bottom',
+					),
+				),
+				'selectors' => array( '{{WRAPPER}} .mcm-contact-item' => 'align-items: {{VALUE}};' ),
+			)
+		);
+		$this->add_control(
+			'st_div_color',
+			array(
+				'label'     => __( 'Line colour', 'medical-college-manager' ),
+				'type'      => \Elementor\Controls_Manager::COLOR,
+				'selectors' => array( '{{WRAPPER}} .mcm-contact-item' => 'border-color: {{VALUE}};' ),
+				'condition' => array( 'divider' => 'yes' ),
+			)
+		);
+		$this->add_control(
+			'st_div_style',
+			array(
+				'label'     => __( 'Line style', 'medical-college-manager' ),
+				'type'      => \Elementor\Controls_Manager::SELECT,
+				'default'   => '',
+				'options'   => array(
+					''       => __( 'Default', 'medical-college-manager' ),
+					'solid'  => __( 'Solid', 'medical-college-manager' ),
+					'dashed' => __( 'Dashed', 'medical-college-manager' ),
+					'dotted' => __( 'Dotted', 'medical-college-manager' ),
+				),
+				'selectors' => array( '{{WRAPPER}} .mcm-contact-item' => 'border-bottom-style: {{VALUE}};' ),
+				'condition' => array( 'divider' => 'yes' ),
+			)
+		);
+		$this->add_control(
+			'st_row_hover',
+			array(
+				'label'     => __( 'Row hover background', 'medical-college-manager' ),
+				'type'      => \Elementor\Controls_Manager::COLOR,
+				'selectors' => array( '{{WRAPPER}} .mcm-contact-item:hover' => 'background-color: {{VALUE}};' ),
+			)
+		);
+		$this->end_controls_section();
+
+		$this->mcm_style_section( 'mcm_contact_style_icon', __( 'Icon', 'medical-college-manager' ), array( 'condition' => array( 'show_icons' => 'yes' ) ) );
+		$icon = '{{WRAPPER}} .mcm-contact-icon';
+		$this->start_controls_tabs( 'st_icon_tabs' );
+		foreach ( array(
+			'normal' => array( __( 'Normal', 'medical-college-manager' ), $icon ),
+			'hover'  => array( __( 'Hover', 'medical-college-manager' ), '{{WRAPPER}} .mcm-contact-item:hover .mcm-contact-icon' ),
+		) as $state => $cfg ) {
+			$this->start_controls_tab( 'st_icon_tab_' . $state, array( 'label' => $cfg[0] ) );
+			$this->add_control(
+				'st_icon_color_' . $state,
+				array(
+					'label'     => __( 'Colour', 'medical-college-manager' ),
+					'type'      => \Elementor\Controls_Manager::COLOR,
+					'selectors' => array(
+						$cfg[1]          => 'color: {{VALUE}};',
+						$cfg[1] . ' svg' => 'fill: {{VALUE}};',
+					),
+				)
+			);
+			$this->add_control(
+				'st_icon_bg_' . $state,
+				array(
+					'label'     => __( 'Background colour', 'medical-college-manager' ),
+					'type'      => \Elementor\Controls_Manager::COLOR,
+					'selectors' => array( $cfg[1] => 'background-color: {{VALUE}};' ),
+				)
+			);
+			$this->end_controls_tab();
+		}
+		$this->end_controls_tabs();
+		$this->add_responsive_control(
+			'st_icon_size',
+			array(
+				'label'      => __( 'Icon size', 'medical-college-manager' ),
+				'type'       => \Elementor\Controls_Manager::SLIDER,
+				'size_units' => array( 'px', 'em' ),
+				'range'      => array(
+					'px' => array(
+						'min' => 8,
+						'max' => 60,
+					),
+				),
+				'separator'  => 'before',
+				'selectors'  => array( '{{WRAPPER}} .mcm-contact' => '--mcm-contact-icon: {{SIZE}}{{UNIT}};' ),
+			)
+		);
+		$this->add_responsive_control(
+			'st_icon_box',
+			array(
+				'label'      => __( 'Background size (0 = no background)', 'medical-college-manager' ),
+				'type'       => \Elementor\Controls_Manager::SLIDER,
+				'size_units' => array( 'px' ),
+				'range'      => array(
+					'px' => array(
+						'min' => 0,
+						'max' => 100,
+					),
+				),
+				'selectors'  => array( '{{WRAPPER}} .mcm-contact' => '--mcm-contact-icon-box: {{SIZE}}{{UNIT}};' ),
+			)
+		);
+		$this->add_responsive_control(
+			'st_icon_radius',
+			array(
+				'label'      => __( 'Background radius', 'medical-college-manager' ),
+				'type'       => \Elementor\Controls_Manager::SLIDER,
+				'size_units' => array( 'px', '%' ),
+				'range'      => array(
+					'px' => array(
+						'min' => 0,
+						'max' => 50,
+					),
+				),
+				'selectors'  => array( $icon => 'border-radius: {{SIZE}}{{UNIT}};' ),
+			)
+		);
+		$this->add_responsive_control(
+			'st_icon_gap',
+			array(
+				'label'      => __( 'Space after the icon', 'medical-college-manager' ),
+				'type'       => \Elementor\Controls_Manager::SLIDER,
+				'size_units' => array( 'px' ),
+				'range'      => array(
+					'px' => array(
+						'min' => 0,
+						'max' => 40,
+					),
+				),
+				'selectors'  => array( '{{WRAPPER}} .mcm-contact' => '--mcm-contact-icon-gap: {{SIZE}}{{UNIT}};' ),
+			)
+		);
+		$this->end_controls_section();
+
+		$this->mcm_style_section( 'mcm_contact_style_label', __( 'Label', 'medical-college-manager' ), array( 'condition' => array( 'show_labels' => 'yes' ) ) );
+		$this->mcm_text_style( 'st_label', '.mcm-contact-label' );
+		$this->end_controls_section();
+
+		$this->mcm_style_section( 'mcm_contact_style_value', __( 'Value', 'medical-college-manager' ) );
+		$this->mcm_text_style( 'st_value', array( '.mcm-contact-value', '.mcm-contact-value a' ) );
+		$this->add_control(
+			'st_value_link',
+			array(
+				'label'     => __( 'Link colour', 'medical-college-manager' ),
+				'type'      => \Elementor\Controls_Manager::COLOR,
+				'selectors' => array( '{{WRAPPER}} .mcm-contact-value a' => 'color: {{VALUE}};' ),
+			)
+		);
+		$this->add_control(
+			'st_value_hover',
+			array(
+				'label'     => __( 'Link hover colour', 'medical-college-manager' ),
+				'type'      => \Elementor\Controls_Manager::COLOR,
+				'selectors' => array( '{{WRAPPER}} .mcm-contact-value a:hover, {{WRAPPER}} .mcm-contact-value a:focus-visible' => 'color: {{VALUE}};' ),
+			)
+		);
+		$this->add_responsive_control(
+			'st_value_align',
+			array(
+				'label'     => __( 'Alignment', 'medical-college-manager' ),
+				'type'      => \Elementor\Controls_Manager::CHOOSE,
+				'options'   => $this->mcm_align_options(),
+				'selectors' => array( '{{WRAPPER}} .mcm-contact-value' => 'text-align: {{VALUE}};' ),
+			)
+		);
+		$this->end_controls_section();
+	}
+
+	/**
+	 * The href for one row, or '' when the row is not a link.
+	 *
+	 * @param array  $item  Repeater row.
+	 * @param string $value Shown value (plain text).
+	 * @return string
+	 */
+	private function mcm_href( $item, $value ) {
+		$type   = isset( $item['link_type'] ) ? $item['link_type'] : 'none';
+		$target = isset( $item['link_target'] ) && '' !== trim( MCM_Safe::str( $item['link_target'] ) ) ? trim( MCM_Safe::str( $item['link_target'] ) ) : $value;
+		switch ( $type ) {
+			case 'tel':
+				$num = preg_replace( '/[^0-9+]/', '', $target );
+				return '' !== $num ? 'tel:' . $num : '';
+			case 'mailto':
+				$mail = sanitize_email( $target );
+				return is_email( $mail ) ? 'mailto:' . $mail : '';
+			case 'whatsapp':
+				$num = preg_replace( '/[^0-9]/', '', $target );
+				return '' !== $num ? 'https://wa.me/' . $num : '';
+			case 'map':
+				return '' !== $target ? 'https://www.google.com/maps/search/?api=1&query=' . rawurlencode( preg_replace( '/\s+/', ' ', $target ) ) : '';
+			case 'url':
+				return isset( $item['link']['url'] ) ? (string) $item['link']['url'] : '';
+		}
+		return '';
+	}
+
+	/**
+	 * Render boundary: a failing widget renders nothing for visitors (and a
+	 * short notice for administrators) instead of breaking the page.
+	 */
+	protected function render() {
+		echo MCM_Safe::render( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Built and escaped by mcm_output().
+			function () {
+				ob_start();
+				$this->mcm_output();
+				return ob_get_clean();
+			},
+			'Elementor widget ' . $this->get_name()
+		);
+	}
+
+	/** Unguarded widget output; see render(). */
+	protected function mcm_output() {
+		$s       = $this->get_settings_for_display();
+		$s       = is_array( $s ) ? $s : array();
+		$title   = isset( $s['title'] ) ? trim( wp_strip_all_tags( MCM_Safe::str( $s['title'] ) ) ) : '';
+		$sub     = isset( $s['subtitle'] ) ? trim( wp_strip_all_tags( MCM_Safe::str( $s['subtitle'] ) ) ) : '';
+		$tag     = isset( $s['title_tag'] ) && in_array( $s['title_tag'], array( 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'div', 'p' ), true ) ? $s['title_tag'] : 'h2';
+		$icons   = ! isset( $s['show_icons'] ) || 'yes' === $s['show_icons'];
+		$labels  = ! isset( $s['show_labels'] ) || 'yes' === $s['show_labels'];
+		$new_tab = ! isset( $s['new_tab'] ) || 'yes' === $s['new_tab'];
+		$items   = isset( $s['items'] ) && is_array( $s['items'] ) ? $s['items'] : array();
+		$uid     = 'mcm-contact-' . $this->get_id();
+
+		$out  = '<section class="mcm-contact' . ( $labels ? '' : ' mcm-contact--no-labels' ) . '"' . ( '' !== $title ? ' aria-labelledby="' . esc_attr( $uid ) . '"' : '' ) . '>';
+		$out .= '' !== $title ? sprintf( '<%1$s class="mcm-contact-title" id="%3$s">%2$s</%1$s>', $tag, esc_html( $title ), esc_attr( $uid ) ) : '';
+		$out .= '' !== $sub ? '<p class="mcm-contact-subtitle">' . nl2br( esc_html( $sub ) ) . '</p>' : '';
+		$out .= '<dl class="mcm-contact-list">';
+		foreach ( $items as $i => $item ) {
+			$label = isset( $item['label'] ) ? trim( wp_strip_all_tags( MCM_Safe::str( $item['label'] ) ) ) : '';
+			$value = isset( $item['value'] ) ? trim( wp_strip_all_tags( MCM_Safe::str( $item['value'] ) ) ) : '';
+			if ( '' === $label && '' === $value ) {
+				continue;
+			}
+			// Rows still on the widget's defaults have no _id yet; the link key
+			// must be unique per row or Elementor merges the hrefs.
+			$id   = ! empty( $item['_id'] ) ? sanitize_html_class( $item['_id'] ) : 'row' . $i;
+			$html = nl2br( esc_html( $value ) );
+			$href = $this->mcm_href( $item, $value );
+			if ( '' !== $href ) {
+				$key   = 'mcm_contact_link_' . $i . '_' . $id;
+				$type  = isset( $item['link_type'] ) ? $item['link_type'] : '';
+				$extra = array();
+				if ( 'url' === $type ) {
+					$this->add_link_attributes( $key, $item['link'] );
+				} else {
+					// Mailto addresses are entity-encoded against harvesters.
+					$this->add_render_attribute( $key, 'href', 'mailto' === $type ? 'mailto:' . antispambot( substr( $href, 7 ) ) : $href );
+					if ( $new_tab && in_array( $type, array( 'whatsapp', 'map' ), true ) ) {
+						$this->add_render_attribute( $key, 'target', '_blank' );
+						$this->add_render_attribute( $key, 'rel', 'noopener' );
+						$extra[] = '<span class="mcm-sr-only"> ' . esc_html__( '(opens in a new tab)', 'medical-college-manager' ) . '</span>';
+					}
+				}
+				if ( 'mailto' === $type ) {
+					$html = esc_html( antispambot( $value ) );
+				}
+				$html = '<a ' . $this->get_render_attribute_string( $key ) . '>' . $html . implode( '', $extra ) . '</a>';
+			}
+			$icon = '';
+			if ( $icons && ! empty( $item['icon']['value'] ) ) {
+				ob_start();
+				\Elementor\Icons_Manager::render_icon( $item['icon'], array( 'aria-hidden' => 'true' ) );
+				$icon = '<span class="mcm-contact-icon">' . ob_get_clean() . '</span>';
+			}
+			$out .= '<div class="mcm-contact-item elementor-repeater-item-' . esc_attr( $id ) . '">';
+			$out .= '<dt class="mcm-contact-term">' . $icon . '<span class="mcm-contact-label' . ( $labels ? '' : ' mcm-sr-only' ) . '">' . esc_html( $label ) . '</span></dt>';
+			$out .= '<dd class="mcm-contact-value">' . $html . '</dd>';
+			$out .= '</div>';
+		}
+		$out .= '</dl></section>';
+
+		echo $out; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Every part escaped above; icons come from Elementor's Icons_Manager.
 	}
 }

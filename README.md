@@ -14,7 +14,7 @@ A WordPress plugin that turns a WordPress site into a complete website for a med
 - **Notice board**: scrolling ticker, auto-scroll board and list, with pinning, priority and auto-expiry. Tenders hide themselves after their deadline.
 - **Printing on the college letterhead** (logo, address, signature block), including filtered lists and Save as PDF.
 - **CSV import/export** for every type, with upsert on re-import and sample files in `samples/`.
-- **Elementor**: 18 drag-and-drop widgets, including a Testimonial / Message widget (e.g. "Message from the Head of Department") with the photo left, right or on top. Each has the full Elementor set of query options (include/exclude terms and items, status, order by field, offset, pagination, filter-bar parts) and Style options (typography, colours, background, border, radius, shadow, Normal/Hover) for every part.
+- **Elementor**: 19 drag-and-drop widgets, including a Testimonial / Message widget (e.g. "Message from the Head of Department") with the photo left, right or on top, and a Contact Info widget (icon + label + clickable value rows). Each has the full Elementor set of query options (include/exclude terms and items, status, order by field, offset, pagination, filter-bar parts) and Style options (typography, colours, background, border, radius, shadow, Normal/Hover) for every part.
 - **Design settings**: colours, spacing, columns, page banners and custom CSS, without code.
 - **SEO**: schema.org JSON-LD for people, events, courses, programs, publications and jobs.
 - **Privacy**: student records have their own capabilities (administrators only), no REST route, and only safe fields on the front end. Includes WordPress personal-data export and erase support.
