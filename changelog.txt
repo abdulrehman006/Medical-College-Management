@@ -124,6 +124,15 @@ Medical College Manager — complete changelog.
     and read-more; exclude categories, tags, author, offset; full Style tab.
   - Notice Ticker / Board / List: "only from the last N days"; full Style tabs.
   The same options are available as shortcode attributes (see readme).
+* Elementor listing widgets: new Display section. Photos: show (default photo
+  when none uploaded, as before), only uploaded photos, or hide all photos
+  (text-only cards) — for teams where only some staff have a photo. Show or
+  hide specialty, designation, department, status badge, details, short
+  description and the button. Table columns: pick which to show (e.g. a Team
+  table without Staff Type and Specialty); with the name column hidden the
+  first column links to the profile. The choices hold through live
+  filtering, paging and printing. Same options as shortcode attributes
+  (images, table_cols, show_*). Existing pages are unchanged.
 * New Elementor widget: Testimonial / Message — heading (tag of your choice,
   across the full width or beside the photo), rich-text message, photo with
   image size, name, designation, organisation, optional profile link and

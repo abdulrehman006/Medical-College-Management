@@ -130,8 +130,11 @@ class MCM_Ajax {
 			$meta_key = '';
 		}
 
+		// Display choices (images, table columns, card parts), re-cleaned.
+		$display = MCM_Query::display_opts( isset( $config['display'] ) && is_array( $config['display'] ) ? $config['display'] : array() );
+
 		$a = MCM_Query::parse_atts(
-			array(
+			$display + array(
 				'type'          => $type,
 				'view'          => sanitize_key( MCM_Safe::scalar( $config, 'view', 'grid' ) ),
 				'columns'       => absint( MCM_Safe::scalar( $config, 'columns', '3' ) ),

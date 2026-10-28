@@ -940,6 +940,8 @@ abstract class MCM_Elementor_Widget_Base extends \Elementor\Widget_Base {
 
 		$this->end_controls_section();
 
+		$this->mcm_display_controls( $type );
+
 		/* ---- Filters & Tools ---- */
 		$this->start_controls_section( 'mcm_tools', array( 'label' => __( 'Filters & Tools', 'medical-college-manager' ) ) );
 
@@ -1109,6 +1111,106 @@ abstract class MCM_Elementor_Widget_Base extends \Elementor\Widget_Base {
 		$this->end_controls_section();
 
 		$this->register_style_controls();
+	}
+
+	/**
+	 * Display section: which images, card parts and table columns are shown.
+	 * Everything is shown by default, as before.
+	 *
+	 * @param string $type Post type.
+	 */
+	private function mcm_display_controls( $type ) {
+		$people = in_array( $type, array( 'mcm_consultant', 'mcm_team' ), true );
+		$job    = 'mcm_job' === $type;
+		$cards  = array( 'view!' => array( 'table', 'citation' ) );
+
+		$this->start_controls_section( 'mcm_display', array( 'label' => __( 'Display', 'medical-college-manager' ) ) );
+
+		if ( ! $job ) {
+			$this->add_control(
+				'images',
+				array(
+					'label'       => $people ? __( 'Photos', 'medical-college-manager' ) : __( 'Images', 'medical-college-manager' ),
+					'type'        => \Elementor\Controls_Manager::SELECT,
+					'default'     => 'all',
+					'options'     => $people
+						? array(
+							'all'      => __( 'Show (default photo when none uploaded)', 'medical-college-manager' ),
+							'uploaded' => __( 'Only uploaded photos', 'medical-college-manager' ),
+							'none'     => __( 'Hide all photos', 'medical-college-manager' ),
+						)
+						: array(
+							'all'  => __( 'Show', 'medical-college-manager' ),
+							'none' => __( 'Hide', 'medical-college-manager' ),
+						),
+					'description' => $people ? __( 'Some staff without a photo? "Only uploaded photos" leaves the picture out for them; "Hide all photos" shows text cards.', 'medical-college-manager' ) : '',
+					'condition'   => $cards,
+				)
+			);
+		}
+
+		$switches = array();
+		if ( $people ) {
+			$switches['show_specialty']   = __( 'Specialty', 'medical-college-manager' );
+			$switches['show_designation'] = __( 'Designation', 'medical-college-manager' );
+			$switches['show_department']  = __( 'Department', 'medical-college-manager' );
+		} elseif ( ! $job ) {
+			if ( MCM_Query::date_status_options( $type ) ) {
+				$switches['show_status'] = __( 'Status badge (e.g. Open, Past event)', 'medical-college-manager' );
+			}
+			$switches['show_meta']    = __( 'Details (date, venue, code…)', 'medical-college-manager' );
+			$switches['show_excerpt'] = __( 'Short description', 'medical-college-manager' );
+		}
+		$switches['show_button'] = __( 'Button / "View details" link', 'medical-college-manager' );
+		foreach ( $switches as $key => $label ) {
+			$this->add_control(
+				$key,
+				array(
+					'label'        => $label,
+					'type'         => \Elementor\Controls_Manager::SWITCHER,
+					'label_on'     => __( 'Show', 'medical-college-manager' ),
+					'label_off'    => __( 'Hide', 'medical-college-manager' ),
+					'return_value' => 'yes',
+					'default'      => 'yes',
+					'condition'    => $cards,
+				)
+			);
+		}
+
+		$this->add_control(
+			'table_cols',
+			array(
+				'label'       => __( 'Table columns', 'medical-college-manager' ),
+				'type'        => \Elementor\Controls_Manager::SELECT2,
+				'multiple'    => true,
+				'label_block' => true,
+				'options'     => MCM_Query::table_column_options( $type ),
+				'default'     => array(),
+				'description' => __( 'Pick the columns to show, e.g. leave out Staff Type or Specialty. Leave empty to show every column.', 'medical-college-manager' ),
+				'condition'   => array( 'view' => 'mcm_timetable' === $type ? array( 'table', 'directory' ) : array( 'table' ) ),
+				'separator'   => 'before',
+			)
+		);
+
+		$this->end_controls_section();
+	}
+
+	/**
+	 * Display attributes from the widget settings ('' from a switched-off
+	 * control means "no"; a control saved before it existed means "yes").
+	 *
+	 * @param array $s Widget settings.
+	 * @return array
+	 */
+	private function mcm_display_atts( $s ) {
+		$atts = array(
+			'images'     => isset( $s['images'] ) ? sanitize_key( MCM_Safe::str( $s['images'] ) ) : 'all',
+			'table_cols' => isset( $s['table_cols'] ) && is_array( $s['table_cols'] ) ? implode( ',', array_map( 'sanitize_key', $s['table_cols'] ) ) : '',
+		);
+		foreach ( array( 'show_button', 'show_specialty', 'show_designation', 'show_department', 'show_excerpt', 'show_meta', 'show_status' ) as $key ) {
+			$atts[ $key ] = ( ! isset( $s[ $key ] ) || 'yes' === $s[ $key ] ) ? 'yes' : 'no';
+		}
+		return $atts;
 	}
 
 	/**
@@ -1610,6 +1712,7 @@ abstract class MCM_Elementor_Widget_Base extends \Elementor\Widget_Base {
 		if ( $exclude ) {
 			$atts['exclude_terms'] = $exclude;
 		}
+		$atts = $this->mcm_display_atts( $s ) + $atts;
 		$atts = $this->mcm_extra_atts( $atts, $s );
 
 		echo MCM_Shortcodes::render_block( $atts ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped

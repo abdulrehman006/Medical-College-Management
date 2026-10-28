@@ -224,6 +224,13 @@ Attributes (all optional):
   offset     skip the first N items
   paginate   yes | no                 numbered pages ("count" is the page size)
   empty      message when nothing is found
+  images     all | uploaded | none     photos/images on cards and list rows
+             (people: "uploaded" leaves out the default photo for staff
+             without a photo; "none" shows text-only cards)
+  table_cols columns to show in the table view, comma separated, e.g.
+             table_cols="title,mcm_designation,mcm_department" (default all)
+  show_button / show_specialty / show_designation / show_department /
+  show_excerpt / show_meta / show_status   yes | no (default yes)
   class_css  extra wrapper class for Custom CSS targeting
 
 Examples:
@@ -286,6 +293,11 @@ everything visually:
   Filters & Tools  — Filter bar on/off, search box, placeholder, which
                      dropdowns to show, Reset button, a starting search
                      keyword, Print button and printed heading.
+  Display          — Photos/Images: show (default photo when none uploaded),
+                     only uploaded, or hide; show/hide specialty, designation,
+                     department (people), status badge, details, short
+                     description and the button; pick the Table columns
+                     (e.g. leave out Staff Type and Specialty).
   Include / Exclude— limit to, or leave out, terms of each taxonomy
                      (Department, Session, Faculty, Specialty, Category…);
                      only these items / leave out these items.

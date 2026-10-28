@@ -392,7 +392,9 @@ class MCM_Job {
 		/* translators: %s: publication date. */
 		$html .= '<p class="mcm-jobcard-pub">' . esc_html( sprintf( __( 'Published %s', 'medical-college-manager' ), MCM_Query::fmt_date( self::publish_date( $id ) ) ) ) . '</p>';
 		$html .= '</div>';
-		$html .= '<div class="mcm-jobcard-foot"><a class="mcm-jobcard-btn" href="' . esc_url( $link ) . '">' . esc_html( MCM_Query::link_label( 'mcm_job' ) ) . ' <span aria-hidden="true">&rarr;</span></a></div>';
+		if ( MCM_Query::shows( 'show_button' ) ) {
+			$html .= '<div class="mcm-jobcard-foot"><a class="mcm-jobcard-btn" href="' . esc_url( $link ) . '">' . esc_html( MCM_Query::link_label( 'mcm_job' ) ) . ' <span aria-hidden="true">&rarr;</span></a></div>';
+		}
 		return $html . '</article>';
 	}
 

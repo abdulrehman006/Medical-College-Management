@@ -89,6 +89,109 @@ class MCM_Query {
 	}
 
 	/**
+	 * Display options of the listing being rendered (set by render_results()).
+	 *
+	 * @var array
+	 */
+	private static $display = array();
+
+	/**
+	 * Clean display options from listing attributes: which images, table
+	 * columns and card parts are shown. Only values that differ from the
+	 * default are returned, so an untouched listing carries nothing extra.
+	 *
+	 * @param array $a Listing attributes (or a data-config "display" object).
+	 * @return array
+	 */
+	public static function display_opts( $a ) {
+		$a   = is_array( $a ) ? $a : array();
+		$out = array();
+		$img = isset( $a['images'] ) ? sanitize_key( MCM_Safe::str( $a['images'] ) ) : 'all';
+		if ( in_array( $img, array( 'uploaded', 'none' ), true ) ) {
+			$out['images'] = $img;
+		}
+		$cols = isset( $a['table_cols'] ) ? $a['table_cols'] : '';
+		$cols = is_array( $cols ) ? $cols : explode( ',', MCM_Safe::str( $cols ) );
+		$cols = array_values( array_filter( array_map( 'sanitize_key', array_map( array( 'MCM_Safe', 'str' ), $cols ) ) ) );
+		if ( $cols ) {
+			$out['table_cols'] = implode( ',', array_slice( $cols, 0, 20 ) );
+		}
+		foreach ( array( 'show_button', 'show_specialty', 'show_designation', 'show_department', 'show_excerpt', 'show_meta', 'show_status' ) as $key ) {
+			if ( isset( $a[ $key ] ) && in_array( strtolower( MCM_Safe::str( $a[ $key ] ) ), array( 'no', '0', 'false', 'off' ), true ) ) {
+				$out[ $key ] = 'no';
+			}
+		}
+		return $out;
+	}
+
+	/**
+	 * Whether a part of the item is shown in the listing being rendered.
+	 *
+	 * @param string $key show_* option.
+	 * @return bool
+	 */
+	public static function shows( $key ) {
+		return ! isset( self::$display[ $key ] ) || 'no' !== self::$display[ $key ];
+	}
+
+	/**
+	 * Images shown in the listing being rendered: all | uploaded | none.
+	 *
+	 * @return string
+	 */
+	public static function image_mode() {
+		return isset( self::$display['images'] ) ? self::$display['images'] : 'all';
+	}
+
+	/**
+	 * Stable key of a table column (its field or taxonomy, else its kind).
+	 *
+	 * @param array $col Column definition from table_columns().
+	 * @return string
+	 */
+	public static function table_column_key( $col ) {
+		return '' !== $col[2] ? $col[2] : $col[1];
+	}
+
+	/**
+	 * Column key => label for a type's table (for the Elementor column picker).
+	 *
+	 * @param string $type Post type.
+	 * @return array<string,string>
+	 */
+	public static function table_column_options( $type ) {
+		$out = array();
+		foreach ( self::table_columns( $type ) as $col ) {
+			$out[ self::table_column_key( $col ) ] = $col[0];
+		}
+		return $out;
+	}
+
+	/**
+	 * The columns to print: the author's choice in table order, or every
+	 * column when none (or none that exist) were chosen.
+	 *
+	 * @param string $type Post type.
+	 * @return array
+	 */
+	private static function visible_table_columns( $type ) {
+		$cols = self::table_columns( $type );
+		if ( empty( self::$display['table_cols'] ) ) {
+			return $cols;
+		}
+		$keep = explode( ',', self::$display['table_cols'] );
+		$out  = array_values(
+			array_filter(
+				$cols,
+				function ( $col ) use ( $keep ) {
+					return in_array( MCM_Query::table_column_key( $col ), $keep, true );
+				}
+			)
+		);
+		return $out ? $out : $cols;
+	}
+
+	/**
 	 * Shared truthy check for yes/1/true/on attribute values.
 	 *
 	 * @param mixed $val Value.
@@ -104,63 +207,75 @@ class MCM_Query {
 	 */
 	public static function parse_atts( $atts ) {
 		$defaults = array(
-			'type'          => 'mcm_consultant',
-			'view'          => 'grid',        // grid | list | table.
-			'columns'       => MCM_Settings::value( 'columns' ),
-			'count'         => 12,
-			'category'      => '',            // primary taxonomy term slug(s).
-			'filters'       => 'no',          // show filter bar.
-			'print'         => '',            // '' = follow the settings screen; yes/no forces it.
-			'paginate'      => 'no',          // render numbered pagination.
-			'print_title'   => '',            // heading shown on the printed page.
-			'search'        => '',            // initial search string.
-			'orderby'       => 'date',
-			'order'         => 'DESC',
-			'meta_key'      => '',            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Shortcode attribute; enables orderby="meta_value".
-			'meta_type'     => '',            // e.g. DATE, NUMERIC, CHAR.
-			'paged'         => 1,
-			'class_css'     => '',
+			'type'             => 'mcm_consultant',
+			'view'             => 'grid',        // grid | list | table.
+			'columns'          => MCM_Settings::value( 'columns' ),
+			'count'            => 12,
+			'category'         => '',            // primary taxonomy term slug(s).
+			'filters'          => 'no',          // show filter bar.
+			'print'            => '',            // '' = follow the settings screen; yes/no forces it.
+			'paginate'         => 'no',          // render numbered pagination.
+			'print_title'      => '',            // heading shown on the printed page.
+			'search'           => '',            // initial search string.
+			'orderby'          => 'date',
+			'order'            => 'DESC',
+			'meta_key'         => '',            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Shortcode attribute; enables orderby="meta_value".
+			'meta_type'        => '',            // e.g. DATE, NUMERIC, CHAR.
+			'paged'            => 1,
+			'class_css'        => '',
 			// Jobs: open (default) | closed | all. Admissions: open | upcoming |
 			// closed. Scholarships, tenders: open | closed. Events: upcoming |
 			// past. Empty = all (jobs: open).
-			'status'        => '',
+			'status'           => '',
 			// Specific items (comma separated IDs) / items to leave out.
-			'ids'           => '',
-			'exclude_ids'   => '',
+			'ids'              => '',
+			'exclude_ids'      => '',
 			// Skip the first N items.
-			'offset'        => 0,
+			'offset'           => 0,
 			// Filter bar parts: search box, which dropdowns (comma separated
 			// taxonomies, empty = all), Reset button, search placeholder.
-			'search_box'    => 'yes',
-			'facets'        => '',
-			'reset'         => 'yes',
-			'placeholder'   => '',
+			'search_box'       => 'yes',
+			'facets'           => '',
+			'reset'            => 'yes',
+			'placeholder'      => '',
 			// Message shown when nothing matches (empty = the default text).
-			'empty'         => '',
+			'empty'            => '',
+			// What each item shows (see display_opts()): images all | uploaded |
+			// none; table_cols = comma separated column keys (empty = all);
+			// show_* = yes | no.
+			'images'           => 'all',
+			'table_cols'       => '',
+			'show_button'      => 'yes',
+			'show_specialty'   => 'yes',
+			'show_designation' => 'yes',
+			'show_department'  => 'yes',
+			'show_excerpt'     => 'yes',
+			'show_meta'        => 'yes',
+			'show_status'      => 'yes',
 			// Generic per-taxonomy attribute (slug = taxonomy without mcm_ prefix).
-			'department'    => '',
-			'session'       => '',
-			'teacher'       => '',
-			'specialty'     => '',
-			'level'         => '',
-			'research_area' => '',
-			'program'       => '',
-			'staff_type'    => '',
+			'department'       => '',
+			'session'          => '',
+			'teacher'          => '',
+			'specialty'        => '',
+			'level'            => '',
+			'research_area'    => '',
+			'program'          => '',
+			'staff_type'       => '',
 			// Alias: editors think "professor", the taxonomy is mcm_teacher.
-			'professor'     => '',
+			'professor'        => '',
 			// Locked taxonomy term (e.g. on a taxonomy archive) — always applied
 			// and ANDed in, surviving AJAX so the archive stays scoped.
-			'lock_tax'      => '',
-			'lock_term'     => '',
+			'lock_tax'         => '',
+			'lock_term'        => '',
 			// Internal: taxonomy => term map chosen by the VISITOR (AJAX).
-			'tax_filters'   => array(),
+			'tax_filters'      => array(),
 			// Internal: taxonomy => slug(s) pre-filter set by the AUTHOR (Elementor
 			// widget controls). Locked like the friendly attributes above.
-			'prefilter'     => array(),
+			'prefilter'        => array(),
 			// Internal: the author scope round-tripped through data-config (AJAX).
-			'scope'         => array(),
+			'scope'            => array(),
 			// Internal: taxonomy => slug(s) the AUTHOR left out (Elementor).
-			'exclude_terms' => array(),
+			'exclude_terms'    => array(),
 		);
 		$a = wp_parse_args( $atts, $defaults );
 
@@ -1562,9 +1677,18 @@ class MCM_Query {
 
 		$btn = self::link_label( $type );
 
+		// Photo: always (default photo when none was uploaded), only uploaded, or never.
+		$mode     = self::image_mode();
+		$media    = 'none' !== $mode && ( $thumb || 'all' === $mode );
+		$spec     = self::shows( 'show_specialty' ) ? $spec : array();
+		$desig    = self::shows( 'show_designation' ) ? $desig : '';
+		$dept     = self::shows( 'show_department' ) ? $dept : array();
+		$link_btn = $link && self::shows( 'show_button' );
+
 		ob_start();
 		?>
-		<article class="mcm-dir-card mcm-dir-card--<?php echo esc_attr( str_replace( 'mcm_', '', $type ) ); ?>">
+		<article class="mcm-dir-card mcm-dir-card--<?php echo esc_attr( str_replace( 'mcm_', '', $type ) ); ?><?php echo $media ? '' : ' mcm-dir-card--no-media'; ?>">
+			<?php if ( $media ) : ?>
 			<div class="mcm-dir-card-media">
 				<?php
 				if ( $thumb ) {
@@ -1574,6 +1698,7 @@ class MCM_Query {
 				}
 				?>
 			</div>
+			<?php endif; ?>
 			<h3 class="mcm-dir-card-name">
 				<?php if ( $link ) : ?>
 					<a href="<?php echo esc_url( $link ); ?>"><?php echo esc_html( $title ); ?></a>
@@ -1590,7 +1715,7 @@ class MCM_Query {
 			<?php if ( ! empty( $dept ) ) : ?>
 				<div class="mcm-dir-card-dept"><?php echo esc_html( implode( ', ', $dept ) ); ?></div>
 			<?php endif; ?>
-			<?php if ( $link ) : ?>
+			<?php if ( $link_btn ) : ?>
 				<a class="mcm-dir-card-btn" href="<?php echo esc_url( $link ); ?>"><?php echo esc_html( $btn ); ?></a>
 			<?php endif; ?>
 		</article>
@@ -1604,6 +1729,23 @@ class MCM_Query {
 	 * @param array $a Parsed attributes.
 	 */
 	public static function render_results( $a ) {
+		// Cards and table rows read the display options from here; nested
+		// listings (a listing inside a listing's content) get theirs back.
+		$previous      = self::$display;
+		self::$display = self::display_opts( $a );
+		try {
+			return self::build_results( $a );
+		} finally {
+			self::$display = $previous;
+		}
+	}
+
+	/**
+	 * Unguarded results builder; see render_results().
+	 *
+	 * @param array $a Parsed attributes.
+	 */
+	private static function build_results( $a ) {
 		// Students are the only content with private fields. Whatever view is
 		// requested — including via the public AJAX endpoint, whose params are
 		// attacker-controlled — force the safe table renderer. This is what makes
@@ -1811,10 +1953,14 @@ class MCM_Query {
 				'alt'     => esc_attr( get_the_title( $id ) ),
 			)
 		);
+		if ( 'none' === self::image_mode() ) {
+			return '';
+		}
 		if ( $thumb ) {
 			return $thumb;
 		}
-		return self::is_person( get_post_type( $id ) ) ? self::default_avatar( $img_class, $ph_class, $id, $size ) : '';
+		// "Only uploaded" leaves the image out instead of the default photo.
+		return self::is_person( get_post_type( $id ) ) && 'all' === self::image_mode() ? self::default_avatar( $img_class, $ph_class, $id, $size ) : '';
 	}
 
 	/**
@@ -1945,7 +2091,7 @@ class MCM_Query {
 		$link  = is_post_type_viewable( $type ) ? get_permalink( $id ) : '';
 		$media = self::media_html( $id, 'large', 'mcm-card-img', 'mcm-card-ph' );
 
-		$when = self::date_status( $id, $type );
+		$when = self::shows( 'show_status' ) ? self::date_status( $id, $type ) : null;
 
 		ob_start();
 		?>
@@ -1972,14 +2118,14 @@ class MCM_Query {
 						<?php echo esc_html( $title ); ?>
 					<?php endif; ?>
 				</h3>
-				<?php echo self::meta_lines( $id, $type ); // phpcs:ignore ?>
+				<?php echo self::shows( 'show_meta' ) ? self::meta_lines( $id, $type ) : ''; // phpcs:ignore ?>
 				<?php
-				$excerpt = has_excerpt( $id ) ? get_the_excerpt( $id ) : '';
+				$excerpt = self::shows( 'show_excerpt' ) && has_excerpt( $id ) ? get_the_excerpt( $id ) : '';
 				if ( $excerpt ) :
 					?>
 					<p class="mcm-card-excerpt"><?php echo esc_html( wp_trim_words( $excerpt, 22 ) ); ?></p>
 				<?php endif; ?>
-				<?php if ( $link ) : ?>
+				<?php if ( $link && self::shows( 'show_button' ) ) : ?>
 					<a class="mcm-card-link" href="<?php echo esc_url( $link ); ?>"><?php echo esc_html( self::link_label( $type ) ); ?> &rarr;</a>
 				<?php endif; ?>
 			</div>
@@ -1999,7 +2145,7 @@ class MCM_Query {
 		$link  = is_post_type_viewable( $type ) ? get_permalink( $id ) : '';
 		$media = self::media_html( $id, 'thumbnail', 'mcm-list-img', 'mcm-list-ph' );
 
-		$when = self::date_status( $id, $type );
+		$when = self::shows( 'show_status' ) ? self::date_status( $id, $type ) : null;
 
 		ob_start();
 		?>
@@ -2026,9 +2172,9 @@ class MCM_Query {
 						<?php echo esc_html( $title ); ?>
 					<?php endif; ?>
 				</h3>
-				<?php echo self::meta_lines( $id, $type ); // phpcs:ignore ?>
+				<?php echo self::shows( 'show_meta' ) ? self::meta_lines( $id, $type ) : ''; // phpcs:ignore ?>
 			</div>
-			<?php if ( $link ) : ?>
+			<?php if ( $link && self::shows( 'show_button' ) ) : ?>
 			<a class="mcm-list-link" href="<?php echo esc_url( $link ); ?>"><?php echo esc_html( self::link_label( $type ) ); ?> &rarr;</a>
 			<?php endif; ?>
 		</div>
@@ -2183,8 +2329,18 @@ class MCM_Query {
 	 * @param array    $a     Parsed attributes.
 	 */
 	public static function render_table( $query, $a ) {
-		$cols        = self::table_columns( $a['type'] );
+		$cols        = self::visible_table_columns( $a['type'] );
 		$title_links = 'mcm_student' !== $a['type'] && is_post_type_viewable( $a['type'] );
+		// With the title column hidden, the first column links to the entry.
+		$linked = array_filter(
+			$cols,
+			function ( $col ) {
+				return 'title' === $col[1] || ! empty( $col[4] );
+			}
+		);
+		if ( ! $linked && $cols ) {
+			$cols[0][4] = true;
+		}
 
 		ob_start();
 		echo '<div class="mcm-table-wrap"><table class="mcm-table">';

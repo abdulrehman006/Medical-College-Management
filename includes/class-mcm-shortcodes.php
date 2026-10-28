@@ -158,10 +158,12 @@ class MCM_Shortcodes {
 			'empty'         => sanitize_text_field( MCM_Safe::str( $a['empty'] ) ),
 			// With no search box the starting keyword is fixed.
 			'fixed_search'  => self::truthy( $a['search_box'] ) ? '' : sanitize_text_field( MCM_Safe::str( $a['search'] ) ),
+			// Images, table columns and card parts the author chose to hide.
+			'display'       => MCM_Query::display_opts( $a ),
 		);
 		foreach ( $extra as $key => $value ) {
 			if ( ! empty( $value ) ) {
-				$data[ $key ] = 'exclude_terms' === $key ? (object) $value : $value;
+				$data[ $key ] = in_array( $key, array( 'exclude_terms', 'display' ), true ) ? (object) $value : $value;
 			}
 		}
 
