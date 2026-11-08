@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-10-28T08:17:40+00:00\n"
+"POT-Creation-Date: 2026-11-08T19:57:40+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: medical-college-manager\n"
@@ -110,25 +110,25 @@ msgid "This image is %1$d px wide; at least %2$d px is recommended, or it may lo
 msgstr ""
 
 #: includes/class-mcm-blog.php:165
-#: includes/elementor-widgets.php:2512
+#: includes/elementor-widgets.php:2513
 msgid "No posts found."
 msgstr ""
 
 #: includes/class-mcm-blog.php:188
-#: includes/elementor-widgets.php:2502
-#: includes/elementor-widgets.php:2700
+#: includes/elementor-widgets.php:2503
+#: includes/elementor-widgets.php:2701
 msgid "Read More"
 msgstr ""
 
 #: includes/class-mcm-cpt.php:48
-#: includes/class-mcm-query.php:2976
+#: includes/class-mcm-query.php:2986
 msgid "Timetable Entry"
 msgstr ""
 
 #: includes/class-mcm-cpt.php:49
 #: includes/class-mcm-import.php:339
 #: includes/class-mcm-program.php:174
-#: includes/elementor-widgets.php:2001
+#: includes/elementor-widgets.php:2002
 msgid "Timetable"
 msgstr ""
 
@@ -136,42 +136,42 @@ msgstr ""
 #: includes/class-mcm-cpt.php:323
 #: includes/class-mcm-meta.php:887
 #: includes/class-mcm-privacy.php:52
-#: includes/class-mcm-query.php:2259
-#: includes/class-mcm-query.php:2280
-#: includes/class-mcm-query.php:2355
-#: includes/class-mcm-query.php:2511
-#: includes/class-mcm-query.php:2580
-#: includes/class-mcm-query.php:2798
+#: includes/class-mcm-query.php:2269
+#: includes/class-mcm-query.php:2290
+#: includes/class-mcm-query.php:2365
+#: includes/class-mcm-query.php:2521
+#: includes/class-mcm-query.php:2590
+#: includes/class-mcm-query.php:2808
 msgid "Program"
 msgstr ""
 
 #: includes/class-mcm-cpt.php:57
 #: includes/class-mcm-cpt.php:324
 #: includes/class-mcm-import.php:343
-#: includes/elementor-widgets.php:1893
+#: includes/elementor-widgets.php:1894
 msgid "Programs"
 msgstr ""
 
 #: includes/class-mcm-cpt.php:64
-#: includes/class-mcm-query.php:2252
+#: includes/class-mcm-query.php:2262
 msgid "Course"
 msgstr ""
 
 #: includes/class-mcm-cpt.php:65
 #: includes/class-mcm-import.php:347
 #: includes/class-mcm-program.php:173
-#: includes/elementor-widgets.php:1929
+#: includes/elementor-widgets.php:1930
 msgid "Courses"
 msgstr ""
 
 #: includes/class-mcm-cpt.php:72
-#: includes/class-mcm-query.php:2288
+#: includes/class-mcm-query.php:2298
 msgid "Event"
 msgstr ""
 
 #: includes/class-mcm-cpt.php:73
 #: includes/class-mcm-import.php:351
-#: includes/elementor-widgets.php:1965
+#: includes/elementor-widgets.php:1966
 msgid "Events"
 msgstr ""
 
@@ -181,7 +181,7 @@ msgstr ""
 
 #: includes/class-mcm-cpt.php:81
 #: includes/class-mcm-import.php:355
-#: includes/elementor-widgets.php:1821
+#: includes/elementor-widgets.php:1822
 msgid "Consultants"
 msgstr ""
 
@@ -191,7 +191,7 @@ msgstr ""
 
 #: includes/class-mcm-cpt.php:89
 #: includes/class-mcm-import.php:359
-#: includes/elementor-widgets.php:1857
+#: includes/elementor-widgets.php:1858
 msgid "Team"
 msgstr ""
 
@@ -202,45 +202,45 @@ msgstr ""
 #: includes/class-mcm-cpt.php:97
 #: includes/class-mcm-import.php:363
 #: includes/class-mcm-program.php:175
-#: includes/elementor-widgets.php:2043
+#: includes/elementor-widgets.php:2044
 msgid "Admissions"
 msgstr ""
 
 #: includes/class-mcm-cpt.php:104
-#: includes/class-mcm-query.php:2305
-#: includes/class-mcm-query.php:2959
+#: includes/class-mcm-query.php:2315
+#: includes/class-mcm-query.php:2969
 msgid "Notice"
 msgstr ""
 
 #: includes/class-mcm-cpt.php:105
 #: includes/class-mcm-import.php:391
-#: includes/elementor-widgets.php:2909
-#: includes/elementor-widgets.php:2994
-#: includes/elementor-widgets.php:3024
-#: includes/elementor-widgets.php:3037
+#: includes/elementor-widgets.php:2910
+#: includes/elementor-widgets.php:2995
+#: includes/elementor-widgets.php:3025
+#: includes/elementor-widgets.php:3038
 msgid "Notices"
 msgstr ""
 
 #: includes/class-mcm-cpt.php:112
 #: includes/class-mcm-notice.php:390
-#: includes/class-mcm-query.php:2312
+#: includes/class-mcm-query.php:2322
 msgid "Tender"
 msgstr ""
 
 #: includes/class-mcm-cpt.php:113
 #: includes/class-mcm-import.php:367
-#: includes/elementor-widgets.php:2079
+#: includes/elementor-widgets.php:2080
 msgid "Tenders"
 msgstr ""
 
 #: includes/class-mcm-cpt.php:120
-#: includes/class-mcm-query.php:2319
+#: includes/class-mcm-query.php:2329
 msgid "Scholarship"
 msgstr ""
 
 #: includes/class-mcm-cpt.php:121
 #: includes/class-mcm-import.php:371
-#: includes/elementor-widgets.php:2115
+#: includes/elementor-widgets.php:2116
 msgid "Scholarships"
 msgstr ""
 
@@ -250,7 +250,7 @@ msgstr ""
 
 #: includes/class-mcm-cpt.php:129
 #: includes/class-mcm-import.php:375
-#: includes/elementor-widgets.php:2294
+#: includes/elementor-widgets.php:2295
 msgid "Publications"
 msgstr ""
 
@@ -260,19 +260,19 @@ msgstr ""
 
 #: includes/class-mcm-cpt.php:137
 #: includes/class-mcm-import.php:379
-#: includes/class-mcm-query.php:1035
-#: includes/elementor-widgets.php:2151
+#: includes/class-mcm-query.php:1036
+#: includes/elementor-widgets.php:2152
 msgid "Research Projects"
 msgstr ""
 
 #: includes/class-mcm-cpt.php:144
-#: includes/class-mcm-query.php:2340
+#: includes/class-mcm-query.php:2350
 msgid "Policy"
 msgstr ""
 
 #: includes/class-mcm-cpt.php:145
 #: includes/class-mcm-import.php:383
-#: includes/elementor-widgets.php:2187
+#: includes/elementor-widgets.php:2188
 msgid "Policies"
 msgstr ""
 
@@ -296,35 +296,35 @@ msgid "Students"
 msgstr ""
 
 #: includes/class-mcm-cpt.php:202
-#: includes/class-mcm-query.php:2246
-#: includes/class-mcm-query.php:2253
-#: includes/class-mcm-query.php:2262
-#: includes/class-mcm-query.php:2268
-#: includes/class-mcm-query.php:2275
-#: includes/class-mcm-query.php:2283
-#: includes/class-mcm-query.php:2292
-#: includes/class-mcm-query.php:2297
-#: includes/class-mcm-query.php:2309
-#: includes/class-mcm-query.php:2316
-#: includes/class-mcm-query.php:2323
-#: includes/class-mcm-query.php:2330
-#: includes/class-mcm-query.php:2337
-#: includes/class-mcm-query.php:2356
-#: includes/class-mcm-query.php:2715
-#: includes/class-mcm-query.php:2753
-#: includes/class-mcm-query.php:2765
-#: includes/class-mcm-query.php:2782
-#: includes/class-mcm-query.php:2799
-#: includes/class-mcm-query.php:2814
-#: includes/class-mcm-query.php:2839
-#: includes/class-mcm-query.php:2866
-#: includes/class-mcm-query.php:2880
-#: includes/class-mcm-query.php:2895
-#: includes/class-mcm-query.php:2948
-#: includes/class-mcm-query.php:2961
-#: includes/class-mcm-query.php:2983
-#: includes/elementor-widgets.php:1170
-#: includes/elementor-widgets.php:2918
+#: includes/class-mcm-query.php:2256
+#: includes/class-mcm-query.php:2263
+#: includes/class-mcm-query.php:2272
+#: includes/class-mcm-query.php:2278
+#: includes/class-mcm-query.php:2285
+#: includes/class-mcm-query.php:2293
+#: includes/class-mcm-query.php:2302
+#: includes/class-mcm-query.php:2307
+#: includes/class-mcm-query.php:2319
+#: includes/class-mcm-query.php:2326
+#: includes/class-mcm-query.php:2333
+#: includes/class-mcm-query.php:2340
+#: includes/class-mcm-query.php:2347
+#: includes/class-mcm-query.php:2366
+#: includes/class-mcm-query.php:2725
+#: includes/class-mcm-query.php:2763
+#: includes/class-mcm-query.php:2775
+#: includes/class-mcm-query.php:2792
+#: includes/class-mcm-query.php:2809
+#: includes/class-mcm-query.php:2824
+#: includes/class-mcm-query.php:2849
+#: includes/class-mcm-query.php:2876
+#: includes/class-mcm-query.php:2890
+#: includes/class-mcm-query.php:2905
+#: includes/class-mcm-query.php:2958
+#: includes/class-mcm-query.php:2971
+#: includes/class-mcm-query.php:2993
+#: includes/elementor-widgets.php:1171
+#: includes/elementor-widgets.php:2919
 msgid "Department"
 msgstr ""
 
@@ -333,8 +333,8 @@ msgid "Departments"
 msgstr ""
 
 #: includes/class-mcm-cpt.php:210
-#: includes/class-mcm-query.php:2248
-#: includes/class-mcm-query.php:2755
+#: includes/class-mcm-query.php:2258
+#: includes/class-mcm-query.php:2765
 msgid "Session"
 msgstr ""
 
@@ -344,10 +344,10 @@ msgstr ""
 
 #: includes/class-mcm-cpt.php:218
 #: includes/class-mcm-meta.php:1133
-#: includes/class-mcm-query.php:2281
-#: includes/class-mcm-query.php:2354
-#: includes/class-mcm-query.php:2479
-#: includes/class-mcm-query.php:2579
+#: includes/class-mcm-query.php:2291
+#: includes/class-mcm-query.php:2364
+#: includes/class-mcm-query.php:2489
+#: includes/class-mcm-query.php:2589
 msgid "Level"
 msgstr ""
 
@@ -361,11 +361,11 @@ msgid "Faculty"
 msgstr ""
 
 #: includes/class-mcm-cpt.php:236
-#: includes/class-mcm-query.php:2269
-#: includes/class-mcm-query.php:2277
-#: includes/class-mcm-query.php:2500
-#: includes/class-mcm-query.php:2507
-#: includes/class-mcm-query.php:2716
+#: includes/class-mcm-query.php:2279
+#: includes/class-mcm-query.php:2287
+#: includes/class-mcm-query.php:2510
+#: includes/class-mcm-query.php:2517
+#: includes/class-mcm-query.php:2726
 #: includes/elementor-widgets.php:1168
 msgid "Specialty"
 msgstr ""
@@ -423,10 +423,10 @@ msgid "Scholarship Types"
 msgstr ""
 
 #: includes/class-mcm-cpt.php:288
-#: includes/class-mcm-query.php:2532
-#: includes/class-mcm-query.php:2544
-#: includes/class-mcm-query.php:2838
-#: includes/class-mcm-query.php:2865
+#: includes/class-mcm-query.php:2542
+#: includes/class-mcm-query.php:2554
+#: includes/class-mcm-query.php:2848
+#: includes/class-mcm-query.php:2875
 msgid "Research Area"
 msgstr ""
 
@@ -435,7 +435,7 @@ msgid "Research Areas"
 msgstr ""
 
 #: includes/class-mcm-cpt.php:297
-#: includes/class-mcm-query.php:2276
+#: includes/class-mcm-query.php:2286
 msgid "Staff Type"
 msgstr ""
 
@@ -715,11 +715,11 @@ msgid "Entry"
 msgstr ""
 
 #: includes/class-mcm-health.php:276
-#: includes/class-mcm-query.php:2320
-#: includes/class-mcm-query.php:2329
-#: includes/class-mcm-query.php:2548
-#: includes/class-mcm-query.php:2837
-#: includes/class-mcm-query.php:2947
+#: includes/class-mcm-query.php:2330
+#: includes/class-mcm-query.php:2339
+#: includes/class-mcm-query.php:2558
+#: includes/class-mcm-query.php:2847
+#: includes/class-mcm-query.php:2957
 msgid "Type"
 msgstr ""
 
@@ -969,9 +969,9 @@ msgid "Create As"
 msgstr ""
 
 #: includes/class-mcm-import.php:962
-#: includes/class-mcm-query.php:2573
-#: includes/class-mcm-query.php:2815
-#: includes/class-mcm-query.php:2899
+#: includes/class-mcm-query.php:2583
+#: includes/class-mcm-query.php:2825
+#: includes/class-mcm-query.php:2909
 msgid "Published"
 msgstr ""
 
@@ -1029,21 +1029,21 @@ msgid "Administrative"
 msgstr ""
 
 #: includes/class-mcm-job.php:270
-#: includes/class-mcm-query.php:2069
-#: includes/class-mcm-query.php:2080
+#: includes/class-mcm-query.php:2079
+#: includes/class-mcm-query.php:2090
 msgid "Upcoming"
 msgstr ""
 
 #: includes/class-mcm-job.php:271
-#: includes/class-mcm-query.php:709
-#: includes/class-mcm-query.php:2088
-#: includes/class-mcm-query.php:2113
-#: includes/elementor-widgets.php:2260
+#: includes/class-mcm-query.php:710
+#: includes/class-mcm-query.php:2098
+#: includes/class-mcm-query.php:2123
+#: includes/elementor-widgets.php:2261
 msgid "Open"
 msgstr ""
 
 #: includes/class-mcm-job.php:272
-#: includes/class-mcm-query.php:2107
+#: includes/class-mcm-query.php:2117
 msgid "Closing soon"
 msgstr ""
 
@@ -1052,10 +1052,10 @@ msgid "Extended"
 msgstr ""
 
 #: includes/class-mcm-job.php:274
-#: includes/class-mcm-query.php:704
-#: includes/class-mcm-query.php:710
-#: includes/class-mcm-query.php:2097
-#: includes/elementor-widgets.php:2261
+#: includes/class-mcm-query.php:705
+#: includes/class-mcm-query.php:711
+#: includes/class-mcm-query.php:2107
+#: includes/elementor-widgets.php:2262
 msgid "Closed"
 msgstr ""
 
@@ -1071,13 +1071,13 @@ msgstr ""
 
 #. translators: %d: number of days.
 #: includes/class-mcm-job.php:364
-#: includes/class-mcm-query.php:2102
+#: includes/class-mcm-query.php:2112
 msgid "Closes today"
 msgstr ""
 
 #. translators: %d: number of days.
 #: includes/class-mcm-job.php:364
-#: includes/class-mcm-query.php:2102
+#: includes/class-mcm-query.php:2112
 #, php-format
 msgid "%d day left"
 msgid_plural "%d days left"
@@ -1086,7 +1086,7 @@ msgstr[1] ""
 
 #. translators: %s: number of posts.
 #: includes/class-mcm-job.php:370
-#: includes/class-mcm-query.php:2569
+#: includes/class-mcm-query.php:2579
 #, php-format
 msgid "%s post"
 msgid_plural "%s posts"
@@ -1095,8 +1095,8 @@ msgstr[1] ""
 
 #: includes/class-mcm-job.php:387
 #: includes/class-mcm-job.php:594
-#: includes/class-mcm-query.php:2299
-#: includes/class-mcm-query.php:2562
+#: includes/class-mcm-query.php:2309
+#: includes/class-mcm-query.php:2572
 msgid "Last date"
 msgstr ""
 
@@ -1119,13 +1119,13 @@ msgstr ""
 #: includes/class-mcm-meta.php:904
 #: includes/class-mcm-meta.php:1157
 #: includes/class-mcm-privacy.php:56
-#: includes/class-mcm-query.php:2300
-#: includes/class-mcm-query.php:2335
-#: includes/class-mcm-query.php:2358
-#: includes/class-mcm-query.php:2531
-#: includes/class-mcm-query.php:2583
-#: includes/class-mcm-query.php:2859
-#: includes/elementor-widgets.php:2256
+#: includes/class-mcm-query.php:2310
+#: includes/class-mcm-query.php:2345
+#: includes/class-mcm-query.php:2368
+#: includes/class-mcm-query.php:2541
+#: includes/class-mcm-query.php:2593
+#: includes/class-mcm-query.php:2869
+#: includes/elementor-widgets.php:2257
 msgid "Status"
 msgstr ""
 
@@ -1145,10 +1145,10 @@ msgstr ""
 
 #: includes/class-mcm-meta.php:302
 #: includes/class-mcm-meta.php:1128
-#: includes/class-mcm-query.php:2241
-#: includes/class-mcm-query.php:2471
-#: includes/class-mcm-query.php:2977
-#: includes/elementor-widgets.php:2645
+#: includes/class-mcm-query.php:2251
+#: includes/class-mcm-query.php:2481
+#: includes/class-mcm-query.php:2987
+#: includes/elementor-widgets.php:2646
 msgid "Day"
 msgstr ""
 
@@ -1175,31 +1175,31 @@ msgid "Year / Semester"
 msgstr ""
 
 #: includes/class-mcm-meta.php:329
-#: includes/class-mcm-query.php:2762
+#: includes/class-mcm-query.php:2772
 msgid "Program Details"
 msgstr ""
 
 #: includes/class-mcm-meta.php:332
-#: includes/class-mcm-query.php:2763
+#: includes/class-mcm-query.php:2773
 msgid "Degree Level"
 msgstr ""
 
 #: includes/class-mcm-meta.php:336
 #: includes/class-mcm-meta.php:1134
-#: includes/class-mcm-query.php:2282
-#: includes/class-mcm-query.php:2480
-#: includes/class-mcm-query.php:2764
+#: includes/class-mcm-query.php:2292
+#: includes/class-mcm-query.php:2490
+#: includes/class-mcm-query.php:2774
 msgid "Duration"
 msgstr ""
 
 #: includes/class-mcm-meta.php:340
-#: includes/class-mcm-query.php:2284
-#: includes/class-mcm-query.php:2766
+#: includes/class-mcm-query.php:2294
+#: includes/class-mcm-query.php:2776
 msgid "Fees"
 msgstr ""
 
 #: includes/class-mcm-meta.php:344
-#: includes/class-mcm-query.php:2767
+#: includes/class-mcm-query.php:2777
 msgid "Intake / Seats"
 msgstr ""
 
@@ -1209,60 +1209,60 @@ msgid "Apply / Info URL"
 msgstr ""
 
 #: includes/class-mcm-meta.php:354
-#: includes/class-mcm-query.php:2751
+#: includes/class-mcm-query.php:2761
 msgid "Course Details"
 msgstr ""
 
 #: includes/class-mcm-meta.php:357
-#: includes/class-mcm-query.php:2752
+#: includes/class-mcm-query.php:2762
 msgid "Course Code"
 msgstr ""
 
 #: includes/class-mcm-meta.php:361
-#: includes/class-mcm-query.php:2756
+#: includes/class-mcm-query.php:2766
 msgid "Credit Hours"
 msgstr ""
 
 #: includes/class-mcm-meta.php:365
 #: includes/class-mcm-meta.php:1138
-#: includes/class-mcm-query.php:2256
-#: includes/class-mcm-query.php:2757
+#: includes/class-mcm-query.php:2266
+#: includes/class-mcm-query.php:2767
 msgid "Semester"
 msgstr ""
 
 #: includes/class-mcm-meta.php:369
-#: includes/class-mcm-query.php:2758
+#: includes/class-mcm-query.php:2768
 msgid "Course Lead"
 msgstr ""
 
 #: includes/class-mcm-meta.php:375
-#: includes/class-mcm-query.php:2775
+#: includes/class-mcm-query.php:2785
 msgid "Event Details"
 msgstr ""
 
 #: includes/class-mcm-meta.php:378
 #: includes/class-mcm-meta.php:1141
-#: includes/class-mcm-query.php:2289
-#: includes/class-mcm-query.php:2308
-#: includes/class-mcm-query.php:2492
-#: includes/class-mcm-query.php:2520
-#: includes/class-mcm-query.php:2776
-#: includes/class-mcm-query.php:2964
-#: includes/elementor-widgets.php:2433
-#: includes/elementor-widgets.php:3051
+#: includes/class-mcm-query.php:2299
+#: includes/class-mcm-query.php:2318
+#: includes/class-mcm-query.php:2502
+#: includes/class-mcm-query.php:2530
+#: includes/class-mcm-query.php:2786
+#: includes/class-mcm-query.php:2974
+#: includes/elementor-widgets.php:2434
+#: includes/elementor-widgets.php:3052
 msgid "Date"
 msgstr ""
 
 #: includes/class-mcm-meta.php:390
 #: includes/class-mcm-meta.php:1142
-#: includes/class-mcm-query.php:2291
-#: includes/class-mcm-query.php:2494
-#: includes/class-mcm-query.php:2780
+#: includes/class-mcm-query.php:2301
+#: includes/class-mcm-query.php:2504
+#: includes/class-mcm-query.php:2790
 msgid "Venue"
 msgstr ""
 
 #: includes/class-mcm-meta.php:394
-#: includes/class-mcm-query.php:2781
+#: includes/class-mcm-query.php:2791
 msgid "Organizer"
 msgstr ""
 
@@ -1282,24 +1282,24 @@ msgstr ""
 #: includes/class-mcm-meta.php:1145
 #: includes/class-mcm-privacy.php:68
 #: includes/class-mcm-privacy.php:79
-#: includes/class-mcm-query.php:2267
-#: includes/class-mcm-query.php:2274
-#: includes/class-mcm-query.php:2714
+#: includes/class-mcm-query.php:2277
+#: includes/class-mcm-query.php:2284
+#: includes/class-mcm-query.php:2724
 #: includes/elementor-widgets.php:1169
-#: includes/elementor-widgets.php:3508
-#: includes/elementor-widgets.php:3808
+#: includes/elementor-widgets.php:3509
+#: includes/elementor-widgets.php:3809
 msgid "Designation"
 msgstr ""
 
 #: includes/class-mcm-meta.php:415
 #: includes/class-mcm-meta.php:477
-#: includes/class-mcm-query.php:2717
+#: includes/class-mcm-query.php:2727
 msgid "Qualifications"
 msgstr ""
 
 #: includes/class-mcm-meta.php:419
 #: includes/class-mcm-meta.php:481
-#: includes/class-mcm-query.php:2718
+#: includes/class-mcm-query.php:2728
 msgid "Experience"
 msgstr ""
 
@@ -1327,7 +1327,7 @@ msgid "OPD / Available Days"
 msgstr ""
 
 #: includes/class-mcm-meta.php:440
-#: includes/class-mcm-query.php:2721
+#: includes/class-mcm-query.php:2731
 msgid "OPD Timing"
 msgstr ""
 
@@ -1339,8 +1339,8 @@ msgstr ""
 #: includes/class-mcm-privacy.php:81
 #: includes/class-mcm-site-chrome-settings.php:351
 #: includes/class-mcm-site-chrome-settings.php:493
-#: includes/elementor-widgets.php:4005
-#: includes/elementor-widgets.php:4084
+#: includes/elementor-widgets.php:4006
+#: includes/elementor-widgets.php:4085
 msgid "Phone"
 msgstr ""
 
@@ -1350,10 +1350,10 @@ msgstr ""
 #: includes/class-mcm-privacy.php:50
 #: includes/class-mcm-privacy.php:69
 #: includes/class-mcm-privacy.php:80
-#: includes/class-mcm-query.php:2734
+#: includes/class-mcm-query.php:2744
 #: includes/class-mcm-site-chrome-settings.php:350
 #: includes/class-mcm-site-chrome-settings.php:494
-#: includes/elementor-widgets.php:4093
+#: includes/elementor-widgets.php:4094
 msgid "Email"
 msgstr ""
 
@@ -1387,7 +1387,7 @@ msgid "Designation / Role"
 msgstr ""
 
 #: includes/class-mcm-meta.php:524
-#: includes/class-mcm-query.php:2797
+#: includes/class-mcm-query.php:2807
 msgid "Admission Details"
 msgstr ""
 
@@ -1406,14 +1406,14 @@ msgstr ""
 #: includes/class-mcm-meta.php:539
 #: includes/class-mcm-meta.php:584
 #: includes/class-mcm-meta.php:823
-#: includes/class-mcm-query.php:2802
-#: includes/class-mcm-query.php:2820
-#: includes/class-mcm-query.php:2950
+#: includes/class-mcm-query.php:2812
+#: includes/class-mcm-query.php:2830
+#: includes/class-mcm-query.php:2960
 msgid "Eligibility"
 msgstr ""
 
 #: includes/class-mcm-meta.php:543
-#: includes/class-mcm-query.php:2803
+#: includes/class-mcm-query.php:2813
 msgid "Application Fee"
 msgstr ""
 
@@ -1422,7 +1422,7 @@ msgid "Apply URL"
 msgstr ""
 
 #: includes/class-mcm-meta.php:553
-#: includes/class-mcm-query.php:2811
+#: includes/class-mcm-query.php:2821
 msgid "Tender Details"
 msgstr ""
 
@@ -1484,11 +1484,11 @@ msgid "Journal / Publisher"
 msgstr ""
 
 #: includes/class-mcm-meta.php:616
-#: includes/class-mcm-query.php:2328
-#: includes/class-mcm-query.php:2543
-#: includes/class-mcm-query.php:2836
-#: includes/class-mcm-query.php:2985
-#: includes/elementor-widgets.php:1627
+#: includes/class-mcm-query.php:2338
+#: includes/class-mcm-query.php:2553
+#: includes/class-mcm-query.php:2846
+#: includes/class-mcm-query.php:2995
+#: includes/elementor-widgets.php:1628
 msgid "Year"
 msgstr ""
 
@@ -1545,12 +1545,12 @@ msgid "Students working under the supervisor — one per line, e.g. \"Dr. Samina
 msgstr ""
 
 #: includes/class-mcm-meta.php:664
-#: includes/class-mcm-query.php:1625
+#: includes/class-mcm-query.php:1626
 msgid "Open Access"
 msgstr ""
 
 #: includes/class-mcm-meta.php:669
-#: includes/class-mcm-query.php:2843
+#: includes/class-mcm-query.php:2853
 msgid "Impact Factor"
 msgstr ""
 
@@ -1563,9 +1563,9 @@ msgid "Research Project Details"
 msgstr ""
 
 #: includes/class-mcm-meta.php:682
-#: includes/class-mcm-query.php:2530
-#: includes/class-mcm-query.php:2841
-#: includes/class-mcm-query.php:2858
+#: includes/class-mcm-query.php:2540
+#: includes/class-mcm-query.php:2851
+#: includes/class-mcm-query.php:2868
 msgid "Supervisor / Principal Investigator"
 msgstr ""
 
@@ -1594,7 +1594,7 @@ msgid "Students assisting under the supervisor — one per line, e.g. \"Dr. Faro
 msgstr ""
 
 #: includes/class-mcm-meta.php:705
-#: includes/class-mcm-query.php:2862
+#: includes/class-mcm-query.php:2872
 msgid "Co-Investigators"
 msgstr ""
 
@@ -1623,7 +1623,7 @@ msgid "Leave empty to use the post date. A future date keeps the job hidden unti
 msgstr ""
 
 #: includes/class-mcm-meta.php:728
-#: includes/class-mcm-query.php:2900
+#: includes/class-mcm-query.php:2910
 msgid "Last date to apply"
 msgstr ""
 
@@ -1664,7 +1664,7 @@ msgid "Leave empty for \"Apply Now\"."
 msgstr ""
 
 #: includes/class-mcm-meta.php:753
-#: includes/class-mcm-query.php:2932
+#: includes/class-mcm-query.php:2942
 msgid "How to apply"
 msgstr ""
 
@@ -1685,13 +1685,13 @@ msgid "Image or PDF."
 msgstr ""
 
 #: includes/class-mcm-meta.php:768
-#: includes/class-mcm-query.php:2896
-#: includes/elementor-widgets.php:2418
+#: includes/class-mcm-query.php:2906
+#: includes/elementor-widgets.php:2419
 msgid "Number of posts"
 msgstr ""
 
 #: includes/class-mcm-meta.php:772
-#: includes/class-mcm-query.php:2897
+#: includes/class-mcm-query.php:2907
 msgid "Pay scale / package"
 msgstr ""
 
@@ -1700,12 +1700,12 @@ msgid "e.g. BPS-18"
 msgstr ""
 
 #: includes/class-mcm-meta.php:777
-#: includes/class-mcm-query.php:2898
+#: includes/class-mcm-query.php:2908
 msgid "Employment type"
 msgstr ""
 
 #: includes/class-mcm-meta.php:782
-#: includes/class-mcm-query.php:2904
+#: includes/class-mcm-query.php:2914
 #: includes/class-mcm-site-chrome.php:142
 msgid "Contact"
 msgstr ""
@@ -1715,7 +1715,7 @@ msgid "Lists this job in the notice ticker and board while it is open (when jobs
 msgstr ""
 
 #: includes/class-mcm-meta.php:795
-#: includes/class-mcm-query.php:2875
+#: includes/class-mcm-query.php:2885
 msgid "Policy Details"
 msgstr ""
 
@@ -1724,13 +1724,13 @@ msgid "Issued By (KMU / GMC / PMDC…)"
 msgstr ""
 
 #: includes/class-mcm-meta.php:802
-#: includes/class-mcm-query.php:2812
-#: includes/class-mcm-query.php:2878
+#: includes/class-mcm-query.php:2822
+#: includes/class-mcm-query.php:2888
 msgid "Reference No."
 msgstr ""
 
 #: includes/class-mcm-meta.php:806
-#: includes/class-mcm-query.php:2879
+#: includes/class-mcm-query.php:2889
 msgid "Effective Date"
 msgstr ""
 
@@ -1739,17 +1739,17 @@ msgid "Policy Document (PDF)"
 msgstr ""
 
 #: includes/class-mcm-meta.php:816
-#: includes/class-mcm-query.php:2946
+#: includes/class-mcm-query.php:2956
 msgid "Scholarship Details"
 msgstr ""
 
 #: includes/class-mcm-meta.php:819
-#: includes/class-mcm-query.php:2949
+#: includes/class-mcm-query.php:2959
 msgid "Amount / Coverage"
 msgstr ""
 
 #: includes/class-mcm-meta.php:827
-#: includes/class-mcm-query.php:2951
+#: includes/class-mcm-query.php:2961
 msgid "Application Deadline"
 msgstr ""
 
@@ -1758,10 +1758,10 @@ msgid "Notice Details"
 msgstr ""
 
 #: includes/class-mcm-meta.php:840
-#: includes/class-mcm-query.php:2307
-#: includes/class-mcm-query.php:2519
-#: includes/class-mcm-query.php:2962
-#: includes/elementor-widgets.php:2888
+#: includes/class-mcm-query.php:2317
+#: includes/class-mcm-query.php:2529
+#: includes/class-mcm-query.php:2972
+#: includes/elementor-widgets.php:2889
 msgid "Priority"
 msgstr ""
 
@@ -1793,15 +1793,15 @@ msgstr ""
 #: includes/class-mcm-meta.php:871
 #: includes/class-mcm-meta.php:1155
 #: includes/class-mcm-privacy.php:48
-#: includes/class-mcm-query.php:2352
+#: includes/class-mcm-query.php:2362
 msgid "Student ID"
 msgstr ""
 
 #: includes/class-mcm-meta.php:875
 #: includes/class-mcm-meta.php:1156
 #: includes/class-mcm-privacy.php:49
-#: includes/class-mcm-query.php:2353
-#: includes/class-mcm-query.php:2578
+#: includes/class-mcm-query.php:2363
+#: includes/class-mcm-query.php:2588
 msgid "PMDC No."
 msgstr ""
 
@@ -1822,7 +1822,7 @@ msgstr ""
 #: includes/class-mcm-meta.php:913
 #: includes/class-mcm-privacy.php:58
 #: includes/class-mcm-site-chrome-settings.php:492
-#: includes/elementor-widgets.php:4102
+#: includes/elementor-widgets.php:4103
 msgid "Address"
 msgstr ""
 
@@ -1879,36 +1879,36 @@ msgid "Stored as \"%1$s\"; it will be saved as %2$s when you click Update."
 msgstr ""
 
 #: includes/class-mcm-meta.php:1129
-#: includes/class-mcm-query.php:2244
-#: includes/class-mcm-query.php:2473
-#: includes/class-mcm-query.php:2981
+#: includes/class-mcm-query.php:2254
+#: includes/class-mcm-query.php:2483
+#: includes/class-mcm-query.php:2991
 msgid "Subject"
 msgstr ""
 
 #: includes/class-mcm-meta.php:1130
-#: includes/class-mcm-query.php:2247
-#: includes/class-mcm-query.php:2475
-#: includes/class-mcm-query.php:2984
+#: includes/class-mcm-query.php:2257
+#: includes/class-mcm-query.php:2485
+#: includes/class-mcm-query.php:2994
 msgid "Room"
 msgstr ""
 
 #: includes/class-mcm-meta.php:1137
-#: includes/class-mcm-query.php:2251
-#: includes/class-mcm-query.php:2485
+#: includes/class-mcm-query.php:2261
+#: includes/class-mcm-query.php:2495
 msgid "Code"
 msgstr ""
 
 #: includes/class-mcm-meta.php:1151
-#: includes/class-mcm-query.php:2260
-#: includes/class-mcm-query.php:2512
-#: includes/class-mcm-query.php:2800
+#: includes/class-mcm-query.php:2270
+#: includes/class-mcm-query.php:2522
+#: includes/class-mcm-query.php:2810
 msgid "Opens"
 msgstr ""
 
 #: includes/class-mcm-meta.php:1152
-#: includes/class-mcm-query.php:2261
-#: includes/class-mcm-query.php:2513
-#: includes/class-mcm-query.php:2801
+#: includes/class-mcm-query.php:2271
+#: includes/class-mcm-query.php:2523
+#: includes/class-mcm-query.php:2811
 msgid "Closes"
 msgstr ""
 
@@ -1927,7 +1927,7 @@ msgid "No notices at the moment."
 msgstr ""
 
 #: includes/class-mcm-notice.php:588
-#: includes/elementor-widgets.php:3170
+#: includes/elementor-widgets.php:3171
 msgid "Latest"
 msgstr ""
 
@@ -1937,9 +1937,9 @@ msgid "Pause"
 msgstr ""
 
 #: includes/class-mcm-notice.php:641
-#: includes/elementor-widgets.php:3222
-#: includes/elementor-widgets.php:3240
-#: includes/elementor-widgets.php:3246
+#: includes/elementor-widgets.php:3223
+#: includes/elementor-widgets.php:3241
+#: includes/elementor-widgets.php:3247
 msgid "Notice Board"
 msgstr ""
 
@@ -1948,8 +1948,8 @@ msgid "View all notices"
 msgstr ""
 
 #: includes/class-mcm-privacy.php:53
-#: includes/class-mcm-query.php:2357
-#: includes/class-mcm-query.php:2582
+#: includes/class-mcm-query.php:2367
+#: includes/class-mcm-query.php:2592
 msgid "Batch"
 msgstr ""
 
@@ -1966,17 +1966,17 @@ msgid "Team Profile"
 msgstr ""
 
 #: includes/class-mcm-privacy.php:82
-#: includes/class-mcm-query.php:2737
+#: includes/class-mcm-query.php:2747
 #: includes/class-mcm-social.php:66
 msgid "LinkedIn"
 msgstr ""
 
 #: includes/class-mcm-privacy.php:201
-#: includes/class-mcm-query.php:2266
-#: includes/class-mcm-query.php:2273
-#: includes/class-mcm-query.php:2351
-#: includes/elementor-widgets.php:3497
-#: includes/elementor-widgets.php:3804
+#: includes/class-mcm-query.php:2276
+#: includes/class-mcm-query.php:2283
+#: includes/class-mcm-query.php:2361
+#: includes/elementor-widgets.php:3498
+#: includes/elementor-widgets.php:3805
 msgid "Name"
 msgstr ""
 
@@ -1998,476 +1998,476 @@ msgstr ""
 msgid "%1$s \"%2$s\": %3$d personal field(s) removed. The public profile, its name and designation were kept; delete the profile manually if it should be removed."
 msgstr ""
 
-#: includes/class-mcm-query.php:693
-#: includes/elementor-widgets.php:2262
+#: includes/class-mcm-query.php:694
+#: includes/elementor-widgets.php:2263
 msgid "All"
 msgstr ""
 
-#: includes/class-mcm-query.php:697
+#: includes/class-mcm-query.php:698
 msgid "Upcoming (today and later)"
 msgstr ""
 
-#: includes/class-mcm-query.php:698
+#: includes/class-mcm-query.php:699
 msgid "Past"
 msgstr ""
 
-#: includes/class-mcm-query.php:702
+#: includes/class-mcm-query.php:703
 msgid "Open now"
 msgstr ""
 
-#: includes/class-mcm-query.php:703
-#: includes/elementor-widgets.php:1496
+#: includes/class-mcm-query.php:704
+#: includes/elementor-widgets.php:1497
 msgid "Opening later"
 msgstr ""
 
-#: includes/class-mcm-query.php:949
+#: includes/class-mcm-query.php:950
 msgid "Search by name, ID or PMDC No.…"
 msgstr ""
 
-#: includes/class-mcm-query.php:950
-#: includes/class-mcm-query.php:1417
+#: includes/class-mcm-query.php:951
+#: includes/class-mcm-query.php:1418
 #: includes/elementor-widgets.php:974
 msgid "Search by name, keyword…"
 msgstr ""
 
-#: includes/class-mcm-query.php:989
+#: includes/class-mcm-query.php:990
 #: includes/class-mcm-site-chrome-settings.php:573
 msgid "Reset"
 msgstr ""
 
-#: includes/class-mcm-query.php:1033
+#: includes/class-mcm-query.php:1034
 msgid "Class Timetable"
 msgstr ""
 
-#: includes/class-mcm-query.php:1034
+#: includes/class-mcm-query.php:1035
 msgid "Student List"
 msgstr ""
 
-#: includes/class-mcm-query.php:1036
+#: includes/class-mcm-query.php:1037
 msgid "Institutional Policies"
 msgstr ""
 
-#: includes/class-mcm-query.php:1043
+#: includes/class-mcm-query.php:1044
 msgid "Listing"
 msgstr ""
 
-#: includes/class-mcm-query.php:1129
+#: includes/class-mcm-query.php:1130
 msgid "Prepared by"
 msgstr ""
 
-#: includes/class-mcm-query.php:1133
+#: includes/class-mcm-query.php:1134
 msgid "Checked by"
 msgstr ""
 
-#: includes/class-mcm-query.php:1137
+#: includes/class-mcm-query.php:1138
 msgid "Principal / Head of Department"
 msgstr ""
 
-#: includes/class-mcm-query.php:1242
+#: includes/class-mcm-query.php:1243
 msgid "Video player"
 msgstr ""
 
-#: includes/class-mcm-query.php:1416
+#: includes/class-mcm-query.php:1417
 msgid "Find a Consultant …"
 msgstr ""
 
-#: includes/class-mcm-query.php:1429
+#: includes/class-mcm-query.php:1430
 #: includes/class-mcm-site-chrome-settings.php:380
 #: includes/class-mcm-site-chrome.php:964
 #: includes/class-mcm-site-chrome.php:967
 msgid "Search"
 msgstr ""
 
-#: includes/class-mcm-query.php:1464
+#: includes/class-mcm-query.php:1465
 msgid "Reset filters"
 msgstr ""
 
-#: includes/class-mcm-query.php:1550
+#: includes/class-mcm-query.php:1551
 msgid "DOI"
 msgstr ""
 
-#: includes/class-mcm-query.php:1554
-#: includes/class-mcm-query.php:1560
-#: includes/class-mcm-query.php:2746
+#: includes/class-mcm-query.php:1555
+#: includes/class-mcm-query.php:1561
+#: includes/class-mcm-query.php:2756
 msgid "PubMed"
 msgstr ""
 
-#: includes/class-mcm-query.php:1565
+#: includes/class-mcm-query.php:1566
 msgid "Full text"
 msgstr ""
 
-#: includes/class-mcm-query.php:1568
+#: includes/class-mcm-query.php:1569
 msgid "PDF"
 msgstr ""
 
-#: includes/class-mcm-query.php:1669
+#: includes/class-mcm-query.php:1670
 msgid "No publications found."
 msgstr ""
 
-#: includes/class-mcm-query.php:1684
+#: includes/class-mcm-query.php:1685
 msgid "Meet the Consultant"
 msgstr ""
 
-#: includes/class-mcm-query.php:1687
+#: includes/class-mcm-query.php:1688
 msgid "View Profile"
 msgstr ""
 
-#: includes/class-mcm-query.php:1690
+#: includes/class-mcm-query.php:1691
 msgid "View & Apply"
 msgstr ""
 
-#: includes/class-mcm-query.php:1693
+#: includes/class-mcm-query.php:1694
 msgid "View details"
 msgstr ""
 
-#: includes/class-mcm-query.php:1835
-#: includes/class-mcm-query.php:1852
-#: includes/class-mcm-query.php:2418
+#: includes/class-mcm-query.php:1845
+#: includes/class-mcm-query.php:1862
+#: includes/class-mcm-query.php:2428
 #: includes/elementor-widgets.php:935
 msgid "No results found."
 msgstr ""
 
-#: includes/class-mcm-query.php:1890
+#: includes/class-mcm-query.php:1900
 msgid "&larr; Prev"
 msgstr ""
 
-#: includes/class-mcm-query.php:1891
+#: includes/class-mcm-query.php:1901
 msgid "Next &rarr;"
 msgstr ""
 
-#: includes/class-mcm-query.php:1894
+#: includes/class-mcm-query.php:1904
 #: includes/elementor-widgets.php:920
-#: includes/elementor-widgets.php:1649
+#: includes/elementor-widgets.php:1650
 msgid "Pagination"
 msgstr ""
 
-#: includes/class-mcm-query.php:2052
+#: includes/class-mcm-query.php:2062
 msgid "Past event"
 msgstr ""
 
-#: includes/class-mcm-query.php:2060
+#: includes/class-mcm-query.php:2070
 msgid "Today"
 msgstr ""
 
 #. translators: %d: number of days.
-#: includes/class-mcm-query.php:2065
+#: includes/class-mcm-query.php:2075
 #, php-format
 msgid "In %d day"
 msgid_plural "In %d days"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/class-mcm-query.php:2070
+#: includes/class-mcm-query.php:2080
 msgid "Tomorrow"
 msgstr ""
 
 #. translators: %d: number of days.
-#: includes/class-mcm-query.php:2076
+#: includes/class-mcm-query.php:2086
 #, php-format
 msgid "Opens in %d day"
 msgid_plural "Opens in %d days"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/class-mcm-query.php:2081
+#: includes/class-mcm-query.php:2091
 msgid "Opens tomorrow"
 msgstr ""
 
-#: includes/class-mcm-query.php:2242
-#: includes/class-mcm-query.php:2290
-#: includes/class-mcm-query.php:2635
-#: includes/class-mcm-query.php:2779
-#: includes/class-mcm-query.php:2980
+#: includes/class-mcm-query.php:2252
+#: includes/class-mcm-query.php:2300
+#: includes/class-mcm-query.php:2645
+#: includes/class-mcm-query.php:2789
+#: includes/class-mcm-query.php:2990
 msgid "Time"
 msgstr ""
 
-#: includes/class-mcm-query.php:2245
-#: includes/class-mcm-query.php:2254
-#: includes/class-mcm-query.php:2474
-#: includes/class-mcm-query.php:2487
-#: includes/class-mcm-query.php:2754
-#: includes/class-mcm-query.php:2840
-#: includes/class-mcm-query.php:2982
+#: includes/class-mcm-query.php:2255
+#: includes/class-mcm-query.php:2264
+#: includes/class-mcm-query.php:2484
+#: includes/class-mcm-query.php:2497
+#: includes/class-mcm-query.php:2764
+#: includes/class-mcm-query.php:2850
+#: includes/class-mcm-query.php:2992
 msgid "Professor"
 msgstr ""
 
-#: includes/class-mcm-query.php:2255
-#: includes/class-mcm-query.php:2488
+#: includes/class-mcm-query.php:2265
+#: includes/class-mcm-query.php:2498
 msgid "Credits"
 msgstr ""
 
-#: includes/class-mcm-query.php:2263
+#: includes/class-mcm-query.php:2273
 msgid "Fee"
 msgstr ""
 
-#: includes/class-mcm-query.php:2270
-#: includes/class-mcm-query.php:2501
+#: includes/class-mcm-query.php:2280
+#: includes/class-mcm-query.php:2511
 msgid "OPD"
 msgstr ""
 
-#: includes/class-mcm-query.php:2285
-#: includes/class-mcm-query.php:2481
+#: includes/class-mcm-query.php:2295
+#: includes/class-mcm-query.php:2491
 msgid "Seats"
 msgstr ""
 
-#: includes/class-mcm-query.php:2295
-#: includes/class-mcm-query.php:2326
-#: includes/class-mcm-query.php:2367
+#: includes/class-mcm-query.php:2305
+#: includes/class-mcm-query.php:2336
+#: includes/class-mcm-query.php:2377
 #: includes/class-mcm-site-chrome-settings.php:476
 #: includes/elementor-widgets.php:860
-#: includes/elementor-widgets.php:1622
-#: includes/elementor-widgets.php:2435
-#: includes/elementor-widgets.php:2680
-#: includes/elementor-widgets.php:3951
-#: includes/elementor-widgets.php:4195
+#: includes/elementor-widgets.php:1623
+#: includes/elementor-widgets.php:2436
+#: includes/elementor-widgets.php:2681
+#: includes/elementor-widgets.php:3952
+#: includes/elementor-widgets.php:4196
 msgid "Title"
 msgstr ""
 
-#: includes/class-mcm-query.php:2296
 #: includes/class-mcm-query.php:2306
-#: includes/class-mcm-query.php:2314
-#: includes/class-mcm-query.php:2341
-#: includes/class-mcm-query.php:2517
-#: includes/class-mcm-query.php:2525
-#: includes/class-mcm-query.php:2536
-#: includes/class-mcm-query.php:2813
-#: includes/class-mcm-query.php:2876
-#: includes/class-mcm-query.php:2894
-#: includes/class-mcm-query.php:2960
+#: includes/class-mcm-query.php:2316
+#: includes/class-mcm-query.php:2324
+#: includes/class-mcm-query.php:2351
+#: includes/class-mcm-query.php:2527
+#: includes/class-mcm-query.php:2535
+#: includes/class-mcm-query.php:2546
+#: includes/class-mcm-query.php:2823
+#: includes/class-mcm-query.php:2886
+#: includes/class-mcm-query.php:2904
+#: includes/class-mcm-query.php:2970
 msgid "Category"
 msgstr ""
 
-#: includes/class-mcm-query.php:2298
+#: includes/class-mcm-query.php:2308
 msgid "Posts"
 msgstr ""
 
-#: includes/class-mcm-query.php:2313
-#: includes/class-mcm-query.php:2343
+#: includes/class-mcm-query.php:2323
+#: includes/class-mcm-query.php:2353
 msgid "Reference"
 msgstr ""
 
-#: includes/class-mcm-query.php:2315
+#: includes/class-mcm-query.php:2325
 msgid "Closing date"
 msgstr ""
 
-#: includes/class-mcm-query.php:2321
-#: includes/class-mcm-query.php:2549
+#: includes/class-mcm-query.php:2331
+#: includes/class-mcm-query.php:2559
 msgid "Amount"
 msgstr ""
 
-#: includes/class-mcm-query.php:2322
-#: includes/class-mcm-query.php:2526
-#: includes/class-mcm-query.php:2550
+#: includes/class-mcm-query.php:2332
+#: includes/class-mcm-query.php:2536
+#: includes/class-mcm-query.php:2560
 msgid "Deadline"
 msgstr ""
 
-#: includes/class-mcm-query.php:2327
-#: includes/class-mcm-query.php:2542
-#: includes/class-mcm-query.php:2835
+#: includes/class-mcm-query.php:2337
+#: includes/class-mcm-query.php:2552
+#: includes/class-mcm-query.php:2845
 msgid "Journal"
 msgstr ""
 
-#: includes/class-mcm-query.php:2333
+#: includes/class-mcm-query.php:2343
 msgid "Project"
 msgstr ""
 
-#: includes/class-mcm-query.php:2334
+#: includes/class-mcm-query.php:2344
 msgid "Principal investigator"
 msgstr ""
 
-#: includes/class-mcm-query.php:2336
+#: includes/class-mcm-query.php:2346
 msgid "Research area"
 msgstr ""
 
-#: includes/class-mcm-query.php:2342
+#: includes/class-mcm-query.php:2352
 msgid "Issued by"
 msgstr ""
 
-#: includes/class-mcm-query.php:2344
-#: includes/class-mcm-query.php:2538
+#: includes/class-mcm-query.php:2354
+#: includes/class-mcm-query.php:2548
 msgid "Effective"
 msgstr ""
 
-#: includes/class-mcm-query.php:2486
-#: includes/class-mcm-query.php:2499
-#: includes/class-mcm-query.php:2506
-#: includes/class-mcm-query.php:2581
+#: includes/class-mcm-query.php:2496
+#: includes/class-mcm-query.php:2509
+#: includes/class-mcm-query.php:2516
+#: includes/class-mcm-query.php:2591
 msgid "Dept"
 msgstr ""
 
-#: includes/class-mcm-query.php:2524
+#: includes/class-mcm-query.php:2534
 msgid "Ref"
 msgstr ""
 
-#: includes/class-mcm-query.php:2537
-#: includes/class-mcm-query.php:2877
+#: includes/class-mcm-query.php:2547
+#: includes/class-mcm-query.php:2887
 msgid "Issued By"
 msgstr ""
 
-#: includes/class-mcm-query.php:2563
+#: includes/class-mcm-query.php:2573
 msgid "Not set"
 msgstr ""
 
-#: includes/class-mcm-query.php:2577
+#: includes/class-mcm-query.php:2587
 msgid "ID"
 msgstr ""
 
-#: includes/class-mcm-query.php:2655
+#: includes/class-mcm-query.php:2665
 msgid "Date not set"
 msgstr ""
 
-#: includes/class-mcm-query.php:2713
+#: includes/class-mcm-query.php:2723
 msgid "Profile"
 msgstr ""
 
-#: includes/class-mcm-query.php:2720
+#: includes/class-mcm-query.php:2730
 msgid "OPD Days"
 msgstr ""
 
-#: includes/class-mcm-query.php:2723
+#: includes/class-mcm-query.php:2733
 msgid "Research Interests"
 msgstr ""
 
-#: includes/class-mcm-query.php:2731
+#: includes/class-mcm-query.php:2741
 msgid "Call"
 msgstr ""
 
-#: includes/class-mcm-query.php:2740
+#: includes/class-mcm-query.php:2750
 msgid "ORCID"
 msgstr ""
 
-#: includes/class-mcm-query.php:2743
+#: includes/class-mcm-query.php:2753
 msgid "Google Scholar"
 msgstr ""
 
-#: includes/class-mcm-query.php:2770
-#: includes/class-mcm-query.php:2954
+#: includes/class-mcm-query.php:2780
+#: includes/class-mcm-query.php:2964
 msgid "Apply / More Info"
 msgstr ""
 
-#: includes/class-mcm-query.php:2785
+#: includes/class-mcm-query.php:2795
 msgid "Register"
 msgstr ""
 
-#: includes/class-mcm-query.php:2792
+#: includes/class-mcm-query.php:2802
 msgid "Watch Live"
 msgstr ""
 
-#: includes/class-mcm-query.php:2806
-#: includes/class-mcm-query.php:2910
+#: includes/class-mcm-query.php:2816
+#: includes/class-mcm-query.php:2920
 #: includes/class-mcm-site-chrome.php:108
 msgid "Apply Now"
 msgstr ""
 
-#: includes/class-mcm-query.php:2816
+#: includes/class-mcm-query.php:2826
 msgid "Submission Deadline"
 msgstr ""
 
-#: includes/class-mcm-query.php:2817
+#: includes/class-mcm-query.php:2827
 msgid "Bid Opening"
 msgstr ""
 
-#: includes/class-mcm-query.php:2818
+#: includes/class-mcm-query.php:2828
 msgid "Document Fee"
 msgstr ""
 
-#: includes/class-mcm-query.php:2819
+#: includes/class-mcm-query.php:2829
 msgid "Earnest Money"
 msgstr ""
 
-#: includes/class-mcm-query.php:2824
+#: includes/class-mcm-query.php:2834
 msgid "Download Tender Document"
 msgstr ""
 
-#: includes/class-mcm-query.php:2827
+#: includes/class-mcm-query.php:2837
 msgid "Submit / Portal"
 msgstr ""
 
-#: includes/class-mcm-query.php:2832
+#: includes/class-mcm-query.php:2842
 msgid "Publication Details"
 msgstr ""
 
-#: includes/class-mcm-query.php:2833
-#: includes/elementor-widgets.php:1626
+#: includes/class-mcm-query.php:2843
+#: includes/elementor-widgets.php:1627
 msgid "Citation"
 msgstr ""
 
-#: includes/class-mcm-query.php:2834
+#: includes/class-mcm-query.php:2844
 msgid "Authors"
 msgstr ""
 
-#: includes/class-mcm-query.php:2842
-#: includes/class-mcm-query.php:2863
+#: includes/class-mcm-query.php:2852
+#: includes/class-mcm-query.php:2873
 msgid "Assisting Students"
 msgstr ""
 
-#: includes/class-mcm-query.php:2844
+#: includes/class-mcm-query.php:2854
 msgid "Indexing"
 msgstr ""
 
-#: includes/class-mcm-query.php:2852
-#: includes/class-mcm-query.php:2870
-#: includes/class-mcm-query.php:2968
+#: includes/class-mcm-query.php:2862
+#: includes/class-mcm-query.php:2880
+#: includes/class-mcm-query.php:2978
 msgid "Download"
 msgstr ""
 
-#: includes/class-mcm-query.php:2857
+#: includes/class-mcm-query.php:2867
 msgid "Research Details"
 msgstr ""
 
-#: includes/class-mcm-query.php:2860
+#: includes/class-mcm-query.php:2870
 msgid "Started"
 msgstr ""
 
-#: includes/class-mcm-query.php:2861
+#: includes/class-mcm-query.php:2871
 msgid "Completed"
 msgstr ""
 
-#: includes/class-mcm-query.php:2864
+#: includes/class-mcm-query.php:2874
 msgid "Funding"
 msgstr ""
 
-#: includes/class-mcm-query.php:2869
+#: includes/class-mcm-query.php:2879
 msgid "View Paper"
 msgstr ""
 
-#: includes/class-mcm-query.php:2883
+#: includes/class-mcm-query.php:2893
 msgid "Download Policy"
 msgstr ""
 
-#: includes/class-mcm-query.php:2892
+#: includes/class-mcm-query.php:2902
 msgid "Job Details"
 msgstr ""
 
-#: includes/class-mcm-query.php:2902
+#: includes/class-mcm-query.php:2912
 msgid "Originally"
 msgstr ""
 
-#: includes/class-mcm-query.php:2914
+#: includes/class-mcm-query.php:2924
 msgid "Download job description"
 msgstr ""
 
-#: includes/class-mcm-query.php:2918
+#: includes/class-mcm-query.php:2928
 msgid "Download voucher / form"
 msgstr ""
 
 #. translators: %s: last date.
-#: includes/class-mcm-query.php:2925
+#: includes/class-mcm-query.php:2935
 #, php-format
 msgid "Applications closed on %s."
 msgstr ""
 
 #. translators: %s: job title.
-#: includes/class-mcm-query.php:2938
+#: includes/class-mcm-query.php:2948
 #, php-format
 msgid "Advertisement: %s"
 msgstr ""
 
-#: includes/class-mcm-query.php:2941
+#: includes/class-mcm-query.php:2951
 msgid "Advertisement — click to view full size."
 msgstr ""
 
-#: includes/class-mcm-query.php:2971
+#: includes/class-mcm-query.php:2981
 msgid "Open Link"
 msgstr ""
 
@@ -2621,12 +2621,12 @@ msgid "Notice board sources"
 msgstr ""
 
 #: includes/class-mcm-settings.php:364
-#: includes/elementor-widgets.php:2910
+#: includes/elementor-widgets.php:2911
 msgid "Open jobs"
 msgstr ""
 
 #: includes/class-mcm-settings.php:365
-#: includes/elementor-widgets.php:2911
+#: includes/elementor-widgets.php:2912
 msgid "Open tenders"
 msgstr ""
 
@@ -3036,7 +3036,7 @@ msgid "Header & Footer sections"
 msgstr ""
 
 #: includes/class-mcm-site-chrome-settings.php:302
-#: includes/elementor-widgets.php:1586
+#: includes/elementor-widgets.php:1587
 msgid "Header"
 msgstr ""
 
@@ -3311,18 +3311,18 @@ msgstr ""
 #: includes/class-mcm-site-chrome-settings.php:442
 #: includes/class-mcm-social.php:280
 #: includes/elementor-widgets.php:201
-#: includes/elementor-widgets.php:1665
-#: includes/elementor-widgets.php:3556
-#: includes/elementor-widgets.php:3601
+#: includes/elementor-widgets.php:1666
+#: includes/elementor-widgets.php:3557
+#: includes/elementor-widgets.php:3602
 msgid "Right"
 msgstr ""
 
 #: includes/class-mcm-site-chrome-settings.php:443
 #: includes/class-mcm-social.php:281
 #: includes/elementor-widgets.php:193
-#: includes/elementor-widgets.php:1657
-#: includes/elementor-widgets.php:3548
-#: includes/elementor-widgets.php:3593
+#: includes/elementor-widgets.php:1658
+#: includes/elementor-widgets.php:3549
+#: includes/elementor-widgets.php:3594
 msgid "Left"
 msgstr ""
 
@@ -3337,7 +3337,7 @@ msgstr ""
 
 #: includes/class-mcm-site-chrome-settings.php:458
 #: includes/elementor-widgets.php:810
-#: includes/elementor-widgets.php:2388
+#: includes/elementor-widgets.php:2389
 msgid "Columns"
 msgstr ""
 
@@ -3361,8 +3361,8 @@ msgstr ""
 #: includes/elementor-widgets.php:229
 #: includes/elementor-widgets.php:349
 #: includes/elementor-widgets.php:540
-#: includes/elementor-widgets.php:2895
-#: includes/elementor-widgets.php:4313
+#: includes/elementor-widgets.php:2896
+#: includes/elementor-widgets.php:4314
 msgid "Normal"
 msgstr ""
 
@@ -3387,8 +3387,8 @@ msgid "Large title next to the logo, e.g. GMC."
 msgstr ""
 
 #: includes/class-mcm-site-chrome-settings.php:477
-#: includes/elementor-widgets.php:3980
-#: includes/elementor-widgets.php:4206
+#: includes/elementor-widgets.php:3981
+#: includes/elementor-widgets.php:4207
 msgid "Subtitle"
 msgstr ""
 
@@ -3913,8 +3913,8 @@ msgid "Fix them from Site Health"
 msgstr ""
 
 #: includes/elementor-widgets.php:139
-#: includes/elementor-widgets.php:3719
-#: includes/elementor-widgets.php:4320
+#: includes/elementor-widgets.php:3720
+#: includes/elementor-widgets.php:4321
 msgid "Colour"
 msgstr ""
 
@@ -3923,29 +3923,29 @@ msgid "Hover colour"
 msgstr ""
 
 #: includes/elementor-widgets.php:159
-#: includes/elementor-widgets.php:1653
-#: includes/elementor-widgets.php:3679
-#: includes/elementor-widgets.php:3779
-#: includes/elementor-widgets.php:4427
+#: includes/elementor-widgets.php:1654
+#: includes/elementor-widgets.php:3680
+#: includes/elementor-widgets.php:3780
+#: includes/elementor-widgets.php:4428
 msgid "Alignment"
 msgstr ""
 
 #: includes/elementor-widgets.php:170
-#: includes/elementor-widgets.php:1464
+#: includes/elementor-widgets.php:1465
 msgid "Spacing below"
 msgstr ""
 
 #: includes/elementor-widgets.php:197
-#: includes/elementor-widgets.php:1418
-#: includes/elementor-widgets.php:1661
-#: includes/elementor-widgets.php:3597
+#: includes/elementor-widgets.php:1419
+#: includes/elementor-widgets.php:1662
+#: includes/elementor-widgets.php:3598
 msgid "Centre"
 msgstr ""
 
 #: includes/elementor-widgets.php:256
 #: includes/elementor-widgets.php:350
 #: includes/elementor-widgets.php:564
-#: includes/elementor-widgets.php:4314
+#: includes/elementor-widgets.php:4315
 msgid "Hover"
 msgstr ""
 
@@ -3953,7 +3953,7 @@ msgstr ""
 #: includes/elementor-widgets.php:372
 #: includes/elementor-widgets.php:423
 #: includes/elementor-widgets.php:466
-#: includes/elementor-widgets.php:1692
+#: includes/elementor-widgets.php:1693
 msgid "Border colour"
 msgstr ""
 
@@ -3977,28 +3977,28 @@ msgstr ""
 #: includes/elementor-widgets.php:397
 #: includes/elementor-widgets.php:443
 #: includes/elementor-widgets.php:502
-#: includes/elementor-widgets.php:2991
-#: includes/elementor-widgets.php:2996
-#: includes/elementor-widgets.php:3021
+#: includes/elementor-widgets.php:2992
+#: includes/elementor-widgets.php:2997
+#: includes/elementor-widgets.php:3022
 msgid "Padding"
 msgstr ""
 
 #: includes/elementor-widgets.php:356
 #: includes/elementor-widgets.php:421
 #: includes/elementor-widgets.php:463
-#: includes/elementor-widgets.php:1512
-#: includes/elementor-widgets.php:1690
+#: includes/elementor-widgets.php:1513
+#: includes/elementor-widgets.php:1691
 msgid "Text colour"
 msgstr ""
 
 #: includes/elementor-widgets.php:364
 #: includes/elementor-widgets.php:422
 #: includes/elementor-widgets.php:465
-#: includes/elementor-widgets.php:1504
-#: includes/elementor-widgets.php:1691
-#: includes/elementor-widgets.php:2986
-#: includes/elementor-widgets.php:3008
-#: includes/elementor-widgets.php:4331
+#: includes/elementor-widgets.php:1505
+#: includes/elementor-widgets.php:1692
+#: includes/elementor-widgets.php:2987
+#: includes/elementor-widgets.php:3009
+#: includes/elementor-widgets.php:4332
 msgid "Background colour"
 msgstr ""
 
@@ -4019,9 +4019,9 @@ msgid "Image fit"
 msgstr ""
 
 #: includes/elementor-widgets.php:522
-#: includes/elementor-widgets.php:1389
-#: includes/elementor-widgets.php:1416
-#: includes/elementor-widgets.php:4290
+#: includes/elementor-widgets.php:1390
+#: includes/elementor-widgets.php:1417
+#: includes/elementor-widgets.php:4291
 msgid "Default"
 msgstr ""
 
@@ -4055,9 +4055,9 @@ msgid "Content"
 msgstr ""
 
 #: includes/elementor-widgets.php:792
-#: includes/elementor-widgets.php:2376
-#: includes/elementor-widgets.php:3537
-#: includes/elementor-widgets.php:4122
+#: includes/elementor-widgets.php:2377
+#: includes/elementor-widgets.php:3538
+#: includes/elementor-widgets.php:4123
 msgid "Layout"
 msgstr ""
 
@@ -4070,7 +4070,7 @@ msgid "List"
 msgstr ""
 
 #: includes/elementor-widgets.php:798
-#: includes/elementor-widgets.php:1585
+#: includes/elementor-widgets.php:1586
 msgid "Table"
 msgstr ""
 
@@ -4088,10 +4088,10 @@ msgstr ""
 
 #: includes/elementor-widgets.php:846
 #: includes/elementor-widgets.php:1143
-#: includes/elementor-widgets.php:1185
-#: includes/elementor-widgets.php:4143
-#: includes/elementor-widgets.php:4155
-#: includes/elementor-widgets.php:4166
+#: includes/elementor-widgets.php:1186
+#: includes/elementor-widgets.php:4144
+#: includes/elementor-widgets.php:4156
+#: includes/elementor-widgets.php:4167
 msgid "Show"
 msgstr ""
 
@@ -4108,17 +4108,17 @@ msgid "Date published"
 msgstr ""
 
 #: includes/elementor-widgets.php:859
-#: includes/elementor-widgets.php:2434
+#: includes/elementor-widgets.php:2435
 msgid "Last updated"
 msgstr ""
 
 #: includes/elementor-widgets.php:861
-#: includes/elementor-widgets.php:2437
+#: includes/elementor-widgets.php:2438
 msgid "Menu order"
 msgstr ""
 
 #: includes/elementor-widgets.php:862
-#: includes/elementor-widgets.php:2438
+#: includes/elementor-widgets.php:2439
 msgid "Random"
 msgstr ""
 
@@ -4131,7 +4131,7 @@ msgid "A field (e.g. a date)"
 msgstr ""
 
 #: includes/elementor-widgets.php:871
-#: includes/elementor-widgets.php:2429
+#: includes/elementor-widgets.php:2430
 msgid "Order by"
 msgstr ""
 
@@ -4140,7 +4140,7 @@ msgid "Items with this field empty are listed last."
 msgstr ""
 
 #: includes/elementor-widgets.php:894
-#: includes/elementor-widgets.php:2446
+#: includes/elementor-widgets.php:2447
 msgid "Order"
 msgstr ""
 
@@ -4153,7 +4153,7 @@ msgid "Ascending"
 msgstr ""
 
 #: includes/elementor-widgets.php:908
-#: includes/elementor-widgets.php:2565
+#: includes/elementor-widgets.php:2566
 msgid "Skip the first"
 msgstr ""
 
@@ -4222,7 +4222,7 @@ msgid "Printed page heading"
 msgstr ""
 
 #: includes/elementor-widgets.php:1043
-#: includes/elementor-widgets.php:2521
+#: includes/elementor-widgets.php:2522
 msgid "Include / Exclude"
 msgstr ""
 
@@ -4249,7 +4249,7 @@ msgid "Photos"
 msgstr ""
 
 #: includes/elementor-widgets.php:1133
-#: includes/elementor-widgets.php:1381
+#: includes/elementor-widgets.php:1382
 msgid "Images"
 msgstr ""
 
@@ -4266,10 +4266,10 @@ msgid "Hide all photos"
 msgstr ""
 
 #: includes/elementor-widgets.php:1144
-#: includes/elementor-widgets.php:1186
-#: includes/elementor-widgets.php:4144
-#: includes/elementor-widgets.php:4156
-#: includes/elementor-widgets.php:4167
+#: includes/elementor-widgets.php:1187
+#: includes/elementor-widgets.php:4145
+#: includes/elementor-widgets.php:4157
+#: includes/elementor-widgets.php:4168
 msgid "Hide"
 msgstr ""
 
@@ -4285,875 +4285,879 @@ msgstr ""
 msgid "Larger files stay sharp in wide cards; smaller ones load faster."
 msgstr ""
 
-#: includes/elementor-widgets.php:1173
+#: includes/elementor-widgets.php:1170
+msgid "Qualifications (MBBS, PhD…)"
+msgstr ""
+
+#: includes/elementor-widgets.php:1174
 msgid "Status badge (e.g. Open, Past event)"
 msgstr ""
 
-#: includes/elementor-widgets.php:1175
+#: includes/elementor-widgets.php:1176
 msgid "Details (date, venue, code…)"
 msgstr ""
 
-#: includes/elementor-widgets.php:1176
+#: includes/elementor-widgets.php:1177
 msgid "Short description"
 msgstr ""
 
-#: includes/elementor-widgets.php:1178
+#: includes/elementor-widgets.php:1179
 msgid "Button / \"View details\" link"
 msgstr ""
 
-#: includes/elementor-widgets.php:1197
+#: includes/elementor-widgets.php:1198
 msgid "Table columns"
 msgstr ""
 
-#: includes/elementor-widgets.php:1203
+#: includes/elementor-widgets.php:1204
 msgid "Pick the columns to show, e.g. leave out Staff Type or Specialty. Leave empty to show every column."
 msgstr ""
 
-#: includes/elementor-widgets.php:1218
+#: includes/elementor-widgets.php:1219
 msgid "Default for the layout"
 msgstr ""
 
-#: includes/elementor-widgets.php:1224
+#: includes/elementor-widgets.php:1225
 msgid "any"
 msgstr ""
 
-#: includes/elementor-widgets.php:1226
+#: includes/elementor-widgets.php:1227
 msgid "Full size (original upload)"
 msgstr ""
 
-#: includes/elementor-widgets.php:1261
-#: includes/elementor-widgets.php:2584
+#: includes/elementor-widgets.php:1262
+#: includes/elementor-widgets.php:2585
 msgid "Layout & Spacing"
 msgstr ""
 
-#: includes/elementor-widgets.php:1266
+#: includes/elementor-widgets.php:1267
 msgid "Gap between cards"
 msgstr ""
 
-#: includes/elementor-widgets.php:1281
+#: includes/elementor-widgets.php:1282
 msgid "Card padding"
 msgstr ""
 
-#: includes/elementor-widgets.php:1296
+#: includes/elementor-widgets.php:1297
 msgid "Corner radius"
 msgstr ""
 
-#: includes/elementor-widgets.php:1311
-#: includes/elementor-widgets.php:2629
+#: includes/elementor-widgets.php:1312
+#: includes/elementor-widgets.php:2630
 msgid "Image height"
 msgstr ""
 
-#: includes/elementor-widgets.php:1324
+#: includes/elementor-widgets.php:1325
 msgid "A fixed height. Image proportions (Style → Images) keep the shape at any width instead."
 msgstr ""
 
-#: includes/elementor-widgets.php:1331
+#: includes/elementor-widgets.php:1332
 msgid "Card text alignment"
 msgstr ""
 
-#: includes/elementor-widgets.php:1342
+#: includes/elementor-widgets.php:1343
 msgid "Colours"
 msgstr ""
 
-#: includes/elementor-widgets.php:1345
+#: includes/elementor-widgets.php:1346
 msgid "Primary (buttons, links)"
 msgstr ""
 
-#: includes/elementor-widgets.php:1346
+#: includes/elementor-widgets.php:1347
 msgid "Accent (hover)"
 msgstr ""
 
-#: includes/elementor-widgets.php:1347
+#: includes/elementor-widgets.php:1348
 msgid "Heading / title text"
 msgstr ""
 
-#: includes/elementor-widgets.php:1348
+#: includes/elementor-widgets.php:1349
 msgid "Secondary / meta text"
 msgstr ""
 
-#: includes/elementor-widgets.php:1349
+#: includes/elementor-widgets.php:1350
 msgid "Card background"
 msgstr ""
 
-#: includes/elementor-widgets.php:1350
+#: includes/elementor-widgets.php:1351
 msgid "Borders"
 msgstr ""
 
-#: includes/elementor-widgets.php:1351
+#: includes/elementor-widgets.php:1352
 msgid "Filter / panel background"
 msgstr ""
 
-#: includes/elementor-widgets.php:1367
-#: includes/elementor-widgets.php:2613
+#: includes/elementor-widgets.php:1368
+#: includes/elementor-widgets.php:2614
 msgid "Cards"
 msgstr ""
 
-#: includes/elementor-widgets.php:1377
-#: includes/elementor-widgets.php:2622
+#: includes/elementor-widgets.php:1378
+#: includes/elementor-widgets.php:2623
 msgid "Content padding"
 msgstr ""
 
-#: includes/elementor-widgets.php:1385
+#: includes/elementor-widgets.php:1386
 msgid "Image proportions"
 msgstr ""
 
-#: includes/elementor-widgets.php:1390
+#: includes/elementor-widgets.php:1391
 msgid "Square (1:1)"
 msgstr ""
 
-#: includes/elementor-widgets.php:1391
+#: includes/elementor-widgets.php:1392
 msgid "Portrait (4:5)"
 msgstr ""
 
-#: includes/elementor-widgets.php:1392
+#: includes/elementor-widgets.php:1393
 msgid "Portrait (3:4)"
 msgstr ""
 
-#: includes/elementor-widgets.php:1393
+#: includes/elementor-widgets.php:1394
 msgid "Tall (2:3)"
 msgstr ""
 
-#: includes/elementor-widgets.php:1394
+#: includes/elementor-widgets.php:1395
 msgid "Landscape (4:3)"
 msgstr ""
 
-#: includes/elementor-widgets.php:1395
+#: includes/elementor-widgets.php:1396
 msgid "Landscape (3:2)"
 msgstr ""
 
-#: includes/elementor-widgets.php:1396
+#: includes/elementor-widgets.php:1397
 msgid "Wide (16:9)"
 msgstr ""
 
-#: includes/elementor-widgets.php:1397
+#: includes/elementor-widgets.php:1398
 msgid "Original (no cropping)"
 msgstr ""
 
-#: includes/elementor-widgets.php:1399
+#: includes/elementor-widgets.php:1400
 msgid "The image keeps this shape at any column count; the height follows the card width."
 msgstr ""
 
-#: includes/elementor-widgets.php:1412
+#: includes/elementor-widgets.php:1413
 msgid "Crop focus"
 msgstr ""
 
-#: includes/elementor-widgets.php:1417
-#: includes/elementor-widgets.php:3552
-#: includes/elementor-widgets.php:3571
-#: includes/elementor-widgets.php:4259
+#: includes/elementor-widgets.php:1418
+#: includes/elementor-widgets.php:3553
+#: includes/elementor-widgets.php:3572
+#: includes/elementor-widgets.php:4260
 msgid "Top"
 msgstr ""
 
-#: includes/elementor-widgets.php:1419
-#: includes/elementor-widgets.php:3579
+#: includes/elementor-widgets.php:1420
+#: includes/elementor-widgets.php:3580
 msgid "Bottom"
 msgstr ""
 
-#: includes/elementor-widgets.php:1432
+#: includes/elementor-widgets.php:1433
 msgid "Titles"
 msgstr ""
 
-#: includes/elementor-widgets.php:1441
+#: includes/elementor-widgets.php:1442
 msgid "Title typography"
 msgstr ""
 
-#: includes/elementor-widgets.php:1448
+#: includes/elementor-widgets.php:1449
 msgid "Title colour"
 msgstr ""
 
-#: includes/elementor-widgets.php:1456
+#: includes/elementor-widgets.php:1457
 msgid "Title hover colour"
 msgstr ""
 
-#: includes/elementor-widgets.php:1480
+#: includes/elementor-widgets.php:1481
 msgid "Details Text"
 msgstr ""
 
-#: includes/elementor-widgets.php:1484
+#: includes/elementor-widgets.php:1485
 msgid "Details"
 msgstr ""
 
-#: includes/elementor-widgets.php:1486
+#: includes/elementor-widgets.php:1487
 msgid "Field labels"
 msgstr ""
 
-#: includes/elementor-widgets.php:1487
+#: includes/elementor-widgets.php:1488
 msgid "Specialty / category line"
 msgstr ""
 
-#: includes/elementor-widgets.php:1491
+#: includes/elementor-widgets.php:1492
 msgid "Status Badges"
 msgstr ""
 
-#: includes/elementor-widgets.php:1494
+#: includes/elementor-widgets.php:1495
 msgid "Open / Upcoming event"
 msgstr ""
 
-#: includes/elementor-widgets.php:1495
+#: includes/elementor-widgets.php:1496
 msgid "Closing soon / Today"
 msgstr ""
 
-#: includes/elementor-widgets.php:1497
+#: includes/elementor-widgets.php:1498
 msgid "Closed / Past"
 msgstr ""
 
-#: includes/elementor-widgets.php:1521
+#: includes/elementor-widgets.php:1522
 msgid "Buttons & Links"
 msgstr ""
 
-#: includes/elementor-widgets.php:1527
+#: includes/elementor-widgets.php:1528
 msgid "Filter Bar"
 msgstr ""
 
-#: includes/elementor-widgets.php:1528
-#: includes/elementor-widgets.php:2962
+#: includes/elementor-widgets.php:1529
+#: includes/elementor-widgets.php:2963
 msgid "Bar"
 msgstr ""
 
-#: includes/elementor-widgets.php:1533
+#: includes/elementor-widgets.php:1534
 msgid "Gap between fields"
 msgstr ""
 
-#: includes/elementor-widgets.php:1545
+#: includes/elementor-widgets.php:1546
 msgid "Search box & dropdowns"
 msgstr ""
 
-#: includes/elementor-widgets.php:1547
+#: includes/elementor-widgets.php:1548
 msgid "Reset & search buttons"
 msgstr ""
 
-#: includes/elementor-widgets.php:1552
+#: includes/elementor-widgets.php:1553
 msgid "Directory Sidebar"
 msgstr ""
 
-#: includes/elementor-widgets.php:1556
+#: includes/elementor-widgets.php:1557
 msgid "Sidebar width"
 msgstr ""
 
-#: includes/elementor-widgets.php:1572
+#: includes/elementor-widgets.php:1573
 msgid "Filter headings"
 msgstr ""
 
-#: includes/elementor-widgets.php:1573
+#: includes/elementor-widgets.php:1574
 msgid "Options"
 msgstr ""
 
-#: includes/elementor-widgets.php:1577
+#: includes/elementor-widgets.php:1578
 msgid "Checkbox colour"
 msgstr ""
 
-#: includes/elementor-widgets.php:1590
+#: includes/elementor-widgets.php:1591
 msgid "Header background"
 msgstr ""
 
-#: includes/elementor-widgets.php:1595
-#: includes/elementor-widgets.php:4074
-#: includes/elementor-widgets.php:4217
+#: includes/elementor-widgets.php:1596
+#: includes/elementor-widgets.php:4075
+#: includes/elementor-widgets.php:4218
 msgid "Rows"
 msgstr ""
 
-#: includes/elementor-widgets.php:1597
+#: includes/elementor-widgets.php:1598
 msgid "Row background"
 msgstr ""
 
-#: includes/elementor-widgets.php:1598
-#: includes/elementor-widgets.php:3043
+#: includes/elementor-widgets.php:1599
+#: includes/elementor-widgets.php:3044
 msgid "Striped row background"
 msgstr ""
 
-#: includes/elementor-widgets.php:1599
-#: includes/elementor-widgets.php:3094
-#: includes/elementor-widgets.php:4302
+#: includes/elementor-widgets.php:1600
+#: includes/elementor-widgets.php:3095
+#: includes/elementor-widgets.php:4303
 msgid "Row hover background"
 msgstr ""
 
-#: includes/elementor-widgets.php:1600
-#: includes/elementor-widgets.php:4277
+#: includes/elementor-widgets.php:1601
+#: includes/elementor-widgets.php:4278
 msgid "Line colour"
 msgstr ""
 
-#: includes/elementor-widgets.php:1611
+#: includes/elementor-widgets.php:1612
 msgid "Cell padding"
 msgstr ""
 
-#: includes/elementor-widgets.php:1612
+#: includes/elementor-widgets.php:1613
 msgid "Table frame"
 msgstr ""
 
-#: includes/elementor-widgets.php:1617
+#: includes/elementor-widgets.php:1618
 msgid "Citations"
 msgstr ""
 
-#: includes/elementor-widgets.php:1628
+#: includes/elementor-widgets.php:1629
 msgid "Items"
 msgstr ""
 
-#: includes/elementor-widgets.php:1632
+#: includes/elementor-widgets.php:1633
 msgid "Number colour"
 msgstr ""
 
-#: includes/elementor-widgets.php:1640
-#: includes/elementor-widgets.php:2606
-#: includes/elementor-widgets.php:3086
+#: includes/elementor-widgets.php:1641
+#: includes/elementor-widgets.php:2607
+#: includes/elementor-widgets.php:3087
 msgid "Divider colour"
 msgstr ""
 
-#: includes/elementor-widgets.php:1645
+#: includes/elementor-widgets.php:1646
 msgid "Item padding"
 msgstr ""
 
-#: includes/elementor-widgets.php:1675
-#: includes/elementor-widgets.php:3788
+#: includes/elementor-widgets.php:1676
+#: includes/elementor-widgets.php:3789
 msgid "Space above"
 msgstr ""
 
-#: includes/elementor-widgets.php:1688
+#: includes/elementor-widgets.php:1689
 msgid "Current page"
 msgstr ""
 
-#: includes/elementor-widgets.php:1706
+#: includes/elementor-widgets.php:1707
 msgid "Print Button"
 msgstr ""
 
-#: includes/elementor-widgets.php:2229
+#: includes/elementor-widgets.php:2230
 msgid "Jobs / Vacancies"
 msgstr ""
 
-#: includes/elementor-widgets.php:2340
-#: includes/elementor-widgets.php:2371
+#: includes/elementor-widgets.php:2341
+#: includes/elementor-widgets.php:2372
 msgid "Blog Posts"
 msgstr ""
 
-#: includes/elementor-widgets.php:2380
+#: includes/elementor-widgets.php:2381
 msgid "List (date badge rows)"
 msgstr ""
 
-#: includes/elementor-widgets.php:2381
+#: includes/elementor-widgets.php:2382
 msgid "Grid (cards)"
 msgstr ""
 
-#: includes/elementor-widgets.php:2409
+#: includes/elementor-widgets.php:2410
 msgid "Intro text (optional)"
 msgstr ""
 
-#: includes/elementor-widgets.php:2436
+#: includes/elementor-widgets.php:2437
 msgid "Most commented"
 msgstr ""
 
-#: includes/elementor-widgets.php:2450
+#: includes/elementor-widgets.php:2451
 msgid "Newest first"
 msgstr ""
 
-#: includes/elementor-widgets.php:2451
+#: includes/elementor-widgets.php:2452
 msgid "Oldest first"
 msgstr ""
 
-#: includes/elementor-widgets.php:2460
+#: includes/elementor-widgets.php:2461
 msgid "Show image"
 msgstr ""
 
-#: includes/elementor-widgets.php:2470
-#: includes/elementor-widgets.php:2938
+#: includes/elementor-widgets.php:2471
+#: includes/elementor-widgets.php:2939
 msgid "Show date"
 msgstr ""
 
-#: includes/elementor-widgets.php:2480
+#: includes/elementor-widgets.php:2481
 msgid "Excerpt words (0 to hide)"
 msgstr ""
 
-#: includes/elementor-widgets.php:2491
+#: includes/elementor-widgets.php:2492
 msgid "Show read-more link"
 msgstr ""
 
-#: includes/elementor-widgets.php:2500
+#: includes/elementor-widgets.php:2501
 msgid "Read-more label"
 msgstr ""
 
-#: includes/elementor-widgets.php:2510
+#: includes/elementor-widgets.php:2511
 msgid "Message when there are no posts"
 msgstr ""
 
-#: includes/elementor-widgets.php:2526
-#: includes/elementor-widgets.php:2878
+#: includes/elementor-widgets.php:2527
+#: includes/elementor-widgets.php:2879
 msgid "Categories"
 msgstr ""
 
-#: includes/elementor-widgets.php:2536
+#: includes/elementor-widgets.php:2537
 msgid "Exclude categories"
 msgstr ""
 
-#: includes/elementor-widgets.php:2546
+#: includes/elementor-widgets.php:2547
 msgid "Tags"
 msgstr ""
 
-#: includes/elementor-widgets.php:2556
+#: includes/elementor-widgets.php:2557
 msgid "Author"
 msgstr ""
 
-#: includes/elementor-widgets.php:2559
-#: includes/elementor-widgets.php:2892
-#: includes/elementor-widgets.php:2921
+#: includes/elementor-widgets.php:2560
+#: includes/elementor-widgets.php:2893
+#: includes/elementor-widgets.php:2922
 msgid "Any"
 msgstr ""
 
-#: includes/elementor-widgets.php:2570
+#: includes/elementor-widgets.php:2571
 msgid "Number of posts to leave out at the start."
 msgstr ""
 
-#: includes/elementor-widgets.php:2588
+#: includes/elementor-widgets.php:2589
 msgid "Gap between posts"
 msgstr ""
 
-#: includes/elementor-widgets.php:2625
+#: includes/elementor-widgets.php:2626
 msgid "Image"
 msgstr ""
 
-#: includes/elementor-widgets.php:2644
+#: includes/elementor-widgets.php:2645
 msgid "Date Badge"
 msgstr ""
 
-#: includes/elementor-widgets.php:2646
+#: includes/elementor-widgets.php:2647
 msgid "Month & year"
 msgstr ""
 
-#: includes/elementor-widgets.php:2647
+#: includes/elementor-widgets.php:2648
 msgid "Badge"
 msgstr ""
 
-#: includes/elementor-widgets.php:2652
+#: includes/elementor-widgets.php:2653
 msgid "Hide pen tile"
 msgstr ""
 
-#: includes/elementor-widgets.php:2663
+#: includes/elementor-widgets.php:2664
 msgid "Pen tile background"
 msgstr ""
 
-#: includes/elementor-widgets.php:2672
+#: includes/elementor-widgets.php:2673
 msgid "Pen colour"
 msgstr ""
 
-#: includes/elementor-widgets.php:2692
+#: includes/elementor-widgets.php:2693
 msgid "Excerpt"
 msgstr ""
 
-#: includes/elementor-widgets.php:2704
+#: includes/elementor-widgets.php:2705
 msgid "Intro Text"
 msgstr ""
 
-#: includes/elementor-widgets.php:2868
+#: includes/elementor-widgets.php:2869
 msgid "Number of notices"
 msgstr ""
 
-#: includes/elementor-widgets.php:2893
+#: includes/elementor-widgets.php:2894
 msgid "Urgent"
 msgstr ""
 
-#: includes/elementor-widgets.php:2894
+#: includes/elementor-widgets.php:2895
 msgid "Important"
 msgstr ""
 
-#: includes/elementor-widgets.php:2902
+#: includes/elementor-widgets.php:2903
 msgid "Include"
 msgstr ""
 
-#: includes/elementor-widgets.php:2903
+#: includes/elementor-widgets.php:2904
 msgid "Leave empty to use Settings → Notice board sources. Category and priority apply to notices only."
 msgstr ""
 
-#: includes/elementor-widgets.php:2927
+#: includes/elementor-widgets.php:2928
 msgid "Only from the last … days"
 msgstr ""
 
-#: includes/elementor-widgets.php:2932
+#: includes/elementor-widgets.php:2933
 msgid "0 shows all current notices."
 msgstr ""
 
-#: includes/elementor-widgets.php:2947
+#: includes/elementor-widgets.php:2948
 msgid "Show category badge"
 msgstr ""
 
-#: includes/elementor-widgets.php:2967
+#: includes/elementor-widgets.php:2968
 msgid "Height"
 msgstr ""
 
-#: includes/elementor-widgets.php:2981
-#: includes/elementor-widgets.php:3168
-#: includes/elementor-widgets.php:4003
-#: includes/elementor-widgets.php:4402
+#: includes/elementor-widgets.php:2982
+#: includes/elementor-widgets.php:3169
+#: includes/elementor-widgets.php:4004
+#: includes/elementor-widgets.php:4403
 msgid "Label"
 msgstr ""
 
-#: includes/elementor-widgets.php:2999
-#: includes/elementor-widgets.php:3033
-#: includes/elementor-widgets.php:3659
-#: includes/elementor-widgets.php:4191
+#: includes/elementor-widgets.php:3000
+#: includes/elementor-widgets.php:3034
+#: includes/elementor-widgets.php:3660
+#: includes/elementor-widgets.php:4192
 msgid "Box"
 msgstr ""
 
-#: includes/elementor-widgets.php:3003
+#: includes/elementor-widgets.php:3004
 msgid "Heading Bar"
 msgstr ""
 
-#: includes/elementor-widgets.php:3016
+#: includes/elementor-widgets.php:3017
 msgid "Pause button colour"
 msgstr ""
 
-#: includes/elementor-widgets.php:3029
+#: includes/elementor-widgets.php:3030
 msgid "View All Link"
 msgstr ""
 
-#: includes/elementor-widgets.php:3055
+#: includes/elementor-widgets.php:3056
 msgid "Badges"
 msgstr ""
 
-#: includes/elementor-widgets.php:3056
+#: includes/elementor-widgets.php:3057
 msgid "Category badge"
 msgstr ""
 
-#: includes/elementor-widgets.php:3057
+#: includes/elementor-widgets.php:3058
 msgid "\"New\" tag"
 msgstr ""
 
-#: includes/elementor-widgets.php:3058
+#: includes/elementor-widgets.php:3059
 msgid "Deadline text"
 msgstr ""
 
-#: includes/elementor-widgets.php:3062
+#: includes/elementor-widgets.php:3063
 msgid "Urgent colour"
 msgstr ""
 
-#: includes/elementor-widgets.php:3082
+#: includes/elementor-widgets.php:3083
 msgid "Row padding"
 msgstr ""
 
-#: includes/elementor-widgets.php:3146
-#: includes/elementor-widgets.php:3164
+#: includes/elementor-widgets.php:3147
+#: includes/elementor-widgets.php:3165
 msgid "Notice Ticker"
 msgstr ""
 
-#: includes/elementor-widgets.php:3177
+#: includes/elementor-widgets.php:3178
 msgid "Speed (1 slow - 10 fast)"
 msgstr ""
 
-#: includes/elementor-widgets.php:3244
-#: includes/elementor-widgets.php:3417
-#: includes/elementor-widgets.php:3663
+#: includes/elementor-widgets.php:3245
+#: includes/elementor-widgets.php:3418
+#: includes/elementor-widgets.php:3664
 msgid "Heading"
 msgstr ""
 
-#: includes/elementor-widgets.php:3253
+#: includes/elementor-widgets.php:3254
 msgid "Height (px)"
 msgstr ""
 
-#: includes/elementor-widgets.php:3263
+#: includes/elementor-widgets.php:3264
 msgid "Scroll speed (1 slow - 10 fast)"
 msgstr ""
 
-#: includes/elementor-widgets.php:3273
+#: includes/elementor-widgets.php:3274
 msgid "Show \"View all\" link"
 msgstr ""
 
-#: includes/elementor-widgets.php:3317
-#: includes/elementor-widgets.php:3335
+#: includes/elementor-widgets.php:3318
+#: includes/elementor-widgets.php:3336
 msgid "Notices List"
 msgstr ""
 
-#: includes/elementor-widgets.php:3380
+#: includes/elementor-widgets.php:3381
 msgid "Testimonial / Message"
 msgstr ""
 
-#: includes/elementor-widgets.php:3412
-#: includes/elementor-widgets.php:3458
-#: includes/elementor-widgets.php:3674
+#: includes/elementor-widgets.php:3413
+#: includes/elementor-widgets.php:3459
+#: includes/elementor-widgets.php:3675
 msgid "Message"
 msgstr ""
 
-#: includes/elementor-widgets.php:3419
+#: includes/elementor-widgets.php:3420
 msgid "Message from Head of Department"
 msgstr ""
 
-#: includes/elementor-widgets.php:3427
+#: includes/elementor-widgets.php:3428
 msgid "Heading HTML tag"
 msgstr ""
 
-#: includes/elementor-widgets.php:3446
+#: includes/elementor-widgets.php:3447
 msgid "Heading across the full width"
 msgstr ""
 
-#: includes/elementor-widgets.php:3447
+#: includes/elementor-widgets.php:3448
 msgid "Off: the heading sits beside the photo, above the message."
 msgstr ""
 
-#: includes/elementor-widgets.php:3460
+#: includes/elementor-widgets.php:3461
 msgid "Welcome to our department. Write the message here."
 msgstr ""
 
-#: includes/elementor-widgets.php:3468
+#: includes/elementor-widgets.php:3469
 msgid "Quotation mark"
 msgstr ""
 
-#: includes/elementor-widgets.php:3478
-#: includes/elementor-widgets.php:3741
+#: includes/elementor-widgets.php:3479
+#: includes/elementor-widgets.php:3742
 msgid "Photo"
 msgstr ""
 
-#: includes/elementor-widgets.php:3499
+#: includes/elementor-widgets.php:3500
 msgid "Prof. Dr. Name"
 msgstr ""
 
-#: includes/elementor-widgets.php:3510
+#: includes/elementor-widgets.php:3511
 msgid "Chairperson, Department of Pathology"
 msgstr ""
 
-#: includes/elementor-widgets.php:3518
+#: includes/elementor-widgets.php:3519
 msgid "Organisation / place"
 msgstr ""
 
-#: includes/elementor-widgets.php:3520
+#: includes/elementor-widgets.php:3521
 msgid "Gomal Medical College, Dera Ismail Khan"
 msgstr ""
 
-#: includes/elementor-widgets.php:3528
+#: includes/elementor-widgets.php:3529
 msgid "Link (name and photo)"
 msgstr ""
 
-#: includes/elementor-widgets.php:3530
+#: includes/elementor-widgets.php:3531
 msgid "https://… e.g. the profile page"
 msgstr ""
 
-#: includes/elementor-widgets.php:3541
+#: includes/elementor-widgets.php:3542
 msgid "Photo position"
 msgstr ""
 
-#: includes/elementor-widgets.php:3567
+#: includes/elementor-widgets.php:3568
 msgid "Vertical alignment (photo left/right)"
 msgstr ""
 
-#: includes/elementor-widgets.php:3575
-#: includes/elementor-widgets.php:4263
+#: includes/elementor-widgets.php:3576
+#: includes/elementor-widgets.php:4264
 msgid "Middle"
 msgstr ""
 
-#: includes/elementor-widgets.php:3589
+#: includes/elementor-widgets.php:3590
 msgid "Photo alignment (photo on top)"
 msgstr ""
 
-#: includes/elementor-widgets.php:3611
+#: includes/elementor-widgets.php:3612
 msgid "Photo width"
 msgstr ""
 
-#: includes/elementor-widgets.php:3638
+#: includes/elementor-widgets.php:3639
 msgid "Space between photo and text"
 msgstr ""
 
-#: includes/elementor-widgets.php:3683
+#: includes/elementor-widgets.php:3684
 msgid "Justified"
 msgstr ""
 
-#: includes/elementor-widgets.php:3693
+#: includes/elementor-widgets.php:3694
 msgid "Space between paragraphs"
 msgstr ""
 
-#: includes/elementor-widgets.php:3708
+#: includes/elementor-widgets.php:3709
 msgid "Link colour in the message"
 msgstr ""
 
-#: includes/elementor-widgets.php:3715
+#: includes/elementor-widgets.php:3716
 msgid "Quotation Mark"
 msgstr ""
 
-#: includes/elementor-widgets.php:3727
+#: includes/elementor-widgets.php:3728
 msgid "Size"
 msgstr ""
 
-#: includes/elementor-widgets.php:3745
+#: includes/elementor-widgets.php:3746
 msgid "Height (empty = natural)"
 msgstr ""
 
-#: includes/elementor-widgets.php:3775
+#: includes/elementor-widgets.php:3776
 msgid "Name & Designation"
 msgstr ""
 
-#: includes/elementor-widgets.php:3809
+#: includes/elementor-widgets.php:3810
 msgid "Organisation"
 msgstr ""
 
-#: includes/elementor-widgets.php:3915
-#: includes/elementor-widgets.php:3946
+#: includes/elementor-widgets.php:3916
+#: includes/elementor-widgets.php:3947
 msgid "Contact Info"
 msgstr ""
 
-#: includes/elementor-widgets.php:3953
+#: includes/elementor-widgets.php:3954
 msgid "Contact Us"
 msgstr ""
 
-#: includes/elementor-widgets.php:3961
+#: includes/elementor-widgets.php:3962
 msgid "Title HTML tag"
 msgstr ""
 
-#: includes/elementor-widgets.php:3991
-#: includes/elementor-widgets.php:4309
+#: includes/elementor-widgets.php:3992
+#: includes/elementor-widgets.php:4310
 msgid "Icon"
 msgstr ""
 
-#: includes/elementor-widgets.php:4013
-#: includes/elementor-widgets.php:4406
+#: includes/elementor-widgets.php:4014
+#: includes/elementor-widgets.php:4407
 msgid "Value"
 msgstr ""
 
-#: includes/elementor-widgets.php:4017
+#: includes/elementor-widgets.php:4018
 msgid "New lines are kept (e.g. a two-line address)."
 msgstr ""
 
-#: includes/elementor-widgets.php:4024
+#: includes/elementor-widgets.php:4025
 msgid "Make it clickable"
 msgstr ""
 
-#: includes/elementor-widgets.php:4028
+#: includes/elementor-widgets.php:4029
 msgid "No link"
 msgstr ""
 
-#: includes/elementor-widgets.php:4029
+#: includes/elementor-widgets.php:4030
 msgid "Phone call (tel:)"
 msgstr ""
 
-#: includes/elementor-widgets.php:4030
+#: includes/elementor-widgets.php:4031
 msgid "Email (mailto:)"
 msgstr ""
 
-#: includes/elementor-widgets.php:4031
+#: includes/elementor-widgets.php:4032
 msgid "WhatsApp chat"
 msgstr ""
 
-#: includes/elementor-widgets.php:4032
+#: includes/elementor-widgets.php:4033
 msgid "Open in Google Maps"
 msgstr ""
 
-#: includes/elementor-widgets.php:4033
+#: includes/elementor-widgets.php:4034
 msgid "Custom link"
 msgstr ""
 
-#: includes/elementor-widgets.php:4040
+#: includes/elementor-widgets.php:4041
 msgid "Number or address to use"
 msgstr ""
 
-#: includes/elementor-widgets.php:4042
+#: includes/elementor-widgets.php:4043
 msgid "Optional — defaults to the value"
 msgstr ""
 
-#: includes/elementor-widgets.php:4043
+#: includes/elementor-widgets.php:4044
 msgid "Use this when the shown text differs, e.g. \"UAN 111-222-333\" dialling 111222333."
 msgstr ""
 
-#: includes/elementor-widgets.php:4051
+#: includes/elementor-widgets.php:4052
 msgid "Link"
 msgstr ""
 
-#: includes/elementor-widgets.php:4061
+#: includes/elementor-widgets.php:4062
 msgid "Icon colour (this row)"
 msgstr ""
 
-#: includes/elementor-widgets.php:4103
+#: includes/elementor-widgets.php:4104
 msgid "Medical College Road, City"
 msgstr ""
 
-#: includes/elementor-widgets.php:4111
+#: includes/elementor-widgets.php:4112
 msgid "Office hours"
 msgstr ""
 
-#: includes/elementor-widgets.php:4112
+#: includes/elementor-widgets.php:4113
 msgid "Monday – Friday, 8:00 AM – 2:00 PM"
 msgstr ""
 
-#: includes/elementor-widgets.php:4126
+#: includes/elementor-widgets.php:4127
 msgid "Label and value"
 msgstr ""
 
-#: includes/elementor-widgets.php:4132
+#: includes/elementor-widgets.php:4133
 msgid "Side by side (label left, value right)"
 msgstr ""
 
-#: includes/elementor-widgets.php:4133
+#: includes/elementor-widgets.php:4134
 msgid "Stacked (label above value)"
 msgstr ""
 
-#: includes/elementor-widgets.php:4141
+#: includes/elementor-widgets.php:4142
 msgid "Icons"
 msgstr ""
 
-#: includes/elementor-widgets.php:4152
+#: includes/elementor-widgets.php:4153
 msgid "Labels"
 msgstr ""
 
-#: includes/elementor-widgets.php:4153
+#: includes/elementor-widgets.php:4154
 msgid "Hidden labels are still read out by screen readers."
 msgstr ""
 
-#: includes/elementor-widgets.php:4164
+#: includes/elementor-widgets.php:4165
 msgid "Lines between rows"
 msgstr ""
 
-#: includes/elementor-widgets.php:4176
+#: includes/elementor-widgets.php:4177
 msgid "Open map and WhatsApp links in a new tab"
 msgstr ""
 
-#: includes/elementor-widgets.php:4221
+#: includes/elementor-widgets.php:4222
 msgid "Space between rows"
 msgstr ""
 
-#: includes/elementor-widgets.php:4236
+#: includes/elementor-widgets.php:4237
 msgid "Label column width"
 msgstr ""
 
-#: includes/elementor-widgets.php:4255
+#: includes/elementor-widgets.php:4256
 msgid "Vertical alignment"
 msgstr ""
 
-#: includes/elementor-widgets.php:4267
+#: includes/elementor-widgets.php:4268
 msgid "Text line"
 msgstr ""
 
-#: includes/elementor-widgets.php:4286
+#: includes/elementor-widgets.php:4287
 msgid "Line style"
 msgstr ""
 
-#: includes/elementor-widgets.php:4291
+#: includes/elementor-widgets.php:4292
 msgid "Solid"
 msgstr ""
 
-#: includes/elementor-widgets.php:4292
+#: includes/elementor-widgets.php:4293
 msgid "Dashed"
 msgstr ""
 
-#: includes/elementor-widgets.php:4293
+#: includes/elementor-widgets.php:4294
 msgid "Dotted"
 msgstr ""
 
-#: includes/elementor-widgets.php:4342
+#: includes/elementor-widgets.php:4343
 msgid "Icon size"
 msgstr ""
 
-#: includes/elementor-widgets.php:4358
+#: includes/elementor-widgets.php:4359
 msgid "Background size (0 = no background)"
 msgstr ""
 
-#: includes/elementor-widgets.php:4373
+#: includes/elementor-widgets.php:4374
 msgid "Background radius"
 msgstr ""
 
-#: includes/elementor-widgets.php:4388
+#: includes/elementor-widgets.php:4389
 msgid "Space after the icon"
 msgstr ""
 
-#: includes/elementor-widgets.php:4411
+#: includes/elementor-widgets.php:4412
 msgid "Link colour"
 msgstr ""
 
-#: includes/elementor-widgets.php:4419
+#: includes/elementor-widgets.php:4420
 msgid "Link hover colour"
 msgstr ""
 
-#: includes/elementor-widgets.php:4519
+#: includes/elementor-widgets.php:4520
 msgid "(opens in a new tab)"
 msgstr ""
 

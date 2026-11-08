@@ -120,7 +120,7 @@ class MCM_Query {
 		if ( '' !== $size && in_array( $size, self::image_sizes(), true ) ) {
 			$out['image_size'] = $size;
 		}
-		foreach ( array( 'show_button', 'show_specialty', 'show_designation', 'show_department', 'show_excerpt', 'show_meta', 'show_status' ) as $key ) {
+		foreach ( array( 'show_button', 'show_specialty', 'show_designation', 'show_qualifications', 'show_department', 'show_excerpt', 'show_meta', 'show_status' ) as $key ) {
 			if ( isset( $a[ $key ] ) && in_array( strtolower( MCM_Safe::str( $a[ $key ] ) ), array( 'no', '0', 'false', 'off' ), true ) ) {
 				$out[ $key ] = 'no';
 			}
@@ -249,77 +249,78 @@ class MCM_Query {
 	 */
 	public static function parse_atts( $atts ) {
 		$defaults = array(
-			'type'             => 'mcm_consultant',
-			'view'             => 'grid',        // grid | list | table.
-			'columns'          => MCM_Settings::value( 'columns' ),
-			'count'            => 12,
-			'category'         => '',            // primary taxonomy term slug(s).
-			'filters'          => 'no',          // show filter bar.
-			'print'            => '',            // '' = follow the settings screen; yes/no forces it.
-			'paginate'         => 'no',          // render numbered pagination.
-			'print_title'      => '',            // heading shown on the printed page.
-			'search'           => '',            // initial search string.
-			'orderby'          => 'date',
-			'order'            => 'DESC',
-			'meta_key'         => '',            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Shortcode attribute; enables orderby="meta_value".
-			'meta_type'        => '',            // e.g. DATE, NUMERIC, CHAR.
-			'paged'            => 1,
-			'class_css'        => '',
+			'type'                => 'mcm_consultant',
+			'view'                => 'grid',        // grid | list | table.
+			'columns'             => MCM_Settings::value( 'columns' ),
+			'count'               => 12,
+			'category'            => '',            // primary taxonomy term slug(s).
+			'filters'             => 'no',          // show filter bar.
+			'print'               => '',            // '' = follow the settings screen; yes/no forces it.
+			'paginate'            => 'no',          // render numbered pagination.
+			'print_title'         => '',            // heading shown on the printed page.
+			'search'              => '',            // initial search string.
+			'orderby'             => 'date',
+			'order'               => 'DESC',
+			'meta_key'            => '',            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Shortcode attribute; enables orderby="meta_value".
+			'meta_type'           => '',            // e.g. DATE, NUMERIC, CHAR.
+			'paged'               => 1,
+			'class_css'           => '',
 			// Jobs: open (default) | closed | all. Admissions: open | upcoming |
 			// closed. Scholarships, tenders: open | closed. Events: upcoming |
 			// past. Empty = all (jobs: open).
-			'status'           => '',
+			'status'              => '',
 			// Specific items (comma separated IDs) / items to leave out.
-			'ids'              => '',
-			'exclude_ids'      => '',
+			'ids'                 => '',
+			'exclude_ids'         => '',
 			// Skip the first N items.
-			'offset'           => 0,
+			'offset'              => 0,
 			// Filter bar parts: search box, which dropdowns (comma separated
 			// taxonomies, empty = all), Reset button, search placeholder.
-			'search_box'       => 'yes',
-			'facets'           => '',
-			'reset'            => 'yes',
-			'placeholder'      => '',
+			'search_box'          => 'yes',
+			'facets'              => '',
+			'reset'               => 'yes',
+			'placeholder'         => '',
 			// Message shown when nothing matches (empty = the default text).
-			'empty'            => '',
+			'empty'               => '',
 			// What each item shows (see display_opts()): images all | uploaded |
 			// none; table_cols = comma separated column keys (empty = all);
 			// show_* = yes | no.
-			'images'           => 'all',
-			'table_cols'       => '',
-			'show_button'      => 'yes',
-			'show_specialty'   => 'yes',
-			'show_designation' => 'yes',
-			'show_department'  => 'yes',
-			'show_excerpt'     => 'yes',
-			'show_meta'        => 'yes',
-			'show_status'      => 'yes',
+			'images'              => 'all',
+			'table_cols'          => '',
+			'show_button'         => 'yes',
+			'show_specialty'      => 'yes',
+			'show_designation'    => 'yes',
+			'show_qualifications' => 'yes',
+			'show_department'     => 'yes',
+			'show_excerpt'        => 'yes',
+			'show_meta'           => 'yes',
+			'show_status'         => 'yes',
 			// Image file size used on cards (thumbnail … full; empty = per layout).
-			'image_size'       => '',
+			'image_size'          => '',
 			// Generic per-taxonomy attribute (slug = taxonomy without mcm_ prefix).
-			'department'       => '',
-			'session'          => '',
-			'teacher'          => '',
-			'specialty'        => '',
-			'level'            => '',
-			'research_area'    => '',
-			'program'          => '',
-			'staff_type'       => '',
+			'department'          => '',
+			'session'             => '',
+			'teacher'             => '',
+			'specialty'           => '',
+			'level'               => '',
+			'research_area'       => '',
+			'program'             => '',
+			'staff_type'          => '',
 			// Alias: editors think "professor", the taxonomy is mcm_teacher.
-			'professor'        => '',
+			'professor'           => '',
 			// Locked taxonomy term (e.g. on a taxonomy archive) — always applied
 			// and ANDed in, surviving AJAX so the archive stays scoped.
-			'lock_tax'         => '',
-			'lock_term'        => '',
+			'lock_tax'            => '',
+			'lock_term'           => '',
 			// Internal: taxonomy => term map chosen by the VISITOR (AJAX).
-			'tax_filters'      => array(),
+			'tax_filters'         => array(),
 			// Internal: taxonomy => slug(s) pre-filter set by the AUTHOR (Elementor
 			// widget controls). Locked like the friendly attributes above.
-			'prefilter'        => array(),
+			'prefilter'           => array(),
 			// Internal: the author scope round-tripped through data-config (AJAX).
-			'scope'            => array(),
+			'scope'               => array(),
 			// Internal: taxonomy => slug(s) the AUTHOR left out (Elementor).
-			'exclude_terms'    => array(),
+			'exclude_terms'       => array(),
 		);
 		$a = wp_parse_args( $atts, $defaults );
 
@@ -1723,10 +1724,16 @@ class MCM_Query {
 		$btn = self::link_label( $type );
 
 		// Photo: always (default photo when none was uploaded), only uploaded, or never.
-		$mode     = self::image_mode();
-		$media    = 'none' !== $mode && ( $thumb || 'all' === $mode );
-		$spec     = self::shows( 'show_specialty' ) ? $spec : array();
-		$desig    = self::shows( 'show_designation' ) ? $desig : '';
+		$mode  = self::image_mode();
+		$media = 'none' !== $mode && ( $thumb || 'all' === $mode );
+		$spec  = self::shows( 'show_specialty' ) ? $spec : array();
+		$desig = self::shows( 'show_designation' ) ? $desig : '';
+		// Degrees (MBBS, FCPS, PhD…), one per line in wp-admin, shown as one line.
+		$qual = '';
+		if ( self::shows( 'show_qualifications' ) ) {
+			$lines = preg_split( '/\R+/', (string) MCM_Safe::meta( $id, 'mcm_qualifications' ) );
+			$qual  = implode( ', ', array_filter( array_map( 'trim', $lines ) ) );
+		}
 		$dept     = self::shows( 'show_department' ) ? $dept : array();
 		$link_btn = $link && self::shows( 'show_button' );
 
@@ -1756,6 +1763,9 @@ class MCM_Query {
 			<?php endif; ?>
 			<?php if ( '' !== $desig ) : ?>
 				<div class="mcm-dir-card-desig"><?php echo esc_html( $desig ); ?></div>
+			<?php endif; ?>
+			<?php if ( '' !== $qual ) : ?>
+				<div class="mcm-dir-card-qual"><?php echo esc_html( $qual ); ?></div>
 			<?php endif; ?>
 			<?php if ( ! empty( $dept ) ) : ?>
 				<div class="mcm-dir-card-dept"><?php echo esc_html( implode( ', ', $dept ) ); ?></div>

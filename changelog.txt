@@ -124,6 +124,13 @@ Medical College Manager — complete changelog.
     and read-more; exclude categories, tags, author, offset; full Style tab.
   - Notice Ticker / Board / List: "only from the last N days"; full Style tabs.
   The same options are available as shortcode attributes (see readme).
+* Team and consultant cards now show qualifications (e.g. MBBS, FCPS, PhD)
+  under the designation, in the order name, specialty, designation,
+  qualifications, department. Elementor: Display → Qualifications switch;
+  shortcodes: show_qualifications="no".
+* Testimonial / Message: the heading is no longer underlined by default (add it
+  back under Style → Heading → Typography → Decoration), and the message stays
+  justified on phones too, with hyphenation for even spacing.
 * Profile photos (consultants, team) are now square by default and sized by
   the card's width, so they keep their shape at 4, 5 or 6 columns instead of
   becoming tall strips; they are cropped toward the top, where faces are, and

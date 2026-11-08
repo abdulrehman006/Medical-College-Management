@@ -229,7 +229,8 @@ Attributes (all optional):
              without a photo; "none" shows text-only cards)
   table_cols columns to show in the table view, comma separated, e.g.
              table_cols="title,mcm_designation,mcm_department" (default all)
-  show_button / show_specialty / show_designation / show_department /
+  show_button / show_specialty / show_designation / show_qualifications /
+  show_department /
   show_excerpt / show_meta / show_status   yes | no (default yes)
   class_css  extra wrapper class for Custom CSS targeting
 

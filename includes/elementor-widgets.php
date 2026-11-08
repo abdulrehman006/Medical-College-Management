@@ -1165,9 +1165,10 @@ abstract class MCM_Elementor_Widget_Base extends \Elementor\Widget_Base {
 
 		$switches = array();
 		if ( $people ) {
-			$switches['show_specialty']   = __( 'Specialty', 'medical-college-manager' );
-			$switches['show_designation'] = __( 'Designation', 'medical-college-manager' );
-			$switches['show_department']  = __( 'Department', 'medical-college-manager' );
+			$switches['show_specialty']      = __( 'Specialty', 'medical-college-manager' );
+			$switches['show_designation']    = __( 'Designation', 'medical-college-manager' );
+			$switches['show_qualifications'] = __( 'Qualifications (MBBS, PhD…)', 'medical-college-manager' );
+			$switches['show_department']     = __( 'Department', 'medical-college-manager' );
 		} elseif ( ! $job ) {
 			if ( MCM_Query::date_status_options( $type ) ) {
 				$switches['show_status'] = __( 'Status badge (e.g. Open, Past event)', 'medical-college-manager' );
@@ -1240,7 +1241,7 @@ abstract class MCM_Elementor_Widget_Base extends \Elementor\Widget_Base {
 			'table_cols' => isset( $s['table_cols'] ) && is_array( $s['table_cols'] ) ? implode( ',', array_map( 'sanitize_key', $s['table_cols'] ) ) : '',
 			'image_size' => isset( $s['image_size'] ) ? sanitize_key( MCM_Safe::str( $s['image_size'] ) ) : '',
 		);
-		foreach ( array( 'show_button', 'show_specialty', 'show_designation', 'show_department', 'show_excerpt', 'show_meta', 'show_status' ) as $key ) {
+		foreach ( array( 'show_button', 'show_specialty', 'show_designation', 'show_qualifications', 'show_department', 'show_excerpt', 'show_meta', 'show_status' ) as $key ) {
 			$atts[ $key ] = ( ! isset( $s[ $key ] ) || 'yes' === $s[ $key ] ) ? 'yes' : 'no';
 		}
 		return $atts;
@@ -1480,7 +1481,7 @@ abstract class MCM_Elementor_Widget_Base extends \Elementor\Widget_Base {
 		$this->mcm_style_section( 'mcm_style_text', __( 'Details Text', 'medical-college-manager' ) );
 		$this->mcm_text_style(
 			'st_meta',
-			array( '.mcm-meta', '.mcm-meta-value', '.mcm-card-excerpt', '.mcm-dir-card-desig', '.mcm-dir-card-dept', '.mcm-jobcard-dept', '.mcm-pub-meta' ),
+			array( '.mcm-meta', '.mcm-meta-value', '.mcm-card-excerpt', '.mcm-dir-card-desig', '.mcm-dir-card-qual', '.mcm-dir-card-dept', '.mcm-jobcard-dept', '.mcm-pub-meta' ),
 			array( 'heading' => __( 'Details', 'medical-college-manager' ) )
 		);
 		$this->mcm_text_style( 'st_meta_label', array( '.mcm-meta-label', '.mcm-jobcard-label' ), array( 'heading' => __( 'Field labels', 'medical-college-manager' ) ) );
