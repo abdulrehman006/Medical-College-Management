@@ -625,12 +625,14 @@ trait MCM_Elementor_Style {
 	}
 
 	/**
-	 * Term slug => name options for a taxonomy.
+	 * Term slug => name options for a taxonomy. With a post type, each name
+	 * carries that type's count, e.g. "Anatomy (1)" (taxonomies are shared).
 	 *
-	 * @param string $tax Taxonomy name.
+	 * @param string $tax  Taxonomy name.
+	 * @param string $type Post type whose posts are counted ('' = no count).
 	 * @return array<string,string>
 	 */
-	protected function mcm_term_options( $tax ) {
+	protected function mcm_term_options( $tax, $type = '' ) {
 		$terms = get_terms(
 			array(
 				'taxonomy'   => $tax,
@@ -640,9 +642,12 @@ trait MCM_Elementor_Style {
 		if ( is_wp_error( $terms ) || empty( $terms ) ) {
 			return array();
 		}
-		$out = array();
+		// Counts only matter in the editor panel; the front end needs just the keys.
+		$type   = $this->mcm_in_editor() ? $type : '';
+		$counts = '' !== $type ? MCM_Query::type_term_counts( $tax, $type ) : array();
+		$out    = array();
 		foreach ( $terms as $t ) {
-			$out[ $t->slug ] = $t->name;
+			$out[ $t->slug ] = '' !== $type ? sprintf( '%1$s (%2$d)', $t->name, isset( $counts[ $t->term_id ] ) ? $counts[ $t->term_id ] : 0 ) : $t->name;
 		}
 		return $out;
 	}
@@ -1052,7 +1057,7 @@ abstract class MCM_Elementor_Widget_Base extends \Elementor\Widget_Base {
 		);
 
 		foreach ( $taxes as $tax ) {
-			$options = $this->mcm_term_options( $tax );
+			$options = $this->mcm_term_options( $tax, $type );
 			if ( empty( $options ) ) {
 				continue;
 			}

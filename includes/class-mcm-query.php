@@ -96,6 +96,24 @@ class MCM_Query {
 	private static $display = array();
 
 	/**
+	 * Whether the last listing rendered found nothing (see take_last_empty()).
+	 *
+	 * @var bool
+	 */
+	private static $last_empty = false;
+
+	/**
+	 * Did the listing just rendered find nothing? Reading it resets it.
+	 *
+	 * @return bool
+	 */
+	public static function take_last_empty() {
+		$empty            = self::$last_empty;
+		self::$last_empty = false;
+		return $empty;
+	}
+
+	/**
 	 * Clean display options from listing attributes: which images, table
 	 * columns and card parts are shown. Only values that differ from the
 	 * default are returned, so an untouched listing carries nothing extra.
@@ -463,10 +481,24 @@ class MCM_Query {
 	 *
 	 * @param string $tax   Taxonomy.
 	 * @param array  $scope Output of scope_terms().
+	 * @param array  $a     Parsed listing attributes (null = no narrowing).
 	 * @return WP_Term[]
 	 */
-	private static function visible_facet_terms( $tax, $scope ) {
+	private static function visible_facet_terms( $tax, $scope, $a = null ) {
 		$terms = self::facet_terms( $tax );
+		// Taxonomies are shared by many types (Department, Faculty…): offer only
+		// terms that this very listing would show, or picking one lists nothing.
+		if ( is_array( $a ) ) {
+			$used  = self::terms_in_use( $tax, $a );
+			$terms = array_values(
+				array_filter(
+					$terms,
+					function ( $term ) use ( $used ) {
+						return isset( $used[ $term->term_id ] );
+					}
+				)
+			);
+		}
 		if ( ! isset( $scope[ $tax ] ) ) {
 			return $terms;
 		}
@@ -968,7 +1000,7 @@ class MCM_Query {
 				}
 				// Honour the author's pre-filter: hidden for one term, limited
 				// to the chosen terms for several.
-				$terms = self::visible_facet_terms( $tax, $scope );
+				$terms = self::visible_facet_terms( $tax, $scope, $a );
 				if ( empty( $terms ) ) {
 					continue;
 				}
@@ -1181,6 +1213,107 @@ class MCM_Query {
 		}
 
 		return is_array( $terms ) ? $terms : array();
+	}
+
+	/**
+	 * Published posts of ONE post type per term (term_id => count).
+	 *
+	 * WordPress keeps a single count per term for all the types a taxonomy is
+	 * attached to, so a Department used by courses, jobs and events shows the
+	 * sum everywhere. This is the per-type figure. Cached until any post or
+	 * term changes (WordPress's own "last changed" stamps).
+	 *
+	 * @param string $tax  Taxonomy.
+	 * @param string $type Post type.
+	 * @return array<int,int>
+	 */
+	public static function type_term_counts( $tax, $type ) {
+		$key    = 'mcm_tc_' . md5( $tax . '|' . $type ) . ':' . wp_cache_get_last_changed( 'posts' ) . ':' . wp_cache_get_last_changed( 'terms' );
+		$counts = wp_cache_get( $key, 'medical-college-manager' );
+		if ( false === $counts ) {
+			global $wpdb;
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- One grouped count per taxonomy and type, cached above.
+			$rows   = $wpdb->get_results(
+				$wpdb->prepare(
+					"SELECT tt.term_id, COUNT( DISTINCT p.ID ) AS n
+					FROM {$wpdb->term_taxonomy} tt
+					INNER JOIN {$wpdb->term_relationships} tr ON tr.term_taxonomy_id = tt.term_taxonomy_id
+					INNER JOIN {$wpdb->posts} p ON p.ID = tr.object_id
+					WHERE tt.taxonomy = %s AND p.post_type = %s AND p.post_status = 'publish'
+					GROUP BY tt.term_id",
+					$tax,
+					$type
+				)
+			);
+			$counts = array();
+			foreach ( (array) $rows as $row ) {
+				$counts[ (int) $row->term_id ] = (int) $row->n;
+			}
+			wp_cache_set( $key, $counts, 'medical-college-manager', DAY_IN_SECONDS );
+		}
+		return is_array( $counts ) ? $counts : array();
+	}
+
+	/**
+	 * Terms that would list something in this listing: terms of the items the
+	 * listing itself returns before any visitor choice (same type, status,
+	 * expiry, author pre-filters and exclusions), plus their parents, since a
+	 * parent term also lists its children's items.
+	 *
+	 * Cached until a post or term changes, and per hour, because "open" and
+	 * "upcoming" move with the clock.
+	 *
+	 * @param string $tax Taxonomy.
+	 * @param array  $a   Parsed listing attributes.
+	 * @return array<int,true> term_id => true
+	 */
+	public static function terms_in_use( $tax, $a ) {
+		$base = array(
+			'type'          => $a['type'],
+			'status'        => $a['status'],
+			'category'      => $a['category'],
+			'lock_tax'      => $a['lock_tax'],
+			'lock_term'     => $a['lock_term'],
+			'prefilter'     => $a['prefilter'],
+			'scope'         => self::scope_terms( $a ),
+			'exclude_terms' => self::exclude_terms( $a ),
+			'ids'           => $a['ids'],
+			'exclude_ids'   => $a['exclude_ids'],
+			// A fixed starting keyword (search box hidden) narrows the list for good.
+			'search'        => self::truthy( $a['search_box'] ) ? '' : $a['search'],
+		);
+		$key  = 'mcm_tiu_' . md5( $tax . wp_json_encode( $base ) ) . ':' . wp_cache_get_last_changed( 'posts' ) . ':' . wp_cache_get_last_changed( 'terms' ) . ':' . current_time( 'YmdH' );
+		$used = wp_cache_get( $key, 'medical-college-manager' );
+		if ( false !== $used ) {
+			return is_array( $used ) ? $used : array();
+		}
+
+		$ids_only = function ( $args ) {
+			$args['fields']         = 'ids';
+			$args['no_found_rows']  = true;
+			$args['posts_per_page'] = 2000; // phpcs:ignore WordPress.WP.PostsPerPage.posts_per_page_posts_per_page -- IDs only, cached; needed to see every term the listing uses.
+			unset( $args['offset'] );
+			return $args;
+		};
+		add_filter( 'mcm_query_args', $ids_only, PHP_INT_MAX );
+		$query = self::get_query( self::parse_atts( $base + array( 'count' => 2000 ) ) );
+		remove_filter( 'mcm_query_args', $ids_only, PHP_INT_MAX );
+
+		$used = array();
+		$ids  = array_map( 'intval', (array) $query->posts );
+		if ( $ids ) {
+			$term_ids = wp_get_object_terms( $ids, $tax, array( 'fields' => 'ids' ) );
+			foreach ( is_wp_error( $term_ids ) ? array() : $term_ids as $term_id ) {
+				$used[ (int) $term_id ] = true;
+				if ( is_taxonomy_hierarchical( $tax ) ) {
+					foreach ( get_ancestors( (int) $term_id, $tax, 'taxonomy' ) as $parent ) {
+						$used[ (int) $parent ] = true;
+					}
+				}
+			}
+		}
+		wp_cache_set( $key, $used, 'medical-college-manager', HOUR_IN_SECONDS );
+		return $used;
 	}
 
 	/**
@@ -1435,7 +1568,7 @@ class MCM_Query {
 				if ( ! $tax || $tax === $a['lock_tax'] || ( $facets && ! in_array( $tax, $facets, true ) ) ) {
 					continue;
 				}
-				$terms = self::visible_facet_terms( $tax, $scope );
+				$terms = self::visible_facet_terms( $tax, $scope, $a );
 				if ( empty( $terms ) ) {
 					continue;
 				}
@@ -1811,6 +1944,8 @@ class MCM_Query {
 		}
 
 		$query = self::get_query( $a );
+
+		self::$last_empty = ! $query->have_posts();
 
 		// The author's own "nothing found" message replaces the empty layout.
 		$empty = trim( sanitize_text_field( MCM_Safe::str( $a['empty'] ) ) );

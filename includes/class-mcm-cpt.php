@@ -24,6 +24,77 @@ class MCM_CPT {
 		// Force the simple classic editor for every plugin CPT (keeps the REST
 		// API on for meta/Elementor, but no block editor — easier data entry).
 		add_filter( 'use_block_editor_for_post_type', array( $this, 'force_classic_editor' ), 10, 2 );
+		add_action( 'admin_init', array( $this, 'term_count_columns' ) );
+	}
+
+	/**
+	 * Per-type Count column on shared taxonomy screens.
+	 *
+	 * Departments, Faculty, Sessions… belong to many content types, and
+	 * WordPress's Count column adds them all up: Events → Departments showed
+	 * "Anatomy 20" when Anatomy had one event. Opened under one content type,
+	 * the column now counts that type only and links to exactly those posts.
+	 */
+	public function term_count_columns() {
+		foreach ( array_keys( self::taxonomies() ) as $tax ) {
+			add_filter(
+				"manage_edit-{$tax}_columns",
+				function ( $cols ) use ( $tax ) {
+					$type = self::term_screen_type( $tax );
+					if ( '' === $type || ! isset( $cols['posts'] ) ) {
+						return $cols;
+					}
+					$obj = get_post_type_object( $type );
+					$out = array();
+					foreach ( $cols as $key => $label ) {
+						$out[ 'posts' === $key ? 'mcm_type_count' : $key ] = 'posts' === $key ? ( $obj ? $obj->labels->name : $label ) : $label;
+					}
+					return $out;
+				}
+			);
+			add_filter(
+				"manage_{$tax}_custom_column",
+				function ( $out, $column, $term_id ) use ( $tax ) {
+					$type = self::term_screen_type( $tax );
+					if ( 'mcm_type_count' !== $column || '' === $type ) {
+						return $out;
+					}
+					$counts = MCM_Query::type_term_counts( $tax, $type );
+					$n      = isset( $counts[ (int) $term_id ] ) ? $counts[ (int) $term_id ] : 0;
+					$term   = get_term( (int) $term_id, $tax );
+					if ( ! $term instanceof WP_Term ) {
+						return number_format_i18n( $n );
+					}
+					$url = add_query_arg(
+						array(
+							'taxonomy'  => $tax,
+							'term'      => $term->slug,
+							'post_type' => $type,
+						),
+						admin_url( 'edit.php' )
+					);
+					return '<a href="' . esc_url( $url ) . '">' . esc_html( number_format_i18n( $n ) ) . '</a>';
+				},
+				10,
+				3
+			);
+		}
+	}
+
+	/**
+	 * The content type a taxonomy screen was opened under, when the taxonomy
+	 * is shared by several types ('' otherwise: the normal count is right).
+	 *
+	 * @param string $tax Taxonomy.
+	 * @return string
+	 */
+	private static function term_screen_type( $tax ) {
+		$type = isset( $_REQUEST['post_type'] ) ? sanitize_key( wp_unslash( $_REQUEST['post_type'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only screen context (also sent by the Add term AJAX form).
+		$tobj = get_taxonomy( $tax );
+		if ( ! $tobj || count( (array) $tobj->object_type ) < 2 || ! in_array( $type, (array) $tobj->object_type, true ) ) {
+			return '';
+		}
+		return $type;
 	}
 
 	/**

@@ -1442,3 +1442,7 @@ a.mcm-jobcard-btn{ position:relative; z-index:1; }
 /* Labels hidden: the icon sits beside its value on every layout and device. */
 .mcm-contact--no-labels .mcm-contact-item{ flex-direction:row; align-items:center; gap:6px 14px; }
 .mcm-contact--no-labels .mcm-contact-term{ flex:0 0 auto; }
+
+/* Empty listing, shown to logged-in editors only (visitors get nothing). */
+.mcm-empty-admin{ padding:14px 18px; border:1px dashed var(--mcm-border-strong, #c8d0cc); border-radius:var(--mcm-radius, 12px); background:var(--mcm-page-bg, #f5f7fa); color:var(--mcm-text, #1f2933); font-size:14px; line-height:1.5; }
+.mcm-empty-admin a{ color:var(--mcm-primary, #0a6b5d); font-weight:600; }

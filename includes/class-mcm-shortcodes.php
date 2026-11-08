@@ -102,6 +102,67 @@ class MCM_Shortcodes {
 	 * @return string
 	 */
 	public static function build_block( $atts, $heading = true ) {
+		MCM_Query::take_last_empty();
+		$html = self::block_html( $atts, $heading );
+		if ( '' === $html || ! MCM_Query::take_last_empty() || ! self::hide_when_empty( $atts ) ) {
+			return $html;
+		}
+		return self::empty_notice( is_array( $atts ) && isset( $atts['type'] ) ? sanitize_key( MCM_Safe::str( $atts['type'] ) ) : '' );
+	}
+
+	/**
+	 * Whether an empty block is hidden from visitors: a block placed on a page
+	 * (widget or shortcode) on its first page, with no message of its own.
+	 * Live filtering ("No results found") and archive pages (their own "nothing
+	 * to show here yet") are left alone.
+	 *
+	 * @param array|string $atts Block attributes.
+	 * @return bool
+	 */
+	private static function hide_when_empty( $atts ) {
+		$atts = is_array( $atts ) ? $atts : array();
+		if ( wp_doing_ajax() || is_post_type_archive() || is_tax() ) {
+			return false;
+		}
+		if ( isset( $atts['empty'] ) && '' !== trim( MCM_Safe::str( $atts['empty'] ) ) ) {
+			return false;
+		}
+		return max( 1, (int) get_query_var( 'paged' ), (int) get_query_var( 'page' ) ) <= 1;
+	}
+
+	/**
+	 * What an empty block shows: nothing for visitors; a short note (with an
+	 * "Add" link where allowed) for logged-in editors, so a blank spot on the
+	 * page is explained to whoever can fix it.
+	 *
+	 * @param string $type Post type.
+	 * @return string
+	 */
+	private static function empty_notice( $type ) {
+		if ( ! current_user_can( 'edit_posts' ) ) {
+			return '';
+		}
+		$obj  = $type ? get_post_type_object( $type ) : null;
+		$name = $obj ? $obj->labels->name : __( 'items', 'medical-college-manager' );
+		$add  = '';
+		if ( $obj && current_user_can( $obj->cap->create_posts ) ) {
+			$add = ' <a href="' . esc_url( admin_url( 'post-new.php?post_type=' . $type ) ) . '">' . esc_html( $obj->labels->add_new_item ) . '</a>';
+		}
+		return '<div class="mcm-wrap mcm-empty-admin" role="note"><strong>'
+			/* translators: %s: content type plural name, e.g. Events. */
+			. esc_html( sprintf( __( 'No %s to show here yet.', 'medical-college-manager' ), $name ) )
+			. '</strong> ' . esc_html__( 'Only logged-in editors see this note; visitors see nothing in this spot.', 'medical-college-manager' )
+			. $add . '</div>';
+	}
+
+	/**
+	 * Markup of one block; see build_block().
+	 *
+	 * @param array $atts    Attributes.
+	 * @param bool  $heading Print the hidden results heading.
+	 * @return string
+	 */
+	private static function block_html( $atts, $heading = true ) {
 		// Backstop: whatever rendered this block (shortcode, Elementor widget,
 		// archive template) now needs the CSS/JS, even if detection missed it.
 		MCM_Assets::need();

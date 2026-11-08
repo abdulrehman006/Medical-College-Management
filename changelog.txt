@@ -124,6 +124,22 @@ Medical College Manager — complete changelog.
     and read-more; exclude categories, tags, author, offset; full Style tab.
   - Notice Ticker / Board / List: "only from the last N days"; full Style tabs.
   The same options are available as shortcode attributes (see readme).
+* Fixed: shared taxonomies (Department, Faculty, Session, Program, Research
+  Area…) showed the total for ALL content types. Events → Departments said
+  "Anatomy 20" when Anatomy had one event. Opened under a content type, the
+  count column now counts that type only (headed e.g. "Events") and links to
+  exactly those posts. Taxonomies used by one type are unchanged.
+* Fixed: front-end filters (dropdowns and directory checkboxes) offered every
+  term, so picking one often listed nothing. They now offer only terms that
+  the listing itself would show: same content type, status (open, upcoming,
+  past…), expiry, pre-filters and exclusions. A filter group with nothing to
+  offer is left out. Refreshes as soon as content changes.
+* Elementor Include / Exclude lists show each term's count for the widget's
+  type, e.g. "Anatomy (1)".
+* A listing with nothing to show (widget or shortcode) is now hidden from
+  visitors; logged-in editors see a short note with an "Add New …" link
+  instead. A message written in the widget's "Message when nothing is found"
+  is still shown to everyone, and live filtering still says "No results found".
 * Team and consultant cards now show qualifications (e.g. MBBS, FCPS, PhD)
   under the designation, in the order name, specialty, designation,
   qualifications, department. Elementor: Display → Qualifications switch;
