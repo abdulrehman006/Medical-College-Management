@@ -31,6 +31,7 @@ function mcm_uninstall_site() {
 		'mcm_staff_type_installed',
 		'mcm_department_page',
 		'mcm_site_chrome',
+		'mcm_listing_ver',
 	);
 	foreach ( $options as $option ) {
 		delete_option( $option );
@@ -57,9 +58,12 @@ function mcm_uninstall_site() {
 		update_option( 'theme_mods_' . $stylesheet, $mods );
 	}
 
-	// Cached logo lookups (mcm_hf_att_*).
+	// Cached logo lookups (mcm_hf_att_*) and listing counts/filters (mcm_c_*).
 	global $wpdb;
-	$wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name LIKE '\_transient\_mcm\_hf\_att\_%' OR option_name LIKE '\_transient\_timeout\_mcm\_hf\_att\_%'" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Uninstall cleanup of the plugin's own transients.
+	$wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name LIKE '\_transient\_mcm\_hf\_att\_%' OR option_name LIKE '\_transient\_timeout\_mcm\_hf\_att\_%' OR option_name LIKE '\_transient\_mcm\_c\_%' OR option_name LIKE '\_transient\_timeout\_mcm\_c\_%'" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Uninstall cleanup of the plugin's own transients.
+
+	// Department access assignments (users stay; only the plugin's ticks go).
+	delete_metadata( 'user', 0, 'mcm_departments', '', true );
 
 	// Remove the student capabilities from every role so none are orphaned.
 	if ( class_exists( 'MCM_Caps' ) ) {

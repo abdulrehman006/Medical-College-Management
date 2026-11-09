@@ -83,6 +83,67 @@ class MCM_Query {
 		return isset( $fields[ $type ]['fields'] ) ? array_keys( $fields[ $type ]['fields'] ) : array();
 	}
 
+	/**
+	 * Fields of a listing's data-config that the browser may change: the page
+	 * number, pagination switch (print-all) and count (print-all asks for more).
+	 * Everything else is signed.
+	 *
+	 * @return string[]
+	 */
+	private static function unsigned_config_keys() {
+		return array( 'paged', 'paginate', 'count', 'sig' );
+	}
+
+	/**
+	 * Canonical form of a config value, identical whether it was built in PHP
+	 * or came back as JSON from the browser (objects vs arrays, 3 vs "3").
+	 *
+	 * @param mixed $v Value.
+	 * @return mixed
+	 */
+	private static function canon( $v ) {
+		if ( is_array( $v ) ) {
+			$out = array();
+			foreach ( $v as $k => $x ) {
+				$out[ (string) $k ] = self::canon( $x );
+			}
+			ksort( $out, SORT_STRING );
+			return $out;
+		}
+		if ( is_bool( $v ) ) {
+			return $v ? '1' : '';
+		}
+		return null === $v ? '' : (string) $v;
+	}
+
+	/**
+	 * Signature of a listing's data-config. The public filter endpoint serves
+	 * only listings the site itself rendered: type, scope, pre-filters, sort,
+	 * page size and display choices cannot be changed by a crafted request.
+	 * Deterministic (no expiry), so full-page caches keep working.
+	 *
+	 * @param array|object $config data-config.
+	 * @return string
+	 */
+	public static function sign_config( $config ) {
+		$data = json_decode( (string) wp_json_encode( $config ), true );
+		$data = is_array( $data ) ? $data : array();
+		foreach ( self::unsigned_config_keys() as $k ) {
+			unset( $data[ $k ] );
+		}
+		return wp_hash( 'mcm_config|' . wp_json_encode( self::canon( $data ) ), 'nonce' );
+	}
+
+	/**
+	 * Does a data-config sent back by the browser carry a valid signature?
+	 *
+	 * @param array $config Decoded config.
+	 * @return bool
+	 */
+	public static function config_signed( $config ) {
+		return is_array( $config ) && isset( $config['sig'] ) && is_string( $config['sig'] ) && hash_equals( self::sign_config( $config ), $config['sig'] );
+	}
+
 	/** Types whose free-text search also scans meta (drives the SQL whitelist). */
 	private static function meta_search_types() {
 		return array( 'mcm_student', 'mcm_consultant', 'mcm_team' );
@@ -603,6 +664,9 @@ class MCM_Query {
 			'paged'          => $paged,
 			'orderby'        => $by_field ? 'date' : $orderby,
 			'order'          => $order,
+			// Password-protected entries are never listed (their fields and
+			// excerpt would be shown without the password).
+			'has_password'   => false,
 			// Found rows are only needed when we render pagination.
 			'no_found_rows'  => ! $paginate,
 		);
@@ -644,8 +708,10 @@ class MCM_Query {
 			if ( in_array( $key, self::sortable_meta_keys( $a['type'] ), true ) ) {
 				$args = self::order_by_optional_meta( $args, $key, self::field_cast( $a['type'], $key ), $order );
 			}
-		} elseif ( '' !== $a['meta_key'] ) {
+		} elseif ( '' !== $a['meta_key'] && ( 'mcm_student' !== $a['type'] || in_array( sanitize_key( $a['meta_key'] ), self::sortable_meta_keys( $a['type'] ), true ) ) ) {
 			// Sorting by a meta field (e.g. event date) requires a meta_key.
+			// Students sort only by the fields their public table shows: a
+			// private field (date of birth...) must not drive the order.
 			$args['meta_key'] = sanitize_key( $a['meta_key'] ); // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
 			if ( '' !== $a['meta_type'] ) {
 				// WP_Query expects an upper-case SQL type from a fixed set.
@@ -828,6 +894,17 @@ class MCM_Query {
 		add_filter( 'posts_clauses', array( __CLASS__, 'filter_order_clauses' ), 10, 2 );
 
 		// Keep the cached filter facets honest.
+		add_action( 'save_post', array( __CLASS__, 'bump_for_post' ) );
+		add_action( 'deleted_post', array( __CLASS__, 'bump_for_post' ) );
+		add_action( 'trashed_post', array( __CLASS__, 'bump_for_post' ) );
+		add_action( 'untrashed_post', array( __CLASS__, 'bump_for_post' ) );
+		add_action( 'set_object_terms', array( __CLASS__, 'bump_for_post' ) );
+		add_action( 'added_post_meta', array( __CLASS__, 'bump_for_meta' ), 10, 3 );
+		add_action( 'updated_post_meta', array( __CLASS__, 'bump_for_meta' ), 10, 3 );
+		add_action( 'deleted_post_meta', array( __CLASS__, 'bump_for_meta' ), 10, 3 );
+		add_action( 'created_term', array( __CLASS__, 'bump_listing_version' ) );
+		add_action( 'edited_term', array( __CLASS__, 'bump_listing_version' ) );
+		add_action( 'delete_term', array( __CLASS__, 'bump_listing_version' ) );
 		add_action( 'created_term', array( __CLASS__, 'flush_facet_cache' ), 10, 3 );
 		add_action( 'edited_term', array( __CLASS__, 'flush_facet_cache' ), 10, 3 );
 		add_action( 'delete_term', array( __CLASS__, 'flush_facet_cache' ), 10, 3 );
@@ -920,9 +997,27 @@ class MCM_Query {
 	public static function filter_join( $join, $query ) {
 		if ( $query->get( 'mcm_meta_search' ) ) {
 			global $wpdb;
-			$join .= " LEFT JOIN {$wpdb->postmeta} AS mcm_smeta ON ( {$wpdb->posts}.ID = mcm_smeta.post_id ) ";
+			// Only the searchable keys are joined (not every meta row of every
+			// post), which keeps a public search cheap.
+			$keys         = self::search_keys_for( $query );
+			$placeholders = implode( ',', array_fill( 0, count( $keys ), '%s' ) );
+			// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders -- {$placeholders} is a run of '%s' built from count( $keys ); the keys are the replacements.
+			$join .= $wpdb->prepare( " LEFT JOIN {$wpdb->postmeta} AS mcm_smeta ON ( {$wpdb->posts}.ID = mcm_smeta.post_id AND mcm_smeta.meta_key IN ( {$placeholders} ) ) ", $keys );
+			// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders
 		}
 		return $join;
+	}
+
+	/**
+	 * Searchable meta keys for a query's post type (the union when unknown).
+	 *
+	 * @param WP_Query $query Query.
+	 * @return string[]
+	 */
+	private static function search_keys_for( $query ) {
+		$pt = $query->get( 'post_type' );
+		$pt = is_array( $pt ) ? ( $pt ? reset( $pt ) : '' ) : $pt;
+		return ( $pt && self::searchable_meta( $pt ) ) ? self::searchable_meta( $pt ) : self::search_meta_whitelist();
 	}
 
 	/**
@@ -944,18 +1039,14 @@ class MCM_Query {
 		// that is private for students but public for another type (e.g. email),
 		// because the union carries it. Per-type keeps student search to the
 		// safe identifiers only. Falls back to the union if the type is unknown.
-		$pt   = $query->get( 'post_type' );
-		$pt   = is_array( $pt ) ? ( $pt ? reset( $pt ) : '' ) : $pt;
-		$keys = ( $pt && self::searchable_meta( $pt ) ) ? self::searchable_meta( $pt ) : self::search_meta_whitelist();
-		// Build with real placeholders — standards-compliant and injection-proof.
-		$placeholders = implode( ',', array_fill( 0, count( $keys ), '%s' ) );
-
-		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber -- {$placeholders} is a run of '%s' built from count( $keys ); every value is a prepare() replacement, passed in one array.
+		// The join (filter_join) already limits mcm_smeta to this type's
+		// searchable keys (per type, so a student search never matches a key
+		// that is private for students), so only the value is matched here.
 		$where .= $wpdb->prepare(
-			" AND ( {$wpdb->posts}.post_title LIKE %s OR ( mcm_smeta.meta_key IN ( {$placeholders} ) AND mcm_smeta.meta_value LIKE %s ) ) ",
-			array_merge( array( $like ), $keys, array( $like ) )
+			" AND ( {$wpdb->posts}.post_title LIKE %s OR mcm_smeta.meta_value LIKE %s ) ",
+			$like,
+			$like
 		);
-		// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber
 		return $where;
 	}
 
@@ -1220,16 +1311,16 @@ class MCM_Query {
 	 *
 	 * WordPress keeps a single count per term for all the types a taxonomy is
 	 * attached to, so a Department used by courses, jobs and events shows the
-	 * sum everywhere. This is the per-type figure. Cached until any post or
-	 * term changes (WordPress's own "last changed" stamps).
+	 * sum everywhere. This is the per-type figure. Cached until plugin content
+	 * or a term changes (see listing_version()).
 	 *
 	 * @param string $tax  Taxonomy.
 	 * @param string $type Post type.
 	 * @return array<int,int>
 	 */
 	public static function type_term_counts( $tax, $type ) {
-		$key    = 'mcm_tc_' . md5( $tax . '|' . $type ) . ':' . wp_cache_get_last_changed( 'posts' ) . ':' . wp_cache_get_last_changed( 'terms' );
-		$counts = wp_cache_get( $key, 'medical-college-manager' );
+		$key    = 'tc|' . $tax . '|' . $type;
+		$counts = self::cache_get( $key );
 		if ( false === $counts ) {
 			global $wpdb;
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- One grouped count per taxonomy and type, cached above.
@@ -1249,7 +1340,7 @@ class MCM_Query {
 			foreach ( (array) $rows as $row ) {
 				$counts[ (int) $row->term_id ] = (int) $row->n;
 			}
-			wp_cache_set( $key, $counts, 'medical-college-manager', DAY_IN_SECONDS );
+			self::cache_set( $key, $counts );
 		}
 		return is_array( $counts ) ? $counts : array();
 	}
@@ -1282,8 +1373,11 @@ class MCM_Query {
 			// A fixed starting keyword (search box hidden) narrows the list for good.
 			'search'        => self::truthy( $a['search_box'] ) ? '' : $a['search'],
 		);
-		$key  = 'mcm_tiu_' . md5( $tax . wp_json_encode( $base ) ) . ':' . wp_cache_get_last_changed( 'posts' ) . ':' . wp_cache_get_last_changed( 'terms' ) . ':' . current_time( 'YmdH' );
-		$used = wp_cache_get( $key, 'medical-college-manager' );
+		// Staff may see entries visitors do not (jobs not yet published), so
+		// they get their own cache entry; the hour keeps date-driven lists
+		// (open/closed, upcoming/past) current.
+		$key  = 'tiu|' . $tax . '|' . wp_json_encode( $base ) . '|' . ( current_user_can( 'edit_posts' ) ? 'staff' : 'public' ) . '|' . current_time( 'YmdH' );
+		$used = self::cache_get( $key );
 		if ( false !== $used ) {
 			return is_array( $used ) ? $used : array();
 		}
@@ -1312,8 +1406,98 @@ class MCM_Query {
 				}
 			}
 		}
-		wp_cache_set( $key, $used, 'medical-college-manager', HOUR_IN_SECONDS );
+		self::cache_set( $key, $used, HOUR_IN_SECONDS );
 		return $used;
+	}
+
+	/**
+	 * Version stamp of everything listings depend on. Stored in an option, so
+	 * it survives between requests on hosts without a persistent object cache
+	 * (WordPress's own "last changed" stamps do not), and bumped by
+	 * bump_listing_version() whenever plugin content, terms or fields change.
+	 *
+	 * @return string
+	 */
+	public static function listing_version() {
+		return (string) get_option( 'mcm_listing_ver', '1' ) . ( self::$local_changes ? ':' . self::$local_changes : '' );
+	}
+
+	/**
+	 * Changes made in this request after the first one (see bump_listing_version()).
+	 *
+	 * @var int
+	 */
+	private static $local_changes = 0;
+
+	/**
+	 * Something listings depend on changed: invalidate every cached count/facet.
+	 */
+	public static function bump_listing_version() {
+		static $bumped = false;
+		if ( ! $bumped ) {
+			// First change in this request: new version at once, so anything
+			// computed later in the request is cached under it.
+			$bumped = true;
+			update_option( 'mcm_listing_ver', (string) microtime( true ), true );
+			return;
+		}
+		// Further changes (bulk edits, imports): the version moves on at once
+		// in memory, and is stored once more at the end of the request, so
+		// nothing computed in between is ever read back as current.
+		++self::$local_changes;
+		if ( ! has_action( 'shutdown', array( __CLASS__, 'final_bump' ) ) ) {
+			add_action( 'shutdown', array( __CLASS__, 'final_bump' ) );
+		}
+	}
+
+	/** End-of-request bump after several changes (see bump_listing_version()). */
+	public static function final_bump() {
+		update_option( 'mcm_listing_ver', (string) microtime( true ), true );
+	}
+
+	/**
+	 * Bump on a post change of one of our types.
+	 *
+	 * @param int $post_id Post ID.
+	 */
+	public static function bump_for_post( $post_id ) {
+		if ( 0 === strpos( (string) get_post_type( $post_id ), 'mcm_' ) ) {
+			self::bump_listing_version();
+		}
+	}
+
+	/**
+	 * Bump when one of our fields changes (dates drive open/closed lists).
+	 *
+	 * @param int|int[] $meta_id   Meta ID(s).
+	 * @param int       $object_id Post ID.
+	 * @param string    $meta_key  Meta key.
+	 */
+	public static function bump_for_meta( $meta_id, $object_id, $meta_key ) {
+		if ( 0 === strpos( (string) $meta_key, 'mcm_' ) ) {
+			self::bump_for_post( $object_id );
+		}
+	}
+
+	/**
+	 * Read a cached listing computation (transient: persistent on every host).
+	 *
+	 * @param string $key Logical key.
+	 * @return mixed False when missing.
+	 */
+	private static function cache_get( $key ) {
+		return get_transient( 'mcm_c_' . md5( $key . '|' . self::listing_version() ) );
+	}
+
+	/**
+	 * Store a cached listing computation.
+	 *
+	 * @param string $key   Logical key.
+	 * @param mixed  $value Value.
+	 * @param int    $ttl   Seconds.
+	 */
+	private static function cache_set( $key, $value, $ttl = DAY_IN_SECONDS ) {
+		set_transient( 'mcm_c_' . md5( $key . '|' . self::listing_version() ), $value, $ttl );
 	}
 
 	/**
@@ -3095,8 +3279,12 @@ class MCM_Query {
 				$rows[ __( 'Eligibility', 'medical-college-manager' ) ]          = MCM_Safe::meta( $id, 'mcm_scholarship_eligibility' );
 				$rows[ __( 'Application Deadline', 'medical-college-manager' ) ] = self::fmt_date( MCM_Safe::meta( $id, 'mcm_scholarship_deadline' ) );
 				$apply = MCM_Safe::meta( $id, 'mcm_scholarship_apply' );
+				$sdoc  = MCM_Safe::meta( $id, 'mcm_scholarship_doc' );
 				if ( $apply ) {
 					$actions[] = array( __( 'Apply / More Info', 'medical-college-manager' ), $apply, true );
+				}
+				if ( $sdoc ) {
+					$actions[] = array( __( 'Download Form / Guidelines', 'medical-college-manager' ), $sdoc, ! $apply );
 				}
 				break;
 
@@ -3219,6 +3407,11 @@ class MCM_Query {
 		// Non-viewable types (students) are refused too: their photo and body
 		// text are private, and this shortcode is open to any shortcode author.
 		if ( ! $id || 'publish' !== get_post_status( $id ) || 0 !== strpos( (string) $type, 'mcm_' ) || ! is_post_type_viewable( $type ) ) {
+			return '';
+		}
+		// A password-protected entry is not embedded elsewhere (the password
+		// form belongs on its own page).
+		if ( post_password_required( $id ) ) {
 			return '';
 		}
 

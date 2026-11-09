@@ -54,6 +54,8 @@ class MCM_Job {
 		add_filter( 'manage_edit-' . self::TYPE . '_sortable_columns', array( __CLASS__, 'sortable_columns' ) );
 		add_action( 'pre_get_posts', array( __CLASS__, 'admin_sort' ) );
 		add_action( 'admin_notices', array( __CLASS__, 'missing_deadline_notice' ) );
+		// An unpublished-yet job must not be embeddable (oEmbed card with title/image).
+		add_filter( 'oembed_request_post_id', array( __CLASS__, 'hide_upcoming_oembed' ) );
 	}
 
 	/*
@@ -637,6 +639,22 @@ class MCM_Job {
 		$args = MCM_Query::order_by_optional_meta( array(), self::EFFECTIVE, 'CHAR', 'DESC' === strtoupper( (string) $query->get( 'order' ) ) ? 'DESC' : 'ASC' );
 		$query->set( 'mcm_order_meta', $args['mcm_order_meta'] );
 		$query->set( 'orderby', 'none' );
+	}
+
+	/**
+	 * Embeds (oEmbed): a job whose publication date is still ahead is not found.
+	 *
+	 * @param int $post_id Post ID resolved from the embed URL.
+	 * @return int
+	 */
+	public static function hide_upcoming_oembed( $post_id ) {
+		if ( $post_id && 'mcm_job' === get_post_type( $post_id ) && ! self::can_see_upcoming() ) {
+			$pub = self::publish_date( $post_id );
+			if ( $pub && $pub > current_time( 'Y-m-d' ) ) {
+				return 0;
+			}
+		}
+		return $post_id;
 	}
 
 	/**

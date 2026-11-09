@@ -178,6 +178,11 @@ class MCM_Relations {
 
 		$grouped = array();
 		foreach ( $query->posts as $rid ) {
+			// Unpublished or private entries are listed only to someone who may
+			// edit them (a contributor must not learn other authors' drafts).
+			if ( 'publish' !== get_post_status( $rid ) && ! current_user_can( 'edit_post', $rid ) ) {
+				continue;
+			}
 			$cpt = get_post_type( $rid );
 			if ( ! isset( $grouped[ $cpt ] ) ) {
 				$grouped[ $cpt ] = array(

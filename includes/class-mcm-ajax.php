@@ -99,6 +99,22 @@ class MCM_Ajax {
 		}
 		$search = sanitize_text_field( MCM_Safe::post( 'search' ) );
 
+		// The config must be one the site rendered (signed in block_html):
+		// otherwise a visitor could ask for any type, scope, sort or page size.
+		if ( ! MCM_Query::config_signed( $config ) ) {
+			wp_send_json_error(
+				array(
+					'code'    => 'nonce',
+					'message' => __( 'This page has expired. Please refresh the page and try again.', 'medical-college-manager' ),
+				),
+				403
+			);
+		}
+		// Page size: what the author chose; Print-all (when the listing has a
+		// print button) may fetch the whole list, up to mcm_ajax_max_count.
+		$max   = max( 1, absint( MCM_Safe::scalar( $config, 'max', '12' ) ) );
+		$limit = ! empty( $config['print'] ) ? max( $max, (int) apply_filters( 'mcm_ajax_max_count', 1000 ) ) : $max;
+
 		$type = sanitize_key( MCM_Safe::scalar( $config, 'type', 'mcm_consultant' ) );
 
 		/*
@@ -139,7 +155,7 @@ class MCM_Ajax {
 				'view'          => sanitize_key( MCM_Safe::scalar( $config, 'view', 'grid' ) ),
 				'columns'       => absint( MCM_Safe::scalar( $config, 'columns', '3' ) ),
 				// Clamp so a crafted request can't ask for an unbounded result set.
-				'count'         => min( absint( MCM_Safe::scalar( $config, 'count', '12' ) ), (int) apply_filters( 'mcm_ajax_max_count', 1000 ) ),
+				'count'         => min( max( 1, absint( MCM_Safe::scalar( $config, 'count', '12' ) ) ), $limit ),
 				'orderby'       => sanitize_key( MCM_Safe::scalar( $config, 'orderby', 'date' ) ),
 				'order'         => sanitize_text_field( MCM_Safe::scalar( $config, 'order', 'DESC' ) ),
 				'category'      => sanitize_text_field( MCM_Safe::scalar( $config, 'category' ) ),

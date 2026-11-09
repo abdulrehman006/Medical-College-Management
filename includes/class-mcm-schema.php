@@ -51,8 +51,9 @@ class MCM_Schema {
 		$id   = (int) get_queried_object_id();
 		$type = $id ? get_post_type( $id ) : '';
 
-		// Never describe a private type, and never publish student data.
-		if ( ! $type || ! is_post_type_viewable( $type ) || 'mcm_student' === $type ) {
+		// Never describe a private type, never publish student data, and never
+		// describe a password-protected entry (email/phone would leak).
+		if ( ! $type || ! is_post_type_viewable( $type ) || 'mcm_student' === $type || post_password_required( $id ) ) {
 			return '';
 		}
 

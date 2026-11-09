@@ -132,7 +132,9 @@ class MCM_Privacy {
 			$ids = get_posts(
 				array(
 					'post_type'      => $type,
-					'post_status'    => 'any',
+					// 'any' leaves out the trash: a record trashed less than 30 days
+					// ago must still be exported and erased.
+					'post_status'    => array( 'publish', 'draft', 'pending', 'private', 'future', 'trash' ),
 					'posts_per_page' => $per_page + 1,
 					'offset'         => ( max( 1, (int) $page ) - 1 ) * $per_page,
 					'orderby'        => 'ID',

@@ -95,6 +95,8 @@ function mcm_modules() {
 		'class-mcm-site-chrome.php'          => 'MCM_Site_Chrome',
 		'class-mcm-site-chrome-settings.php' => 'MCM_Site_Chrome_Settings',
 		'class-mcm-schema.php'               => 'MCM_Schema',
+		'class-mcm-integrity.php'            => 'MCM_Integrity',
+		'class-mcm-dept-access.php'          => 'MCM_Dept_Access',
 		'class-mcm-elementor.php'            => 'MCM_Elementor',
 	);
 }

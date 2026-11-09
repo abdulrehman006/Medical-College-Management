@@ -260,7 +260,7 @@ class MCM_Import {
 				),
 			),
 			'mcm_scholarship' => array(
-				'meta' => array( 'scholarship_amount', 'scholarship_eligibility', 'scholarship_deadline', 'scholarship_apply' ),
+				'meta' => array( 'scholarship_amount', 'scholarship_eligibility', 'scholarship_deadline', 'scholarship_apply', 'scholarship_doc' ),
 				'tax'  => array(
 					'scholarship_type' => 'mcm_scholarship_cat',
 					'department'       => 'mcm_department',

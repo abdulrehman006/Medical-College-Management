@@ -25,6 +25,43 @@ class MCM_CPT {
 		// API on for meta/Elementor, but no block editor — easier data entry).
 		add_filter( 'use_block_editor_for_post_type', array( $this, 'force_classic_editor' ), 10, 2 );
 		add_action( 'admin_init', array( $this, 'term_count_columns' ) );
+		add_action( 'edit_form_after_title', array( $this, 'editor_hint' ) );
+	}
+
+	/**
+	 * Name of the featured image per type ('' = WordPress's "Featured image").
+	 *
+	 * @param string $type Post type.
+	 * @return string
+	 */
+	public static function image_label( $type ) {
+		$map = array(
+			'mcm_team'       => __( 'Photo', 'medical-college-manager' ),
+			'mcm_consultant' => __( 'Photo', 'medical-college-manager' ),
+			'mcm_event'      => __( 'Event banner', 'medical-college-manager' ),
+			'mcm_job'        => __( 'Advertisement image', 'medical-college-manager' ),
+		);
+		return isset( $map[ $type ] ) ? $map[ $type ] : '';
+	}
+
+	/**
+	 * One line above the editor saying what the text is for.
+	 *
+	 * @param WP_Post $post Post being edited.
+	 */
+	public function editor_hint( $post ) {
+		$hints = array(
+			'mcm_team'        => __( 'Biography — shown on the profile page. Photo, department and specialty are set in the boxes on the right.', 'medical-college-manager' ),
+			'mcm_consultant'  => __( 'Biography — shown on the profile page. Photo, department and specialty are set in the boxes on the right.', 'medical-college-manager' ),
+			'mcm_research'    => __( 'Abstract / project summary — shown on the project page.', 'medical-college-manager' ),
+			'mcm_publication' => __( 'Abstract (optional) — shown on the publication page under the citation.', 'medical-college-manager' ),
+			'mcm_event'       => __( 'Event description — shown on the event page. Add the banner in "Event banner" on the right.', 'medical-college-manager' ),
+			'mcm_notice'      => __( 'Notice text — shown on the notice page. Attach a PDF in "Notice Details" below.', 'medical-college-manager' ),
+		);
+		if ( ! $post instanceof WP_Post || ! isset( $hints[ $post->post_type ] ) ) {
+			return;
+		}
+		echo '<p class="description mcm-editor-hint" style="margin:12px 0 4px;">' . esc_html( $hints[ $post->post_type ] ) . '</p>';
 	}
 
 	/**
@@ -427,6 +464,17 @@ class MCM_CPT {
 				/* translators: %s: content type or taxonomy plural name. */
 				'all_items'          => sprintf( __( 'All %s', 'medical-college-manager' ), $p ),
 			);
+			// Say what the image is for: a person's photo, an event banner.
+			$image = self::image_label( $key );
+			if ( '' !== $image ) {
+				$labels['featured_image'] = $image;
+				/* translators: %s: image name, e.g. "Photo". */
+				$labels['set_featured_image'] = sprintf( __( 'Set %s', 'medical-college-manager' ), strtolower( $image ) );
+				/* translators: %s: image name, e.g. "Photo". */
+				$labels['remove_featured_image'] = sprintf( __( 'Remove %s', 'medical-college-manager' ), strtolower( $image ) );
+				/* translators: %s: image name, e.g. "Photo". */
+				$labels['use_featured_image'] = sprintf( __( 'Use as %s', 'medical-college-manager' ), strtolower( $image ) );
+			}
 
 			$args = array(
 				'labels'       => $labels,

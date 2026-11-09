@@ -196,6 +196,9 @@ class MCM_Notice {
 				array(
 					'post_type'              => $post_type,
 					'post_status'            => 'publish',
+					// A password-protected notice is not put on the board (its
+					// attachment and link would be shown without the password).
+					'has_password'           => false,
 					'posts_per_page'         => self::FEED_MAX,
 					'fields'                 => 'ids',
 					'no_found_rows'          => true,

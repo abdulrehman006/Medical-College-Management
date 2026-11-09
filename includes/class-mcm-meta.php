@@ -585,8 +585,9 @@ class MCM_Meta {
 						'type'  => 'textarea',
 					),
 					'mcm_tender_doc'         => array(
-						'label' => __( 'Tender Document URL (download)', 'medical-college-manager' ),
-						'type'  => 'url',
+						'label'  => __( 'Tender Document (upload or URL)', 'medical-college-manager' ),
+						'type'   => 'media',
+						'accept' => 'application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/zip',
 					),
 					'mcm_tender_apply'       => array(
 						'label' => __( 'Submit / Portal URL', 'medical-college-manager' ),
@@ -831,6 +832,11 @@ class MCM_Meta {
 						'label' => __( 'Apply / Info URL', 'medical-college-manager' ),
 						'type'  => 'url',
 					),
+					'mcm_scholarship_doc'         => array(
+						'label'  => __( 'Documents: form / guidelines (upload or URL)', 'medical-college-manager' ),
+						'type'   => 'media',
+						'accept' => 'application/pdf,image,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+					),
 				),
 			),
 			'mcm_notice'      => array(
@@ -859,8 +865,9 @@ class MCM_Meta {
 						'type'  => 'url',
 					),
 					'mcm_notice_attachment' => array(
-						'label' => __( 'Attachment / File URL', 'medical-college-manager' ),
-						'type'  => 'url',
+						'label'  => __( 'Attachment (upload or URL)', 'medical-college-manager' ),
+						'type'   => 'media',
+						'accept' => 'application/pdf,image,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document',
 					),
 				),
 			),

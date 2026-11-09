@@ -182,9 +182,10 @@ class MCM_Shortcodes {
 		if ( 'mcm_student' === $a['type'] && ! MCM_Query::students_visible() ) {
 			return '';
 		}
-		// Jobs are listable only while the Jobs module is up (it is what hides
-		// jobs not yet published); otherwise only staff see the list.
-		if ( 'mcm_job' === $a['type'] && ! MCM_Query::type_allowed( 'mcm_job' ) ) {
+		// Only this plugin's own content types, and only those the viewer may
+		// list (jobs need the Jobs module, which hides jobs not yet published).
+		// [mcm_table type="..."] must not list another plugin's private records.
+		if ( ! MCM_Query::type_allowed( $a['type'] ) ) {
 			return '';
 		}
 
@@ -242,6 +243,13 @@ class MCM_Shortcodes {
 		$print_attr  = trim( (string) $a['print'] );
 		$show_print  = in_array( $a['type'], $print_types, true )
 			&& ( '' === $print_attr ? true : self::truthy( $print_attr ) );
+
+		// Signed: the filter endpoint serves only this exact listing. 'max' is
+		// the page size the author chose; 'print' lets Print-all fetch the
+		// whole list.
+		$data['max']   = (int) $a['count'];
+		$data['print'] = $show_print ? 1 : 0;
+		$data['sig']   = MCM_Query::sign_config( $data );
 
 		ob_start();
 
