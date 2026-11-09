@@ -54,22 +54,6 @@ Consultants, Team etc. by the same departments consistently.
 3. Open "College Manager" for design/colors/Custom CSS, and "College Manager > CSV Import" to bulk-import.
 4. Add a shortcode (below) to any page.
 
-== Editors and departments ==
-
-* Department access: under Users > Edit user, an administrator can tick the
-  departments a user (e.g. a department's web coordinator, role Editor or
-  Author) may manage. That user then sees, edits and publishes only entries
-  tagged with those departments (plus their own new entries, which are put in
-  their department), edits only those department pages, and cannot add
-  departments. Users with nothing ticked, and administrators, are unaffected.
-* Needs attention: a published team member or consultant without a
-  department, a course or timetable entry without a program, or an event,
-  tender, scholarship or admission without its key date is flagged after
-  saving, labelled "Missing: ..." in the list, and listed under the
-  "Needs attention" view. Publishing is never blocked.
-* Status on website: the Tenders, Scholarships, Notices, Admissions and Events
-  lists show whether each entry is open, closed or expired (hidden).
-
 == CSV Import / Export ==
 
 Go to College Manager > CSV Import / Export.
@@ -379,6 +363,28 @@ shadow + hover toggles, font family, and a raw Custom CSS box. Generated CSS use
   .mcm-card .mcm-card-title .mcm-card-link .mcm-meta .mcm-list-item .mcm-single
   Per-type modifiers: .mcm-card--consultant, .mcm-card--team, .mcm-card--event,
   .mcm-card--program, .mcm-card--course, .mcm-card--timetable, .mcm-card--admission
+
+== Frequently Asked Questions ==
+
+= Can an editor manage only their own department? =
+Yes. Under Users > Edit user, an administrator ticks the departments that user
+(an Editor or Author, e.g. a department's web coordinator) may manage. They then
+see, edit and publish only entries tagged with those departments (plus their own
+new entries, which are put in their department), edit only those department
+pages, and cannot add departments. Users with nothing ticked, and
+administrators, are unaffected.
+
+= What does "Needs attention" in a list mean? =
+A published entry is missing something the website relies on: a team member or
+consultant without a department, a course or timetable entry without a program,
+or an event, tender, scholarship or admission without its date. It is labelled
+"Missing: ..." in the list and a warning is shown after saving. Publishing is
+never blocked.
+
+= Why is a tender or notice not on the website? =
+Tenders hide after their submission deadline and notices after their expiry
+date. The "Status on website" column in the Tenders, Scholarships, Notices,
+Admissions and Events lists shows whether each entry is open, closed or hidden.
 
 == Changelog ==
 
