@@ -189,6 +189,12 @@ class MCM_Shortcodes {
 			return '';
 		}
 
+		// The listing starts with the sort its control shows (newest first,
+		// unless the author chose another order).
+		if ( MCM_Query::sort_visible( $a ) ) {
+			$a['sort'] = MCM_Query::initial_sort( $a );
+		}
+
 		$data = array(
 			'type'      => $a['type'],
 			'view'      => $a['view'],
@@ -207,6 +213,8 @@ class MCM_Shortcodes {
 			'scope'     => (object) MCM_Query::scope_terms( $a ),
 			// Jobs status filter (open/closed/all) must survive AJAX, Reset and Print.
 			'status'    => sanitize_key( MCM_Safe::str( $a['status'] ) ),
+			// Visitor-changeable (not signed): newest | az | ''.
+			'sort'      => MCM_Query::normalize_sort( $a['sort'] ),
 			// Without these a filtered AJAX response silently loses pagination.
 			'paginate'  => $a['paginate'],
 			'paged'     => (int) $a['paged'],

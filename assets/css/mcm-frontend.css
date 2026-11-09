@@ -1279,7 +1279,7 @@ a.mcm-board-more:focus{
 .mcm-jobcard-deadline .mcm-jobcard-label, .mcm-jobcard-deadline .mcm-job-old-date{ color:#4b5563; }
 .mcm-jobcard-date{ font-weight:600; color:var(--mcm-text, #1f2933); }
 .mcm-jobcard-date .mcm-job-old-date{ display:block; font-weight:400; font-size:13px; }
-.mcm-jobcard-date .mcm-job-time{ font-weight:400; color:var(--mcm-muted, #6b7280); }
+.mcm-jobcard-date .mcm-job-time{ font-weight:400; color:#4b5563; } /* 4.5:1 on the grey deadline box. */
 .mcm-jobcard-left{ grid-column:1 / -1; font-size:13px; font-weight:600; color:var(--mcm-primary, #0a6b5d); }
 .mcm-jobcard.is-closing .mcm-jobcard-left{ color:#8a4b00; }
 .mcm-jobcard.is-closed .mcm-jobcard-left{ color:#50575e; }
@@ -1468,3 +1468,27 @@ body[class*="tax-mcm_"] .page-title,
 .mcm-sd-work-type{ color:var(--mcm-muted, #52606d); font-size:13px; }
 .mcm-sd-work-more{ margin:8px 0 0; }
 .mcm-sd-work-more a{ color:var(--mcm-primary, #0a6b5d); font-weight:600; }
+
+/* "Sort by" control: inline in the filter bar, a block in the directory
+   sidebar. Same look as the filter dropdowns. */
+.mcm-sort{ display:flex; align-items:center; gap:8px; flex:0 1 auto; min-width:0; }
+.mcm-sort-label{ font-size:13px; font-weight:600; color:var(--mcm-muted, #6b7280); white-space:nowrap; }
+.mcm-sort .mcm-sort-select{
+	height:44px; width:auto !important; min-width:0; box-sizing:border-box; margin:0;
+	padding:0 38px 0 14px; border:1px solid var(--mcm-border, #e5e7eb); border-radius:8px;
+	background-color:var(--mcm-page-bg, #f5f7fa); font-size:14px; line-height:normal; color:var(--mcm-text, #1f2933);
+	-webkit-appearance:none; -moz-appearance:none; appearance:none; cursor:pointer;
+	background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='none' stroke='%236b7280' stroke-width='1.6' stroke-linecap='round' d='M1 1.5 6 6.5 11 1.5'/%3E%3C/svg%3E");
+	background-repeat:no-repeat; background-position:right 14px center;
+	transition:border-color .15s ease, box-shadow .15s ease, background-color .15s ease;
+}
+.mcm-sort .mcm-sort-select:hover{ border-color:var(--mcm-border-strong, #c8d0cc); }
+.mcm-sort .mcm-sort-select:focus{ outline:none; background-color:var(--mcm-card-bg, #fff); border-color:var(--mcm-primary, #0a6b5d); box-shadow:0 0 0 3px rgba(10,107,93,.12); }
+.mcm-sort .mcm-sort-select:focus-visible{ outline:2px solid var(--mcm-primary, #0a6b5d); outline-offset:2px; }
+.mcm-dir-sort{ display:block; margin:0 0 22px; }
+.mcm-dir-sort .mcm-sort-label{ display:block; margin:0 0 8px; font-size:12px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; }
+.mcm-dir-sort .mcm-sort-select{ width:100% !important; }
+@media (max-width:600px){
+	.mcm-filters .mcm-sort{ flex:1 1 100%; }
+	.mcm-filters .mcm-sort .mcm-sort-select{ flex:1 1 auto; }
+}

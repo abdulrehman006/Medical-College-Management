@@ -214,6 +214,12 @@ Attributes (all optional):
              one of the type's own fields; items without it are listed last)
   search     initial search string
   search_box / reset   yes | no      show the search box / Reset button (default yes)
+  sort_control yes | no              "Sort by" control (Newest first / Alphabetical A–Z)
+             beside the filters; shown whenever the filter bar or directory
+             sidebar is shown (default yes). Sorting keeps every filter and search.
+  sort       newest | az             the order a listing starts with (default newest;
+             orderby="title" order="ASC" starts on A–Z; any other orderby adds a
+             "Default order" choice that keeps it)
   facets     taxonomies to offer as filters, comma separated (default all)
   placeholder  search box placeholder text
   status     events: upcoming | past; admissions: open | upcoming | closed;
@@ -381,6 +387,14 @@ or an event, tender, scholarship or admission without its date. It is labelled
 "Missing: ..." in the list and a warning is shown after saving. Publishing is
 never blocked.
 
+= Is the student list public? =
+No, not unless an administrator turns it on. "Make student lists public" (College
+Manager > Settings > Privacy) is off by default. When turned on, every student list
+placed on the site shows each student's Name, Student ID, PMDC No., Level, Program,
+Department, Batch and Status to any visitor, searchable by Student ID or PMDC No.
+Email, phone, date of birth, address, blood group, gender and guardian details are
+never shown on the website.
+
 = Why is a tender or notice not on the website? =
 Tenders hide after their submission deadline and notices after their expiry
 date. The "Status on website" column in the Tenders, Scholarships, Notices,
@@ -400,6 +414,8 @@ New: college header & footer, Staff Type, full Elementor widget options.
 * New Elementor widgets: Testimonial / Message (photo left, right or on top) and Contact Info.
 * Profile photos keep their shape at any column count; image proportions and quality options.
 * Department access for editors; "Needs attention" flags; status column for dated content.
+* "Sort by" control (Newest first / Alphabetical A–Z) on every filterable listing and widget.
+* Public student directory is now opt-in (off by default; switched off once on update).
 * Profile pages link to the department/faculty pages and list the person's publications
   and research; details panels link every department, faculty and specialty.
 * Security: the live filter only serves listings the site rendered; password-protected

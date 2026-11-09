@@ -479,7 +479,8 @@ class MCM_Job {
 
 		// Soonest deadline first (most recently closed first for closed lists),
 		// unless the author asked for a specific order.
-		$no_preference = empty( $a['meta_key'] ) && ( empty( $a['orderby'] ) || 'date' === $a['orderby'] );
+		// "Newest first" chosen in the Sort control means newest posted.
+		$no_preference = empty( $a['meta_key'] ) && ( empty( $a['orderby'] ) || 'date' === $a['orderby'] ) && ( empty( $a['sort'] ) || 'newest' !== $a['sort'] );
 		if ( $no_preference ) {
 			$args = MCM_Query::order_by_optional_meta( $args, self::EFFECTIVE, 'CHAR', 'closed' === $status ? 'DESC' : 'ASC' );
 		}

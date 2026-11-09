@@ -46,10 +46,20 @@
 		$wrap.find( '.mcm-ajax-error' ).hide().text( '' );
 	}
 
+	// The visitor's "Sort by" choice travels with every request (filters,
+	// search, pager, Print all), so sorting and filtering combine.
+	function applySort( $wrap, config ) {
+		var $sort = $wrap.find( '.mcm-sort-select' ).first();
+		if ( $sort.length ) {
+			config.sort = $sort.val() || '';
+		}
+	}
+
 	// page: which results page to load (1 for every new search or filter).
 	function run( $wrap, page ) {
 		var config = $.extend( {}, $wrap.data( 'config' ) || {} );
 		config.paged = page || 1;
+		applySort( $wrap, config );
 		// From now on the block's pager loads pages in place (see below).
 		$wrap.data( 'mcmFiltered', true );
 		var search = $wrap.find( '.mcm-search' ).val() || '';
@@ -224,6 +234,7 @@
 		config.paginate = 'no';
 		config.paged    = 1;
 		config.count    = PRINT_ALL_LIMIT;
+		applySort( $wrap, config );
 
 		$btn.prop( 'disabled', true );
 		$.post( MCM.ajaxurl, {
@@ -248,7 +259,7 @@
 	 * tabs and accordions that load content on demand.
 	 */
 	$( document )
-		.on( 'change', '.mcm-wrap .mcm-filter-tax, .mcm-wrap .mcm-filter-check', function () {
+		.on( 'change', '.mcm-wrap .mcm-filter-tax, .mcm-wrap .mcm-filter-check, .mcm-wrap .mcm-sort-select', function () {
 			runNow( blockOf( this ) );
 		} )
 		// 'input' covers typing, pasting, autofill and the search box's clear

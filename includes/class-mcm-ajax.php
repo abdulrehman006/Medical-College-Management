@@ -157,6 +157,8 @@ class MCM_Ajax {
 				// Clamp so a crafted request can't ask for an unbounded result set.
 				'count'         => min( max( 1, absint( MCM_Safe::scalar( $config, 'count', '12' ) ) ), $limit ),
 				'orderby'       => sanitize_key( MCM_Safe::scalar( $config, 'orderby', 'date' ) ),
+				// The visitor's sort (newest / az), on top of the author's filters.
+				'sort'          => MCM_Query::normalize_sort( MCM_Safe::scalar( $config, 'sort' ) ),
 				'order'         => sanitize_text_field( MCM_Safe::scalar( $config, 'order', 'DESC' ) ),
 				'category'      => sanitize_text_field( MCM_Safe::scalar( $config, 'category' ) ),
 				'meta_key'      => $meta_key, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Shortcode attribute (whitelisted sort key), not a query argument.

@@ -1002,6 +1002,16 @@ abstract class MCM_Elementor_Widget_Base extends \Elementor\Widget_Base {
 			);
 		}
 		$this->add_control(
+			'sort_control',
+			array(
+				'label'        => __( 'Sort control (Newest first / A–Z)', 'medical-college-manager' ),
+				'type'         => \Elementor\Controls_Manager::SWITCHER,
+				'return_value' => 'yes',
+				'default'      => 'yes',
+				'conditions'   => $this->mcm_filters_on(),
+			)
+		);
+		$this->add_control(
 			'reset',
 			array(
 				'label'        => __( 'Reset button', 'medical-college-manager' ),
@@ -1769,6 +1779,8 @@ abstract class MCM_Elementor_Widget_Base extends \Elementor\Widget_Base {
 			'ids'         => isset( $s['ids'] ) ? implode( ',', MCM_Query::id_list( $s['ids'] ) ) : '',
 			'exclude_ids' => isset( $s['exclude_ids'] ) ? implode( ',', MCM_Query::id_list( $s['exclude_ids'] ) ) : '',
 		);
+		// "Sort by" control beside the filters (on unless switched off).
+		$atts['sort_control'] = $yes( 'sort_control', 'yes' );
 		if ( 'field' === $orderby && ! empty( $s['order_field'] ) ) {
 			$atts['meta_key'] = sanitize_key( MCM_Safe::str( $s['order_field'] ) ); // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Listing attribute (whitelisted per type in MCM_Query), not a query argument.
 		}

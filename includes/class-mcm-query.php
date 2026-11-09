@@ -85,13 +85,14 @@ class MCM_Query {
 
 	/**
 	 * Fields of a listing's data-config that the browser may change: the page
-	 * number, pagination switch (print-all) and count (print-all asks for more).
+	 * number, pagination switch (print-all), count (print-all asks for more)
+	 * and the visitor's sort choice (validated by normalize_sort()).
 	 * Everything else is signed.
 	 *
 	 * @return string[]
 	 */
 	private static function unsigned_config_keys() {
-		return array( 'paged', 'paginate', 'count', 'sig' );
+		return array( 'paged', 'paginate', 'count', 'sort', 'sig' );
 	}
 
 	/**
@@ -340,6 +341,11 @@ class MCM_Query {
 			'search'              => '',            // initial search string.
 			'orderby'             => 'date',
 			'order'               => 'DESC',
+			// Visitor's sort choice: '' (the author's order) | newest | az.
+			// Combines with every filter; see apply_sort().
+			'sort'                => '',
+			// Show the "Sort by" control with the filter bar / sidebar.
+			'sort_control'        => 'yes',
 			'meta_key'            => '',            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Shortcode attribute; enables orderby="meta_value".
 			'meta_type'           => '',            // e.g. DATE, NUMERIC, CHAR.
 			'paged'               => 1,
@@ -624,6 +630,7 @@ class MCM_Query {
 	 * @return WP_Query
 	 */
 	public static function get_query( $a ) {
+		$a         = self::apply_sort( $a );
 		$terms     = self::collect_terms( $a );
 		$tax_query = array();
 
@@ -1061,6 +1068,113 @@ class MCM_Query {
 	}
 
 	/**
+	 * A sort choice, cleaned: 'newest', 'az' or '' (the author's order).
+	 *
+	 * @param mixed $value Raw value.
+	 * @return string
+	 */
+	public static function normalize_sort( $value ) {
+		$value = sanitize_key( MCM_Safe::str( $value ) );
+		return in_array( $value, array( 'newest', 'az' ), true ) ? $value : '';
+	}
+
+	/**
+	 * Did the author ask for a specific order (anything but the default
+	 * newest-first, or A-Z)?
+	 *
+	 * @param array $a Parsed attributes.
+	 * @return bool
+	 */
+	private static function author_order_custom( $a ) {
+		$by = sanitize_key( MCM_Safe::str( $a['orderby'] ) );
+		if ( ( '' === $by || 'date' === $by ) && '' === MCM_Safe::str( $a['meta_key'] ) ) {
+			return false;
+		}
+		return ! ( 'title' === $by && 'ASC' === strtoupper( MCM_Safe::str( $a['order'] ) ) );
+	}
+
+	/**
+	 * The sort a listing starts with: A-Z when the author ordered by title,
+	 * '' when the author chose another order, otherwise newest first.
+	 *
+	 * @param array $a Parsed attributes.
+	 * @return string
+	 */
+	public static function initial_sort( $a ) {
+		$chosen = self::normalize_sort( $a['sort'] );
+		if ( '' !== $chosen ) {
+			return $chosen;
+		}
+		if ( 'title' === sanitize_key( MCM_Safe::str( $a['orderby'] ) ) && 'ASC' === strtoupper( MCM_Safe::str( $a['order'] ) ) ) {
+			return 'az';
+		}
+		return self::author_order_custom( $a ) ? '' : 'newest';
+	}
+
+	/**
+	 * Is the "Sort by" control shown for this listing?
+	 *
+	 * @param array $a Parsed attributes.
+	 * @return bool
+	 */
+	public static function sort_visible( $a ) {
+		return self::truthy( $a['sort_control'] ) && ( self::truthy( $a['filters'] ) || 'directory' === $a['view'] );
+	}
+
+	/**
+	 * Turn a sort choice into ordering attributes. Only the order changes:
+	 * type, filters, scope, status and search are untouched, so sorting
+	 * combines with whatever the visitor has filtered.
+	 * - newest: publications by publication year (newest first), everything
+	 *   else by publish date, newest first.
+	 * - az: by title, A to Z.
+	 *
+	 * @param array $a Parsed attributes.
+	 * @return array
+	 */
+	public static function apply_sort( $a ) {
+		$sort = self::normalize_sort( isset( $a['sort'] ) ? $a['sort'] : '' );
+		if ( 'az' === $sort ) {
+			$a['orderby']  = 'title';
+			$a['order']    = 'ASC';
+			$a['meta_key'] = ''; // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Attribute reset, not a query argument.
+		} elseif ( 'newest' === $sort ) {
+			$a['orderby']  = 'date';
+			$a['order']    = 'DESC';
+			$a['meta_key'] = ''; // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Attribute reset, not a query argument.
+		}
+		$a['sort'] = $sort;
+		return $a;
+	}
+
+	/**
+	 * The "Sort by" control.
+	 *
+	 * @param array  $a           Parsed attributes.
+	 * @param string $extra_class Extra wrapper class.
+	 * @return string
+	 */
+	public static function render_sort( $a, $extra_class = '' ) {
+		if ( ! self::sort_visible( $a ) ) {
+			return '';
+		}
+		$current = self::normalize_sort( $a['sort'] );
+		$options = array();
+		if ( '' === $current ) {
+			$options[''] = __( 'Default order', 'medical-college-manager' );
+		}
+		$options['newest'] = __( 'Newest first', 'medical-college-manager' );
+		$options['az']     = __( 'Alphabetical (A–Z)', 'medical-college-manager' );
+		$id                = wp_unique_id( 'mcm-sort-' );
+		$html              = '<div class="mcm-sort ' . esc_attr( $extra_class ) . '"><label class="mcm-sort-label" for="' . esc_attr( $id ) . '">' . esc_html__( 'Sort by', 'medical-college-manager' ) . '</label>';
+		$html             .= '<select class="mcm-sort-select" id="' . esc_attr( $id ) . '">';
+		foreach ( $options as $value => $label ) {
+			$html .= '<option value="' . esc_attr( $value ) . '"' . selected( $current, $value, false ) . '>' . esc_html( $label ) . '</option>';
+		}
+		return $html . '</select></div>';
+	}
+
+	/**
 	 * Render the filter bar (search + a dropdown per filterable taxonomy).
 	 *
 	 * @param array $a Parsed attributes.
@@ -1109,6 +1223,7 @@ class MCM_Query {
 				<?php
 			}
 			?>
+			<?php echo self::render_sort( $a ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Built escaped in render_sort(). ?>
 			<?php if ( self::truthy( $a['reset'] ) ) : ?>
 				<button type="button" class="mcm-reset"><?php esc_html_e( 'Reset', 'medical-college-manager' ); ?></button>
 			<?php endif; ?>
@@ -1439,6 +1554,10 @@ class MCM_Query {
 			// computed later in the request is cached under it.
 			$bumped = true;
 			update_option( 'mcm_listing_ver', (string) microtime( true ), true );
+			// Entries cached under older versions can never be read again:
+			// drop them at the end of the request instead of letting them
+			// sit in the options table until they expire.
+			add_action( 'shutdown', array( __CLASS__, 'purge_stale_cache' ) );
 			return;
 		}
 		// Further changes (bulk edits, imports): the version moves on at once
@@ -1448,6 +1567,21 @@ class MCM_Query {
 		if ( ! has_action( 'shutdown', array( __CLASS__, 'final_bump' ) ) ) {
 			add_action( 'shutdown', array( __CLASS__, 'final_bump' ) );
 		}
+	}
+
+	/**
+	 * Delete the plugin's cached counts/filters stored in the options table
+	 * (all are keyed on a listing version that has just been replaced).
+	 * Hosts with a persistent object cache keep transients there and evict
+	 * stale keys on their own.
+	 */
+	public static function purge_stale_cache() {
+		if ( wp_using_ext_object_cache() ) {
+			return;
+		}
+		global $wpdb;
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Bulk removal of the plugin's own expired-by-version transients.
+		$wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name LIKE '\\_transient\\_mcm\\_c\\_%' OR option_name LIKE '\\_transient\\_timeout\\_mcm\\_c\\_%'" );
 	}
 
 	/** End-of-request bump after several changes (see bump_listing_version()). */
@@ -1747,6 +1881,7 @@ class MCM_Query {
 				<button type="button" class="mcm-search-btn mcm-search-btn--icon"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path fill="currentColor" d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 10-.7.7l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0a4.5 4.5 0 110-9 4.5 4.5 0 010 9z"/></svg><span class="mcm-sr-only"><?php esc_html_e( 'Search', 'medical-college-manager' ); ?></span></button>
 			</div>
 			<?php endif; ?>
+			<?php echo self::render_sort( $a, 'mcm-dir-sort' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Built escaped in render_sort(). ?>
 			<?php
 			foreach ( $taxes as $tax ) {
 				if ( ! $tax || $tax === $a['lock_tax'] || ( $facets && ! in_array( $tax, $facets, true ) ) ) {

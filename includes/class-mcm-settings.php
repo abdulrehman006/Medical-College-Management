@@ -22,6 +22,25 @@ class MCM_Settings {
 	public function __construct() {
 		add_action( 'admin_menu', array( $this, 'menu' ) );
 		add_action( 'admin_init', array( $this, 'register' ) );
+		add_action( 'init', array( __CLASS__, 'students_off_once' ), 5 );
+	}
+
+	/**
+	 * One-time switch of the public student directory to OFF (pre-launch
+	 * decision, 2026-11-09). The default used to be ON, so sites that never
+	 * saved the setting, and sites that kept the old default, are switched
+	 * off once. Afterwards the administrator's choice is never touched again.
+	 */
+	public static function students_off_once() {
+		if ( get_option( 'mcm_students_default_off' ) ) {
+			return;
+		}
+		$stored = get_option( self::OPTION );
+		if ( is_array( $stored ) && isset( $stored['public_students'] ) && '0' !== (string) $stored['public_students'] ) {
+			$stored['public_students'] = '0';
+			update_option( self::OPTION, $stored );
+		}
+		update_option( 'mcm_students_default_off', '1', false );
 	}
 
 	/**
@@ -50,7 +69,7 @@ class MCM_Settings {
 			'archive_filters'       => '1', // show the filter bar on CPT/taxonomy archives.
 			// Public, safe-fields-only student list ([mcm_students] + AJAX).
 			// On by default so existing sites behave exactly as before.
-			'public_students'       => '1',
+			'public_students'       => '0', // Opt-in (decision 2026-11-09): student records are private unless an administrator turns this on.
 			// Extra sources on the notice ticker/board/list (notices are always in).
 			'notice_sources'        => array( 'job', 'tender' ),
 			// A job counts as "Closing soon" this many days before its deadline.
@@ -396,10 +415,10 @@ class MCM_Settings {
 						<td>
 							<label>
 								<input type="checkbox" id="public_students" name="<?php echo esc_attr( self::OPTION ); ?>[public_students]" value="1" <?php checked( $s['public_students'], '1' ); ?> />
-								<?php esc_html_e( 'Anyone can view and search the student list', 'medical-college-manager' ); ?>
+								<?php esc_html_e( 'Make student lists public (opt-in, off by default)', 'medical-college-manager' ); ?>
 							</label>
 							<p class="description" style="max-width:820px;">
-								<?php esc_html_e( 'When on, any visitor can see and search the student list produced by [mcm_students]: Name, Student ID, PMDC No., Level, Program, Department, Batch and Status. Email, phone, date of birth, address, blood group, gender and guardian details are never shown on the website either way.', 'medical-college-manager' ); ?>
+								<?php esc_html_e( 'Off by default. Turn on only if the college intends to publish its student roll. When on, any visitor can see and search every student list placed on the site ([mcm_students] or a student table): each student\'s Name, Student ID, PMDC No., Level, Program, Department, Batch and Status become public and searchable by Student ID or PMDC No. Email, phone, date of birth, address, blood group, gender and guardian details are never shown on the website either way.', 'medical-college-manager' ); ?>
 							</p>
 							<p class="description" style="max-width:820px;">
 								<?php esc_html_e( 'When off, the list (and its live search) is shown only to logged-in staff who can manage student records — administrators by default. Everyone else sees nothing where the list would be.', 'medical-college-manager' ); ?>

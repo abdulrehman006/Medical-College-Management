@@ -32,6 +32,7 @@ function mcm_uninstall_site() {
 		'mcm_department_page',
 		'mcm_site_chrome',
 		'mcm_listing_ver',
+		'mcm_students_default_off',
 	);
 	foreach ( $options as $option ) {
 		delete_option( $option );

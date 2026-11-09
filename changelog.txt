@@ -2,6 +2,24 @@ Medical College Manager — complete changelog.
 
 = 1.32.0 =
 Pre-launch QA (see docs/qa-report-2026-11-09.md):
+* Changed (college decision): the public student directory is opt-in. The
+  setting ("Make student lists public", Settings > Privacy) is off by default,
+  and is switched off once on update, since the site has not launched; an
+  administrator can turn it on again and that choice is kept. The settings
+  screen now says exactly what becomes public when it is on.
+* New: "Sort by" control (Newest first / Alphabetical A–Z) next to the filters
+  on every archive and every filterable listing, including the Elementor
+  listing widgets (switch "Sort control", on by default) and department-page
+  sections that have filters. Sorting keeps the visitor's department / session
+  / specialty / faculty filters and search, carries through the pager and
+  Print all, and works the same on archive pages and in widgets. Newest first
+  = publication year for publications, publish date for everything else
+  (vacancies listings with the control therefore start newest-posted instead
+  of closing-soonest). Shortcodes: sort_control="no" hides it; sort="az"
+  starts alphabetical; an author's own orderby adds a "Default order" choice.
+* Performance: cached filter/count entries made stale by a content change are
+  deleted at the end of that request instead of waiting to expire.
+* Fixed: the closing time on job cards now meets 4.5:1 contrast.
 * New: Department access. Under Users > Edit user an administrator can limit a
   user to one or more departments: they see, edit, publish and delete only
   those departments' entries (and their own new ones, which are put in their
