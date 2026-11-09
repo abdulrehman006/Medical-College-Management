@@ -214,12 +214,8 @@ Attributes (all optional):
              one of the type's own fields; items without it are listed last)
   search     initial search string
   search_box / reset   yes | no      show the search box / Reset button (default yes)
-  sort_control yes | no              "Sort by" control (Newest first / Alphabetical A–Z)
-             beside the filters; shown whenever the filter bar or directory
-             sidebar is shown (default yes). Sorting keeps every filter and search.
-  sort       newest | az             the order a listing starts with (default newest;
-             orderby="title" order="ASC" starts on A–Z; any other orderby adds a
-             "Default order" choice that keeps it)
+  sort_control yes | no  "Sort by" (Newest / A–Z) beside the filters (default yes)
+  sort       newest | az  starting order (default newest)
   facets     taxonomies to offer as filters, comma separated (default all)
   placeholder  search box placeholder text
   status     events: upcoming | past; admissions: open | upcoming | closed;
