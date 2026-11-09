@@ -28,6 +28,98 @@ class MCM_Schema {
 	 */
 	public function __construct() {
 		add_action( 'wp_head', array( $this, 'output' ), 20 );
+		add_action( 'wp_head', array( $this, 'meta_description' ), 2 );
+	}
+
+	/**
+	 * Is an SEO plugin managing meta descriptions? Then the plugin stays out.
+	 *
+	 * @return bool
+	 */
+	public static function seo_plugin_active() {
+		$active = defined( 'WPSEO_VERSION' ) || defined( 'RANK_MATH_VERSION' ) || defined( 'AIOSEO_VERSION' )
+			|| defined( 'SEOPRESS_VERSION' ) || defined( 'THE_SEO_FRAMEWORK_VERSION' ) || defined( 'SLIM_SEO_VER' );
+		/**
+		 * Filter whether another plugin handles meta descriptions.
+		 *
+		 * @param bool $active Detected.
+		 */
+		return (bool) apply_filters( 'mcm_seo_plugin_active', $active );
+	}
+
+	/** Print <meta name="description"> on the plugin's pages (no SEO plugin). */
+	public function meta_description() {
+		if ( self::seo_plugin_active() ) {
+			return;
+		}
+		$desc = MCM_Safe::render( array( __CLASS__, 'describe' ), 'meta description' );
+		if ( '' !== $desc ) {
+			echo '<meta name="description" content="' . esc_attr( $desc ) . '" />' . "\n";
+		}
+	}
+
+	/**
+	 * Plain-text description of the current plugin page ('' elsewhere):
+	 * the excerpt, else the text, else the entry's key facts; for listings
+	 * the term description or a short line naming what is listed.
+	 *
+	 * @internal
+	 * @return string
+	 */
+	public static function describe() {
+		$site = wp_strip_all_tags( get_bloginfo( 'name' ) );
+		$desc = '';
+		if ( is_singular() ) {
+			$id   = (int) get_queried_object_id();
+			$type = (string) get_post_type( $id );
+			if ( 0 !== strpos( $type, 'mcm_' ) || ! is_post_type_viewable( $type ) || post_password_required( $id ) ) {
+				return '';
+			}
+			$post = get_post( $id );
+			$desc = has_excerpt( $id ) ? $post->post_excerpt : wp_strip_all_tags( strip_shortcodes( (string) $post->post_content ) );
+			if ( '' === trim( $desc ) ) {
+				// One "Label: value" per fact line, facts separated by " · ".
+				$facts = preg_replace( '#</span>\s*</span>#', ' · ', MCM_Query::meta_lines( $id, $type ) );
+				$facts = wp_strip_all_tags( (string) $facts );
+				$facts = trim( preg_replace( '/(\s*·\s*)+/u', ' · ', $facts ), " ·\t\n" );
+				$desc  = get_the_title( $id ) . ( '' !== $facts ? ' — ' . $facts : '' );
+			}
+		} elseif ( is_post_type_archive() ) {
+			$type = (string) get_query_var( 'post_type' );
+			$obj  = 0 === strpos( $type, 'mcm_' ) ? get_post_type_object( $type ) : null;
+			if ( ! $obj ) {
+				return '';
+			}
+			/* translators: 1: content type, e.g. "Events"; 2: site name. */
+			$desc = sprintf( __( '%1$s at %2$s — browse and filter by department.', 'medical-college-manager' ), $obj->labels->name, $site );
+		} elseif ( is_tax() ) {
+			$term = get_queried_object();
+			if ( ! $term instanceof WP_Term || 0 !== strpos( $term->taxonomy, 'mcm_' ) ) {
+				return '';
+			}
+			$desc = wp_strip_all_tags( term_description( $term ) );
+			if ( '' === trim( $desc ) ) {
+				$tax = get_taxonomy( $term->taxonomy );
+				/* translators: 1: term, e.g. "Dr. Ayesha Noor"; 2: taxonomy, e.g. "Faculty"; 3: site name. */
+				$desc = sprintf( __( '%1$s (%2$s) — %3$s.', 'medical-college-manager' ), $term->name, $tax ? $tax->labels->singular_name : '', $site );
+				if ( 'mcm_department' === $term->taxonomy ) {
+					/* translators: 1: department, e.g. "Anatomy"; 2: site name. */
+					$desc = sprintf( __( 'Department of %1$s at %2$s: faculty, courses, timetable, research and news.', 'medical-college-manager' ), $term->name, $site );
+				}
+			}
+		} else {
+			return '';
+		}
+		$desc = trim( preg_replace( '/\s+/u', ' ', html_entity_decode( (string) $desc, ENT_QUOTES, 'UTF-8' ) ) );
+		if ( function_exists( 'mb_strlen' ) && mb_strlen( $desc ) > 160 ) {
+			$desc = rtrim( mb_substr( $desc, 0, 157 ), ' ,.;:-' ) . '…';
+		}
+		/**
+		 * Filter the meta description the plugin prints ('' prints none).
+		 *
+		 * @param string $desc Description.
+		 */
+		return (string) apply_filters( 'mcm_meta_description', $desc );
 	}
 
 	/** Print the JSON-LD block for the current single page. */

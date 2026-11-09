@@ -290,6 +290,9 @@ class MCM_Settings {
 		<div class="wrap mcm-settings-wrap">
 			<h1><?php esc_html_e( 'Medical College Manager — Design & Settings', 'medical-college-manager' ); ?></h1>
 			<p class="description"><?php esc_html_e( 'Everything below is live and dynamic. Adjust colors, spacing and card style, or drop in your own CSS. All shortcodes update automatically.', 'medical-college-manager' ); ?></p>
+			<?php if ( ! class_exists( 'MCM_Elementor' ) || ! MCM_Elementor::compatible() ) : ?>
+				<div class="notice notice-info inline"><p><?php esc_html_e( 'The Medical College Elementor widgets are not available because Elementor (free) is not active or is too old. Everything else — archive pages, department pages and shortcodes — works without it. Install or update Elementor to use the widgets.', 'medical-college-manager' ); ?></p></div>
+			<?php endif; ?>
 
 			<form method="post" action="options.php">
 				<?php settings_fields( 'mcm_settings_group' ); ?>

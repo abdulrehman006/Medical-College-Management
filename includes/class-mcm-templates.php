@@ -308,6 +308,7 @@ class MCM_Templates {
 				'posts_per_page'         => 1,
 				'fields'                 => 'ids',
 				'no_found_rows'          => false,
+				'has_password'           => false, // Listings leave these out too.
 				'ignore_sticky_posts'    => true,
 				'update_post_meta_cache' => false,
 				'update_post_term_cache' => false,
@@ -390,6 +391,9 @@ class MCM_Templates {
 		}
 		if ( 'mcm_publication' === $cpt ) {
 			return 'citation'; // professor/department pages list proper citations.
+		}
+		if ( 'mcm_policy' === $cpt ) {
+			return 'list'; // Documents read as a list — same default as the Policies widget.
 		}
 		return 'grid';
 	}

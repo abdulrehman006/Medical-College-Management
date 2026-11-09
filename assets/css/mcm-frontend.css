@@ -1446,3 +1446,25 @@ a.mcm-jobcard-btn{ position:relative; z-index:1; }
 /* Empty listing, shown to logged-in editors only (visitors get nothing). */
 .mcm-empty-admin{ padding:14px 18px; border:1px dashed var(--mcm-border-strong, #c8d0cc); border-radius:var(--mcm-radius, 12px); background:var(--mcm-page-bg, #f5f7fa); color:var(--mcm-text, #1f2933); font-size:14px; line-height:1.5; }
 .mcm-empty-admin a{ color:var(--mcm-primary, #0a6b5d); font-weight:600; }
+
+/* Long unbroken words (department names, IDs, URLs) wrap instead of pushing
+   the page sideways on narrow phones (320px). Scoped to the plugin's own
+   pages and blocks; the theme's title is wrapped only on plugin pages. */
+body[class*="single-mcm_"] .entry-title,
+body[class*="post-type-archive-mcm_"] .page-title,
+body[class*="tax-mcm_"] .page-title,
+.mcm-wrap h1, .mcm-wrap h2, .mcm-wrap h3, .mcm-single-title, .mcm-card-title,
+.mcm-single-content, .mcm-single-details td, .mcm-pub-list li{ overflow-wrap:anywhere; }
+
+/* Details panel: linked departments / faculty / specialties, and a person's
+   publications & research. */
+.mcm-sd-value a{ color:var(--mcm-primary, #0a6b5d); text-decoration:underline; text-underline-offset:2px; }
+.mcm-sd-value a:hover, .mcm-sd-value a:focus-visible{ text-decoration-thickness:2px; }
+.mcm-sd-work{ margin-top:20px; }
+.mcm-sd-subheading{ margin:0 0 8px; font-size:16px; color:var(--mcm-text, #1f2933); }
+.mcm-sd-work-list{ margin:0; padding-left:1.1em; }
+.mcm-sd-work-list li{ margin:0 0 6px; line-height:1.45; }
+.mcm-sd-work-list a{ color:var(--mcm-primary, #0a6b5d); }
+.mcm-sd-work-type{ color:var(--mcm-muted, #52606d); font-size:13px; }
+.mcm-sd-work-more{ margin:8px 0 0; }
+.mcm-sd-work-more a{ color:var(--mcm-primary, #0a6b5d); font-weight:600; }

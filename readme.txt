@@ -54,6 +54,22 @@ Consultants, Team etc. by the same departments consistently.
 3. Open "College Manager" for design/colors/Custom CSS, and "College Manager > CSV Import" to bulk-import.
 4. Add a shortcode (below) to any page.
 
+== Editors and departments ==
+
+* Department access: under Users > Edit user, an administrator can tick the
+  departments a user (e.g. a department's web coordinator, role Editor or
+  Author) may manage. That user then sees, edits and publishes only entries
+  tagged with those departments (plus their own new entries, which are put in
+  their department), edits only those department pages, and cannot add
+  departments. Users with nothing ticked, and administrators, are unaffected.
+* Needs attention: a published team member or consultant without a
+  department, a course or timetable entry without a program, or an event,
+  tender, scholarship or admission without its key date is flagged after
+  saving, labelled "Missing: ..." in the list, and listed under the
+  "Needs attention" view. Publishing is never blocked.
+* Status on website: the Tenders, Scholarships, Notices, Admissions and Events
+  lists show whether each entry is open, closed or expired (hidden).
+
 == CSV Import / Export ==
 
 Go to College Manager > CSV Import / Export.
@@ -377,6 +393,11 @@ New: college header & footer, Staff Type, full Elementor widget options.
   filter-bar options, plus full Style tabs (Normal/Hover) on all widgets.
 * New Elementor widgets: Testimonial / Message (photo left, right or on top) and Contact Info.
 * Profile photos keep their shape at any column count; image proportions and quality options.
+* Department access for editors; "Needs attention" flags; status column for dated content.
+* Profile pages link to the department/faculty pages and list the person's publications
+  and research; details panels link every department, faculty and specialty.
+* Security: the live filter only serves listings the site rendered; password-protected
+  entries are never listed; meta descriptions on plugin pages when no SEO plugin is active.
 * Full list: changelog.txt.
 
 = 1.31.0 =

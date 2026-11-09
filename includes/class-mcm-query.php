@@ -3015,6 +3015,82 @@ class MCM_Query {
 		return implode( ', ', self::cached_term_names( $id, $tax ) );
 	}
 
+	/**
+	 * Terms of an entry as links to their pages (department, faculty,
+	 * specialty...), for the details panel. '' when the entry has none;
+	 * otherwise array( 'html' => escaped HTML ).
+	 *
+	 * @param int    $id  Post ID.
+	 * @param string $tax Taxonomy name.
+	 * @return string|array
+	 */
+	private static function tax_links( $id, $tax ) {
+		$terms = get_the_terms( $id, $tax );
+		if ( ! $terms || is_wp_error( $terms ) ) {
+			return '';
+		}
+		$viewable = is_taxonomy_viewable( $tax );
+		$out      = array();
+		foreach ( $terms as $t ) {
+			$link  = $viewable ? get_term_link( $t ) : '';
+			$out[] = ( $link && ! is_wp_error( $link ) ) ? '<a href="' . esc_url( $link ) . '">' . esc_html( $t->name ) . '</a>' : esc_html( $t->name );
+		}
+		return array( 'html' => implode( ', ', $out ) );
+	}
+
+	/**
+	 * A person's publications and research projects (linked through their
+	 * Faculty term), for their profile page. '' when there are none.
+	 *
+	 * @param int $id Team member / consultant ID.
+	 * @return string Escaped HTML.
+	 */
+	private static function person_work( $id ) {
+		$terms = get_the_terms( $id, 'mcm_teacher' );
+		if ( ! $terms || is_wp_error( $terms ) ) {
+			return '';
+		}
+		$types = array_values( array_filter( array( 'mcm_publication', 'mcm_research' ), 'is_post_type_viewable' ) );
+		if ( ! $types ) {
+			return '';
+		}
+		$limit = (int) apply_filters( 'mcm_person_work_limit', 6, $id );
+		$q     = new WP_Query(
+			array(
+				'post_type'              => $types,
+				'post_status'            => 'publish',
+				'has_password'           => false,
+				'posts_per_page'         => $limit + 1,
+				'no_found_rows'          => true,
+				'update_post_meta_cache' => false,
+				'update_post_term_cache' => false,
+				'tax_query'              => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query -- One small query per profile page.
+					array(
+						'taxonomy' => 'mcm_teacher',
+						'field'    => 'term_id',
+						'terms'    => wp_list_pluck( $terms, 'term_id' ),
+					),
+				),
+			)
+		);
+		if ( ! $q->posts ) {
+			return '';
+		}
+		$html = '<div class="mcm-sd-work"><h3 class="mcm-sd-subheading">' . esc_html__( 'Publications & research', 'medical-college-manager' ) . '</h3><ul class="mcm-sd-work-list">';
+		foreach ( array_slice( $q->posts, 0, $limit ) as $p ) {
+			$obj   = get_post_type_object( $p->post_type );
+			$html .= '<li><a href="' . esc_url( get_permalink( $p ) ) . '">' . esc_html( get_the_title( $p ) ) . '</a> <span class="mcm-sd-work-type">' . esc_html( $obj ? $obj->labels->singular_name : '' ) . '</span></li>';
+		}
+		$html .= '</ul>';
+		$term  = $terms[0];
+		$link  = is_taxonomy_viewable( 'mcm_teacher' ) ? get_term_link( $term ) : '';
+		if ( count( $q->posts ) > $limit && $link && ! is_wp_error( $link ) ) {
+			/* translators: %s: person's name. */
+			$html .= '<p class="mcm-sd-work-more"><a href="' . esc_url( $link ) . '">' . esc_html( sprintf( __( 'Everything by %s', 'medical-college-manager' ), $term->name ) ) . ' &rarr;</a></p>';
+		}
+		return $html . '</div>';
+	}
+
 	/*
 	 * ----------------------------------------------------------------
 	 * Single / detail
@@ -3041,15 +3117,15 @@ class MCM_Query {
 			case 'mcm_team':
 				$heading = __( 'Profile', 'medical-college-manager' );
 				$rows[ __( 'Designation', 'medical-college-manager' ) ]    = MCM_Safe::meta( $id, 'mcm_designation' );
-				$rows[ __( 'Department', 'medical-college-manager' ) ]     = self::tax_names( $id, 'mcm_department' );
-				$rows[ __( 'Specialty', 'medical-college-manager' ) ]      = self::tax_names( $id, 'mcm_specialty' );
+				$rows[ __( 'Department', 'medical-college-manager' ) ]     = self::tax_links( $id, 'mcm_department' );
+				$rows[ __( 'Specialty', 'medical-college-manager' ) ]      = self::tax_links( $id, 'mcm_specialty' );
 				$rows[ __( 'Qualifications', 'medical-college-manager' ) ] = MCM_Safe::meta( $id, 'mcm_qualifications' );
 				$rows[ __( 'Experience', 'medical-college-manager' ) ]     = MCM_Safe::meta( $id, 'mcm_experience' );
 				if ( 'mcm_consultant' === $type ) {
 					$rows[ __( 'OPD Days', 'medical-college-manager' ) ]   = MCM_Safe::meta( $id, 'mcm_opd_days' );
 					$rows[ __( 'OPD Timing', 'medical-college-manager' ) ] = MCM_Safe::meta( $id, 'mcm_opd_time' );
 				}
-				$rows[ __( 'Research Interests', 'medical-college-manager' ) ] = self::tax_names( $id, 'mcm_research_area' );
+				$rows[ __( 'Research Interests', 'medical-college-manager' ) ] = self::tax_links( $id, 'mcm_research_area' );
 				$phone    = MCM_Safe::meta( $id, 'mcm_phone' );
 				$email    = MCM_Safe::meta( $id, 'mcm_email' );
 				$linkedin = MCM_Safe::meta( $id, 'mcm_linkedin' );
@@ -3074,14 +3150,15 @@ class MCM_Query {
 				if ( $pubmed ) {
 					$actions[] = array( __( 'PubMed', 'medical-college-manager' ), $pubmed, false );
 				}
+				$after .= self::person_work( $id );
 				break;
 
 			case 'mcm_course':
 				$heading = __( 'Course Details', 'medical-college-manager' );
 				$rows[ __( 'Course Code', 'medical-college-manager' ) ]  = MCM_Safe::meta( $id, 'mcm_course_code' );
-				$rows[ __( 'Department', 'medical-college-manager' ) ]   = self::tax_names( $id, 'mcm_department' );
-				$rows[ __( 'Professor', 'medical-college-manager' ) ]    = self::tax_names( $id, 'mcm_teacher' );
-				$rows[ __( 'Session', 'medical-college-manager' ) ]      = self::tax_names( $id, 'mcm_session' );
+				$rows[ __( 'Department', 'medical-college-manager' ) ]   = self::tax_links( $id, 'mcm_department' );
+				$rows[ __( 'Professor', 'medical-college-manager' ) ]    = self::tax_links( $id, 'mcm_teacher' );
+				$rows[ __( 'Session', 'medical-college-manager' ) ]      = self::tax_links( $id, 'mcm_session' );
 				$rows[ __( 'Credit Hours', 'medical-college-manager' ) ] = MCM_Safe::meta( $id, 'mcm_credit_hours' );
 				$rows[ __( 'Semester', 'medical-college-manager' ) ]     = MCM_Safe::meta( $id, 'mcm_semester' );
 				$rows[ __( 'Course Lead', 'medical-college-manager' ) ]  = MCM_Safe::meta( $id, 'mcm_course_lead' );
@@ -3091,7 +3168,7 @@ class MCM_Query {
 				$heading = __( 'Program Details', 'medical-college-manager' );
 				$rows[ __( 'Degree Level', 'medical-college-manager' ) ]   = MCM_Safe::meta( $id, 'mcm_degree_level' );
 				$rows[ __( 'Duration', 'medical-college-manager' ) ]       = MCM_Safe::meta( $id, 'mcm_duration' );
-				$rows[ __( 'Department', 'medical-college-manager' ) ]     = self::tax_names( $id, 'mcm_department' );
+				$rows[ __( 'Department', 'medical-college-manager' ) ]     = self::tax_links( $id, 'mcm_department' );
 				$rows[ __( 'Fees', 'medical-college-manager' ) ]           = MCM_Safe::meta( $id, 'mcm_fees' );
 				$rows[ __( 'Intake / Seats', 'medical-college-manager' ) ] = MCM_Safe::meta( $id, 'mcm_intake' );
 				$apply = MCM_Safe::meta( $id, 'mcm_apply_url' );
@@ -3108,7 +3185,7 @@ class MCM_Query {
 				$rows[ __( 'Time', 'medical-college-manager' ) ]       = trim( $start . ( $end ? ' – ' . $end : '' ) );
 				$rows[ __( 'Venue', 'medical-college-manager' ) ]      = MCM_Safe::meta( $id, 'mcm_venue' );
 				$rows[ __( 'Organizer', 'medical-college-manager' ) ]  = MCM_Safe::meta( $id, 'mcm_organizer' );
-				$rows[ __( 'Department', 'medical-college-manager' ) ] = self::tax_names( $id, 'mcm_department' );
+				$rows[ __( 'Department', 'medical-college-manager' ) ] = self::tax_links( $id, 'mcm_department' );
 				$reg = MCM_Safe::meta( $id, 'mcm_event_url' );
 				if ( $reg ) {
 					$actions[] = array( __( 'Register', 'medical-college-manager' ), $reg, true );
@@ -3125,7 +3202,7 @@ class MCM_Query {
 			case 'mcm_admission':
 				$heading = __( 'Admission Details', 'medical-college-manager' );
 				$rows[ __( 'Program', 'medical-college-manager' ) ]         = MCM_Safe::meta( $id, 'mcm_program_name' );
-				$rows[ __( 'Department', 'medical-college-manager' ) ]      = self::tax_names( $id, 'mcm_department' );
+				$rows[ __( 'Department', 'medical-college-manager' ) ]      = self::tax_links( $id, 'mcm_department' );
 				$rows[ __( 'Opens', 'medical-college-manager' ) ]           = self::fmt_date( MCM_Safe::meta( $id, 'mcm_open_date' ) );
 				$rows[ __( 'Closes', 'medical-college-manager' ) ]          = self::fmt_date( MCM_Safe::meta( $id, 'mcm_close_date' ) );
 				$rows[ __( 'Eligibility', 'medical-college-manager' ) ]     = MCM_Safe::meta( $id, 'mcm_eligibility' );
@@ -3139,8 +3216,8 @@ class MCM_Query {
 			case 'mcm_tender':
 				$heading = __( 'Tender Details', 'medical-college-manager' );
 				$rows[ __( 'Reference No.', 'medical-college-manager' ) ]       = MCM_Safe::meta( $id, 'mcm_tender_ref' );
-				$rows[ __( 'Category', 'medical-college-manager' ) ]            = self::tax_names( $id, 'mcm_tender_cat' );
-				$rows[ __( 'Department', 'medical-college-manager' ) ]          = self::tax_names( $id, 'mcm_department' );
+				$rows[ __( 'Category', 'medical-college-manager' ) ]            = self::tax_links( $id, 'mcm_tender_cat' );
+				$rows[ __( 'Department', 'medical-college-manager' ) ]          = self::tax_links( $id, 'mcm_department' );
 				$rows[ __( 'Published', 'medical-college-manager' ) ]           = self::fmt_date( MCM_Safe::meta( $id, 'mcm_tender_open' ) );
 				$rows[ __( 'Submission Deadline', 'medical-college-manager' ) ] = self::fmt_date( MCM_Safe::meta( $id, 'mcm_tender_close' ) );
 				$rows[ __( 'Bid Opening', 'medical-college-manager' ) ]         = self::fmt_date( MCM_Safe::meta( $id, 'mcm_tender_bid' ) );
@@ -3164,9 +3241,9 @@ class MCM_Query {
 				$rows[ __( 'Journal', 'medical-college-manager' ) ]                             = MCM_Safe::meta( $id, 'mcm_pub_journal' );
 				$rows[ __( 'Year', 'medical-college-manager' ) ]                                = MCM_Safe::meta( $id, 'mcm_pub_year' );
 				$rows[ __( 'Type', 'medical-college-manager' ) ]                                = MCM_Safe::meta( $id, 'mcm_pub_type' );
-				$rows[ __( 'Research Area', 'medical-college-manager' ) ]                       = self::tax_names( $id, 'mcm_research_area' );
-				$rows[ __( 'Department', 'medical-college-manager' ) ]                          = self::tax_names( $id, 'mcm_department' );
-				$rows[ __( 'Professor', 'medical-college-manager' ) ]                           = self::tax_names( $id, 'mcm_teacher' );
+				$rows[ __( 'Research Area', 'medical-college-manager' ) ]                       = self::tax_links( $id, 'mcm_research_area' );
+				$rows[ __( 'Department', 'medical-college-manager' ) ]                          = self::tax_links( $id, 'mcm_department' );
+				$rows[ __( 'Professor', 'medical-college-manager' ) ]                           = self::tax_links( $id, 'mcm_teacher' );
 				$rows[ __( 'Supervisor / Principal Investigator', 'medical-college-manager' ) ] = MCM_Safe::meta( $id, 'mcm_pub_supervisor' );
 				$rows[ __( 'Assisting Students', 'medical-college-manager' ) ]                  = MCM_Safe::meta( $id, 'mcm_pub_fellows' );
 				$rows[ __( 'Impact Factor', 'medical-college-manager' ) ]                       = MCM_Safe::meta( $id, 'mcm_pub_impact' );
@@ -3191,8 +3268,8 @@ class MCM_Query {
 				$rows[ __( 'Co-Investigators', 'medical-college-manager' ) ]                    = MCM_Safe::meta( $id, 'mcm_res_coinv' );
 				$rows[ __( 'Assisting Students', 'medical-college-manager' ) ]                  = MCM_Safe::meta( $id, 'mcm_res_students' );
 				$rows[ __( 'Funding', 'medical-college-manager' ) ]                             = MCM_Safe::meta( $id, 'mcm_res_funding' );
-				$rows[ __( 'Research Area', 'medical-college-manager' ) ]                       = self::tax_names( $id, 'mcm_research_area' );
-				$rows[ __( 'Department', 'medical-college-manager' ) ]                          = self::tax_names( $id, 'mcm_department' );
+				$rows[ __( 'Research Area', 'medical-college-manager' ) ]                       = self::tax_links( $id, 'mcm_research_area' );
+				$rows[ __( 'Department', 'medical-college-manager' ) ]                          = self::tax_links( $id, 'mcm_department' );
 				$doc = MCM_Safe::meta( $id, 'mcm_res_doc' );
 				if ( $doc ) {
 					$actions[] = array( __( 'View Paper', 'medical-college-manager' ), $doc, true, array( 'newtab' => true ) );
@@ -3202,11 +3279,11 @@ class MCM_Query {
 
 			case 'mcm_policy':
 				$heading = __( 'Policy Details', 'medical-college-manager' );
-				$rows[ __( 'Category', 'medical-college-manager' ) ]       = self::tax_names( $id, 'mcm_policy_cat' );
+				$rows[ __( 'Category', 'medical-college-manager' ) ]       = self::tax_links( $id, 'mcm_policy_cat' );
 				$rows[ __( 'Issued By', 'medical-college-manager' ) ]      = MCM_Safe::meta( $id, 'mcm_policy_issuer' );
 				$rows[ __( 'Reference No.', 'medical-college-manager' ) ]  = MCM_Safe::meta( $id, 'mcm_policy_ref' );
 				$rows[ __( 'Effective Date', 'medical-college-manager' ) ] = self::fmt_date( MCM_Safe::meta( $id, 'mcm_policy_date' ) );
-				$rows[ __( 'Department', 'medical-college-manager' ) ]     = self::tax_names( $id, 'mcm_department' );
+				$rows[ __( 'Department', 'medical-college-manager' ) ]     = self::tax_links( $id, 'mcm_department' );
 				$pdoc = MCM_Safe::meta( $id, 'mcm_policy_doc' );
 				if ( $pdoc ) {
 					$actions[] = array( __( 'Download Policy', 'medical-college-manager' ), $pdoc, true );
@@ -3220,8 +3297,8 @@ class MCM_Query {
 				$status  = MCM_Job::status( $id );
 				$heading = __( 'Job Details', 'medical-college-manager' );
 				$badge   = MCM_Job::badge( $status );
-				$rows[ __( 'Category', 'medical-college-manager' ) ]            = self::tax_names( $id, 'mcm_job_cat' );
-				$rows[ __( 'Department', 'medical-college-manager' ) ]          = self::tax_names( $id, 'mcm_department' );
+				$rows[ __( 'Category', 'medical-college-manager' ) ]            = self::tax_links( $id, 'mcm_job_cat' );
+				$rows[ __( 'Department', 'medical-college-manager' ) ]          = self::tax_links( $id, 'mcm_department' );
 				$rows[ __( 'Number of posts', 'medical-college-manager' ) ]     = MCM_Safe::meta( $id, 'mcm_job_posts' );
 				$rows[ __( 'Pay scale / package', 'medical-college-manager' ) ] = MCM_Safe::meta( $id, 'mcm_job_scale' );
 				$rows[ __( 'Employment type', 'medical-college-manager' ) ]     = MCM_Safe::meta( $id, 'mcm_job_type' );
@@ -3273,8 +3350,8 @@ class MCM_Query {
 
 			case 'mcm_scholarship':
 				$heading = __( 'Scholarship Details', 'medical-college-manager' );
-				$rows[ __( 'Type', 'medical-college-manager' ) ]                 = self::tax_names( $id, 'mcm_scholarship_cat' );
-				$rows[ __( 'Department', 'medical-college-manager' ) ]           = self::tax_names( $id, 'mcm_department' );
+				$rows[ __( 'Type', 'medical-college-manager' ) ]                 = self::tax_links( $id, 'mcm_scholarship_cat' );
+				$rows[ __( 'Department', 'medical-college-manager' ) ]           = self::tax_links( $id, 'mcm_department' );
 				$rows[ __( 'Amount / Coverage', 'medical-college-manager' ) ]    = MCM_Safe::meta( $id, 'mcm_scholarship_amount' );
 				$rows[ __( 'Eligibility', 'medical-college-manager' ) ]          = MCM_Safe::meta( $id, 'mcm_scholarship_eligibility' );
 				$rows[ __( 'Application Deadline', 'medical-college-manager' ) ] = self::fmt_date( MCM_Safe::meta( $id, 'mcm_scholarship_deadline' ) );
@@ -3290,8 +3367,8 @@ class MCM_Query {
 
 			case 'mcm_notice':
 				$heading = __( 'Notice', 'medical-college-manager' );
-				$rows[ __( 'Category', 'medical-college-manager' ) ]   = self::tax_names( $id, 'mcm_notice_cat' );
-				$rows[ __( 'Department', 'medical-college-manager' ) ] = self::tax_names( $id, 'mcm_department' );
+				$rows[ __( 'Category', 'medical-college-manager' ) ]   = self::tax_links( $id, 'mcm_notice_cat' );
+				$rows[ __( 'Department', 'medical-college-manager' ) ] = self::tax_links( $id, 'mcm_department' );
 				$rows[ __( 'Priority', 'medical-college-manager' ) ]   = MCM_Safe::meta( $id, 'mcm_notice_priority' );
 				$ndate = MCM_Safe::meta( $id, 'mcm_notice_date' );
 				$rows[ __( 'Date', 'medical-college-manager' ) ] = $ndate ? self::fmt_date( $ndate ) : get_the_date( '', $id );
@@ -3312,8 +3389,8 @@ class MCM_Query {
 				$end   = MCM_Safe::meta( $id, 'mcm_end_time' );
 				$rows[ __( 'Time', 'medical-college-manager' ) ]       = trim( $start . ( $end ? ' – ' . $end : '' ) );
 				$rows[ __( 'Subject', 'medical-college-manager' ) ]    = MCM_Safe::meta( $id, 'mcm_subject' );
-				$rows[ __( 'Professor', 'medical-college-manager' ) ]  = self::tax_names( $id, 'mcm_teacher' );
-				$rows[ __( 'Department', 'medical-college-manager' ) ] = self::tax_names( $id, 'mcm_department' );
+				$rows[ __( 'Professor', 'medical-college-manager' ) ]  = self::tax_links( $id, 'mcm_teacher' );
+				$rows[ __( 'Department', 'medical-college-manager' ) ] = self::tax_links( $id, 'mcm_department' );
 				$rows[ __( 'Room', 'medical-college-manager' ) ]       = MCM_Safe::meta( $id, 'mcm_room' );
 				$rows[ __( 'Year', 'medical-college-manager' ) ]       = MCM_Safe::meta( $id, 'mcm_year' );
 				break;
@@ -3354,7 +3431,9 @@ class MCM_Query {
 				// Escape first, then keep line breaks: Fellowship Members and
 				// Co-Investigators are entered one per line and must not collapse
 				// into a run-on. nl2br after esc_html is safe (no raw HTML).
-				echo '<div class="mcm-sd-item"><span class="mcm-sd-label">' . esc_html( $label ) . '</span><span class="mcm-sd-value">' . nl2br( esc_html( $value ) ) . '</span></div>';
+				// Linked terms arrive pre-escaped from tax_links().
+				$shown = is_array( $value ) && isset( $value['html'] ) ? $value['html'] : nl2br( esc_html( $value ) );
+				echo '<div class="mcm-sd-item"><span class="mcm-sd-label">' . esc_html( $label ) . '</span><span class="mcm-sd-value">' . $shown . '</span></div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped above or built escaped by tax_links().
 			}
 			echo '</div>';
 		}

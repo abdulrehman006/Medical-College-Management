@@ -1,6 +1,53 @@
 Medical College Manager — complete changelog.
 
 = 1.32.0 =
+Pre-launch QA (see docs/qa-report-2026-11-09.md):
+* New: Department access. Under Users > Edit user an administrator can limit a
+  user to one or more departments: they see, edit, publish and delete only
+  those departments' entries (and their own new ones, which are put in their
+  department), edit only those department pages, cannot add departments, and
+  cannot remove departments they do not manage from a shared entry. Off for
+  everyone until departments are ticked; administrators are never limited.
+* New: Needs attention. A published entry missing what the website relies on
+  (team member / consultant / publication / research without a department;
+  course / timetable without a program; event, tender, scholarship or
+  admission without its date) shows a warning after saving, a "Missing: ..."
+  label in the list and appears in a "Needs attention" view. Nothing is
+  blocked.
+* New: "Status on website" column in the Tenders, Scholarships, Notices,
+  Admissions and Events lists (Open / Closed - hidden / Expired - hidden).
+* New: Upload / Select buttons for the notice attachment and the tender
+  document; new scholarship Documents field (form / guidelines), shown as a
+  download button and importable by CSV (scholarship_doc).
+* New: profile pages of team members and consultants list their publications
+  and research projects (through their Faculty term). Department, Faculty,
+  Specialty, Session and category values in every details panel link to their
+  pages.
+* New: meta description on the plugin's pages (excerpt, text or key facts;
+  archive and department pages get a short line) when no SEO plugin is active.
+* The featured image is called Photo / Event banner / Advertisement image, and
+  a hint above the editor says what the text is for.
+* Security: the public live-filter endpoint only serves listings the site
+  itself rendered (signed configuration): the content type, pre-filters, sort
+  and page size can no longer be changed by a crafted request. Print all is
+  unchanged. Pages cached before this update ask visitors to refresh once.
+* Security: shortcodes list only this plugin's content types.
+* Security: password-protected entries are no longer listed, embedded with
+  [mcm_single], put on the notice board or described in structured data.
+* Security: students cannot be sorted by a private field; jobs not yet
+  published cannot be embedded (oEmbed); the privacy exporter and eraser
+  include trashed records; the Related Content box no longer shows other
+  authors' drafts to users who cannot edit them.
+* Performance: filter and count caches are stored as transients, so they work
+  on hosts without a persistent object cache; a member search joins only the
+  searchable fields.
+* Fixed: long words in titles (e.g. "Otorhinolaryngology") no longer push the
+  page sideways on 320px phones.
+* Fixed: department sections no longer count password-protected entries.
+* Policies on department pages use the list layout, the same default as the
+  Policies widget.
+* The settings screen says when the Elementor widgets are unavailable
+  (Elementor not active or too old); everything else works without it.
 * New: Gender field (Male / Female) for consultants and team members. It is
   never shown on the website and never sent through the REST API.
 * New: Settings → Default Photo — Male and Default Photo — Female. A person
