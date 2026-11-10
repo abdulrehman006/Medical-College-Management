@@ -411,6 +411,7 @@ New: college header & footer, Staff Type, full Elementor widget options.
 * Profile photos keep their shape at any column count; image proportions and quality options.
 * Department access for editors; "Needs attention" flags; status column for dated content.
 * "Sort by" control (Newest first / Alphabetical A–Z) on every filterable listing and widget.
+* Publications and research tables show Supervisor, Team and a PDF Download.
 * Public student directory is now opt-in (off by default; switched off once on update).
 * Profile pages link to the department/faculty pages and list the person's publications
   and research; details panels link every department, faculty and specialty.

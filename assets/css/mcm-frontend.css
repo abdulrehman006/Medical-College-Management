@@ -235,6 +235,15 @@
 }
 .mcm-table tbody td{ padding:12px 16px; border-top:1px solid var(--mcm-border, #e5e7eb); color: var(--mcm-text, #1f2933); vertical-align:top; }
 .mcm-table th.mcm-col-center, .mcm-table td.mcm-col-center{ text-align:center; }
+/* Team lists (one member per line) and the Download link (publications, research). */
+.mcm-cell-list{ list-style:none; margin:0; padding:0; }
+.mcm-cell-list li{ margin:0; padding:0; line-height:1.45; }
+.mcm-cell-list li + li{ margin-top:4px; }
+.mcm-table td.mcm-cell-file{ white-space:nowrap; }
+.mcm-table td.mcm-cell-lines{ min-width:13em; }
+.mcm-table-dl{ display:inline-flex; align-items:center; gap:6px; min-height:32px; padding:4px 12px; border:1px solid var(--mcm-primary, #0a6b5d); border-radius:999px; color:var(--mcm-primary, #0a6b5d); font-weight:600; font-size:13px; line-height:1; text-decoration:none; background:transparent; }
+.mcm-table-dl:hover, .mcm-table-dl:focus-visible{ background:var(--mcm-primary, #0a6b5d); color:#fff; text-decoration:none; }
+.mcm-table-dl:focus-visible{ outline:2px solid var(--mcm-primary, #0a6b5d); outline-offset:2px; }
 .mcm-table th.mcm-col-right, .mcm-table td.mcm-col-right{ text-align:right; }
 .mcm-table tbody tr:nth-child(even){ background: var(--mcm-page-bg, #f5f7fa); }
 .mcm-table tbody tr:hover{ background: rgba(0,0,0,.03); }
@@ -248,6 +257,10 @@
 	.mcm-table tr{ border-top:1px solid var(--mcm-border, #e5e7eb); padding:6px 0; }
 	.mcm-table td{ border:none; padding:6px 16px; display:flex; justify-content:space-between; gap:12px; }
 	.mcm-table td::before{ content: attr(data-label); font-weight:600; color: var(--mcm-muted, #6b7280); }
+	.mcm-table td::before{ flex:0 0 auto; }
+	.mcm-table td.mcm-cell-lines{ align-items:flex-start; }
+	.mcm-table td.mcm-cell-lines .mcm-cell-list{ text-align:right; }
+	.mcm-table td:empty{ display:none; }
 }
 
 /* Visible keyboard focus on every interactive control — many themes reset the
@@ -928,6 +941,7 @@
 	   tighten the cells and let long values wrap rather than force a scroll. */
 	.mcm-table th, .mcm-table td{ padding:4px 6px; word-break:break-word; }
 	.mcm-table a{ color:#000 !important; text-decoration:none; }
+	.mcm-table .mcm-cell-file{ display:none !important; } /* a Download button means nothing on paper */
 
 	/* Card/list fallbacks if a print-enabled block isn't a table. */
 	.mcm-card, .mcm-list-item{ box-shadow:none !important; border:1px solid #ccc !important; break-inside:avoid; }

@@ -20,6 +20,12 @@ Pre-launch QA (see docs/qa-report-2026-11-09.md):
 * Performance: cached filter/count entries made stale by a content change are
   deleted at the end of that request instead of waiting to expire.
 * Fixed: the closing time on job cards now meets 4.5:1 contrast.
+* Fixed: the publications table now shows Type, Supervisor, Team (one member
+  per line) and a PDF Download button; the research table shows Supervisor /
+  PI, Team and Download. These were entered on every paper but only appeared
+  on its single page. Cards show Type and Supervisor too. Search in both
+  listings also matches supervisor, team members, authors and journal. The
+  Download column is left out when printing; on phones, empty cells are hidden.
 * New: Department access. Under Users > Edit user an administrator can limit a
   user to one or more departments: they see, edit, publish and delete only
   those departments' entries (and their own new ones, which are put in their

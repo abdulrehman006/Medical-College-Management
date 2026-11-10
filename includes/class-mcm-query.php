@@ -53,9 +53,12 @@ class MCM_Query {
 			// Students are searchable by public identifiers only — never by email
 			// or phone, so the list cannot be used to confirm a student from
 			// their contact details. Name is always matched via the post title.
-			'mcm_student'    => array( 'mcm_student_id', 'mcm_roll_no', 'mcm_program', 'mcm_batch' ),
-			'mcm_consultant' => array( 'mcm_email', 'mcm_phone', 'mcm_designation', 'mcm_qualifications' ),
-			'mcm_team'       => array( 'mcm_email', 'mcm_phone', 'mcm_designation' ),
+			'mcm_student'     => array( 'mcm_student_id', 'mcm_roll_no', 'mcm_program', 'mcm_batch' ),
+			'mcm_consultant'  => array( 'mcm_email', 'mcm_phone', 'mcm_designation', 'mcm_qualifications' ),
+			'mcm_team'        => array( 'mcm_email', 'mcm_phone', 'mcm_designation' ),
+			// Visitors look papers up by supervisor, team member, author or journal.
+			'mcm_publication' => array( 'mcm_pub_supervisor', 'mcm_pub_fellows', 'mcm_pub_authors', 'mcm_pub_journal' ),
+			'mcm_research'    => array( 'mcm_res_pi', 'mcm_res_students', 'mcm_res_coinv' ),
 		);
 		return isset( $map[ $type ] ) ? $map[ $type ] : array();
 	}
@@ -2786,19 +2789,26 @@ class MCM_Query {
 				array( __( 'Deadline', 'medical-college-manager' ), 'date', 'mcm_scholarship_deadline' ),
 				array( __( 'Department', 'medical-college-manager' ), 'tax', 'mcm_department' ),
 			),
+			// Kind 'lines' = one entry per line (team members); 'file' = a
+			// Download link to the uploaded paper.
 			'mcm_publication' => array(
 				array( __( 'Title', 'medical-college-manager' ), 'title', '' ),
+				array( __( 'Type', 'medical-college-manager' ), 'meta', 'mcm_pub_type' ),
+				array( __( 'Supervisor', 'medical-college-manager' ), 'meta', 'mcm_pub_supervisor' ),
+				array( __( 'Team', 'medical-college-manager' ), 'lines', 'mcm_pub_fellows' ),
 				array( __( 'Journal', 'medical-college-manager' ), 'meta', 'mcm_pub_journal' ),
 				array( __( 'Year', 'medical-college-manager' ), 'meta', 'mcm_pub_year', 'center' ),
-				array( __( 'Type', 'medical-college-manager' ), 'meta', 'mcm_pub_type' ),
 				array( __( 'Department', 'medical-college-manager' ), 'tax', 'mcm_department' ),
+				array( __( 'Download', 'medical-college-manager' ), 'file', 'mcm_pub_pdf', 'center' ),
 			),
 			'mcm_research'    => array(
 				array( __( 'Project', 'medical-college-manager' ), 'title', '' ),
-				array( __( 'Principal investigator', 'medical-college-manager' ), 'meta', 'mcm_res_pi' ),
+				array( __( 'Supervisor / PI', 'medical-college-manager' ), 'meta', 'mcm_res_pi' ),
+				array( __( 'Team', 'medical-college-manager' ), 'lines', 'mcm_res_students' ),
 				array( __( 'Status', 'medical-college-manager' ), 'meta', 'mcm_res_status' ),
 				array( __( 'Research area', 'medical-college-manager' ), 'tax', 'mcm_research_area' ),
 				array( __( 'Department', 'medical-college-manager' ), 'tax', 'mcm_department' ),
+				array( __( 'Download', 'medical-college-manager' ), 'file', 'mcm_res_doc', 'center' ),
 			),
 			'mcm_policy'      => array(
 				array( __( 'Policy', 'medical-college-manager' ), 'title', '' ),
@@ -2856,7 +2866,11 @@ class MCM_Query {
 		echo '<div class="mcm-table-wrap"><table class="mcm-table">';
 		echo '<thead><tr>';
 		foreach ( $cols as $col ) {
-			$cls = isset( $col[3] ) ? ' class="mcm-col-' . esc_attr( $col[3] ) . '"' : '';
+			$classes = isset( $col[3] ) ? array( 'mcm-col-' . $col[3] ) : array();
+			if ( 'file' === $col[1] ) {
+				$classes[] = 'mcm-cell-file';
+			}
+			$cls = $classes ? ' class="' . esc_attr( implode( ' ', $classes ) ) . '"' : '';
 			echo '<th scope="col"' . $cls . '>' . esc_html( $col[0] ) . '</th>'; // phpcs:ignore
 		}
 		echo '</tr></thead><tbody>';
@@ -2867,8 +2881,15 @@ class MCM_Query {
 				$id = get_the_ID();
 				echo '<tr>';
 				foreach ( $cols as $col ) {
-					$cls  = isset( $col[3] ) ? ' class="mcm-col-' . esc_attr( $col[3] ) . '"' : '';
-					$cell = esc_html( self::cell_value( $id, $col ) );
+					$classes = array();
+					if ( isset( $col[3] ) ) {
+						$classes[] = 'mcm-col-' . $col[3];
+					}
+					if ( in_array( $col[1], array( 'lines', 'file' ), true ) ) {
+						$classes[] = 'mcm-cell-' . $col[1];
+					}
+					$cls  = $classes ? ' class="' . esc_attr( implode( ' ', $classes ) ) . '"' : '';
+					$cell = in_array( $col[1], array( 'lines', 'file' ), true ) ? self::cell_html( $id, $col ) : esc_html( self::cell_value( $id, $col ) );
 					// Display standard §4: the title links to the single page for
 					// public types. Students (not publicly viewable) stay plain text.
 					if ( ( 'title' === $col[1] || ! empty( $col[4] ) ) && '' !== $cell && $title_links ) {
@@ -2887,6 +2908,41 @@ class MCM_Query {
 	}
 
 	/**
+	 * Escaped HTML for the cells that are more than plain text: a team list
+	 * (one member per line) and a Download link to the uploaded paper.
+	 *
+	 * @param int   $id  Post ID.
+	 * @param array $col Column definition.
+	 * @return string
+	 */
+	private static function cell_html( $id, $col ) {
+		$raw = trim( (string) MCM_Safe::meta( $id, $col[2] ) );
+		if ( '' === $raw ) {
+			return '';
+		}
+		if ( 'file' === $col[1] ) {
+			$url = esc_url( self::external_url( $raw ) );
+			if ( '' === $url ) {
+				return '';
+			}
+			/* translators: %s: publication or project title. */
+			$label = sprintf( __( 'Download: %s', 'medical-college-manager' ), wp_strip_all_tags( get_the_title( $id ) ) );
+			return '<a class="mcm-table-dl" href="' . $url . '" download aria-label="' . esc_attr( $label ) . '">'
+				. '<svg aria-hidden="true" focusable="false" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11"/><path d="m7 10 5 5 5-5"/><path d="M5 20h14"/></svg>'
+				. '<span>' . esc_html__( 'PDF', 'medical-college-manager' ) . '</span></a>';
+		}
+		$items = array_values( array_filter( array_map( 'trim', preg_split( '/\r\n|\r|\n/', $raw ) ), 'strlen' ) );
+		if ( count( $items ) < 2 ) {
+			return esc_html( $raw );
+		}
+		$out = '<ul class="mcm-cell-list">';
+		foreach ( $items as $item ) {
+			$out .= '<li>' . esc_html( $item ) . '</li>';
+		}
+		return $out . '</ul>';
+	}
+
+	/**
 	 * Value of one table cell.
 	 *
 	 * @param int   $id  Post ID.
@@ -2898,6 +2954,8 @@ class MCM_Query {
 			case 'title':
 				return get_the_title( $id );
 			case 'meta':
+			case 'lines':
+			case 'file':
 				return (string) MCM_Safe::meta( $id, $key );
 			case 'date':
 				return self::fmt_date( MCM_Safe::meta( $id, $key ) );
@@ -3003,6 +3061,8 @@ class MCM_Query {
 				break;
 
 			case 'mcm_publication':
+				$rows[] = self::meta_pair( __( 'Type', 'medical-college-manager' ), MCM_Safe::meta( $id, 'mcm_pub_type' ) );
+				$rows[] = self::meta_pair( __( 'Supervisor', 'medical-college-manager' ), MCM_Safe::meta( $id, 'mcm_pub_supervisor' ) );
 				$rows[] = self::meta_pair( __( 'Journal', 'medical-college-manager' ), MCM_Safe::meta( $id, 'mcm_pub_journal' ) );
 				$rows[] = self::meta_pair( __( 'Year', 'medical-college-manager' ), MCM_Safe::meta( $id, 'mcm_pub_year' ) );
 				$rows[] = self::tax_pair( __( 'Research Area', 'medical-college-manager' ), $id, 'mcm_research_area' );
