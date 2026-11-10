@@ -35,6 +35,9 @@ class MCM_Assets {
 	public function frontend() {
 		wp_register_style( 'mcm-frontend', MCM_URL . 'assets/css/mcm-frontend.css', array(), MCM_VERSION );
 		wp_register_script( 'mcm-frontend', MCM_URL . 'assets/js/mcm-frontend.js', array( 'jquery' ), MCM_VERSION, true );
+		// Slider widget: registered only; Elementor enqueues them on pages that use it.
+		wp_register_style( 'mcm-slider', MCM_URL . 'assets/css/mcm-slider.css', array(), self::file_ver( 'assets/css/mcm-slider.css' ) );
+		wp_register_script( 'mcm-slider', MCM_URL . 'assets/js/mcm-slider.js', array(), self::file_ver( 'assets/js/mcm-slider.js' ), true );
 		wp_localize_script(
 			'mcm-frontend',
 			'MCM',
@@ -58,6 +61,18 @@ class MCM_Assets {
 		if ( self::is_needed() ) {
 			self::need();
 		}
+	}
+
+	/**
+	 * Asset version: the plugin version plus the file's modification time, so
+	 * an edited file is never served stale from a browser or page cache.
+	 *
+	 * @param string $rel Path relative to the plugin folder.
+	 * @return string
+	 */
+	public static function file_ver( $rel ) {
+		$time = @filemtime( MCM_PATH . $rel ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged -- A missing file just falls back to the version.
+		return $time ? MCM_VERSION . '.' . $time : MCM_VERSION;
 	}
 
 	/**

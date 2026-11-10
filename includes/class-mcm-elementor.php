@@ -79,6 +79,7 @@ class MCM_Elementor {
 		if ( ! MCM_Safe::load( MCM_PATH . 'includes/elementor-widgets.php', 'elementor-widgets.php' ) ) {
 			return;
 		}
+		MCM_Safe::load( MCM_PATH . 'includes/class-mcm-widget-slider.php', 'class-mcm-widget-slider.php' );
 
 		foreach ( self::widget_classes() as $class ) {
 			if ( ! class_exists( $class ) ) {
@@ -135,6 +136,7 @@ class MCM_Elementor {
 			'MCM_Widget_Notices',
 			'MCM_Widget_Testimonial',
 			'MCM_Widget_Contact',
+			'MCM_Widget_Slider',
 		);
 	}
 }

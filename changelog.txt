@@ -1,6 +1,32 @@
 Medical College Manager — complete changelog.
 
 = 1.32.0 =
+New: Elementor "Slider (Images & Videos)" widget:
+* Slides: image or video (YouTube via youtube-nocookie, Vimeo with Do Not
+  Track, or an uploaded MP4 / WebM). Videos play as a muted background loop
+  or behind a play button with sound and controls. Each slide has a heading,
+  description, button and link (button or whole slide), an optional lightbox,
+  and its own overlay, position and text colour.
+* Size: custom height (px / vh / em per desktop, tablet and phone), fit to
+  screen minus a header offset, or an aspect ratio (21:9 to 9:16); custom
+  width and alignment; stretch edge to edge even inside a boxed section.
+* Motion: slide or fade, speed, autoplay with time per slide, pause on hover,
+  stop after the visitor uses it, loop, slides per view and slides to move
+  per screen size, space between, Ken Burns zoom, content entrance animation.
+* Navigation: arrows (inside / outside), dots, numbers or a progress bar
+  (inside / below), each hideable per screen size; swipe / mouse drag and
+  keyboard arrows.
+* Style tab: overlay, content position / width / padding, frame border,
+  radius and shadow, heading, description, button (Normal / Hover), arrows,
+  pagination and pause button.
+* Accessibility: labelled carousel region and slides, off-screen slides are
+  inert, a pause / play button, autoplay pauses on keyboard focus, reduced
+  motion turns off autoplay and zoom.
+* Performance: no library dependency; assets load only on pages with a
+  slider; videos are created when their slide is shown and background videos
+  pause off-screen or in a background tab; without JavaScript the slides
+  scroll sideways.
+
 Pre-launch QA (see docs/qa-report-2026-11-09.md):
 * Changed (college decision): the public student directory is opt-in. The
   setting ("Make student lists public", Settings > Privacy) is off by default,

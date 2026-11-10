@@ -396,6 +396,13 @@ Tenders hide after their submission deadline and notices after their expiry
 date. The "Status on website" column in the Tenders, Scholarships, Notices,
 Admissions and Events lists shows whether each entry is open, closed or hidden.
 
+= How do I add an image or video slider? =
+In Elementor, drag "Slider (Images & Videos)" from the Medical College panel.
+Each slide is an image or a video (YouTube, Vimeo or an uploaded MP4) with an
+optional heading, text and button. Layout & Size sets custom, full-screen or
+aspect-ratio height per screen size, a custom width, full-width stretch and
+slides per view. Background videos only play while the slider is on screen.
+
 == Changelog ==
 
 = 1.32.0 =
@@ -407,7 +414,8 @@ New: college header & footer, Staff Type, full Elementor widget options.
   scholarships, tenders and events; display and accessibility fixes across listings.
 * Elementor widgets: status, include/exclude, order by field, offset, pagination and
   filter-bar options, plus full Style tabs (Normal/Hover) on all widgets.
-* New Elementor widgets: Testimonial / Message (photo left, right or on top) and Contact Info.
+* New Elementor widgets: Testimonial / Message (photo left, right or on top), Contact Info,
+  and Slider (image and YouTube / Vimeo / MP4 video slides).
 * Profile photos keep their shape at any column count; image proportions and quality options.
 * Department access for editors; "Needs attention" flags; status column for dated content.
 * "Sort by" control (Newest first / Alphabetical A–Z) on every filterable listing and widget.
