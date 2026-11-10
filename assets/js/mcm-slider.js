@@ -77,6 +77,13 @@
 			this.on( this.pauseBtn, 'click', function () {
 				self.paused.user = ! self.paused.user;
 				self.paused.used = false;
+				self.slides.forEach( function ( s ) {
+					if ( self.paused.user ) {
+						self.pauseBackground( s );
+					} else if ( s.classList.contains( 'is-visible' ) ) {
+						self.enterVideo( s );
+					}
+				} );
 				self.syncPause();
 				self.schedule();
 			} );
@@ -164,6 +171,7 @@
 			this.on( window, 'resize', function () { self.stretch(); } );
 			this.stretch();
 		}
+		this.thumbFallbacks();
 		el.classList.add( 'is-ready' );
 		this.layout( true );
 		this.syncPause();
@@ -463,22 +471,94 @@
 
 	/* ---------- Video ---------- */
 
+	/*
+	 * Each video slide carries one state class, which the stylesheet turns into
+	 * what the visitor sees:
+	 *   is-video-loading   thumbnail + spinner (click-to-play) until frames play
+	 *   is-video-on        playing: thumbnail hidden
+	 *   is-video-buffering playing but stalled: spinner over the video
+	 *   is-video-paused    thumbnail back (when "Show thumbnail when paused")
+	 *   is-video-ended     thumbnail + replay button (click-to-play)
+	 * The state follows the player's own events (HTML5 media events, the
+	 * YouTube and Vimeo postMessage APIs), not just the iframe having loaded.
+	 */
+	var STATES = [ 'is-video-loading', 'is-video-on', 'is-video-buffering', 'is-video-paused', 'is-video-ended' ];
+	var ORIGINS = { 'https://www.youtube-nocookie.com': 'youtube', 'https://www.youtube.com': 'youtube', 'https://player.vimeo.com': 'vimeo' };
+	var players = []; // { node, onMessage } for iframe players, for the shared message listener.
+
+	window.addEventListener( 'message', function ( e ) {
+		var kind = ORIGINS[ e.origin ], i, data;
+		if ( ! kind ) {
+			return;
+		}
+		for ( i = 0; i < players.length; i++ ) {
+			if ( players[ i ].node.contentWindow === e.source ) {
+				try {
+					data = typeof e.data === 'string' ? JSON.parse( e.data ) : e.data;
+				} catch ( err ) {
+					return;
+				}
+				if ( data && typeof data === 'object' ) {
+					players[ i ].onMessage( kind, data );
+				}
+				return;
+			}
+		}
+	} );
+
 	Slider.prototype.videoData = function ( slide ) {
 		var box = slide.querySelector( '.mcm-sl-video' );
 		if ( ! box ) {
 			return null;
 		}
 		try {
-			return { box: box, v: JSON.parse( box.getAttribute( 'data-video' ) || '{}' ) };
+			return { box: box, slide: slide, v: JSON.parse( box.getAttribute( 'data-video' ) || '{}' ) };
 		} catch ( e ) {
 			return null;
 		}
+	};
+
+	Slider.prototype.setState = function ( d, state, node ) {
+		var slide = d.slide, v = d.v;
+		// A player that has been removed (e.g. its slide was left) can still fire
+		// a late "pause"; it no longer speaks for the slide.
+		if ( node && ! node.isConnected ) {
+			return;
+		}
+		clearTimeout( slide.mcmBufferTimer );
+		if ( state === 'paused' && v.thumbPaused === false ) {
+			state = 'on'; // Keep the paused frame instead of the thumbnail.
+		}
+		if ( state === 'ended' && ( v.mode !== 'click' || v.thumbEnded === false ) ) {
+			state = v.mode === 'click' ? 'on' : 'paused';
+		}
+		STATES.forEach( function ( c ) { slide.classList.remove( c ); } );
+		if ( state ) {
+			slide.classList.add( 'is-video-' + state );
+		}
+		if ( state === 'loading' ) {
+			slide.setAttribute( 'aria-busy', 'true' );
+		} else {
+			slide.removeAttribute( 'aria-busy' );
+		}
+		slide.mcmVideoState = state;
+	};
+
+	// Brief stalls are common; only show the spinner if one lasts.
+	Slider.prototype.buffering = function ( d ) {
+		clearTimeout( d.slide.mcmBufferTimer );
+		d.slide.mcmBufferTimer = setTimeout( function () {
+			if ( d.slide.mcmVideoState === 'on' ) {
+				d.slide.classList.add( 'is-video-buffering' );
+			}
+		}, 400 );
 	};
 
 	Slider.prototype.embedUrl = function ( v, background ) {
 		var id = encodeURIComponent( v.id || '' );
 		if ( v.type === 'youtube' ) {
 			return 'https://www.youtube-nocookie.com/embed/' + id + '?enablejsapi=1&rel=0&playsinline=1&modestbranding=1&autoplay=1' +
+				'&origin=' + encodeURIComponent( window.location.origin ) +
 				( background ? '&mute=1&loop=1&controls=0&disablekb=1&playlist=' + id : '' );
 		}
 		if ( v.type === 'vimeo' ) {
@@ -488,13 +568,16 @@
 	};
 
 	Slider.prototype.makePlayer = function ( d, background, title ) {
-		var v = d.v, node;
+		var self = this, v = d.v, node;
+		this.setState( d, 'loading' );
 		if ( v.type === 'hosted' ) {
 			node = document.createElement( 'video' );
-			node.src = v.src;
 			node.playsInline = true;
 			node.setAttribute( 'playsinline', '' );
 			node.preload = 'auto';
+			if ( v.poster ) {
+				node.poster = v.poster; // Browsers show it before the first frame, too.
+			}
 			if ( background ) {
 				node.muted = true;
 				node.loop = true;
@@ -506,9 +589,28 @@
 				node.controls = true;
 				node.autoplay = true;
 			}
+			node.addEventListener( 'playing', function () { self.setState( d, 'on', node ); } );
+			node.addEventListener( 'waiting', function () {
+				if ( node.isConnected ) {
+					self.buffering( d );
+				}
+			} );
+			node.addEventListener( 'pause', function () {
+				if ( ! node.ended && ! node.seeking ) {
+					self.setState( d, 'paused', node );
+				}
+			} );
+			node.addEventListener( 'ended', function () { self.setState( d, 'ended', node ); } );
+			node.addEventListener( 'error', function () {
+				if ( node.isConnected ) {
+					// Self-hosted: keep the thumbnail, and for click-to-play the
+					// browser's own controls show the failure.
+					self.setState( d, d.v.mode === 'click' ? 'on' : '', node );
+				}
+			} );
+			node.src = v.src;
 		} else {
 			node = document.createElement( 'iframe' );
-			node.src = this.embedUrl( v, background );
 			node.setAttribute( 'allow', 'autoplay; fullscreen; picture-in-picture; encrypted-media' );
 			node.setAttribute( 'allowfullscreen', '' );
 			node.title = title || this.i18n.video || 'Video';
@@ -516,21 +618,120 @@
 				node.setAttribute( 'aria-hidden', 'true' );
 				node.tabIndex = -1;
 			}
+			this.listen( d, node );
+			node.src = this.embedUrl( v, background );
 		}
 		d.box.appendChild( node );
-		var slide = d.box.closest( '.mcm-sl-slide' );
-		var onReady = function () {
-			d.box.classList.add( 'is-on' );
-			if ( slide ) {
-				slide.classList.add( 'is-video-on' );
-			}
-		};
-		node.addEventListener( v.type === 'hosted' ? 'playing' : 'load', onReady );
 		this.cover( d.box );
 		return node;
 	};
 
-	Slider.prototype.command = function ( node, play ) {
+	// Subscribe to a YouTube / Vimeo player's state. If the player never
+	// answers (blocked, or an old embed), fall back to "playing" a few seconds
+	// after the frame loads so a background video is never hidden for good.
+	Slider.prototype.listen = function ( d, node ) {
+		var self = this, entry, tries = 0, timer = null;
+		node.mcmEvents = false;
+		var hello = function () {
+			var w = node.contentWindow;
+			if ( ! w || node.mcmEvents ) {
+				return;
+			}
+			if ( d.v.type === 'youtube' ) {
+				w.postMessage( JSON.stringify( { event: 'listening', id: d.slide.id || 'mcm-sl', channel: 'widget' } ), '*' );
+			} else {
+				[ 'play', 'playing', 'pause', 'ended', 'bufferstart', 'bufferend' ].forEach( function ( ev ) {
+					w.postMessage( JSON.stringify( { method: 'addEventListener', value: ev } ), '*' );
+				} );
+			}
+			if ( ++tries < 8 ) {
+				timer = setTimeout( hello, 400 );
+			}
+		};
+		entry = {
+			node: node,
+			onMessage: function ( kind, msg ) {
+				var st;
+				if ( kind === 'youtube' ) {
+					if ( msg.event === 'onStateChange' ) {
+						st = msg.info;
+					} else if ( msg.event === 'infoDelivery' && msg.info && typeof msg.info.playerState === 'number' ) {
+						st = msg.info.playerState;
+					} else if ( msg.event === 'onReady' || msg.event === 'initialDelivery' ) {
+						node.mcmEvents = true;
+					} else if ( msg.event === 'onError' ) {
+						self.failed( d );
+					}
+					if ( typeof st === 'number' ) {
+						node.mcmEvents = true;
+						if ( st === 1 ) {
+							self.setState( d, 'on' );
+						} else if ( st === 2 ) {
+							self.setState( d, 'paused' );
+						} else if ( st === 0 ) {
+							self.setState( d, 'ended' );
+						} else if ( st === 3 ) {
+							if ( d.slide.mcmVideoState === 'on' ) {
+								self.buffering( d );
+							}
+						}
+					}
+					return;
+				}
+				// Vimeo.
+				if ( msg.event === 'ready' ) {
+					node.mcmEvents = false;
+					tries = 0;
+					hello();
+					node.mcmEvents = true;
+					return;
+				}
+				node.mcmEvents = node.mcmEvents || !! msg.event;
+				if ( msg.event === 'error' ) {
+					self.failed( d );
+				} else if ( msg.event === 'play' || msg.event === 'playing' || msg.event === 'bufferend' ) {
+					self.setState( d, 'on' );
+				} else if ( msg.event === 'pause' ) {
+					self.setState( d, 'paused' );
+				} else if ( msg.event === 'ended' ) {
+					self.setState( d, 'ended' );
+				} else if ( msg.event === 'bufferstart' && d.slide.mcmVideoState === 'on' ) {
+					self.buffering( d );
+				}
+			},
+		};
+		players.push( entry );
+		node.addEventListener( 'load', function () {
+			hello();
+			setTimeout( function () {
+				if ( ! node.mcmEvents && node.isConnected && d.slide.mcmVideoState === 'loading' ) {
+					self.setState( d, 'on' );
+				}
+			}, 4000 );
+		} );
+		// Safety net: a click-to-play video that has not started after 10 s
+		// shows the player itself (its own spinner or error message) instead of
+		// a spinner that never ends.
+		setTimeout( function () {
+			if ( node.isConnected && d.v.mode === 'click' && d.slide.mcmVideoState === 'loading' ) {
+				self.setState( d, 'on' );
+			}
+		}, 10000 );
+		node.mcmForget = function () {
+			clearTimeout( timer );
+			players = players.filter( function ( p ) { return p !== entry; } );
+		};
+	};
+
+	// The provider reported that the video cannot play. A click-to-play video
+	// shows the player so its own message is visible; a background video goes
+	// back to its thumbnail.
+	Slider.prototype.failed = function ( d ) {
+		this.setState( d, d.v.mode === 'click' ? 'on' : '' );
+	};
+
+	Slider.prototype.command = function ( d, play ) {
+		var node = d && d.box.firstElementChild;
 		if ( ! node ) {
 			return;
 		}
@@ -546,18 +747,30 @@
 			return;
 		}
 		var w = node.contentWindow;
-		if ( ! w ) {
-			return;
+		if ( w ) {
+			if ( d.v.type === 'youtube' ) {
+				w.postMessage( JSON.stringify( { event: 'command', func: play ? 'playVideo' : 'pauseVideo', args: '' } ), '*' );
+			} else {
+				w.postMessage( JSON.stringify( { method: play ? 'play' : 'pause' } ), '*' );
+			}
 		}
-		if ( node.src.indexOf( 'youtube' ) !== -1 ) {
-			w.postMessage( JSON.stringify( { event: 'command', func: play ? 'playVideo' : 'pauseVideo', args: '' } ), '*' );
-		} else {
-			w.postMessage( JSON.stringify( { method: play ? 'play' : 'pause' } ), '*' );
+		// A player that does not report its state: show the result directly.
+		if ( ! node.mcmEvents ) {
+			this.setState( d, play ? 'on' : 'paused' );
 		}
 	};
 
+	Slider.prototype.removePlayer = function ( d ) {
+		var node = d.box.firstElementChild;
+		if ( node && node.mcmForget ) {
+			node.mcmForget();
+		}
+		d.box.innerHTML = '';
+		this.setState( d, '' );
+	};
+
 	Slider.prototype.bgAllowed = function () {
-		if ( reduceMotion ) {
+		if ( reduceMotion || this.paused.user ) {
 			return false;
 		}
 		return this.cfg.bgMobile || ! ( window.matchMedia && window.matchMedia( '(max-width: 767px)' ).matches );
@@ -571,23 +784,22 @@
 		if ( ! d || ! this.bgAllowed() || this.paused.offscreen || this.paused.hidden ) {
 			return;
 		}
-		var node = d.box.firstElementChild;
-		if ( ! node ) {
+		if ( ! d.box.firstElementChild ) {
 			this.makePlayer( d, true );
 		} else {
-			this.command( node, true );
+			this.command( d, true );
 		}
 	};
 
-	// Off-screen or hidden tab: background videos stop; a video the visitor
-	// started keeps its own controls and is left alone.
+	// Off-screen, hidden tab or the slider's pause button: background videos
+	// stop (WCAG 2.2.2); a video the visitor started is left alone.
 	Slider.prototype.pauseBackground = function ( slide ) {
 		if ( ! slide.classList.contains( 'mcm-sl-slide--video-background' ) ) {
 			return;
 		}
 		var d = this.videoData( slide );
 		if ( d && d.box.firstElementChild ) {
-			this.command( d.box.firstElementChild, false );
+			this.command( d, false );
 		}
 	};
 
@@ -596,13 +808,14 @@
 		if ( ! d || ! d.box.firstElementChild ) {
 			return;
 		}
-		this.command( d.box.firstElementChild, false );
 		if ( slide.classList.contains( 'is-playing' ) ) {
+			// A click-to-play video is removed so its thumbnail and play button come back.
 			slide.classList.remove( 'is-playing' );
 			this.paused.video = false;
-			// A click-to-play video is removed so the cover and play button come back.
-			d.box.innerHTML = '';
+			this.removePlayer( d );
+			return;
 		}
+		this.command( d, false );
 	};
 
 	Slider.prototype.playClick = function ( slide ) {
@@ -610,14 +823,48 @@
 		if ( ! d ) {
 			return;
 		}
-		var heading = slide.querySelector( '.mcm-sl-heading' );
-		slide.classList.add( 'is-playing' );
-		d.box.innerHTML = '';
-		var node = this.makePlayer( d, false, heading ? heading.textContent : '' );
 		this.paused.video = true;
 		this.used();
 		this.schedule();
+		if ( slide.classList.contains( 'is-playing' ) && d.box.firstElementChild ) {
+			// Paused or ended: carry on (an ended video starts again).
+			this.setState( d, 'loading' );
+			this.command( d, true );
+			return;
+		}
+		var heading = slide.querySelector( '.mcm-sl-heading' );
+		slide.classList.add( 'is-playing' );
+		this.removePlayer( d );
+		var node = this.makePlayer( d, false, heading ? heading.textContent : '' );
 		try { node.focus(); } catch ( e ) {}
+	};
+
+	// YouTube's maxresdefault does not exist for every video; it then serves
+	// a 120 px grey placeholder (or an error). Swap in hqdefault.
+	Slider.prototype.thumbFallbacks = function () {
+		this.el.querySelectorAll( 'img[data-fallback]' ).forEach( function ( img ) {
+			var swap = function () {
+				var fb = img.getAttribute( 'data-fallback' );
+				if ( fb && img.src !== fb ) {
+					img.removeAttribute( 'srcset' );
+					img.src = fb;
+				}
+			};
+			var check = function () {
+				if ( img.naturalWidth && img.naturalWidth <= 120 ) {
+					swap();
+				}
+			};
+			if ( img.complete ) {
+				if ( ! img.naturalWidth ) {
+					swap();
+				} else {
+					check();
+				}
+			}
+			img.addEventListener( 'load', check );
+			img.addEventListener( 'error', swap );
+		} );
 	};
 
 	// Size a background iframe so a 16:9 video covers the slide (like object-fit: cover).
@@ -648,6 +895,11 @@
 
 	Slider.prototype.destroy = function () {
 		clearTimeout( this.timer );
+		this.el.querySelectorAll( '.mcm-sl-video > iframe' ).forEach( function ( f ) {
+			if ( f.mcmForget ) {
+				f.mcmForget();
+			}
+		} );
 		this.handlers.forEach( function ( h ) { h[ 0 ].removeEventListener( h[ 1 ], h[ 2 ], h[ 3 ] ); } );
 		if ( this.io ) {
 			this.io.disconnect();

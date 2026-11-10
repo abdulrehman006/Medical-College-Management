@@ -22,6 +22,14 @@ New: Elementor "Slider (Images & Videos)" widget:
 * Accessibility: labelled carousel region and slides, off-screen slides are
   inert, a pause / play button, autoplay pauses on keyboard focus, reduced
   motion turns off autoplay and zoom.
+* Video thumbnails: each video slide has a Thumbnail (or uses YouTube's /
+  Vimeo's own; Vimeo's is looked up once by the server and cached). It shows
+  while the video loads (with a spinner for click-to-play), again when the
+  video is paused, and with a replay button when it ends; both can be
+  switched off per slide. The state follows the player's own events
+  (HTML5, YouTube and Vimeo APIs), a stalled video shows a spinner, and a
+  video that cannot play shows the provider's own message. The slider's
+  pause button now also pauses background videos (WCAG 2.2.2).
 * Performance: no library dependency; assets load only on pages with a
   slider; videos are created when their slide is shown and background videos
   pause off-screen or in a background tab; without JavaScript the slides

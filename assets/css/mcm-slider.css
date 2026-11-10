@@ -61,12 +61,26 @@
 .mcm-sl-slide--video-click .mcm-sl-video iframe{ inset: 0; width: 100%; height: 100%; }
 .mcm-sl-slide--video-click .mcm-sl-video video{ object-fit: contain; background: #000; }
 .mcm-sl-video:empty{ display: none; }
-/* The cover sits above a background video and fades out once the video plays.
+/* Video thumbnail: it sits above the player and fades out only while the video
+   is actually playing; it comes back when the video is paused or has ended.
    (The video itself is never made transparent: Safari pauses an autoplaying
    video it considers invisible.) */
-.mcm-sl-slide--video-background .mcm-sl-video{ z-index: 0; }
-.mcm-sl-slide--video-background .mcm-sl-poster{ z-index: 1; transition: opacity .6s ease; }
-.mcm-sl-slide--video-background.is-video-on .mcm-sl-poster{ opacity: 0; }
+.mcm-sl-slide--video .mcm-sl-video{ z-index: 0; }
+.mcm-sl-slide--video .mcm-sl-poster{ z-index: 1; transition: opacity .4s ease; pointer-events: none; }
+.mcm-sl-slide--video.is-video-on .mcm-sl-poster{ opacity: 0; }
+
+/* Loading / buffering spinner (click-to-play videos). */
+.mcm-sl-spinner{
+	display: none; position: absolute; z-index: 4; left: 50%; top: 50%;
+	width: 52px; height: 52px; margin: -26px 0 0 -26px;
+	border: 4px solid rgba(255,255,255,.3); border-top-color: #fff; border-radius: 50%;
+	background: rgba(0,0,0,.35); box-shadow: 0 0 0 6px rgba(0,0,0,.35); /* visible on light thumbnails too */
+	animation: mcm-sl-spin .8s linear infinite; pointer-events: none;
+}
+.mcm-sl-slide--video-click.is-video-loading .mcm-sl-spinner,
+.mcm-sl-slide--video-click.is-video-buffering .mcm-sl-spinner{ display: block; }
+.mcm-sl-slide--video-click.is-video-loading .mcm-sl-play{ visibility: hidden; }
+@keyframes mcm-sl-spin{ to{ transform: rotate(360deg); } }
 
 .mcm-sl-overlay{ position: absolute; inset: 0; z-index: 1; background-color: rgba(0,0,0,.35); pointer-events: none; }
 
@@ -113,8 +127,10 @@
 .mcm-sl-play:hover, .mcm-sl-play:focus-visible{ transform: scale(1.08); background: var(--mcm-primary, #0a6b5d); }
 .mcm-sl-play:focus-visible{ outline: 3px solid #fff; outline-offset: 3px; }
 .mcm-sl-slide--video-click .mcm-sl-content{ padding-bottom: 130px; }
-.mcm-sl-slide.is-playing .mcm-sl-play, .mcm-sl-slide.is-playing .mcm-sl-content, .mcm-sl-slide.is-playing .mcm-sl-overlay, .mcm-sl-slide.is-playing .mcm-sl-poster{ display: none; }
-.mcm-sl-slide.is-playing .mcm-sl-video{ z-index: 5; }
+/* Once a click-to-play video has been started its text steps aside; the play
+   button returns (as resume / replay) when the video is paused or has ended. */
+.mcm-sl-slide.is-playing .mcm-sl-content, .mcm-sl-slide.is-playing .mcm-sl-overlay{ display: none; }
+.mcm-sl-slide.is-playing.is-video-on .mcm-sl-play{ display: none; }
 
 /* Arrows. */
 .mcm-sl-arrow{
@@ -210,7 +226,8 @@
 }
 
 @media (prefers-reduced-motion: reduce){
-	.mcm-sl-track, .mcm-sl.is-fade .mcm-sl-slide, .mcm-sl-progress{ transition-duration: 0s !important; }
+	.mcm-sl-track, .mcm-sl.is-fade .mcm-sl-slide, .mcm-sl-progress, .mcm-sl-poster{ transition-duration: 0s !important; }
+	.mcm-sl-spinner{ animation-duration: 2.4s; }
 	.mcm-sl .mcm-sl-slide .mcm-sl-img, .mcm-sl.is-ready .mcm-sl-slide .mcm-sl-inner{ animation: none !important; opacity: 1 !important; }
 }
 

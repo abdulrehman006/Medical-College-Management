@@ -401,7 +401,8 @@ In Elementor, drag "Slider (Images & Videos)" from the Medical College panel.
 Each slide is an image or a video (YouTube, Vimeo or an uploaded MP4) with an
 optional heading, text and button. Layout & Size sets custom, full-screen or
 aspect-ratio height per screen size, a custom width, full-width stretch and
-slides per view. Background videos only play while the slider is on screen.
+slides per view. A video's Thumbnail shows while it loads and when it is
+paused or ends. Background videos only play while the slider is on screen.
 
 == Changelog ==
 

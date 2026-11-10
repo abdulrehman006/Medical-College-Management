@@ -130,11 +130,11 @@ class MCM_Widget_Slider extends \Elementor\Widget_Base {
 		$rep->add_control(
 			'image',
 			array(
-				'label'       => __( 'Image', 'medical-college-manager' ),
-				'description' => __( 'For a video slide this is the cover (poster) shown before the video plays.', 'medical-college-manager' ),
-				'type'        => \Elementor\Controls_Manager::MEDIA,
-				'dynamic'     => array( 'active' => true ),
-				'default'     => array( 'url' => \Elementor\Utils::get_placeholder_image_src() ),
+				'label'     => __( 'Image', 'medical-college-manager' ),
+				'type'      => \Elementor\Controls_Manager::MEDIA,
+				'dynamic'   => array( 'active' => true ),
+				'default'   => array( 'url' => \Elementor\Utils::get_placeholder_image_src() ),
+				'condition' => array( 'type' => 'image' ),
 			)
 		);
 		$rep->add_control(
@@ -189,6 +189,40 @@ class MCM_Widget_Slider extends \Elementor\Widget_Base {
 				),
 				'description' => __( 'Background videos start when the slide is shown and stop when it leaves.', 'medical-college-manager' ),
 				'condition'   => array( 'type' => 'video' ),
+			)
+		);
+		$rep->add_control(
+			'video_thumb',
+			array(
+				'label'       => __( 'Thumbnail', 'medical-college-manager' ),
+				'description' => __( 'Shown while the video loads, and when it is paused or has ended. Leave empty to use the video\'s own thumbnail (YouTube and Vimeo). For a self-hosted video, upload one.', 'medical-college-manager' ),
+				'type'        => \Elementor\Controls_Manager::MEDIA,
+				'dynamic'     => array( 'active' => true ),
+				'separator'   => 'before',
+				'condition'   => array( 'type' => 'video' ),
+			)
+		);
+		$rep->add_control(
+			'thumb_paused',
+			array(
+				'label'        => __( 'Show thumbnail when paused', 'medical-college-manager' ),
+				'type'         => \Elementor\Controls_Manager::SWITCHER,
+				'return_value' => 'yes',
+				'default'      => 'yes',
+				'condition'    => array( 'type' => 'video' ),
+			)
+		);
+		$rep->add_control(
+			'thumb_ended',
+			array(
+				'label'        => __( 'Show thumbnail when the video ends', 'medical-college-manager' ),
+				'type'         => \Elementor\Controls_Manager::SWITCHER,
+				'return_value' => 'yes',
+				'default'      => 'yes',
+				'condition'    => array(
+					'type'       => 'video',
+					'video_play' => 'click',
+				),
 			)
 		);
 		$rep->add_control(
@@ -1206,18 +1240,111 @@ class MCM_Widget_Slider extends \Elementor\Widget_Base {
 	}
 
 	/**
-	 * The cover image for a slide.
+	 * A media control value that holds a real image (not Elementor's
+	 * placeholder).
 	 *
-	 * @param array  $slide Repeater item.
-	 * @param string $size  Image size.
-	 * @param bool   $first Is this the first slide (load eagerly).
-	 * @param array  $video Video descriptor or null.
+	 * @param mixed $media Media control value.
+	 * @return array|null { id, url } or null.
+	 */
+	private static function real_media( $media ) {
+		if ( ! is_array( $media ) ) {
+			return null;
+		}
+		$id  = ! empty( $media['id'] ) ? (int) $media['id'] : 0;
+		$url = ! empty( $media['url'] ) ? (string) $media['url'] : '';
+		if ( ! $id && ( '' === $url || \Elementor\Utils::get_placeholder_image_src() === $url ) ) {
+			return null;
+		}
+		return array(
+			'id'  => $id,
+			'url' => $url,
+		);
+	}
+
+	/**
+	 * Vimeo's own thumbnail, asked for once by the server (not the visitor's
+	 * browser) and cached for a week; a failed lookup is retried after an hour.
+	 *
+	 * @param string $id Vimeo video ID.
+	 * @return string Thumbnail URL or ''.
+	 */
+	public static function vimeo_thumb( $id ) {
+		$id = preg_replace( '/\D/', '', (string) $id );
+		if ( '' === $id ) {
+			return '';
+		}
+		$key    = 'mcm_vimeo_thumb_' . $id;
+		$cached = get_transient( $key );
+		if ( false !== $cached ) {
+			return (string) $cached;
+		}
+		$thumb = '';
+		$res   = wp_safe_remote_get(
+			'https://vimeo.com/api/oembed.json?width=1280&url=' . rawurlencode( 'https://vimeo.com/' . $id ),
+			array( 'timeout' => 5 )
+		);
+		if ( ! is_wp_error( $res ) && 200 === (int) wp_remote_retrieve_response_code( $res ) ) {
+			$data = json_decode( wp_remote_retrieve_body( $res ), true );
+			$url  = is_array( $data ) && ! empty( $data['thumbnail_url'] ) ? (string) $data['thumbnail_url'] : '';
+			$host = (string) wp_parse_url( $url, PHP_URL_HOST );
+			if ( 0 === strpos( $url, 'https://' ) && preg_match( '/(^|\.)vimeocdn\.com$/', $host ) ) {
+				$thumb = esc_url_raw( $url );
+			}
+		}
+		set_transient( $key, $thumb, $thumb ? WEEK_IN_SECONDS : HOUR_IN_SECONDS );
+		return $thumb;
+	}
+
+	/**
+	 * The thumbnail for a video slide: the uploaded Thumbnail, else an image
+	 * set on the slide before it was a video, else the provider's own.
+	 *
+	 * @param array      $slide Repeater item.
+	 * @param array|null $video Video descriptor (null when the link is unusable).
+	 * @return array|null { id, url, fallback } (id 0 for a remote image).
+	 */
+	public static function video_thumb( $slide, $video ) {
+		$own = self::real_media( isset( $slide['video_thumb'] ) ? $slide['video_thumb'] : null );
+		if ( ! $own ) {
+			$own = self::real_media( isset( $slide['legacy_image'] ) ? $slide['legacy_image'] : null );
+		}
+		if ( $own ) {
+			return array_merge( $own, array( 'fallback' => '' ) );
+		}
+		if ( ! $video ) {
+			return null; // No usable video link: only an uploaded thumbnail can show.
+		}
+		if ( 'youtube' === $video['type'] ) {
+			$base = 'https://i.ytimg.com/vi/' . rawurlencode( $video['id'] ) . '/';
+			// Full HD where YouTube has one; the script swaps in hqdefault when not.
+			return array(
+				'id'       => 0,
+				'url'      => $base . 'maxresdefault.jpg',
+				'fallback' => $base . 'hqdefault.jpg',
+			);
+		}
+		if ( 'vimeo' === $video['type'] ) {
+			$url = self::vimeo_thumb( $video['id'] );
+			return $url ? array(
+				'id'       => 0,
+				'url'      => $url,
+				'fallback' => '',
+			) : null;
+		}
+		return null;
+	}
+
+	/**
+	 * The image (or video thumbnail) for a slide.
+	 *
+	 * @param array      $slide Repeater item.
+	 * @param string     $size  Image size.
+	 * @param bool       $first Is this the first slide (load eagerly).
+	 * @param array|null $thumb For a video slide: video_thumb() result.
+	 * @param bool       $video Is this a video slide.
 	 * @return string HTML.
 	 */
-	private function slide_image( $slide, $size, $first, $video ) {
-		$img   = isset( $slide['image'] ) && is_array( $slide['image'] ) ? $slide['image'] : array();
-		$id    = ! empty( $img['id'] ) ? (int) $img['id'] : 0;
-		$url   = ! empty( $img['url'] ) ? $img['url'] : '';
+	private function slide_image( $slide, $size, $first, $thumb, $video ) {
 		$attrs = array(
 			'class'    => 'mcm-sl-img' . ( $video ? ' mcm-sl-poster' : '' ),
 			'loading'  => $first ? 'eager' : 'lazy',
@@ -1226,22 +1353,29 @@ class MCM_Widget_Slider extends \Elementor\Widget_Base {
 		if ( $first ) {
 			$attrs['fetchpriority'] = 'high';
 		}
-		if ( $id && wp_attachment_is_image( $id ) ) {
-			if ( $video ) {
-				$attrs['alt'] = '';
+		if ( $video ) {
+			if ( ! $thumb ) {
+				return '';
 			}
-			return wp_get_attachment_image( $id, $size, false, $attrs );
+			$attrs['alt'] = ''; // Decorative: the play button and slide label name the video.
+			$id           = $thumb['id'];
+			$url          = $thumb['url'];
+			if ( '' !== $thumb['fallback'] ) {
+				$attrs['data-fallback'] = $thumb['fallback'];
+			}
+		} else {
+			$img = self::real_media( isset( $slide['image'] ) ? $slide['image'] : null );
+			$id  = $img ? $img['id'] : 0;
+			$url = isset( $slide['image']['url'] ) ? (string) $slide['image']['url'] : '';
 		}
-		$placeholder = \Elementor\Utils::get_placeholder_image_src();
-		if ( $video && 'youtube' === $video['type'] && ( '' === $url || $url === $placeholder ) ) {
-			$url = 'https://i.ytimg.com/vi/' . rawurlencode( $video['id'] ) . '/hqdefault.jpg';
-		} elseif ( $video && ( '' === $url || $url === $placeholder ) ) {
-			return '';
+		if ( $id && wp_attachment_is_image( $id ) ) {
+			return wp_get_attachment_image( $id, $size, false, $attrs );
 		}
 		if ( '' === $url ) {
 			return '';
 		}
 		$html = '<img src="' . esc_url( $url ) . '" alt=""';
+		unset( $attrs['alt'] );
 		foreach ( $attrs as $k => $v ) {
 			$html .= ' ' . esc_attr( $k ) . '="' . esc_attr( $v ) . '"';
 		}
@@ -1350,7 +1484,19 @@ class MCM_Widget_Slider extends \Elementor\Widget_Base {
 		$out .= '<div class="mcm-sl-viewport" aria-live="' . ( $autoplay ? 'off' : 'polite' ) . '">';
 		$out .= '<div class="mcm-sl-track">';
 
+		// A video slide may still hold the cover image set before it had its own
+		// Thumbnail. Elementor drops hidden controls from the display settings,
+		// so take that image from the raw settings.
+		$raw = array();
+		foreach ( (array) $this->get_settings( 'slides' ) as $item ) {
+			if ( isset( $item['_id'], $item['image'] ) ) {
+				$raw[ $item['_id'] ] = $item['image'];
+			}
+		}
 		foreach ( $slides as $i => $slide ) {
+			if ( isset( $slide['type'], $slide['_id'] ) && 'video' === $slide['type'] && isset( $raw[ $slide['_id'] ] ) ) {
+				$slide['legacy_image'] = $raw[ $slide['_id'] ];
+			}
 			$out .= $this->render_slide( $slide, $i, $total, $size, $tag, $whole, $yes( 'lightbox' ) );
 		}
 		$out .= '</div></div>';
@@ -1404,10 +1550,24 @@ class MCM_Widget_Slider extends \Elementor\Widget_Base {
 		$aria = sprintf( __( 'Slide %1$d of %2$d', 'medical-college-manager' ), $i + 1, $total );
 		$html = '<div class="' . esc_attr( $cls ) . '" role="group" aria-roledescription="' . esc_attr__( 'slide', 'medical-college-manager' ) . '" aria-label="' . esc_attr( $aria ) . '">';
 
-		$html .= '<div class="mcm-sl-media">' . $this->slide_image( $slide, $size, 0 === $i, $video );
+		$thumb = $is_video ? self::video_thumb( $slide, $video ) : null;
+		$html .= '<div class="mcm-sl-media">' . $this->slide_image( $slide, $size, 0 === $i, $thumb, $is_video );
 		if ( $video ) {
-			$data  = array_merge( $video, array( 'mode' => $mode ) );
+			$poster = '';
+			if ( $thumb ) {
+				$poster = $thumb['id'] ? (string) wp_get_attachment_image_url( $thumb['id'], $size ) : $thumb['url'];
+			}
+			$data  = array_merge(
+				$video,
+				array(
+					'mode'        => $mode,
+					'poster'      => $poster ? esc_url_raw( $poster ) : '',
+					'thumbPaused' => ! isset( $slide['thumb_paused'] ) || 'yes' === $slide['thumb_paused'],
+					'thumbEnded'  => ! isset( $slide['thumb_ended'] ) || 'yes' === $slide['thumb_ended'],
+				)
+			);
 			$html .= '<div class="mcm-sl-video" data-video="' . esc_attr( wp_json_encode( $data ) ) . '"></div>';
+			$html .= '<span class="mcm-sl-spinner" aria-hidden="true"></span>';
 		} elseif ( $is_video && $this->mcm_in_editor() ) {
 			$html .= '<p class="mcm-sl-empty">' . esc_html__( 'Add a YouTube or Vimeo link, or choose a video file.', 'medical-college-manager' ) . '</p>';
 		}
@@ -1456,7 +1616,7 @@ class MCM_Widget_Slider extends \Elementor\Widget_Base {
 		} elseif ( $link && ( $whole || '' === $btn ) ) {
 			$name  = '' !== $heading ? $heading : $btn;
 			$html .= '<a class="mcm-sl-link"' . $link_attrs . ( '' !== $name ? ' aria-label="' . esc_attr( $name ) . '"' : '' ) . '></a>';
-		} elseif ( ! $video && ! $link && $lightbox && ! empty( $slide['image']['url'] ) ) {
+		} elseif ( ! $is_video && ! $link && $lightbox && self::real_media( isset( $slide['image'] ) ? $slide['image'] : null ) ) {
 			$full  = ! empty( $slide['image']['id'] ) ? wp_get_attachment_image_url( (int) $slide['image']['id'], 'full' ) : $slide['image']['url'];
 			$name  = '' !== $heading ? $heading : __( 'Open image', 'medical-college-manager' );
 			$html .= '<a class="mcm-sl-link" href="' . esc_url( $full ) . '" data-elementor-open-lightbox="yes" data-elementor-lightbox-slideshow="' . esc_attr( 'mcm-sl-' . $this->get_id() ) . '" aria-label="' . esc_attr( $name ) . '"></a>';

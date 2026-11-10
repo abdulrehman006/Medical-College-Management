@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-11-10T12:11:34+00:00\n"
+"POT-Creation-Date: 2026-11-10T13:04:40+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: medical-college-manager\n"
@@ -872,8 +872,8 @@ msgstr ""
 
 #: includes/class-mcm-health.php:342
 #: includes/class-mcm-health.php:346
-#: includes/class-mcm-widget-slider.php:680
-#: includes/class-mcm-widget-slider.php:746
+#: includes/class-mcm-widget-slider.php:714
+#: includes/class-mcm-widget-slider.php:780
 msgid "None"
 msgstr ""
 
@@ -2294,8 +2294,8 @@ msgid "Next &rarr;"
 msgstr ""
 
 #: includes/class-mcm-query.php:2361
-#: includes/class-mcm-widget-slider.php:679
-#: includes/class-mcm-widget-slider.php:999
+#: includes/class-mcm-widget-slider.php:713
+#: includes/class-mcm-widget-slider.php:1033
 #: includes/elementor-widgets.php:925
 #: includes/elementor-widgets.php:1665
 msgid "Pagination"
@@ -3399,7 +3399,7 @@ msgid "Show a search button after the menu"
 msgstr ""
 
 #: includes/class-mcm-site-chrome-settings.php:381
-#: includes/class-mcm-widget-slider.php:893
+#: includes/class-mcm-widget-slider.php:927
 msgid "Button"
 msgstr ""
 
@@ -3408,7 +3408,7 @@ msgid "Show a button after the menu (e.g. Apply Now)"
 msgstr ""
 
 #: includes/class-mcm-site-chrome-settings.php:382
-#: includes/class-mcm-widget-slider.php:227
+#: includes/class-mcm-widget-slider.php:261
 msgid "Button text"
 msgstr ""
 
@@ -3530,8 +3530,8 @@ msgstr ""
 
 #: includes/class-mcm-site-chrome-settings.php:442
 #: includes/class-mcm-social.php:280
-#: includes/class-mcm-widget-slider.php:554
-#: includes/class-mcm-widget-slider.php:1106
+#: includes/class-mcm-widget-slider.php:588
+#: includes/class-mcm-widget-slider.php:1140
 #: includes/elementor-widgets.php:201
 #: includes/elementor-widgets.php:1681
 #: includes/elementor-widgets.php:3574
@@ -3541,8 +3541,8 @@ msgstr ""
 
 #: includes/class-mcm-site-chrome-settings.php:443
 #: includes/class-mcm-social.php:281
-#: includes/class-mcm-widget-slider.php:553
-#: includes/class-mcm-widget-slider.php:1098
+#: includes/class-mcm-widget-slider.php:587
+#: includes/class-mcm-widget-slider.php:1132
 #: includes/elementor-widgets.php:193
 #: includes/elementor-widgets.php:1673
 #: includes/elementor-widgets.php:3566
@@ -3582,7 +3582,7 @@ msgid "Footer style"
 msgstr ""
 
 #: includes/class-mcm-site-chrome-settings.php:470
-#: includes/class-mcm-widget-slider.php:966
+#: includes/class-mcm-widget-slider.php:1000
 #: includes/elementor-widgets.php:229
 #: includes/elementor-widgets.php:349
 #: includes/elementor-widgets.php:540
@@ -3622,8 +3622,8 @@ msgid "Empty: the college name from the letterhead settings."
 msgstr ""
 
 #: includes/class-mcm-site-chrome-settings.php:478
-#: includes/class-mcm-widget-slider.php:218
-#: includes/class-mcm-widget-slider.php:889
+#: includes/class-mcm-widget-slider.php:252
+#: includes/class-mcm-widget-slider.php:923
 msgid "Description"
 msgstr ""
 
@@ -4148,8 +4148,8 @@ msgid "Full (original)"
 msgstr ""
 
 #: includes/class-mcm-widget-slider.php:104
-#: includes/class-mcm-widget-slider.php:310
-#: includes/class-mcm-widget-slider.php:802
+#: includes/class-mcm-widget-slider.php:344
+#: includes/class-mcm-widget-slider.php:836
 msgid "Slides"
 msgstr ""
 
@@ -4169,13 +4169,9 @@ msgstr ""
 
 #. translators: %s: slide heading or "Video".
 #: includes/class-mcm-widget-slider.php:124
-#: includes/class-mcm-widget-slider.php:1344
-#: includes/class-mcm-widget-slider.php:1454
+#: includes/class-mcm-widget-slider.php:1478
+#: includes/class-mcm-widget-slider.php:1614
 msgid "Video"
-msgstr ""
-
-#: includes/class-mcm-widget-slider.php:134
-msgid "For a video slide this is the cover (poster) shown before the video plays."
 msgstr ""
 
 #: includes/class-mcm-widget-slider.php:143
@@ -4211,8 +4207,24 @@ msgid "Background videos start when the slide is shown and stop when it leaves."
 msgstr ""
 
 #: includes/class-mcm-widget-slider.php:197
-#: includes/class-mcm-widget-slider.php:981
-#: includes/class-mcm-widget-slider.php:1082
+msgid "Thumbnail"
+msgstr ""
+
+#: includes/class-mcm-widget-slider.php:198
+msgid "Shown while the video loads, and when it is paused or has ended. Leave empty to use the video's own thumbnail (YouTube and Vimeo). For a self-hosted video, upload one."
+msgstr ""
+
+#: includes/class-mcm-widget-slider.php:208
+msgid "Show thumbnail when paused"
+msgstr ""
+
+#: includes/class-mcm-widget-slider.php:218
+msgid "Show thumbnail when the video ends"
+msgstr ""
+
+#: includes/class-mcm-widget-slider.php:231
+#: includes/class-mcm-widget-slider.php:1015
+#: includes/class-mcm-widget-slider.php:1116
 #: includes/elementor-widgets.php:364
 #: includes/elementor-widgets.php:422
 #: includes/elementor-widgets.php:465
@@ -4224,51 +4236,51 @@ msgstr ""
 msgid "Background colour"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:205
+#: includes/class-mcm-widget-slider.php:239
 #: includes/elementor-widgets.php:792
 msgid "Content"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:209
-#: includes/class-mcm-widget-slider.php:885
+#: includes/class-mcm-widget-slider.php:243
+#: includes/class-mcm-widget-slider.php:919
 #: includes/elementor-widgets.php:3262
 #: includes/elementor-widgets.php:3435
 #: includes/elementor-widgets.php:3681
 msgid "Heading"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:235
+#: includes/class-mcm-widget-slider.php:269
 #: includes/elementor-widgets.php:4069
 msgid "Link"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:244
+#: includes/class-mcm-widget-slider.php:278
 msgid "Style"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:248
+#: includes/class-mcm-widget-slider.php:282
 msgid "Custom style for this slide"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:256
-#: includes/class-mcm-widget-slider.php:806
+#: includes/class-mcm-widget-slider.php:290
+#: includes/class-mcm-widget-slider.php:840
 msgid "Overlay colour"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:265
+#: includes/class-mcm-widget-slider.php:299
 msgid "Horizontal position"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:276
+#: includes/class-mcm-widget-slider.php:310
 msgid "Vertical position"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:287
-#: includes/class-mcm-widget-slider.php:846
+#: includes/class-mcm-widget-slider.php:321
+#: includes/class-mcm-widget-slider.php:880
 msgid "Text alignment"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:297
+#: includes/class-mcm-widget-slider.php:331
 #: includes/elementor-widgets.php:356
 #: includes/elementor-widgets.php:421
 #: includes/elementor-widgets.php:463
@@ -4277,83 +4289,83 @@ msgstr ""
 msgid "Text colour"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:313
+#: includes/class-mcm-widget-slider.php:347
 msgid "Video slide"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:313
+#: includes/class-mcm-widget-slider.php:347
 msgid "Image slide"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:318
+#: includes/class-mcm-widget-slider.php:352
 msgid "Welcome to our college"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:319
-#: includes/class-mcm-widget-slider.php:326
+#: includes/class-mcm-widget-slider.php:353
+#: includes/class-mcm-widget-slider.php:360
 msgid "Write a short line about this slide."
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:320
+#: includes/class-mcm-widget-slider.php:354
 msgid "Learn more"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:325
+#: includes/class-mcm-widget-slider.php:359
 msgid "Admissions are open"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:327
+#: includes/class-mcm-widget-slider.php:361
 msgid "Apply now"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:332
+#: includes/class-mcm-widget-slider.php:366
 msgid "Campus life"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:344
+#: includes/class-mcm-widget-slider.php:378
 msgid "Layout & Size"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:349
+#: includes/class-mcm-widget-slider.php:383
 #: includes/elementor-widgets.php:2985
 msgid "Height"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:353
-#: includes/class-mcm-widget-slider.php:362
+#: includes/class-mcm-widget-slider.php:387
+#: includes/class-mcm-widget-slider.php:396
 msgid "Custom height"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:354
+#: includes/class-mcm-widget-slider.php:388
 msgid "Fit to screen (full screen)"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:355
-#: includes/class-mcm-widget-slider.php:411
+#: includes/class-mcm-widget-slider.php:389
+#: includes/class-mcm-widget-slider.php:445
 msgid "Aspect ratio"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:394
+#: includes/class-mcm-widget-slider.php:428
 msgid "Subtract from screen height"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:395
+#: includes/class-mcm-widget-slider.php:429
 msgid "E.g. the height of a sticky header, so the slider fills exactly what is left."
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:431
+#: includes/class-mcm-widget-slider.php:465
 msgid "Stretch to full screen width"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:432
+#: includes/class-mcm-widget-slider.php:466
 msgid "Edge to edge, even inside a boxed section."
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:441
+#: includes/class-mcm-widget-slider.php:475
 msgid "Custom width"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:461
+#: includes/class-mcm-widget-slider.php:495
 #: includes/elementor-widgets.php:159
 #: includes/elementor-widgets.php:1669
 #: includes/elementor-widgets.php:3697
@@ -4362,41 +4374,41 @@ msgstr ""
 msgid "Alignment"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:477
+#: includes/class-mcm-widget-slider.php:511
 msgid "Slides per view"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:497
+#: includes/class-mcm-widget-slider.php:531
 msgid "Slides to move"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:507
+#: includes/class-mcm-widget-slider.php:541
 msgid "Space between slides"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:523
+#: includes/class-mcm-widget-slider.php:557
 msgid "Image size"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:533
+#: includes/class-mcm-widget-slider.php:567
 #: includes/elementor-widgets.php:518
 msgid "Image fit"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:537
+#: includes/class-mcm-widget-slider.php:571
 msgid "Fill (crop to fit)"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:538
+#: includes/class-mcm-widget-slider.php:572
 msgid "Whole image (no crop)"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:546
+#: includes/class-mcm-widget-slider.php:580
 msgid "Image focus"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:550
-#: includes/class-mcm-widget-slider.php:1102
+#: includes/class-mcm-widget-slider.php:584
+#: includes/class-mcm-widget-slider.php:1136
 #: includes/elementor-widgets.php:197
 #: includes/elementor-widgets.php:1434
 #: includes/elementor-widgets.php:1677
@@ -4404,8 +4416,8 @@ msgstr ""
 msgid "Centre"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:551
-#: includes/class-mcm-widget-slider.php:1133
+#: includes/class-mcm-widget-slider.php:585
+#: includes/class-mcm-widget-slider.php:1167
 #: includes/elementor-widgets.php:1433
 #: includes/elementor-widgets.php:3570
 #: includes/elementor-widgets.php:3589
@@ -4413,214 +4425,214 @@ msgstr ""
 msgid "Top"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:552
-#: includes/class-mcm-widget-slider.php:1141
+#: includes/class-mcm-widget-slider.php:586
+#: includes/class-mcm-widget-slider.php:1175
 #: includes/elementor-widgets.php:1435
 #: includes/elementor-widgets.php:3597
 msgid "Bottom"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:562
+#: includes/class-mcm-widget-slider.php:596
 #: includes/elementor-widgets.php:3445
 msgid "Heading HTML tag"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:582
+#: includes/class-mcm-widget-slider.php:616
 msgid "Slider Options"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:587
+#: includes/class-mcm-widget-slider.php:621
 msgid "Transition"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:591
+#: includes/class-mcm-widget-slider.php:625
 msgid "Slide"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:592
+#: includes/class-mcm-widget-slider.php:626
 msgid "Fade"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:594
+#: includes/class-mcm-widget-slider.php:628
 msgid "Fade is used when one slide is shown at a time."
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:600
+#: includes/class-mcm-widget-slider.php:634
 msgid "Transition speed (ms)"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:611
+#: includes/class-mcm-widget-slider.php:645
 msgid "Autoplay"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:621
+#: includes/class-mcm-widget-slider.php:655
 msgid "Time on each slide (ms)"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:633
+#: includes/class-mcm-widget-slider.php:667
 msgid "Pause on hover"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:643
+#: includes/class-mcm-widget-slider.php:677
 msgid "Stop after the visitor uses the slider"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:653
+#: includes/class-mcm-widget-slider.php:687
 msgid "Show pause / play button"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:654
+#: includes/class-mcm-widget-slider.php:688
 msgid "Recommended for accessibility: visitors must be able to stop moving content."
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:664
+#: includes/class-mcm-widget-slider.php:698
 msgid "Loop (back to the first slide)"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:673
-#: includes/class-mcm-widget-slider.php:902
+#: includes/class-mcm-widget-slider.php:707
+#: includes/class-mcm-widget-slider.php:936
 msgid "Navigation"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:677
+#: includes/class-mcm-widget-slider.php:711
 msgid "Arrows and pagination"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:678
-#: includes/class-mcm-widget-slider.php:904
+#: includes/class-mcm-widget-slider.php:712
+#: includes/class-mcm-widget-slider.php:938
 msgid "Arrows"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:688
+#: includes/class-mcm-widget-slider.php:722
 msgid "Pagination type"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:692
+#: includes/class-mcm-widget-slider.php:726
 msgid "Dots"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:693
+#: includes/class-mcm-widget-slider.php:727
 msgid "Numbers (2 / 5)"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:694
+#: includes/class-mcm-widget-slider.php:728
 msgid "Progress bar"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:702
+#: includes/class-mcm-widget-slider.php:736
 msgid "Swipe / drag"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:711
+#: includes/class-mcm-widget-slider.php:745
 msgid "Keyboard arrows"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:720
+#: includes/class-mcm-widget-slider.php:754
 msgid "Ken Burns effect (slow zoom)"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:729
+#: includes/class-mcm-widget-slider.php:763
 msgid "Zoom direction"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:733
-#: includes/class-mcm-widget-slider.php:750
+#: includes/class-mcm-widget-slider.php:767
+#: includes/class-mcm-widget-slider.php:784
 msgid "Zoom in"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:734
+#: includes/class-mcm-widget-slider.php:768
 msgid "Zoom out"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:742
+#: includes/class-mcm-widget-slider.php:776
 msgid "Content animation"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:747
+#: includes/class-mcm-widget-slider.php:781
 msgid "Fade in"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:748
+#: includes/class-mcm-widget-slider.php:782
 msgid "Fade in up"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:749
+#: includes/class-mcm-widget-slider.php:783
 msgid "Fade in down"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:757
+#: includes/class-mcm-widget-slider.php:791
 msgid "Link applies to"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:761
+#: includes/class-mcm-widget-slider.php:795
 msgid "Button only"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:762
+#: includes/class-mcm-widget-slider.php:796
 msgid "Whole slide"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:769
+#: includes/class-mcm-widget-slider.php:803
 msgid "Open images in a lightbox"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:770
+#: includes/class-mcm-widget-slider.php:804
 msgid "Image slides without a link open full size when clicked."
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:778
+#: includes/class-mcm-widget-slider.php:812
 msgid "Play background videos on phones"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:779
+#: includes/class-mcm-widget-slider.php:813
 msgid "Off: phones show the cover image instead (saves mobile data)."
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:788
+#: includes/class-mcm-widget-slider.php:822
 msgid "Name for screen readers"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:790
-#: includes/class-mcm-widget-slider.php:1305
+#: includes/class-mcm-widget-slider.php:824
+#: includes/class-mcm-widget-slider.php:1439
 msgid "Slider"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:791
+#: includes/class-mcm-widget-slider.php:825
 msgid "e.g. Campus highlights"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:815
+#: includes/class-mcm-widget-slider.php:849
 msgid "Slide background colour"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:823
+#: includes/class-mcm-widget-slider.php:857
 msgid "Content: horizontal position"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:835
+#: includes/class-mcm-widget-slider.php:869
 msgid "Content: vertical position"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:856
+#: includes/class-mcm-widget-slider.php:890
 msgid "Content width"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:868
+#: includes/class-mcm-widget-slider.php:902
 #: includes/elementor-widgets.php:1393
 #: includes/elementor-widgets.php:2640
 msgid "Content padding"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:869
+#: includes/class-mcm-widget-slider.php:903
 msgid "Slider frame"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:908
+#: includes/class-mcm-widget-slider.php:942
 msgid "Show arrows"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:911
-#: includes/class-mcm-widget-slider.php:1006
+#: includes/class-mcm-widget-slider.php:945
+#: includes/class-mcm-widget-slider.php:1040
 #: includes/elementor-widgets.php:522
 #: includes/elementor-widgets.php:1405
 #: includes/elementor-widgets.php:1432
@@ -4628,8 +4640,8 @@ msgstr ""
 msgid "Default"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:912
-#: includes/class-mcm-widget-slider.php:1007
+#: includes/class-mcm-widget-slider.php:946
+#: includes/class-mcm-widget-slider.php:1041
 #: includes/elementor-widgets.php:851
 #: includes/elementor-widgets.php:1158
 #: includes/elementor-widgets.php:1201
@@ -4639,8 +4651,8 @@ msgstr ""
 msgid "Show"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:913
-#: includes/class-mcm-widget-slider.php:1008
+#: includes/class-mcm-widget-slider.php:947
+#: includes/class-mcm-widget-slider.php:1042
 #: includes/elementor-widgets.php:1159
 #: includes/elementor-widgets.php:1202
 #: includes/elementor-widgets.php:4162
@@ -4649,27 +4661,27 @@ msgstr ""
 msgid "Hide"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:925
+#: includes/class-mcm-widget-slider.php:959
 msgid "Arrows position"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:929
+#: includes/class-mcm-widget-slider.php:963
 msgid "Inside"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:930
+#: includes/class-mcm-widget-slider.php:964
 msgid "Outside"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:937
+#: includes/class-mcm-widget-slider.php:971
 msgid "Button size"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:952
+#: includes/class-mcm-widget-slider.php:986
 msgid "Distance from edge"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:967
+#: includes/class-mcm-widget-slider.php:1001
 #: includes/elementor-widgets.php:256
 #: includes/elementor-widgets.php:350
 #: includes/elementor-widgets.php:564
@@ -4677,12 +4689,12 @@ msgstr ""
 msgid "Hover"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:973
-#: includes/class-mcm-widget-slider.php:1074
+#: includes/class-mcm-widget-slider.php:1007
+#: includes/class-mcm-widget-slider.php:1108
 msgid "Icon colour"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:992
+#: includes/class-mcm-widget-slider.php:1026
 #: includes/elementor-widgets.php:318
 #: includes/elementor-widgets.php:391
 #: includes/elementor-widgets.php:437
@@ -4691,108 +4703,108 @@ msgstr ""
 msgid "Border radius"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:1003
+#: includes/class-mcm-widget-slider.php:1037
 msgid "Show pagination"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:1020
+#: includes/class-mcm-widget-slider.php:1054
 msgid "Pagination position"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:1024
+#: includes/class-mcm-widget-slider.php:1058
 msgid "Inside (over the slide)"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:1025
+#: includes/class-mcm-widget-slider.php:1059
 msgid "Below the slider"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:1032
+#: includes/class-mcm-widget-slider.php:1066
 msgid "Dot size"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:1047
+#: includes/class-mcm-widget-slider.php:1081
 #: includes/elementor-widgets.php:139
 #: includes/elementor-widgets.php:3737
 #: includes/elementor-widgets.php:4338
 msgid "Colour"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:1055
+#: includes/class-mcm-widget-slider.php:1089
 msgid "Active colour"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:1064
+#: includes/class-mcm-widget-slider.php:1098
 msgid "Numbers typography"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:1070
+#: includes/class-mcm-widget-slider.php:1104
 msgid "Pause button"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:1137
+#: includes/class-mcm-widget-slider.php:1171
 #: includes/elementor-widgets.php:3593
 #: includes/elementor-widgets.php:4281
 msgid "Middle"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:1276
+#: includes/class-mcm-widget-slider.php:1410
 msgid "Add slides in the Slides section."
 msgstr ""
 
 #. translators: %d: slide number.
-#: includes/class-mcm-widget-slider.php:1339
+#: includes/class-mcm-widget-slider.php:1473
 #, php-format
 msgid "Go to slide %d"
 msgstr ""
 
 #. translators: 1: slide number, 2: number of slides.
-#: includes/class-mcm-widget-slider.php:1341
-#: includes/class-mcm-widget-slider.php:1404
+#: includes/class-mcm-widget-slider.php:1475
+#: includes/class-mcm-widget-slider.php:1550
 #, php-format
 msgid "Slide %1$d of %2$d"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:1342
-#: includes/class-mcm-widget-slider.php:1365
+#: includes/class-mcm-widget-slider.php:1476
+#: includes/class-mcm-widget-slider.php:1511
 msgid "Pause slider"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:1343
+#: includes/class-mcm-widget-slider.php:1477
 msgid "Play slider"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:1345
+#: includes/class-mcm-widget-slider.php:1479
 msgid "Playing video"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:1349
+#: includes/class-mcm-widget-slider.php:1483
 msgid "carousel"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:1359
+#: includes/class-mcm-widget-slider.php:1505
 msgid "Previous slide"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:1360
+#: includes/class-mcm-widget-slider.php:1506
 msgid "Next slide"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:1405
+#: includes/class-mcm-widget-slider.php:1551
 msgid "slide"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:1412
+#: includes/class-mcm-widget-slider.php:1572
 msgid "Add a YouTube or Vimeo link, or choose a video file."
 msgstr ""
 
 #. translators: %s: slide heading or "Video".
-#: includes/class-mcm-widget-slider.php:1454
+#: includes/class-mcm-widget-slider.php:1614
 #, php-format
 msgid "Play video: %s"
 msgstr ""
 
-#: includes/class-mcm-widget-slider.php:1461
+#: includes/class-mcm-widget-slider.php:1621
 msgid "Open image"
 msgstr ""
 
