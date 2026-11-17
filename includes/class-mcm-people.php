@@ -285,7 +285,7 @@ class MCM_People {
 				/* translators: 1: email, 2: name of the other record. */
 				__( '%1$s is already used by "%2$s". Each person has one record: add this department to that record instead.', 'medical-college-manager' ),
 				$email,
-				get_the_title( $other )
+				self::visible_name( $other )
 			);
 		}
 		return '';
@@ -396,9 +396,24 @@ class MCM_People {
 			return null;
 		}
 		return array(
-			'name' => wp_strip_all_tags( get_the_title( $id ) ),
+			'name' => self::visible_name( $id ),
 			'url'  => current_user_can( 'edit_post', $id ) ? (string) get_edit_post_link( $id, 'raw' ) : '',
 		);
+	}
+
+	/**
+	 * The other record's name, only when this user could see it anyway (it is
+	 * published, or they may edit it). A department coordinator checking an
+	 * email must not learn the names of other departments' unpublished records.
+	 *
+	 * @param int $id Post ID.
+	 * @return string
+	 */
+	private static function visible_name( $id ) {
+		if ( 'publish' === get_post_status( $id ) || current_user_can( 'edit_post', $id ) ) {
+			return wp_strip_all_tags( get_the_title( $id ) );
+		}
+		return __( 'a record you cannot open', 'medical-college-manager' );
 	}
 
 	/**

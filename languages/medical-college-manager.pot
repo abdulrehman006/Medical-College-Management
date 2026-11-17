@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-11-17T08:38:52+00:00\n"
+"POT-Creation-Date: 2026-11-17T10:27:18+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: medical-college-manager\n"
@@ -2192,12 +2192,16 @@ msgstr ""
 msgid "You cannot edit that record: ask an administrator to add your department to it."
 msgstr ""
 
-#: includes/class-mcm-people.php:446
+#: includes/class-mcm-people.php:416
+msgid "a record you cannot open"
+msgstr ""
+
+#: includes/class-mcm-people.php:461
 msgid "No email"
 msgstr ""
 
 #. translators: %s: name of the other record.
-#: includes/class-mcm-people.php:452
+#: includes/class-mcm-people.php:467
 #, php-format
 msgid "Same email as: %s"
 msgstr ""
