@@ -1,6 +1,16 @@
 Medical College Manager — complete changelog.
 
 = 1.32.0 =
+Security audit (docs/security-audit-ai-common-issues-2026-11-17.md):
+* Fixed (High): a department coordinator could put an entry in another
+  department, or remove one from a shared entry, through the REST API (the
+  department rule now also runs after the REST API stores terms).
+* Fixed (Medium): if the department-access module ever fails to start,
+  coordinators lose editing rights on plugin content instead of silently
+  getting full rights (fail closed; administrators are unaffected).
+* Department fields check that the user may edit that department (form and
+  REST meta), not just "manage terms"; malformed admin form input no longer
+  causes a fatal error; count messages use proper plural forms.
 Pre-launch QA (see docs/qa-report-2026-11-09.md):
 * Changed (college decision): the public student directory is opt-in. The
   setting ("Make student lists public", Settings > Privacy) is off by default,

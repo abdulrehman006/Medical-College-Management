@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-11-10T09:06:06+00:00\n"
+"POT-Creation-Date: 2026-11-17T10:29:11+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: medical-college-manager\n"
@@ -18,13 +18,13 @@ msgstr ""
 #: medical-college-manager.php
 #: includes/class-mcm-elementor.php:104
 #: includes/class-mcm-health.php:108
-#: includes/class-mcm-health.php:334
-#: includes/class-mcm-health.php:512
-#: includes/class-mcm-health.php:525
+#: includes/class-mcm-health.php:339
+#: includes/class-mcm-health.php:517
+#: includes/class-mcm-health.php:530
 #: includes/class-mcm-privacy.php:97
 #: includes/class-mcm-privacy.php:110
 #: includes/class-mcm-settings.php:155
-#: includes/class-mcm-site-chrome.php:1235
+#: includes/class-mcm-site-chrome.php:1236
 #: includes/class-mcm-upgrade.php:228
 msgid "Medical College Manager"
 msgstr ""
@@ -369,8 +369,8 @@ msgid "Department"
 msgstr ""
 
 #: includes/class-mcm-cpt.php:311
-#: includes/class-mcm-dept-access.php:296
-#: includes/class-mcm-dept-access.php:300
+#: includes/class-mcm-dept-access.php:315
+#: includes/class-mcm-dept-access.php:319
 msgid "Departments"
 msgstr ""
 
@@ -604,27 +604,28 @@ msgstr ""
 msgid "All staff types"
 msgstr ""
 
-#: includes/class-mcm-dept-access.php:247
+#: includes/class-mcm-dept-access.php:266
+#: includes/class-medical-college-manager.php:146
 msgid "Only an administrator can add departments."
 msgstr ""
 
-#: includes/class-mcm-dept-access.php:295
+#: includes/class-mcm-dept-access.php:314
 msgid "Department access (Medical College Manager)"
 msgstr ""
 
-#: includes/class-mcm-dept-access.php:298
+#: includes/class-mcm-dept-access.php:317
 msgid "Administrators always manage every department; ticks here have no effect for them."
 msgstr ""
 
-#: includes/class-mcm-dept-access.php:311
+#: includes/class-mcm-dept-access.php:330
 msgid "Leave all unticked for normal access. Tick one or more to limit this user to those departments: they will see, edit and publish only entries tagged with them (plus their own new entries), and edit only those department pages."
 msgstr ""
 
-#: includes/class-mcm-dept-access.php:348
+#: includes/class-mcm-dept-access.php:367
 msgid "Department access"
 msgstr ""
 
-#: includes/class-mcm-dept-access.php:366
+#: includes/class-mcm-dept-access.php:385
 #: includes/class-mcm-query.php:802
 #: includes/elementor-widgets.php:2280
 msgid "All"
@@ -783,24 +784,28 @@ msgstr ""
 #. translators: 1: number of values converted, 2: date of the upgrade.
 #: includes/class-mcm-health.php:243
 #, php-format
-msgid "The 1.30.2 upgrade converted %1$d stored dates/times to the standard format on %2$s."
-msgstr ""
+msgid "The 1.30.2 upgrade converted %1$d stored date/time to the standard format on %2$s."
+msgid_plural "The 1.30.2 upgrade converted %1$d stored dates/times to the standard format on %2$s."
+msgstr[0] ""
+msgstr[1] ""
 
-#: includes/class-mcm-health.php:253
+#: includes/class-mcm-health.php:258
 msgid "All stored dates and times are readable"
 msgstr ""
 
 #. translators: %d: number of values checked.
-#: includes/class-mcm-health.php:257
+#: includes/class-mcm-health.php:262
 #, php-format
-msgid "%d stored dates and times checked."
-msgstr ""
+msgid "%d stored date or time checked."
+msgid_plural "%d stored dates and times checked."
+msgstr[0] ""
+msgstr[1] ""
 
-#: includes/class-mcm-health.php:276
+#: includes/class-mcm-health.php:281
 msgid "Entry"
 msgstr ""
 
-#: includes/class-mcm-health.php:276
+#: includes/class-mcm-health.php:281
 #: includes/class-mcm-query.php:2787
 #: includes/class-mcm-query.php:2796
 #: includes/class-mcm-query.php:3064
@@ -810,24 +815,26 @@ msgstr ""
 msgid "Type"
 msgstr ""
 
-#: includes/class-mcm-health.php:276
+#: includes/class-mcm-health.php:281
 #: includes/elementor-widgets.php:886
 msgid "Field"
 msgstr ""
 
-#: includes/class-mcm-health.php:276
+#: includes/class-mcm-health.php:281
 msgid "Stored value"
 msgstr ""
 
 #. translators: %d: number of further items not listed.
-#: includes/class-mcm-health.php:279
+#: includes/class-mcm-health.php:284
 #: includes/class-mcm-import.php:538
 #, php-format
 msgid "…and %d more."
-msgstr ""
+msgid_plural "…and %d more."
+msgstr[0] ""
+msgstr[1] ""
 
 #. translators: %d: number of values.
-#: includes/class-mcm-health.php:286
+#: includes/class-mcm-health.php:291
 #, php-format
 msgid "%d further value is readable but not yet in the standard format; it is corrected the next time the entry is saved."
 msgid_plural "%d further values are readable but not yet in the standard format; they are corrected the next time each entry is saved."
@@ -835,82 +842,82 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %d: number of unreadable values.
-#: includes/class-mcm-health.php:297
+#: includes/class-mcm-health.php:302
 #, php-format
 msgid "%d stored date or time cannot be read"
 msgid_plural "%d stored dates or times cannot be read"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/class-mcm-health.php:300
+#: includes/class-mcm-health.php:305
 msgid "These values were left unchanged. Until they are fixed, the entries may be hidden (for example an expired-looking tender) or sorted in the wrong place. Open each entry and enter the date again, e.g. 15/10/2026, or the time, e.g. 14:30."
 msgstr ""
 
-#: includes/class-mcm-health.php:312
+#: includes/class-mcm-health.php:317
 msgid "Pretty permalinks are on"
 msgstr ""
 
-#: includes/class-mcm-health.php:312
+#: includes/class-mcm-health.php:317
 msgid "Archive pages such as /events/ and /department/anatomy/ work."
 msgstr ""
 
-#: includes/class-mcm-health.php:317
+#: includes/class-mcm-health.php:322
 msgid "Permalinks are set to \"Plain\""
 msgstr ""
 
-#: includes/class-mcm-health.php:318
+#: includes/class-mcm-health.php:323
 msgid "Archive and department page addresses (e.g. /events/) need pretty permalinks. Choose \"Post name\" in Settings → Permalinks."
 msgstr ""
 
-#: includes/class-mcm-health.php:337
+#: includes/class-mcm-health.php:342
 msgid "Version"
 msgstr ""
 
-#: includes/class-mcm-health.php:341
+#: includes/class-mcm-health.php:346
 msgid "Active modules"
 msgstr ""
 
-#: includes/class-mcm-health.php:342
-#: includes/class-mcm-health.php:346
+#: includes/class-mcm-health.php:347
+#: includes/class-mcm-health.php:351
 msgid "None"
 msgstr ""
 
-#: includes/class-mcm-health.php:345
+#: includes/class-mcm-health.php:350
 msgid "Disabled modules"
 msgstr ""
 
-#: includes/class-mcm-health.php:349
+#: includes/class-mcm-health.php:354
 msgid "Errors logged (last 7 days)"
 msgstr ""
 
-#: includes/class-mcm-health.php:353
+#: includes/class-mcm-health.php:358
 msgid "Elementor version"
 msgstr ""
 
-#: includes/class-mcm-health.php:354
+#: includes/class-mcm-health.php:359
 msgid "Not active"
 msgstr ""
 
-#: includes/class-mcm-health.php:364
-#: includes/class-mcm-health.php:536
+#: includes/class-mcm-health.php:369
+#: includes/class-mcm-health.php:541
 msgid "You are not allowed to do that."
 msgstr ""
 
 #. translators: %s: comma-separated list of module names.
-#: includes/class-mcm-health.php:516
+#: includes/class-mcm-health.php:521
 #, php-format
 msgid "these parts could not start and have been switched off so the rest of the site keeps working: %s."
 msgstr ""
 
-#: includes/class-mcm-health.php:526
+#: includes/class-mcm-health.php:531
 msgid "a problem was caught and logged. Visitors were not shown an error."
 msgstr ""
 
-#: includes/class-mcm-health.php:527
+#: includes/class-mcm-health.php:532
 msgid "View details in Site Health"
 msgstr ""
 
-#: includes/class-mcm-health.php:528
+#: includes/class-mcm-health.php:533
 msgid "Dismiss"
 msgstr ""
 
@@ -1995,11 +2002,11 @@ msgid "Upload / Select"
 msgstr ""
 
 #: includes/class-mcm-meta.php:1018
-#: includes/class-mcm-settings.php:631
-#: includes/class-mcm-settings.php:670
-#: includes/class-mcm-settings.php:697
+#: includes/class-mcm-settings.php:637
+#: includes/class-mcm-settings.php:676
+#: includes/class-mcm-settings.php:703
 #: includes/class-mcm-site-chrome-settings.php:285
-#: includes/class-mcm-termmeta.php:256
+#: includes/class-mcm-termmeta.php:258
 msgid "Clear"
 msgstr ""
 
@@ -2132,14 +2139,18 @@ msgstr ""
 #. translators: 1: post ID, 2: number of fields removed.
 #: includes/class-mcm-privacy.php:293
 #, php-format
-msgid "Student record #%1$d: the name was replaced and %2$d personal field(s) removed. The academic record (program, batch, status, department, session, level) was kept; delete the record manually if a full removal is required."
-msgstr ""
+msgid "Student record #%1$d: the name was replaced and %2$d personal field removed. The academic record (program, batch, status, department, session, level) was kept; delete the record manually if a full removal is required."
+msgid_plural "Student record #%1$d: the name was replaced and %2$d personal fields removed. The academic record (program, batch, status, department, session, level) was kept; delete the record manually if a full removal is required."
+msgstr[0] ""
+msgstr[1] ""
 
 #. translators: 1: record type label, 2: record title, 3: number of fields removed.
-#: includes/class-mcm-privacy.php:300
+#: includes/class-mcm-privacy.php:305
 #, php-format
-msgid "%1$s \"%2$s\": %3$d personal field(s) removed. The public profile, its name and designation were kept; delete the profile manually if it should be removed."
-msgstr ""
+msgid "%1$s \"%2$s\": %3$d personal field removed. The public profile, its name and designation were kept; delete the profile manually if it should be removed."
+msgid_plural "%1$s \"%2$s\": %3$d personal fields removed. The public profile, its name and designation were kept; delete the profile manually if it should be removed."
+msgstr[0] ""
+msgstr[1] ""
 
 #: includes/class-mcm-query.php:806
 msgid "Upcoming (today and later)"
@@ -2228,8 +2239,8 @@ msgstr ""
 
 #: includes/class-mcm-query.php:1884
 #: includes/class-mcm-site-chrome-settings.php:380
-#: includes/class-mcm-site-chrome.php:964
-#: includes/class-mcm-site-chrome.php:967
+#: includes/class-mcm-site-chrome.php:965
+#: includes/class-mcm-site-chrome.php:968
 msgid "Search"
 msgstr ""
 
@@ -2661,7 +2672,9 @@ msgstr ""
 #: includes/class-mcm-relations.php:108
 #, php-format
 msgid "+%d more"
-msgstr ""
+msgid_plural "+%d more"
+msgstr[0] ""
+msgstr[1] ""
 
 #: includes/class-mcm-relations.php:117
 msgid "No related content yet. Assign shared Departments, Faculty, Sessions or Specialties to link this with other content."
@@ -2695,447 +2708,447 @@ msgstr ""
 msgid "College Manager"
 msgstr ""
 
-#: includes/class-mcm-settings.php:310
+#: includes/class-mcm-settings.php:316
 msgid "Medical College Manager — Design & Settings"
 msgstr ""
 
-#: includes/class-mcm-settings.php:311
+#: includes/class-mcm-settings.php:317
 msgid "Everything below is live and dynamic. Adjust colors, spacing and card style, or drop in your own CSS. All shortcodes update automatically."
 msgstr ""
 
-#: includes/class-mcm-settings.php:313
+#: includes/class-mcm-settings.php:319
 msgid "The Medical College Elementor widgets are not available because Elementor (free) is not active or is too old. Everything else — archive pages, department pages and shortcodes — works without it. Install or update Elementor to use the widgets."
 msgstr ""
 
-#: includes/class-mcm-settings.php:319
+#: includes/class-mcm-settings.php:325
 msgid "Colors"
 msgstr ""
 
-#: includes/class-mcm-settings.php:322
+#: includes/class-mcm-settings.php:328
 msgid "Primary Color"
 msgstr ""
 
-#: includes/class-mcm-settings.php:323
+#: includes/class-mcm-settings.php:329
 msgid "Accent Color"
 msgstr ""
 
-#: includes/class-mcm-settings.php:324
+#: includes/class-mcm-settings.php:330
 msgid "Text Color"
 msgstr ""
 
-#: includes/class-mcm-settings.php:325
+#: includes/class-mcm-settings.php:331
 msgid "Muted / Meta Text"
 msgstr ""
 
-#: includes/class-mcm-settings.php:326
+#: includes/class-mcm-settings.php:332
 msgid "Card Background"
 msgstr ""
 
-#: includes/class-mcm-settings.php:327
+#: includes/class-mcm-settings.php:333
 msgid "Section Background"
 msgstr ""
 
-#: includes/class-mcm-settings.php:328
+#: includes/class-mcm-settings.php:334
 msgid "Border Color"
 msgstr ""
 
-#: includes/class-mcm-settings.php:332
+#: includes/class-mcm-settings.php:338
 msgid "Layout & Cards"
 msgstr ""
 
-#: includes/class-mcm-settings.php:335
+#: includes/class-mcm-settings.php:341
 msgid "Default Grid Columns"
 msgstr ""
 
-#: includes/class-mcm-settings.php:336
+#: includes/class-mcm-settings.php:342
 msgid "Gap Between Cards (px)"
 msgstr ""
 
-#: includes/class-mcm-settings.php:337
+#: includes/class-mcm-settings.php:343
 msgid "Card Padding (px)"
 msgstr ""
 
-#: includes/class-mcm-settings.php:338
+#: includes/class-mcm-settings.php:344
 msgid "Border Radius (px)"
 msgstr ""
 
-#: includes/class-mcm-settings.php:339
+#: includes/class-mcm-settings.php:345
 msgid "Title Font Size (px)"
 msgstr ""
 
-#: includes/class-mcm-settings.php:340
+#: includes/class-mcm-settings.php:346
 msgid "Image Height (px)"
 msgstr ""
 
-#: includes/class-mcm-settings.php:341
+#: includes/class-mcm-settings.php:347
 msgid "Card Shadow"
 msgstr ""
 
-#: includes/class-mcm-settings.php:342
+#: includes/class-mcm-settings.php:348
 msgid "Hover Lift Effect"
 msgstr ""
 
-#: includes/class-mcm-settings.php:343
+#: includes/class-mcm-settings.php:349
 msgid "Filterable Archive Pages"
 msgstr ""
 
-#: includes/class-mcm-settings.php:347
+#: includes/class-mcm-settings.php:353
 msgid "Font Family"
 msgstr ""
 
-#: includes/class-mcm-settings.php:350
+#: includes/class-mcm-settings.php:356
 msgid "e.g. \"Poppins\", sans-serif — or leave as \"inherit\"."
 msgstr ""
 
-#: includes/class-mcm-settings.php:355
+#: includes/class-mcm-settings.php:361
 msgid "Default Photos"
 msgstr ""
 
-#: includes/class-mcm-settings.php:356
+#: includes/class-mcm-settings.php:362
 msgid "Shown for consultants and team members who have no photo of their own: the photo for their Gender first (set Gender on each profile), then the general default photo, then a plain silhouette."
 msgstr ""
 
-#: includes/class-mcm-settings.php:361
+#: includes/class-mcm-settings.php:367
 msgid "Printing & Letterhead"
 msgstr ""
 
-#: includes/class-mcm-settings.php:362
+#: includes/class-mcm-settings.php:368
 msgid "Printed sheets and \"Save as PDF\" both use this letterhead, so a timetable or student list handed out on paper carries the college identity. Filters, result count and date are added automatically from whatever the visitor had on screen."
 msgstr ""
 
-#: includes/class-mcm-settings.php:370
+#: includes/class-mcm-settings.php:376
 msgid "Page Banners"
 msgstr ""
 
-#: includes/class-mcm-settings.php:371
+#: includes/class-mcm-settings.php:377
 msgid "Add a title banner to the top of any listing page — a video (YouTube/Vimeo link or an uploaded MP4) or a static image. Leave both blank to show no banner. A video takes priority over an image."
 msgstr ""
 
-#: includes/class-mcm-settings.php:376
+#: includes/class-mcm-settings.php:382
 msgid "Notice board & jobs"
 msgstr ""
 
-#: includes/class-mcm-settings.php:379
-#: includes/class-mcm-settings.php:382
+#: includes/class-mcm-settings.php:385
+#: includes/class-mcm-settings.php:388
 msgid "Notice board sources"
 msgstr ""
 
-#: includes/class-mcm-settings.php:386
+#: includes/class-mcm-settings.php:392
 #: includes/elementor-widgets.php:2928
 msgid "Open jobs"
 msgstr ""
 
-#: includes/class-mcm-settings.php:387
+#: includes/class-mcm-settings.php:393
 #: includes/elementor-widgets.php:2929
 msgid "Open tenders"
 msgstr ""
 
-#: includes/class-mcm-settings.php:398
+#: includes/class-mcm-settings.php:404
 msgid "Notices always appear on the notice ticker, board and list. Tick a source to add its open items too (each item can still opt out with its own \"Show on notice board\" field). A shortcode can choose its own sources with include=\"notice,job,tender\"."
 msgstr ""
 
-#: includes/class-mcm-settings.php:403
+#: includes/class-mcm-settings.php:409
 msgid "Jobs: \"Closing soon\" days"
 msgstr ""
 
-#: includes/class-mcm-settings.php:406
+#: includes/class-mcm-settings.php:412
 msgid "A job shows the \"Closing soon\" badge this many days before its last date."
 msgstr ""
 
-#: includes/class-mcm-settings.php:411
+#: includes/class-mcm-settings.php:417
 msgid "Privacy"
 msgstr ""
 
-#: includes/class-mcm-settings.php:414
+#: includes/class-mcm-settings.php:420
 msgid "Public student directory"
 msgstr ""
 
-#: includes/class-mcm-settings.php:418
+#: includes/class-mcm-settings.php:424
 msgid "Make student lists public (opt-in, off by default)"
 msgstr ""
 
-#: includes/class-mcm-settings.php:421
+#: includes/class-mcm-settings.php:427
 msgid "Off by default. Turn on only if the college intends to publish its student roll. When on, any visitor can see and search every student list placed on the site ([mcm_students] or a student table): each student's Name, Student ID, PMDC No., Level, Program, Department, Batch and Status become public and searchable by Student ID or PMDC No. Email, phone, date of birth, address, blood group, gender and guardian details are never shown on the website either way."
 msgstr ""
 
-#: includes/class-mcm-settings.php:424
+#: includes/class-mcm-settings.php:430
 msgid "When off, the list (and its live search) is shown only to logged-in staff who can manage student records — administrators by default. Everyone else sees nothing where the list would be."
 msgstr ""
 
-#: includes/class-mcm-settings.php:430
+#: includes/class-mcm-settings.php:436
 msgid "Custom CSS"
 msgstr ""
 
-#: includes/class-mcm-settings.php:431
+#: includes/class-mcm-settings.php:437
 msgid "Advanced: write any CSS here. It is printed after the generated styles, so it always wins. Use the .mcm- classes (see the readme / shortcode reference)."
 msgstr ""
 
-#: includes/class-mcm-settings.php:434
+#: includes/class-mcm-settings.php:440
 msgid "Save Settings"
 msgstr ""
 
-#: includes/class-mcm-settings.php:451
+#: includes/class-mcm-settings.php:457
 msgid "Content lists — drop on any page or Elementor Shortcode block"
 msgstr ""
 
-#: includes/class-mcm-settings.php:452
+#: includes/class-mcm-settings.php:458
 msgid "Doctors & consultants directory — photo cards with a left-side search & filter sidebar."
 msgstr ""
 
-#: includes/class-mcm-settings.php:453
+#: includes/class-mcm-settings.php:459
 msgid "Staff / team member directory, in the same layout as consultants. staff_type=\"support-staff\" (or \"teaching-technical-staff\") lists one staff type."
 msgstr ""
 
-#: includes/class-mcm-settings.php:454
+#: includes/class-mcm-settings.php:460
 msgid "Degree programmes (MBBS, BDS, Nursing…) as cards."
 msgstr ""
 
-#: includes/class-mcm-settings.php:455
+#: includes/class-mcm-settings.php:461
 msgid "Course listing — code, credit hours, semester, lead."
 msgstr ""
 
-#: includes/class-mcm-settings.php:456
+#: includes/class-mcm-settings.php:462
 msgid "Class timetable as a clean, printable table."
 msgstr ""
 
-#: includes/class-mcm-settings.php:457
+#: includes/class-mcm-settings.php:463
 msgid "Open admissions with dates, eligibility and an Apply button."
 msgstr ""
 
-#: includes/class-mcm-settings.php:458
+#: includes/class-mcm-settings.php:464
 msgid "Upcoming events, soonest first."
 msgstr ""
 
-#: includes/class-mcm-settings.php:459
+#: includes/class-mcm-settings.php:465
 msgid "Research papers as a numbered Vancouver citation list, with DOI/PubMed links."
 msgstr ""
 
-#: includes/class-mcm-settings.php:460
+#: includes/class-mcm-settings.php:466
 msgid "Research projects — supervisor, status, and a downloadable paper."
 msgstr ""
 
-#: includes/class-mcm-settings.php:461
+#: includes/class-mcm-settings.php:467
 msgid "Scholarships with amount, eligibility and an Apply button."
 msgstr ""
 
-#: includes/class-mcm-settings.php:462
+#: includes/class-mcm-settings.php:468
 msgid "Active tenders with download & submit links (auto-hide after the deadline)."
 msgstr ""
 
-#: includes/class-mcm-settings.php:463
+#: includes/class-mcm-settings.php:469
 msgid "Institutional policies, each with a downloadable document."
 msgstr ""
 
-#: includes/class-mcm-settings.php:464
+#: includes/class-mcm-settings.php:470
 msgid "Jobs / vacancies (alias [mcm_vacancies]): open jobs by default; status=\"closed\" or status=\"all\" for past ones. Filter with category=\"…\" and department=\"…\"."
 msgstr ""
 
-#: includes/class-mcm-settings.php:465
+#: includes/class-mcm-settings.php:471
 msgid "Student list — safe fields only (name, PMDC No., department, batch). Put this on the Student Affairs page."
 msgstr ""
 
-#: includes/class-mcm-settings.php:467
+#: includes/class-mcm-settings.php:473
 msgid "Department page — auto-detect the current department, or add department=\"anatomy\""
 msgstr ""
 
-#: includes/class-mcm-settings.php:468
+#: includes/class-mcm-settings.php:474
 msgid "The department’s video or image banner (hero) at the top of the page."
 msgstr ""
 
-#: includes/class-mcm-settings.php:469
+#: includes/class-mcm-settings.php:475
 msgid "The Head of Department’s message card (photo, name, message, contact)."
 msgstr ""
 
-#: includes/class-mcm-settings.php:470
+#: includes/class-mcm-settings.php:476
 msgid "Hero banner + HOD message together."
 msgstr ""
 
-#: includes/class-mcm-settings.php:471
+#: includes/class-mcm-settings.php:477
 msgid "Every section the department actually has — courses, faculty, timetable, publications… built automatically."
 msgstr ""
 
-#: includes/class-mcm-settings.php:473
+#: includes/class-mcm-settings.php:479
 msgid "Notice board & homepage pieces"
 msgstr ""
 
-#: includes/class-mcm-settings.php:474
+#: includes/class-mcm-settings.php:480
 msgid "Scrolling headline strip — great just under the header."
 msgstr ""
 
-#: includes/class-mcm-settings.php:475
+#: includes/class-mcm-settings.php:481
 msgid "Vertical auto-scrolling notices panel for a sidebar or homepage column."
 msgstr ""
 
-#: includes/class-mcm-settings.php:476
+#: includes/class-mcm-settings.php:482
 msgid "Static, filterable notices list."
 msgstr ""
 
-#: includes/class-mcm-settings.php:477
+#: includes/class-mcm-settings.php:483
 msgid "Choose what a ticker/board/list shows: notices, open jobs and/or open tenders (default: notices plus the sources ticked in Settings)."
 msgstr ""
 
-#: includes/class-mcm-settings.php:478
+#: includes/class-mcm-settings.php:484
 msgid "Floating social-media icon bar (also settable site-wide from Settings)."
 msgstr ""
 
-#: includes/class-mcm-settings.php:479
+#: includes/class-mcm-settings.php:485
 msgid "Latest blog posts in a date-badge card layout."
 msgstr ""
 
-#: includes/class-mcm-settings.php:481
+#: includes/class-mcm-settings.php:487
 msgid "Generic & advanced"
 msgstr ""
 
-#: includes/class-mcm-settings.php:482
+#: includes/class-mcm-settings.php:488
 msgid "Any content type as a grid of cards."
 msgstr ""
 
-#: includes/class-mcm-settings.php:483
+#: includes/class-mcm-settings.php:489
 msgid "Any content type as a stacked list."
 msgstr ""
 
-#: includes/class-mcm-settings.php:484
+#: includes/class-mcm-settings.php:490
 msgid "Any content type as a table."
 msgstr ""
 
-#: includes/class-mcm-settings.php:485
+#: includes/class-mcm-settings.php:491
 msgid "A single entry by its ID."
 msgstr ""
 
-#: includes/class-mcm-settings.php:493
+#: includes/class-mcm-settings.php:499
 msgid "Shortcodes — copy & paste anywhere"
 msgstr ""
 
-#: includes/class-mcm-settings.php:495
+#: includes/class-mcm-settings.php:501
 msgid "Click a shortcode to copy it, then paste it into any page, post, or an Elementor “Shortcode” widget. Every list accepts optional attributes:"
 msgstr ""
 
-#: includes/class-mcm-settings.php:497
+#: includes/class-mcm-settings.php:503
 msgid "and filter by a connector using its term slug —"
 msgstr ""
 
-#: includes/class-mcm-settings.php:508
+#: includes/class-mcm-settings.php:514
 msgid "Copy to clipboard"
 msgstr ""
 
-#: includes/class-mcm-settings.php:521
+#: includes/class-mcm-settings.php:527
 msgid "Tip: taxonomy attribute values use the term “slug” (lowercase, hyphenated) — e.g. fall-2025, dr-sara-khan. On the front end, visitors filter with the dropdowns and search box automatically; slugs are only needed when you pre-filter inside a shortcode."
 msgstr ""
 
-#: includes/class-mcm-settings.php:575
-#: includes/class-mcm-settings.php:578
+#: includes/class-mcm-settings.php:581
+#: includes/class-mcm-settings.php:584
 msgid "Printable Content Types"
 msgstr ""
 
-#: includes/class-mcm-settings.php:593
+#: includes/class-mcm-settings.php:599
 msgid "Adds a Print button to those listings. The printout keeps whatever filters and search the visitor applied, and prints only the list — not the surrounding page."
 msgstr ""
 
-#: includes/class-mcm-settings.php:609
+#: includes/class-mcm-settings.php:615
 msgid "Default Photo — Male"
 msgstr ""
 
-#: includes/class-mcm-settings.php:610
+#: includes/class-mcm-settings.php:616
 msgid "Shown for consultants and team members whose Gender is Male and who have no photo."
 msgstr ""
 
-#: includes/class-mcm-settings.php:613
+#: includes/class-mcm-settings.php:619
 msgid "Default Photo — Female"
 msgstr ""
 
-#: includes/class-mcm-settings.php:614
+#: includes/class-mcm-settings.php:620
 msgid "Shown for consultants and team members whose Gender is Female and who have no photo."
 msgstr ""
 
-#: includes/class-mcm-settings.php:617
+#: includes/class-mcm-settings.php:623
 msgid "Default Profile Image"
 msgstr ""
 
-#: includes/class-mcm-settings.php:618
+#: includes/class-mcm-settings.php:624
 msgid "Shown for anyone without a photo whose Gender is not set (or whose male/female photo above is empty). Upload a branded placeholder carrying the college logo; leave blank for a plain silhouette. Square images of at least 400 × 400 px work best."
 msgstr ""
 
-#: includes/class-mcm-settings.php:630
-#: includes/class-mcm-settings.php:669
-#: includes/class-mcm-settings.php:696
+#: includes/class-mcm-settings.php:636
+#: includes/class-mcm-settings.php:675
+#: includes/class-mcm-settings.php:702
 #: includes/class-mcm-site-chrome-settings.php:285
-#: includes/class-mcm-termmeta.php:255
+#: includes/class-mcm-termmeta.php:257
 msgid "Select Image"
 msgstr ""
 
-#: includes/class-mcm-settings.php:665
+#: includes/class-mcm-settings.php:671
 msgid "Video URL (optional)"
 msgstr ""
 
-#: includes/class-mcm-settings.php:668
+#: includes/class-mcm-settings.php:674
 msgid "Or an image URL"
 msgstr ""
 
-#: includes/class-mcm-settings.php:691
+#: includes/class-mcm-settings.php:697
 msgid "Letterhead Logo"
 msgstr ""
 
-#: includes/class-mcm-settings.php:698
+#: includes/class-mcm-settings.php:704
 msgid "Shown top-left of every printed sheet. Leave blank to fall back to your theme logo, then the site icon. A wide transparent PNG works best."
 msgstr ""
 
-#: includes/class-mcm-settings.php:707
+#: includes/class-mcm-settings.php:713
 msgid "Institution Name"
 msgstr ""
 
-#: includes/class-mcm-settings.php:713
+#: includes/class-mcm-settings.php:719
 msgid "Leave blank to use the site title."
 msgstr ""
 
-#: includes/class-mcm-settings.php:717
+#: includes/class-mcm-settings.php:723
 msgid "Address / Contact Line"
 msgstr ""
 
-#: includes/class-mcm-settings.php:722
+#: includes/class-mcm-settings.php:728
 msgid "e.g. Dera Ismail Khan, KP, Pakistan · +92 966 000000 · info@example.edu.pk"
 msgstr ""
 
-#: includes/class-mcm-settings.php:723
+#: includes/class-mcm-settings.php:729
 msgid "Printed under the institution name."
 msgstr ""
 
-#: includes/class-mcm-settings.php:727
+#: includes/class-mcm-settings.php:733
 msgid "Footer Note"
 msgstr ""
 
-#: includes/class-mcm-settings.php:732
+#: includes/class-mcm-settings.php:738
 msgid "e.g. This is a computer-generated document."
 msgstr ""
 
-#: includes/class-mcm-settings.php:733
+#: includes/class-mcm-settings.php:739
 msgid "Printed bottom-left. The generation date is added bottom-right automatically."
 msgstr ""
 
-#: includes/class-mcm-settings.php:737
+#: includes/class-mcm-settings.php:743
 msgid "Signature Block"
 msgstr ""
 
-#: includes/class-mcm-settings.php:748
+#: includes/class-mcm-settings.php:754
 msgid "Auto — show it only if the theme does not (recommended)"
 msgstr ""
 
-#: includes/class-mcm-settings.php:749
+#: includes/class-mcm-settings.php:755
 msgid "Always show it"
 msgstr ""
 
-#: includes/class-mcm-settings.php:750
+#: includes/class-mcm-settings.php:756
 msgid "Never — leave it entirely to the theme"
 msgstr ""
 
-#: includes/class-mcm-settings.php:754
+#: includes/class-mcm-settings.php:760
 msgid "Featured Image on Single Pages"
 msgstr ""
 
-#: includes/class-mcm-settings.php:762
+#: includes/class-mcm-settings.php:768
 msgid "Many themes only show a featured image for blog posts, so an image set on a Consultant or Event can end up invisible. Auto fills that gap without ever showing the picture twice. Choose \"Always\" if your theme shows it below the content instead of above."
 msgstr ""
 
-#: includes/class-mcm-settings.php:783
+#: includes/class-mcm-settings.php:789
 msgid "Enable"
 msgstr ""
 
@@ -3174,7 +3187,7 @@ msgstr ""
 
 #: includes/class-mcm-site-chrome-settings.php:65
 #: includes/class-mcm-site-chrome-settings.php:349
-#: includes/class-mcm-site-chrome.php:912
+#: includes/class-mcm-site-chrome.php:913
 msgid "Top bar"
 msgstr ""
 
@@ -3523,7 +3536,7 @@ msgid "Mobile menu opens from"
 msgstr ""
 
 #: includes/class-mcm-site-chrome-settings.php:442
-#: includes/class-mcm-social.php:280
+#: includes/class-mcm-social.php:282
 #: includes/elementor-widgets.php:201
 #: includes/elementor-widgets.php:1681
 #: includes/elementor-widgets.php:3574
@@ -3532,7 +3545,7 @@ msgid "Right"
 msgstr ""
 
 #: includes/class-mcm-site-chrome-settings.php:443
-#: includes/class-mcm-social.php:281
+#: includes/class-mcm-social.php:283
 #: includes/elementor-widgets.php:193
 #: includes/elementor-widgets.php:1673
 #: includes/elementor-widgets.php:3566
@@ -3541,7 +3554,7 @@ msgid "Left"
 msgstr ""
 
 #: includes/class-mcm-site-chrome-settings.php:446
-#: includes/class-mcm-site-chrome.php:1106
+#: includes/class-mcm-site-chrome.php:1107
 msgid "Back to top"
 msgstr ""
 
@@ -3731,7 +3744,7 @@ msgid "Location"
 msgstr ""
 
 #: includes/class-mcm-site-chrome-settings.php:538
-#: includes/class-mcm-site-chrome.php:1004
+#: includes/class-mcm-site-chrome.php:1005
 msgid "Menu"
 msgstr ""
 
@@ -3804,7 +3817,7 @@ msgid "Show submenu for %s"
 msgstr ""
 
 #: includes/class-mcm-site-chrome.php:140
-#: includes/class-mcm-site-chrome.php:1009
+#: includes/class-mcm-site-chrome.php:1010
 msgid "Quick Links"
 msgstr ""
 
@@ -3817,131 +3830,131 @@ msgstr ""
 msgid "© {year} {site} — All Rights Reserved."
 msgstr ""
 
-#: includes/class-mcm-site-chrome.php:287
+#: includes/class-mcm-site-chrome.php:288
 msgid "College header: main menu"
 msgstr ""
 
-#: includes/class-mcm-site-chrome.php:288
+#: includes/class-mcm-site-chrome.php:289
 msgid "College header: top bar menu"
 msgstr ""
 
-#: includes/class-mcm-site-chrome.php:289
+#: includes/class-mcm-site-chrome.php:290
 msgid "College footer: column 2 links"
 msgstr ""
 
-#: includes/class-mcm-site-chrome.php:290
+#: includes/class-mcm-site-chrome.php:291
 msgid "College footer: column 3 links"
 msgstr ""
 
-#: includes/class-mcm-site-chrome.php:291
+#: includes/class-mcm-site-chrome.php:292
 msgid "College footer: bottom bar links"
 msgstr ""
 
-#: includes/class-mcm-site-chrome.php:877
+#: includes/class-mcm-site-chrome.php:878
 msgid "Skip to content"
 msgstr ""
 
 #. translators: %s: email address.
-#: includes/class-mcm-site-chrome.php:896
+#: includes/class-mcm-site-chrome.php:897
 #, php-format
 msgid "Email %s"
 msgstr ""
 
 #. translators: %s: phone number.
-#: includes/class-mcm-site-chrome.php:901
+#: includes/class-mcm-site-chrome.php:902
 #, php-format
 msgid "Call %s"
 msgstr ""
 
 #. translators: %s: college name.
-#: includes/class-mcm-site-chrome.php:918
+#: includes/class-mcm-site-chrome.php:919
 #, php-format
 msgid "%s — home"
 msgstr ""
 
-#: includes/class-mcm-site-chrome.php:932
+#: includes/class-mcm-site-chrome.php:933
 msgid "Main"
 msgstr ""
 
-#: includes/class-mcm-site-chrome.php:934
+#: includes/class-mcm-site-chrome.php:935
 msgid "Open menu"
 msgstr ""
 
-#: includes/class-mcm-site-chrome.php:965
+#: includes/class-mcm-site-chrome.php:966
 msgid "Search for:"
 msgstr ""
 
-#: includes/class-mcm-site-chrome.php:966
+#: includes/class-mcm-site-chrome.php:967
 msgid "Search…"
 msgstr ""
 
-#: includes/class-mcm-site-chrome.php:1006
+#: includes/class-mcm-site-chrome.php:1007
 msgid "Close menu"
 msgstr ""
 
-#: includes/class-mcm-site-chrome.php:1007
+#: includes/class-mcm-site-chrome.php:1008
 msgid "Main (mobile)"
 msgstr ""
 
-#: includes/class-mcm-site-chrome.php:1009
+#: includes/class-mcm-site-chrome.php:1010
 msgid "Top bar (mobile)"
 msgstr ""
 
-#: includes/class-mcm-site-chrome.php:1059
+#: includes/class-mcm-site-chrome.php:1060
 msgid "Footer links"
 msgstr ""
 
-#: includes/class-mcm-site-chrome.php:1093
+#: includes/class-mcm-site-chrome.php:1094
 msgid "Legal"
 msgstr ""
 
-#: includes/class-mcm-site-chrome.php:1180
+#: includes/class-mcm-site-chrome.php:1181
 msgid "Medical College Manager: header & footer"
 msgstr ""
 
-#: includes/class-mcm-site-chrome.php:1198
+#: includes/class-mcm-site-chrome.php:1199
 msgid "The active theme is a block theme; it builds its own header and footer in the Site Editor, so the college header and footer are not shown. Use a classic theme such as Hello Elementor."
 msgstr ""
 
-#: includes/class-mcm-site-chrome.php:1200
+#: includes/class-mcm-site-chrome.php:1201
 msgid "The active theme is not Hello Elementor, so its own header and footer may still show next to the college ones. Switch them off in the theme, or let the plugin hide them with the mcm_site_chrome_suppress_theme filter."
 msgstr ""
 
-#: includes/class-mcm-site-chrome.php:1203
+#: includes/class-mcm-site-chrome.php:1204
 msgid "The active theme does not call wp_body_open(), so the header cannot be printed. Update the theme or use Hello Elementor."
 msgstr ""
 
-#: includes/class-mcm-site-chrome.php:1207
+#: includes/class-mcm-site-chrome.php:1208
 msgid "header"
 msgstr ""
 
-#: includes/class-mcm-site-chrome.php:1208
+#: includes/class-mcm-site-chrome.php:1209
 msgid "footer"
 msgstr ""
 
 #. translators: %s: "header" or "footer".
-#: includes/class-mcm-site-chrome.php:1212
+#: includes/class-mcm-site-chrome.php:1213
 #, php-format
 msgid "The Elementor template chosen for the %s is missing, unpublished or not built with Elementor; the built-in design is shown instead."
 msgstr ""
 
-#: includes/class-mcm-site-chrome.php:1217
+#: includes/class-mcm-site-chrome.php:1218
 msgid "No menu is assigned to \"College header: main menu\" (Appearance → Menus → Manage Locations)."
 msgstr ""
 
-#: includes/class-mcm-site-chrome.php:1230
+#: includes/class-mcm-site-chrome.php:1231
 msgid "The college header and footer are off, or set up correctly."
 msgstr ""
 
-#: includes/class-mcm-site-chrome.php:1232
+#: includes/class-mcm-site-chrome.php:1233
 msgid "The college header & footer need attention"
 msgstr ""
 
-#: includes/class-mcm-site-chrome.php:1232
+#: includes/class-mcm-site-chrome.php:1233
 msgid "The college header & footer are fine"
 msgstr ""
 
-#: includes/class-mcm-site-chrome.php:1239
+#: includes/class-mcm-site-chrome.php:1240
 msgid "Header & Footer settings"
 msgstr ""
 
@@ -3974,72 +3987,72 @@ msgstr ""
 msgid "Social Bar"
 msgstr ""
 
-#: includes/class-mcm-social.php:209
+#: includes/class-mcm-social.php:211
 msgid "Social media links"
 msgstr ""
 
-#: includes/class-mcm-social.php:240
+#: includes/class-mcm-social.php:242
 msgid "Medical College Manager — Social Bar"
 msgstr ""
 
-#: includes/class-mcm-social.php:241
+#: includes/class-mcm-social.php:243
 msgid "Add your social links below. Leave a field empty to hide that icon. Then either turn on \"Show on whole website\", or place the shortcode on any page."
 msgstr ""
 
-#: includes/class-mcm-social.php:246
+#: includes/class-mcm-social.php:248
 msgid "Links"
 msgstr ""
 
-#: includes/class-mcm-social.php:258
+#: includes/class-mcm-social.php:260
 msgid "e.g. 923001234567 (country code, digits only)"
 msgstr ""
 
-#: includes/class-mcm-social.php:258
+#: includes/class-mcm-social.php:260
 msgid "https://…"
 msgstr ""
 
-#: includes/class-mcm-social.php:265
+#: includes/class-mcm-social.php:267
 #: includes/elementor-widgets.php:1142
 msgid "Display"
 msgstr ""
 
-#: includes/class-mcm-social.php:268
+#: includes/class-mcm-social.php:270
 msgid "Show on whole website"
 msgstr ""
 
-#: includes/class-mcm-social.php:272
+#: includes/class-mcm-social.php:274
 msgid "Float the bar on every page (no shortcode needed)"
 msgstr ""
 
-#: includes/class-mcm-social.php:277
+#: includes/class-mcm-social.php:279
 msgid "Side"
 msgstr ""
 
-#: includes/class-mcm-social.php:286
+#: includes/class-mcm-social.php:288
 msgid "On mobile"
 msgstr ""
 
-#: includes/class-mcm-social.php:289
+#: includes/class-mcm-social.php:291
 msgid "Show as a bottom bar"
 msgstr ""
 
-#: includes/class-mcm-social.php:290
+#: includes/class-mcm-social.php:292
 msgid "Hide on small screens"
 msgstr ""
 
-#: includes/class-mcm-social.php:296
+#: includes/class-mcm-social.php:298
 msgid "Save Social Bar"
 msgstr ""
 
-#: includes/class-mcm-social.php:300
+#: includes/class-mcm-social.php:302
 msgid "Shortcode"
 msgstr ""
 
-#: includes/class-mcm-social.php:301
+#: includes/class-mcm-social.php:303
 msgid "Prefer to place it manually (e.g. in a specific page or an Elementor Shortcode widget)? Use:"
 msgstr ""
 
-#: includes/class-mcm-social.php:303
+#: includes/class-mcm-social.php:305
 msgid "The bar is fixed/floating, so it appears over the page wherever the shortcode is placed. If \"Show on whole website\" is on, the shortcode is not needed (and duplicates are prevented automatically)."
 msgstr ""
 
@@ -4060,7 +4073,7 @@ msgid "Static banner shown at the top when no hero video is set. A wide (16:9) i
 msgstr ""
 
 #: includes/class-mcm-termmeta.php:75
-#: includes/class-mcm-termmeta.php:417
+#: includes/class-mcm-termmeta.php:421
 msgid "Head of Department"
 msgstr ""
 
@@ -4104,25 +4117,19 @@ msgstr ""
 msgid "Tick any sections you do NOT want on this department page (e.g. hide the timetable). Unticked sections appear automatically whenever they have content."
 msgstr ""
 
-#: includes/class-mcm-termmeta.php:267
+#: includes/class-mcm-termmeta.php:269
 msgid "No sections available."
 msgstr ""
 
-#. translators: 1: number of dates/times converted, 2: number checked.
-#: includes/class-mcm-upgrade.php:232
-#, php-format
-msgid "converted %1$d of %2$d stored dates and times to the standard format."
-msgstr ""
-
 #. translators: %d: number of values that could not be read.
-#: includes/class-mcm-upgrade.php:241
+#: includes/class-mcm-upgrade.php:246
 #, php-format
 msgid "%d value could not be read and was left unchanged."
 msgid_plural "%d values could not be read and were left unchanged."
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/class-mcm-upgrade.php:244
+#: includes/class-mcm-upgrade.php:249
 msgid "Fix them from Site Health"
 msgstr ""
 
