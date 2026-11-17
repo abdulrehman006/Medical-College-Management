@@ -586,14 +586,14 @@ class MCM_Notice {
 		MCM_Assets::need();
 		$ids = self::feed_for( $a );
 		if ( empty( $ids ) ) {
-			return '';
+			return self::editor_note();
 		}
 		$label = '' !== $a['label'] ? $a['label'] : __( 'Latest', 'medical-college-manager' );
 		$dur   = self::duration( $a, count( $ids ) );
 
 		$items = '';
 		foreach ( $ids as $id ) {
-			$items .= '<a class="mcm-ticker-item" href="' . esc_url( self::notice_link( $id ) ) . '"' . self::link_attrs( $id ) . '>'
+			$items .= '<a class="mcm-ticker-item' . self::priority_class( $id ) . '" href="' . esc_url( self::notice_link( $id ) ) . '"' . self::link_attrs( $id ) . '>'
 				. ( 'yes' === $a['show_badge'] ? self::badge( $id ) : '' )
 				. '<span class="mcm-ticker-text">' . esc_html( get_the_title( $id ) ) . '</span>'
 				. self::new_tag( $id )
@@ -603,7 +603,7 @@ class MCM_Notice {
 
 		ob_start();
 		echo '<div class="mcm-ticker" role="region" aria-label="' . esc_attr( $label ) . '">';
-		echo '<span class="mcm-ticker-label">&#128226; ' . esc_html( $label ) . '</span>';
+		echo '<span class="mcm-ticker-label"><span aria-hidden="true">&#128226;</span> ' . esc_html( $label ) . '</span>';
 		echo '<div class="mcm-ticker-viewport"><div class="mcm-ticker-track" style="animation-duration:' . (int) $dur . 's">';
 		echo '<span class="mcm-ticker-group">' . $items . '</span>'; // phpcs:ignore
 		// The looping copy is hidden from screen readers, so it must not take keyboard focus either.
@@ -639,7 +639,7 @@ class MCM_Notice {
 		MCM_Assets::need();
 		$ids = self::feed_for( $a );
 		if ( empty( $ids ) ) {
-			return '';
+			return self::editor_note();
 		}
 		$title = '' !== $a['title'] ? $a['title'] : __( 'Notice Board', 'medical-college-manager' );
 		$dur   = self::duration( $a, count( $ids ) );
@@ -661,7 +661,7 @@ class MCM_Notice {
 
 		ob_start();
 		echo '<div class="mcm-board">';
-		echo '<div class="mcm-board-head"><span class="mcm-board-title">&#128204; ' . esc_html( $title ) . '</span>';
+		echo '<div class="mcm-board-head"><span class="mcm-board-title"><span aria-hidden="true">&#128204;</span> ' . esc_html( $title ) . '</span>';
 		echo '<button type="button" class="mcm-scroll-pause" aria-label="' . esc_attr__( 'Pause', 'medical-college-manager' ) . '" aria-pressed="false">&#10073;&#10073;</button></div>';
 		echo '<div class="mcm-board-viewport" style="--mcm-board-h:' . absint( $a['height'] ) . 'px;">';
 		echo '<div class="mcm-board-track" style="animation-duration:' . (int) $dur . 's">';
@@ -673,6 +673,17 @@ class MCM_Notice {
 		}
 		echo '</div>';
 		return ob_get_clean();
+	}
+
+	/**
+	 * An empty ticker or board prints nothing for visitors. Logged-in editors
+	 * get the plugin's usual note instead, so the blank spot (and the widget
+	 * in the Elementor editor) can still be found and fixed.
+	 *
+	 * @return string
+	 */
+	private static function editor_note() {
+		return class_exists( 'MCM_Shortcodes' ) ? MCM_Shortcodes::empty_notice( 'mcm_notice' ) : '';
 	}
 
 	/**

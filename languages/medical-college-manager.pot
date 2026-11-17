@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-11-10T09:06:06+00:00\n"
+"POT-Creation-Date: 2026-11-17T11:45:46+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: medical-college-manager\n"
@@ -81,7 +81,7 @@ msgid "Show fewer"
 msgstr ""
 
 #: includes/class-mcm-assets.php:53
-#: includes/class-mcm-shortcodes.php:267
+#: includes/class-mcm-shortcodes.php:269
 msgid "Filters"
 msgstr ""
 
@@ -124,8 +124,8 @@ msgstr ""
 
 #: includes/class-mcm-cpt.php:39
 #: includes/class-mcm-cpt.php:40
-#: includes/elementor-widgets.php:3496
-#: includes/elementor-widgets.php:3759
+#: includes/elementor-widgets.php:3535
+#: includes/elementor-widgets.php:3798
 msgid "Photo"
 msgstr ""
 
@@ -254,10 +254,10 @@ msgstr ""
 
 #: includes/class-mcm-cpt.php:213
 #: includes/class-mcm-import.php:391
-#: includes/elementor-widgets.php:2927
-#: includes/elementor-widgets.php:3012
-#: includes/elementor-widgets.php:3042
+#: includes/elementor-widgets.php:2930
+#: includes/elementor-widgets.php:3025
 #: includes/elementor-widgets.php:3055
+#: includes/elementor-widgets.php:3068
 msgid "Notices"
 msgstr ""
 
@@ -364,7 +364,7 @@ msgstr ""
 #: includes/class-mcm-query.php:3566
 #: includes/class-mcm-query.php:3588
 #: includes/elementor-widgets.php:1186
-#: includes/elementor-widgets.php:2936
+#: includes/elementor-widgets.php:2939
 msgid "Department"
 msgstr ""
 
@@ -1386,7 +1386,7 @@ msgstr ""
 #: includes/class-mcm-query.php:3377
 #: includes/class-mcm-query.php:3569
 #: includes/elementor-widgets.php:2451
-#: includes/elementor-widgets.php:3069
+#: includes/elementor-widgets.php:3083
 msgid "Date"
 msgstr ""
 
@@ -1423,8 +1423,8 @@ msgstr ""
 #: includes/class-mcm-query.php:2741
 #: includes/class-mcm-query.php:3314
 #: includes/elementor-widgets.php:1184
-#: includes/elementor-widgets.php:3526
-#: includes/elementor-widgets.php:3826
+#: includes/elementor-widgets.php:3565
+#: includes/elementor-widgets.php:3865
 msgid "Designation"
 msgstr ""
 
@@ -1476,8 +1476,8 @@ msgstr ""
 #: includes/class-mcm-privacy.php:81
 #: includes/class-mcm-site-chrome-settings.php:351
 #: includes/class-mcm-site-chrome-settings.php:493
-#: includes/elementor-widgets.php:4023
-#: includes/elementor-widgets.php:4102
+#: includes/elementor-widgets.php:4062
+#: includes/elementor-widgets.php:4141
 msgid "Phone"
 msgstr ""
 
@@ -1490,7 +1490,7 @@ msgstr ""
 #: includes/class-mcm-query.php:3334
 #: includes/class-mcm-site-chrome-settings.php:350
 #: includes/class-mcm-site-chrome-settings.php:494
-#: includes/elementor-widgets.php:4111
+#: includes/elementor-widgets.php:4150
 msgid "Email"
 msgstr ""
 
@@ -1904,7 +1904,7 @@ msgstr ""
 #: includes/class-mcm-query.php:2774
 #: includes/class-mcm-query.php:3041
 #: includes/class-mcm-query.php:3567
-#: includes/elementor-widgets.php:2906
+#: includes/elementor-widgets.php:2909
 msgid "Priority"
 msgstr ""
 
@@ -1965,7 +1965,7 @@ msgstr ""
 #: includes/class-mcm-meta.php:920
 #: includes/class-mcm-privacy.php:58
 #: includes/class-mcm-site-chrome-settings.php:492
-#: includes/elementor-widgets.php:4120
+#: includes/elementor-widgets.php:4159
 msgid "Address"
 msgstr ""
 
@@ -2070,7 +2070,7 @@ msgid "No notices at the moment."
 msgstr ""
 
 #: includes/class-mcm-notice.php:591
-#: includes/elementor-widgets.php:3188
+#: includes/elementor-widgets.php:3225
 msgid "Latest"
 msgstr ""
 
@@ -2080,9 +2080,9 @@ msgid "Pause"
 msgstr ""
 
 #: includes/class-mcm-notice.php:644
-#: includes/elementor-widgets.php:3240
-#: includes/elementor-widgets.php:3258
-#: includes/elementor-widgets.php:3264
+#: includes/elementor-widgets.php:3277
+#: includes/elementor-widgets.php:3295
+#: includes/elementor-widgets.php:3302
 msgid "Notice Board"
 msgstr ""
 
@@ -2118,8 +2118,8 @@ msgstr ""
 #: includes/class-mcm-query.php:2733
 #: includes/class-mcm-query.php:2740
 #: includes/class-mcm-query.php:2825
-#: includes/elementor-widgets.php:3515
-#: includes/elementor-widgets.php:3822
+#: includes/elementor-widgets.php:3554
+#: includes/elementor-widgets.php:3861
 msgid "Name"
 msgstr ""
 
@@ -2374,8 +2374,8 @@ msgstr ""
 #: includes/elementor-widgets.php:1638
 #: includes/elementor-widgets.php:2453
 #: includes/elementor-widgets.php:2698
-#: includes/elementor-widgets.php:3969
-#: includes/elementor-widgets.php:4213
+#: includes/elementor-widgets.php:4008
+#: includes/elementor-widgets.php:4252
 msgid "Title"
 msgstr ""
 
@@ -2821,12 +2821,12 @@ msgid "Notice board sources"
 msgstr ""
 
 #: includes/class-mcm-settings.php:386
-#: includes/elementor-widgets.php:2928
+#: includes/elementor-widgets.php:2931
 msgid "Open jobs"
 msgstr ""
 
 #: includes/class-mcm-settings.php:387
-#: includes/elementor-widgets.php:2929
+#: includes/elementor-widgets.php:2932
 msgid "Open tenders"
 msgstr ""
 
@@ -3139,26 +3139,26 @@ msgstr ""
 msgid "Enable"
 msgstr ""
 
-#: includes/class-mcm-shortcodes.php:146
+#: includes/class-mcm-shortcodes.php:148
 msgid "items"
 msgstr ""
 
 #. translators: %s: content type plural name, e.g. Events.
-#: includes/class-mcm-shortcodes.php:153
+#: includes/class-mcm-shortcodes.php:155
 #, php-format
 msgid "No %s to show here yet."
 msgstr ""
 
-#: includes/class-mcm-shortcodes.php:154
+#: includes/class-mcm-shortcodes.php:156
 msgid "Only logged-in editors see this note; visitors see nothing in this spot."
 msgstr ""
 
-#: includes/class-mcm-shortcodes.php:275
-#: includes/class-mcm-shortcodes.php:297
+#: includes/class-mcm-shortcodes.php:277
+#: includes/class-mcm-shortcodes.php:299
 msgid "Print"
 msgstr ""
 
-#: includes/class-mcm-shortcodes.php:325
+#: includes/class-mcm-shortcodes.php:327
 msgid "Results"
 msgstr ""
 
@@ -3526,8 +3526,8 @@ msgstr ""
 #: includes/class-mcm-social.php:280
 #: includes/elementor-widgets.php:201
 #: includes/elementor-widgets.php:1681
-#: includes/elementor-widgets.php:3574
-#: includes/elementor-widgets.php:3619
+#: includes/elementor-widgets.php:3613
+#: includes/elementor-widgets.php:3658
 msgid "Right"
 msgstr ""
 
@@ -3535,8 +3535,8 @@ msgstr ""
 #: includes/class-mcm-social.php:281
 #: includes/elementor-widgets.php:193
 #: includes/elementor-widgets.php:1673
-#: includes/elementor-widgets.php:3566
-#: includes/elementor-widgets.php:3611
+#: includes/elementor-widgets.php:3605
+#: includes/elementor-widgets.php:3650
 msgid "Left"
 msgstr ""
 
@@ -3575,8 +3575,8 @@ msgstr ""
 #: includes/elementor-widgets.php:229
 #: includes/elementor-widgets.php:349
 #: includes/elementor-widgets.php:540
-#: includes/elementor-widgets.php:2913
-#: includes/elementor-widgets.php:4331
+#: includes/elementor-widgets.php:2916
+#: includes/elementor-widgets.php:4370
 msgid "Normal"
 msgstr ""
 
@@ -3601,8 +3601,8 @@ msgid "Large title next to the logo, e.g. GMC."
 msgstr ""
 
 #: includes/class-mcm-site-chrome-settings.php:477
-#: includes/elementor-widgets.php:3998
-#: includes/elementor-widgets.php:4224
+#: includes/elementor-widgets.php:4037
+#: includes/elementor-widgets.php:4263
 msgid "Subtitle"
 msgstr ""
 
@@ -4127,8 +4127,8 @@ msgid "Fix them from Site Health"
 msgstr ""
 
 #: includes/elementor-widgets.php:139
-#: includes/elementor-widgets.php:3737
-#: includes/elementor-widgets.php:4338
+#: includes/elementor-widgets.php:3776
+#: includes/elementor-widgets.php:4377
 msgid "Colour"
 msgstr ""
 
@@ -4138,9 +4138,9 @@ msgstr ""
 
 #: includes/elementor-widgets.php:159
 #: includes/elementor-widgets.php:1669
-#: includes/elementor-widgets.php:3697
-#: includes/elementor-widgets.php:3797
-#: includes/elementor-widgets.php:4445
+#: includes/elementor-widgets.php:3736
+#: includes/elementor-widgets.php:3836
+#: includes/elementor-widgets.php:4484
 msgid "Alignment"
 msgstr ""
 
@@ -4152,14 +4152,14 @@ msgstr ""
 #: includes/elementor-widgets.php:197
 #: includes/elementor-widgets.php:1434
 #: includes/elementor-widgets.php:1677
-#: includes/elementor-widgets.php:3615
+#: includes/elementor-widgets.php:3654
 msgid "Centre"
 msgstr ""
 
 #: includes/elementor-widgets.php:256
 #: includes/elementor-widgets.php:350
 #: includes/elementor-widgets.php:564
-#: includes/elementor-widgets.php:4332
+#: includes/elementor-widgets.php:4371
 msgid "Hover"
 msgstr ""
 
@@ -4191,9 +4191,9 @@ msgstr ""
 #: includes/elementor-widgets.php:397
 #: includes/elementor-widgets.php:443
 #: includes/elementor-widgets.php:502
-#: includes/elementor-widgets.php:3009
-#: includes/elementor-widgets.php:3014
-#: includes/elementor-widgets.php:3039
+#: includes/elementor-widgets.php:3022
+#: includes/elementor-widgets.php:3027
+#: includes/elementor-widgets.php:3052
 msgid "Padding"
 msgstr ""
 
@@ -4210,9 +4210,9 @@ msgstr ""
 #: includes/elementor-widgets.php:465
 #: includes/elementor-widgets.php:1520
 #: includes/elementor-widgets.php:1707
-#: includes/elementor-widgets.php:3004
-#: includes/elementor-widgets.php:3026
-#: includes/elementor-widgets.php:4349
+#: includes/elementor-widgets.php:3017
+#: includes/elementor-widgets.php:3039
+#: includes/elementor-widgets.php:4388
 msgid "Background colour"
 msgstr ""
 
@@ -4235,7 +4235,7 @@ msgstr ""
 #: includes/elementor-widgets.php:522
 #: includes/elementor-widgets.php:1405
 #: includes/elementor-widgets.php:1432
-#: includes/elementor-widgets.php:4308
+#: includes/elementor-widgets.php:4347
 msgid "Default"
 msgstr ""
 
@@ -4270,8 +4270,8 @@ msgstr ""
 
 #: includes/elementor-widgets.php:797
 #: includes/elementor-widgets.php:2394
-#: includes/elementor-widgets.php:3555
-#: includes/elementor-widgets.php:4140
+#: includes/elementor-widgets.php:3594
+#: includes/elementor-widgets.php:4179
 msgid "Layout"
 msgstr ""
 
@@ -4303,9 +4303,9 @@ msgstr ""
 #: includes/elementor-widgets.php:851
 #: includes/elementor-widgets.php:1158
 #: includes/elementor-widgets.php:1201
-#: includes/elementor-widgets.php:4161
-#: includes/elementor-widgets.php:4173
-#: includes/elementor-widgets.php:4184
+#: includes/elementor-widgets.php:4200
+#: includes/elementor-widgets.php:4212
+#: includes/elementor-widgets.php:4223
 msgid "Show"
 msgstr ""
 
@@ -4485,9 +4485,9 @@ msgstr ""
 
 #: includes/elementor-widgets.php:1159
 #: includes/elementor-widgets.php:1202
-#: includes/elementor-widgets.php:4162
-#: includes/elementor-widgets.php:4174
-#: includes/elementor-widgets.php:4185
+#: includes/elementor-widgets.php:4201
+#: includes/elementor-widgets.php:4213
+#: includes/elementor-widgets.php:4224
 msgid "Hide"
 msgstr ""
 
@@ -4660,14 +4660,14 @@ msgid "Crop focus"
 msgstr ""
 
 #: includes/elementor-widgets.php:1433
-#: includes/elementor-widgets.php:3570
-#: includes/elementor-widgets.php:3589
-#: includes/elementor-widgets.php:4277
+#: includes/elementor-widgets.php:3609
+#: includes/elementor-widgets.php:3628
+#: includes/elementor-widgets.php:4316
 msgid "Top"
 msgstr ""
 
 #: includes/elementor-widgets.php:1435
-#: includes/elementor-widgets.php:3597
+#: includes/elementor-widgets.php:3636
 msgid "Bottom"
 msgstr ""
 
@@ -4728,7 +4728,7 @@ msgid "Filter Bar"
 msgstr ""
 
 #: includes/elementor-widgets.php:1544
-#: includes/elementor-widgets.php:2980
+#: includes/elementor-widgets.php:2985
 msgid "Bar"
 msgstr ""
 
@@ -4769,8 +4769,8 @@ msgid "Header background"
 msgstr ""
 
 #: includes/elementor-widgets.php:1611
-#: includes/elementor-widgets.php:4092
-#: includes/elementor-widgets.php:4235
+#: includes/elementor-widgets.php:4131
+#: includes/elementor-widgets.php:4274
 msgid "Rows"
 msgstr ""
 
@@ -4779,18 +4779,18 @@ msgid "Row background"
 msgstr ""
 
 #: includes/elementor-widgets.php:1614
-#: includes/elementor-widgets.php:3061
+#: includes/elementor-widgets.php:3074
 msgid "Striped row background"
 msgstr ""
 
 #: includes/elementor-widgets.php:1615
-#: includes/elementor-widgets.php:3112
-#: includes/elementor-widgets.php:4320
+#: includes/elementor-widgets.php:3148
+#: includes/elementor-widgets.php:4359
 msgid "Row hover background"
 msgstr ""
 
 #: includes/elementor-widgets.php:1616
-#: includes/elementor-widgets.php:4295
+#: includes/elementor-widgets.php:4334
 msgid "Line colour"
 msgstr ""
 
@@ -4816,7 +4816,7 @@ msgstr ""
 
 #: includes/elementor-widgets.php:1656
 #: includes/elementor-widgets.php:2624
-#: includes/elementor-widgets.php:3104
+#: includes/elementor-widgets.php:3140
 msgid "Divider colour"
 msgstr ""
 
@@ -4825,7 +4825,7 @@ msgid "Item padding"
 msgstr ""
 
 #: includes/elementor-widgets.php:1691
-#: includes/elementor-widgets.php:3806
+#: includes/elementor-widgets.php:3845
 msgid "Space above"
 msgstr ""
 
@@ -4871,7 +4871,7 @@ msgid "Show image"
 msgstr ""
 
 #: includes/elementor-widgets.php:2488
-#: includes/elementor-widgets.php:2956
+#: includes/elementor-widgets.php:2960
 msgid "Show date"
 msgstr ""
 
@@ -4892,7 +4892,7 @@ msgid "Message when there are no posts"
 msgstr ""
 
 #: includes/elementor-widgets.php:2544
-#: includes/elementor-widgets.php:2896
+#: includes/elementor-widgets.php:2899
 msgid "Categories"
 msgstr ""
 
@@ -4909,8 +4909,8 @@ msgid "Author"
 msgstr ""
 
 #: includes/elementor-widgets.php:2577
-#: includes/elementor-widgets.php:2910
-#: includes/elementor-widgets.php:2939
+#: includes/elementor-widgets.php:2913
+#: includes/elementor-widgets.php:2942
 msgid "Any"
 msgstr ""
 
@@ -4958,415 +4958,416 @@ msgstr ""
 msgid "Intro Text"
 msgstr ""
 
-#: includes/elementor-widgets.php:2886
+#: includes/elementor-widgets.php:2889
 msgid "Number of notices"
 msgstr ""
 
-#: includes/elementor-widgets.php:2911
+#: includes/elementor-widgets.php:2914
 msgid "Urgent"
 msgstr ""
 
-#: includes/elementor-widgets.php:2912
+#: includes/elementor-widgets.php:2915
 msgid "Important"
 msgstr ""
 
-#: includes/elementor-widgets.php:2920
+#: includes/elementor-widgets.php:2923
 msgid "Include"
 msgstr ""
 
-#: includes/elementor-widgets.php:2921
+#: includes/elementor-widgets.php:2924
 msgid "Leave empty to use Settings → Notice board sources. Category and priority apply to notices only."
 msgstr ""
 
-#: includes/elementor-widgets.php:2945
+#: includes/elementor-widgets.php:2948
 msgid "Only from the last … days"
 msgstr ""
 
-#: includes/elementor-widgets.php:2950
+#: includes/elementor-widgets.php:2953
 msgid "0 shows all current notices."
 msgstr ""
 
-#: includes/elementor-widgets.php:2965
+#: includes/elementor-widgets.php:2970
 msgid "Show category badge"
 msgstr ""
 
-#: includes/elementor-widgets.php:2985
+#: includes/elementor-widgets.php:2990
 msgid "Height"
 msgstr ""
 
-#: includes/elementor-widgets.php:2999
-#: includes/elementor-widgets.php:3186
-#: includes/elementor-widgets.php:4021
-#: includes/elementor-widgets.php:4420
-msgid "Label"
-msgstr ""
-
-#: includes/elementor-widgets.php:3017
-#: includes/elementor-widgets.php:3051
-#: includes/elementor-widgets.php:3677
-#: includes/elementor-widgets.php:4209
-msgid "Box"
-msgstr ""
-
-#: includes/elementor-widgets.php:3021
-msgid "Heading Bar"
-msgstr ""
-
-#: includes/elementor-widgets.php:3034
+#: includes/elementor-widgets.php:3005
+#: includes/elementor-widgets.php:3047
 msgid "Pause button colour"
 msgstr ""
 
-#: includes/elementor-widgets.php:3047
+#: includes/elementor-widgets.php:3012
+#: includes/elementor-widgets.php:3222
+#: includes/elementor-widgets.php:4060
+#: includes/elementor-widgets.php:4459
+msgid "Label"
+msgstr ""
+
+#: includes/elementor-widgets.php:3030
+#: includes/elementor-widgets.php:3064
+#: includes/elementor-widgets.php:3716
+#: includes/elementor-widgets.php:4248
+msgid "Box"
+msgstr ""
+
+#: includes/elementor-widgets.php:3034
+msgid "Heading Bar"
+msgstr ""
+
+#: includes/elementor-widgets.php:3060
 msgid "View All Link"
 msgstr ""
 
-#: includes/elementor-widgets.php:3073
+#: includes/elementor-widgets.php:3088
 msgid "Badges"
 msgstr ""
 
-#: includes/elementor-widgets.php:3074
+#: includes/elementor-widgets.php:3089
 msgid "Category badge"
 msgstr ""
 
-#: includes/elementor-widgets.php:3075
+#: includes/elementor-widgets.php:3090
 msgid "\"New\" tag"
 msgstr ""
 
-#: includes/elementor-widgets.php:3076
+#: includes/elementor-widgets.php:3091
 msgid "Deadline text"
 msgstr ""
 
-#: includes/elementor-widgets.php:3080
+#: includes/elementor-widgets.php:3095
 msgid "Urgent colour"
 msgstr ""
 
-#: includes/elementor-widgets.php:3100
+#: includes/elementor-widgets.php:3136
 msgid "Row padding"
 msgstr ""
 
-#: includes/elementor-widgets.php:3164
-#: includes/elementor-widgets.php:3182
+#: includes/elementor-widgets.php:3200
+#: includes/elementor-widgets.php:3218
 msgid "Notice Ticker"
 msgstr ""
 
-#: includes/elementor-widgets.php:3195
+#: includes/elementor-widgets.php:3232
 msgid "Speed (1 slow - 10 fast)"
 msgstr ""
 
-#: includes/elementor-widgets.php:3262
-#: includes/elementor-widgets.php:3435
-#: includes/elementor-widgets.php:3681
+#: includes/elementor-widgets.php:3299
+#: includes/elementor-widgets.php:3474
+#: includes/elementor-widgets.php:3720
 msgid "Heading"
 msgstr ""
 
-#: includes/elementor-widgets.php:3271
+#: includes/elementor-widgets.php:3309
 msgid "Height (px)"
 msgstr ""
 
-#: includes/elementor-widgets.php:3281
+#: includes/elementor-widgets.php:3320
 msgid "Scroll speed (1 slow - 10 fast)"
 msgstr ""
 
-#: includes/elementor-widgets.php:3291
+#: includes/elementor-widgets.php:3330
 msgid "Show \"View all\" link"
 msgstr ""
 
-#: includes/elementor-widgets.php:3335
-#: includes/elementor-widgets.php:3353
+#: includes/elementor-widgets.php:3374
+#: includes/elementor-widgets.php:3392
 msgid "Notices List"
 msgstr ""
 
-#: includes/elementor-widgets.php:3398
+#: includes/elementor-widgets.php:3437
 msgid "Testimonial / Message"
 msgstr ""
 
-#: includes/elementor-widgets.php:3430
-#: includes/elementor-widgets.php:3476
-#: includes/elementor-widgets.php:3692
+#: includes/elementor-widgets.php:3469
+#: includes/elementor-widgets.php:3515
+#: includes/elementor-widgets.php:3731
 msgid "Message"
 msgstr ""
 
-#: includes/elementor-widgets.php:3437
+#: includes/elementor-widgets.php:3476
 msgid "Message from Head of Department"
 msgstr ""
 
-#: includes/elementor-widgets.php:3445
+#: includes/elementor-widgets.php:3484
 msgid "Heading HTML tag"
 msgstr ""
 
-#: includes/elementor-widgets.php:3464
+#: includes/elementor-widgets.php:3503
 msgid "Heading across the full width"
 msgstr ""
 
-#: includes/elementor-widgets.php:3465
+#: includes/elementor-widgets.php:3504
 msgid "Off: the heading sits beside the photo, above the message."
 msgstr ""
 
-#: includes/elementor-widgets.php:3478
+#: includes/elementor-widgets.php:3517
 msgid "Welcome to our department. Write the message here."
 msgstr ""
 
-#: includes/elementor-widgets.php:3486
+#: includes/elementor-widgets.php:3525
 msgid "Quotation mark"
 msgstr ""
 
-#: includes/elementor-widgets.php:3517
+#: includes/elementor-widgets.php:3556
 msgid "Prof. Dr. Name"
 msgstr ""
 
-#: includes/elementor-widgets.php:3528
+#: includes/elementor-widgets.php:3567
 msgid "Chairperson, Department of Pathology"
 msgstr ""
 
-#: includes/elementor-widgets.php:3536
+#: includes/elementor-widgets.php:3575
 msgid "Organisation / place"
 msgstr ""
 
-#: includes/elementor-widgets.php:3538
+#: includes/elementor-widgets.php:3577
 msgid "Gomal Medical College, Dera Ismail Khan"
 msgstr ""
 
-#: includes/elementor-widgets.php:3546
+#: includes/elementor-widgets.php:3585
 msgid "Link (name and photo)"
 msgstr ""
 
-#: includes/elementor-widgets.php:3548
+#: includes/elementor-widgets.php:3587
 msgid "https://… e.g. the profile page"
 msgstr ""
 
-#: includes/elementor-widgets.php:3559
+#: includes/elementor-widgets.php:3598
 msgid "Photo position"
 msgstr ""
 
-#: includes/elementor-widgets.php:3585
+#: includes/elementor-widgets.php:3624
 msgid "Vertical alignment (photo left/right)"
 msgstr ""
 
-#: includes/elementor-widgets.php:3593
-#: includes/elementor-widgets.php:4281
+#: includes/elementor-widgets.php:3632
+#: includes/elementor-widgets.php:4320
 msgid "Middle"
 msgstr ""
 
-#: includes/elementor-widgets.php:3607
+#: includes/elementor-widgets.php:3646
 msgid "Photo alignment (photo on top)"
 msgstr ""
 
-#: includes/elementor-widgets.php:3629
+#: includes/elementor-widgets.php:3668
 msgid "Photo width"
 msgstr ""
 
-#: includes/elementor-widgets.php:3656
+#: includes/elementor-widgets.php:3695
 msgid "Space between photo and text"
 msgstr ""
 
-#: includes/elementor-widgets.php:3701
+#: includes/elementor-widgets.php:3740
 msgid "Justified"
 msgstr ""
 
-#: includes/elementor-widgets.php:3711
+#: includes/elementor-widgets.php:3750
 msgid "Space between paragraphs"
 msgstr ""
 
-#: includes/elementor-widgets.php:3726
+#: includes/elementor-widgets.php:3765
 msgid "Link colour in the message"
 msgstr ""
 
-#: includes/elementor-widgets.php:3733
+#: includes/elementor-widgets.php:3772
 msgid "Quotation Mark"
 msgstr ""
 
-#: includes/elementor-widgets.php:3745
+#: includes/elementor-widgets.php:3784
 msgid "Size"
 msgstr ""
 
-#: includes/elementor-widgets.php:3763
+#: includes/elementor-widgets.php:3802
 msgid "Height (empty = natural)"
 msgstr ""
 
-#: includes/elementor-widgets.php:3793
+#: includes/elementor-widgets.php:3832
 msgid "Name & Designation"
 msgstr ""
 
-#: includes/elementor-widgets.php:3827
+#: includes/elementor-widgets.php:3866
 msgid "Organisation"
 msgstr ""
 
-#: includes/elementor-widgets.php:3933
-#: includes/elementor-widgets.php:3964
+#: includes/elementor-widgets.php:3972
+#: includes/elementor-widgets.php:4003
 msgid "Contact Info"
 msgstr ""
 
-#: includes/elementor-widgets.php:3971
+#: includes/elementor-widgets.php:4010
 msgid "Contact Us"
 msgstr ""
 
-#: includes/elementor-widgets.php:3979
+#: includes/elementor-widgets.php:4018
 msgid "Title HTML tag"
 msgstr ""
 
-#: includes/elementor-widgets.php:4009
-#: includes/elementor-widgets.php:4327
+#: includes/elementor-widgets.php:4048
+#: includes/elementor-widgets.php:4366
 msgid "Icon"
 msgstr ""
 
-#: includes/elementor-widgets.php:4031
-#: includes/elementor-widgets.php:4424
+#: includes/elementor-widgets.php:4070
+#: includes/elementor-widgets.php:4463
 msgid "Value"
 msgstr ""
 
-#: includes/elementor-widgets.php:4035
+#: includes/elementor-widgets.php:4074
 msgid "New lines are kept (e.g. a two-line address)."
 msgstr ""
 
-#: includes/elementor-widgets.php:4042
+#: includes/elementor-widgets.php:4081
 msgid "Make it clickable"
 msgstr ""
 
-#: includes/elementor-widgets.php:4046
+#: includes/elementor-widgets.php:4085
 msgid "No link"
 msgstr ""
 
-#: includes/elementor-widgets.php:4047
+#: includes/elementor-widgets.php:4086
 msgid "Phone call (tel:)"
 msgstr ""
 
-#: includes/elementor-widgets.php:4048
+#: includes/elementor-widgets.php:4087
 msgid "Email (mailto:)"
 msgstr ""
 
-#: includes/elementor-widgets.php:4049
+#: includes/elementor-widgets.php:4088
 msgid "WhatsApp chat"
 msgstr ""
 
-#: includes/elementor-widgets.php:4050
+#: includes/elementor-widgets.php:4089
 msgid "Open in Google Maps"
 msgstr ""
 
-#: includes/elementor-widgets.php:4051
+#: includes/elementor-widgets.php:4090
 msgid "Custom link"
 msgstr ""
 
-#: includes/elementor-widgets.php:4058
+#: includes/elementor-widgets.php:4097
 msgid "Number or address to use"
 msgstr ""
 
-#: includes/elementor-widgets.php:4060
+#: includes/elementor-widgets.php:4099
 msgid "Optional — defaults to the value"
 msgstr ""
 
-#: includes/elementor-widgets.php:4061
+#: includes/elementor-widgets.php:4100
 msgid "Use this when the shown text differs, e.g. \"UAN 111-222-333\" dialling 111222333."
 msgstr ""
 
-#: includes/elementor-widgets.php:4069
+#: includes/elementor-widgets.php:4108
 msgid "Link"
 msgstr ""
 
-#: includes/elementor-widgets.php:4079
+#: includes/elementor-widgets.php:4118
 msgid "Icon colour (this row)"
 msgstr ""
 
-#: includes/elementor-widgets.php:4121
+#: includes/elementor-widgets.php:4160
 msgid "Medical College Road, City"
 msgstr ""
 
-#: includes/elementor-widgets.php:4129
+#: includes/elementor-widgets.php:4168
 msgid "Office hours"
 msgstr ""
 
-#: includes/elementor-widgets.php:4130
+#: includes/elementor-widgets.php:4169
 msgid "Monday – Friday, 8:00 AM – 2:00 PM"
 msgstr ""
 
-#: includes/elementor-widgets.php:4144
+#: includes/elementor-widgets.php:4183
 msgid "Label and value"
 msgstr ""
 
-#: includes/elementor-widgets.php:4150
+#: includes/elementor-widgets.php:4189
 msgid "Side by side (label left, value right)"
 msgstr ""
 
-#: includes/elementor-widgets.php:4151
+#: includes/elementor-widgets.php:4190
 msgid "Stacked (label above value)"
 msgstr ""
 
-#: includes/elementor-widgets.php:4159
+#: includes/elementor-widgets.php:4198
 msgid "Icons"
 msgstr ""
 
-#: includes/elementor-widgets.php:4170
+#: includes/elementor-widgets.php:4209
 msgid "Labels"
 msgstr ""
 
-#: includes/elementor-widgets.php:4171
+#: includes/elementor-widgets.php:4210
 msgid "Hidden labels are still read out by screen readers."
 msgstr ""
 
-#: includes/elementor-widgets.php:4182
+#: includes/elementor-widgets.php:4221
 msgid "Lines between rows"
 msgstr ""
 
-#: includes/elementor-widgets.php:4194
+#: includes/elementor-widgets.php:4233
 msgid "Open map and WhatsApp links in a new tab"
 msgstr ""
 
-#: includes/elementor-widgets.php:4239
+#: includes/elementor-widgets.php:4278
 msgid "Space between rows"
 msgstr ""
 
-#: includes/elementor-widgets.php:4254
+#: includes/elementor-widgets.php:4293
 msgid "Label column width"
 msgstr ""
 
-#: includes/elementor-widgets.php:4273
+#: includes/elementor-widgets.php:4312
 msgid "Vertical alignment"
 msgstr ""
 
-#: includes/elementor-widgets.php:4285
+#: includes/elementor-widgets.php:4324
 msgid "Text line"
 msgstr ""
 
-#: includes/elementor-widgets.php:4304
+#: includes/elementor-widgets.php:4343
 msgid "Line style"
 msgstr ""
 
-#: includes/elementor-widgets.php:4309
+#: includes/elementor-widgets.php:4348
 msgid "Solid"
 msgstr ""
 
-#: includes/elementor-widgets.php:4310
+#: includes/elementor-widgets.php:4349
 msgid "Dashed"
 msgstr ""
 
-#: includes/elementor-widgets.php:4311
+#: includes/elementor-widgets.php:4350
 msgid "Dotted"
 msgstr ""
 
-#: includes/elementor-widgets.php:4360
+#: includes/elementor-widgets.php:4399
 msgid "Icon size"
 msgstr ""
 
-#: includes/elementor-widgets.php:4376
+#: includes/elementor-widgets.php:4415
 msgid "Background size (0 = no background)"
 msgstr ""
 
-#: includes/elementor-widgets.php:4391
+#: includes/elementor-widgets.php:4430
 msgid "Background radius"
 msgstr ""
 
-#: includes/elementor-widgets.php:4406
+#: includes/elementor-widgets.php:4445
 msgid "Space after the icon"
 msgstr ""
 
-#: includes/elementor-widgets.php:4429
+#: includes/elementor-widgets.php:4468
 msgid "Link colour"
 msgstr ""
 
-#: includes/elementor-widgets.php:4437
+#: includes/elementor-widgets.php:4476
 msgid "Link hover colour"
 msgstr ""
 
-#: includes/elementor-widgets.php:4537
+#: includes/elementor-widgets.php:4576
 msgid "(opens in a new tab)"
 msgstr ""
 

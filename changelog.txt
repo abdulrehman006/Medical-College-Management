@@ -1,6 +1,27 @@
 Medical College Manager — complete changelog.
 
 = 1.32.0 =
+Notice widgets (Notice Ticker, Notice Board, Notices List) brought to the
+widget standard:
+* Fixed: keyboard users could not stop the ticker or board by tabbing into
+  it; focus on a notice now pauses the scroll, as hovering does.
+* Fixed: the pause button now shows a play icon while paused (it already
+  reported the state to screen readers).
+* Fixed: the ticker showed a "Show date" switch and a Date style section
+  that did nothing (the ticker prints no date). Both are removed from it.
+* Fixed: "Urgent colour" did nothing on the ticker; urgent notices now
+  carry the urgent style there too, as on the board and list.
+* Fixed: "Pause button colour" on the board was lost on hover and focus;
+  the ticker now has the same control.
+* Fixed: an empty ticker or board was invisible and hard to find in the
+  Elementor editor. Logged-in editors now see the plugin's usual "No
+  Notices to show here yet" note; visitors still see nothing. The unused
+  Empty Message style section is removed from these two.
+* Changed: the board height can be set per device; saved heights are kept.
+* Changed: Ticker label and Board heading accept dynamic tags.
+* Changed: the decorative icons before the ticker label and board heading
+  are no longer read out by screen readers.
+
 Pre-launch QA (see docs/qa-report-2026-11-09.md):
 * Changed (college decision): the public student directory is opt-in. The
   setting ("Make student lists public", Settings > Privacy) is off by default,

@@ -306,7 +306,7 @@
 		.on( 'click', '.mcm-scroll-pause', function () {
 			var $c     = $( this ).closest( '.mcm-ticker, .mcm-board' );
 			var paused = $c.toggleClass( 'is-paused' ).hasClass( 'is-paused' );
-			$( this ).attr( 'aria-pressed', paused ? 'true' : 'false' );
+			$( this ).attr( 'aria-pressed', paused ? 'true' : 'false' ).html( paused ? '&#9654;' : '&#10073;&#10073;' );
 		} );
 
 	/*
