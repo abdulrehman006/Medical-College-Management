@@ -175,7 +175,7 @@ class MCM_TermMeta {
 							return MCM_Meta::sanitize_value( $type, $value );
 						},
 						// Object-level: may this user edit THIS term? (Department
-						// coordinators are limited to their own departments.)
+						// coordinators are limited to their own departments).
 						'auth_callback'     => function ( $allowed, $meta_key, $term_id ) {
 							return current_user_can( 'edit_term', (int) $term_id );
 						},
