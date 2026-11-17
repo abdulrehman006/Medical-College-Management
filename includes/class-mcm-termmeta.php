@@ -174,8 +174,10 @@ class MCM_TermMeta {
 							}
 							return MCM_Meta::sanitize_value( $type, $value );
 						},
-						'auth_callback'     => function () {
-							return current_user_can( 'manage_categories' );
+						// Object-level: may this user edit THIS term? (Department
+						// coordinators are limited to their own departments.)
+						'auth_callback'     => function ( $allowed, $meta_key, $term_id ) {
+							return current_user_can( 'edit_term', (int) $term_id );
 						},
 					)
 				);
@@ -300,7 +302,9 @@ class MCM_TermMeta {
 		if ( ! isset( $_POST['mcm_term_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['mcm_term_nonce'] ) ), 'mcm_term_save' ) ) {
 			return;
 		}
-		if ( ! current_user_can( 'manage_categories' ) ) {
+		// Object-level check: the term being saved, not "can manage terms in
+		// general" (a department coordinator may edit only their departments).
+		if ( ! current_user_can( 'edit_term', (int) $term_id ) ) {
 			return;
 		}
 
@@ -318,7 +322,7 @@ class MCM_TermMeta {
 				$checked = isset( $_POST[ $key ] ) && is_array( $_POST[ $key ] ) ? wp_unslash( $_POST[ $key ] ) : array(); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
 				$keep    = array();
 				foreach ( $checked as $cpt ) {
-					$cpt = sanitize_key( $cpt );
+					$cpt = sanitize_key( MCM_Safe::str( $cpt ) ); // A nested array is not a value.
 					if ( isset( $valid[ $cpt ] ) ) {
 						$keep[] = $cpt;
 					}

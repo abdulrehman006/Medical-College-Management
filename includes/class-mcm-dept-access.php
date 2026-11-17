@@ -45,6 +45,10 @@ class MCM_Dept_Access {
 		add_action( 'pre_get_posts', array( __CLASS__, 'scope_admin_lists' ) );
 		add_action( 'pre_post_update', array( __CLASS__, 'remember_terms' ) );
 		add_action( 'save_post', array( __CLASS__, 'enforce_terms' ), 15, 2 );
+		// The REST API (and any other path that sets terms after save_post)
+		// assigns departments AFTER save_post has run, so the rule is applied
+		// again once the post, its terms and meta are all stored.
+		add_action( 'wp_after_insert_post', array( __CLASS__, 'enforce_after_insert' ), 10, 2 );
 		add_filter( 'pre_insert_term', array( __CLASS__, 'block_new_department' ), 10, 2 );
 		add_filter( 'get_terms_args', array( __CLASS__, 'limit_checklist' ), 10, 2 );
 		add_action( 'show_user_profile', array( __CLASS__, 'profile_field' ) );
@@ -224,6 +228,21 @@ class MCM_Dept_Access {
 		if ( $want !== $now ) {
 			wp_set_object_terms( $post_id, $want, self::TAX );
 		}
+	}
+
+	/**
+	 * Re-apply the department rule after the whole save (REST sets terms
+	 * after save_post; without this a coordinator could put an entry in any
+	 * department, or remove another department from a shared entry).
+	 *
+	 * @param int     $post_id Post ID.
+	 * @param WP_Post $post    Post.
+	 */
+	public static function enforce_after_insert( $post_id, $post ) {
+		if ( $post instanceof WP_Post ) {
+			self::enforce_terms( $post_id, $post );
+		}
+		unset( self::$before[ (int) $post_id ] );
 	}
 
 	/**

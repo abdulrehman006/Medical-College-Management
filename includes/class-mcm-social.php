@@ -135,10 +135,12 @@ class MCM_Social {
 	public function sanitize( $input ) {
 		$defaults = self::defaults();
 		$out      = array();
+		// options.php can post anything: only an array of scalars is read.
+		$input = is_array( $input ) ? $input : array();
 
 		foreach ( array_keys( self::networks() ) as $key ) {
 			$field = 'social_' . $key;
-			$raw   = isset( $input[ $field ] ) ? trim( (string) $input[ $field ] ) : '';
+			$raw   = isset( $input[ $field ] ) ? trim( MCM_Safe::str( $input[ $field ] ) ) : '';
 			if ( 'whatsapp' === $key ) {
 				// Keep digits (and a leading +) only — used to build a wa.me link.
 				$out[ $field ] = preg_replace( '/[^0-9]/', '', $raw );
@@ -148,8 +150,8 @@ class MCM_Social {
 		}
 
 		$out['social_enable_sitewide'] = ! empty( $input['social_enable_sitewide'] ) ? '1' : '0';
-		$out['social_position']        = ( isset( $input['social_position'] ) && 'left' === $input['social_position'] ) ? 'left' : 'right';
-		$out['social_mobile']          = ( isset( $input['social_mobile'] ) && 'hide' === $input['social_mobile'] ) ? 'hide' : 'bottom';
+		$out['social_position']        = ( isset( $input['social_position'] ) && 'left' === MCM_Safe::str( $input['social_position'] ) ) ? 'left' : 'right';
+		$out['social_mobile']          = ( isset( $input['social_mobile'] ) && 'hide' === MCM_Safe::str( $input['social_mobile'] ) ) ? 'hide' : 'bottom';
 
 		return wp_parse_args( $out, $defaults );
 	}

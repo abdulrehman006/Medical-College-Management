@@ -120,7 +120,7 @@ class MCM_Import {
 			return;
 		}
 
-		$type   = isset( $_POST['mcm_export_type'] ) ? sanitize_key( $_POST['mcm_export_type'] ) : '';
+		$type   = sanitize_key( MCM_Safe::post( 'mcm_export_type' ) );
 		$schema = self::schema();
 		if ( ! isset( $schema[ $type ] ) ) {
 			return;
@@ -535,7 +535,7 @@ class MCM_Import {
 		$more = count( $items ) - 20;
 		if ( $more > 0 ) {
 			/* translators: %d: number of further items not listed. */
-			$html .= '<li>' . esc_html( sprintf( __( '…and %d more.', 'medical-college-manager' ), $more ) ) . '</li>';
+			$html .= '<li>' . esc_html( sprintf( _n( '…and %d more.', '…and %d more.', $more, 'medical-college-manager' ), $more ) ) . '</li>';
 		}
 		return $html . '</ul>';
 	}

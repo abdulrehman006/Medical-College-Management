@@ -290,14 +290,24 @@ class MCM_Privacy {
 			if ( 'mcm_student' === $item['type'] ) {
 				$msgs[] = sprintf(
 					/* translators: 1: post ID, 2: number of fields removed. */
-					__( 'Student record #%1$d: the name was replaced and %2$d personal field(s) removed. The academic record (program, batch, status, department, session, level) was kept; delete the record manually if a full removal is required.', 'medical-college-manager' ),
+					_n(
+						'Student record #%1$d: the name was replaced and %2$d personal field removed. The academic record (program, batch, status, department, session, level) was kept; delete the record manually if a full removal is required.',
+						'Student record #%1$d: the name was replaced and %2$d personal fields removed. The academic record (program, batch, status, department, session, level) was kept; delete the record manually if a full removal is required.',
+						$cleared,
+						'medical-college-manager'
+					),
 					$id,
 					$cleared
 				);
 			} else {
 				$msgs[] = sprintf(
 					/* translators: 1: record type label, 2: record title, 3: number of fields removed. */
-					__( '%1$s "%2$s": %3$d personal field(s) removed. The public profile, its name and designation were kept; delete the profile manually if it should be removed.', 'medical-college-manager' ),
+					_n(
+						'%1$s "%2$s": %3$d personal field removed. The public profile, its name and designation were kept; delete the profile manually if it should be removed.',
+						'%1$s "%2$s": %3$d personal fields removed. The public profile, its name and designation were kept; delete the profile manually if it should be removed.',
+						$cleared,
+						'medical-college-manager'
+					),
 					$item['cfg']['label'],
 					get_the_title( $id ),
 					$cleared

@@ -67,6 +67,14 @@ final class Medical_College_Manager {
 			}
 		}
 
+		// Fail closed: department access is an authorization control. If its
+		// module could not start (reported in Site Health and to admins), users
+		// limited to departments must not silently get full editing rights.
+		if ( ! isset( $this->modules['MCM_Dept_Access'] ) ) {
+			add_filter( 'map_meta_cap', array( __CLASS__, 'dept_access_fail_closed' ), 10, 4 );
+			add_filter( 'pre_insert_term', array( __CLASS__, 'dept_access_no_new_terms' ), 10, 2 );
+		}
+
 		// Meta-aware search (students by ID / roll / PMDC No.).
 		if ( class_exists( 'MCM_Query' ) ) {
 			MCM_Safe::run( array( 'MCM_Query', 'register_hooks' ), 'query hooks' );
@@ -79,6 +87,65 @@ final class Medical_College_Manager {
 		// plugin shortcode whose module was switched off a silent stand-in, so
 		// visitors never see raw "[mcm_blog]" text on the page.
 		add_action( 'init', array( $this, 'guard_shortcodes' ), 999 );
+	}
+
+	/**
+	 * Whether a user was limited to departments (read straight from user meta,
+	 * so it works even when the department-access module failed to load).
+	 *
+	 * @param int $user_id User ID.
+	 * @return bool
+	 */
+	private static function is_dept_scoped( $user_id ) {
+		$user_id = (int) $user_id;
+		if ( ! $user_id ) {
+			return false;
+		}
+		$ids = array_filter( array_map( 'intval', (array) get_user_meta( $user_id, 'mcm_departments', true ) ) );
+		return $ids && ! user_can( $user_id, 'manage_options' );
+	}
+
+	/**
+	 * Department access failed to start: users limited to departments may not
+	 * edit, delete or publish plugin content or departments until it works.
+	 *
+	 * @param string[] $caps    Primitive caps.
+	 * @param string   $cap     Meta cap.
+	 * @param int      $user_id User.
+	 * @param array    $args    Args (object ID first).
+	 * @return string[]
+	 */
+	public static function dept_access_fail_closed( $caps, $cap, $user_id, $args ) {
+		$post_caps = array( 'edit_post', 'delete_post', 'publish_post' );
+		$term_caps = array( 'edit_term', 'delete_term' );
+		if ( empty( $args[0] ) || ( ! in_array( $cap, $post_caps, true ) && ! in_array( $cap, $term_caps, true ) ) ) {
+			return $caps;
+		}
+		if ( in_array( $cap, $term_caps, true ) ) {
+			$term = get_term( (int) $args[0] );
+			$ours = $term instanceof WP_Term && 'mcm_department' === $term->taxonomy;
+		} else {
+			$ours = 0 === strpos( (string) get_post_type( (int) $args[0] ), 'mcm_' );
+		}
+		if ( $ours && self::is_dept_scoped( $user_id ) ) {
+			$caps[] = 'do_not_allow';
+		}
+		return $caps;
+	}
+
+	/**
+	 * Department access failed to start: users limited to departments cannot
+	 * add departments.
+	 *
+	 * @param string|WP_Error $term     Term name.
+	 * @param string          $taxonomy Taxonomy.
+	 * @return string|WP_Error
+	 */
+	public static function dept_access_no_new_terms( $term, $taxonomy ) {
+		if ( 'mcm_department' === $taxonomy && self::is_dept_scoped( get_current_user_id() ) ) {
+			return new WP_Error( 'mcm_dept_scoped', __( 'Only an administrator can add departments.', 'medical-college-manager' ) );
+		}
+		return $term;
 	}
 
 	/**
