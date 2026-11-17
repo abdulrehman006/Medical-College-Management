@@ -23,6 +23,15 @@ class MCM_Widget_Slider extends \Elementor\Widget_Base {
 	use MCM_Elementor_Style;
 
 	/**
+	 * The "sizes" attribute for slide images in the current render: how wide
+	 * one slide is on phone / tablet / desktop, so the browser downloads an
+	 * image that fits (three slides per view need a third of the width).
+	 *
+	 * @var string
+	 */
+	private $img_sizes = '';
+
+	/**
 	 * Widget machine name.
 	 */
 	public function get_name() {
@@ -182,6 +191,7 @@ class MCM_Widget_Slider extends \Elementor\Widget_Base {
 			array(
 				'label'       => __( 'Video playback', 'medical-college-manager' ),
 				'type'        => \Elementor\Controls_Manager::SELECT,
+				'label_block' => true,
 				'default'     => 'background',
 				'options'     => array(
 					'background' => __( 'Background (muted loop, no controls)', 'medical-college-manager' ),
@@ -704,16 +714,17 @@ class MCM_Widget_Slider extends \Elementor\Widget_Base {
 		$this->add_control(
 			'navigation',
 			array(
-				'label'     => __( 'Navigation', 'medical-college-manager' ),
-				'type'      => \Elementor\Controls_Manager::SELECT,
-				'default'   => 'both',
-				'options'   => array(
+				'label'       => __( 'Navigation', 'medical-college-manager' ),
+				'type'        => \Elementor\Controls_Manager::SELECT,
+				'label_block' => true,
+				'default'     => 'both',
+				'options'     => array(
 					'both'   => __( 'Arrows and pagination', 'medical-college-manager' ),
 					'arrows' => __( 'Arrows', 'medical-college-manager' ),
 					'dots'   => __( 'Pagination', 'medical-college-manager' ),
 					'none'   => __( 'None', 'medical-college-manager' ),
 				),
-				'separator' => 'before',
+				'separator'   => 'before',
 			)
 		);
 		$this->add_control(
@@ -810,7 +821,7 @@ class MCM_Widget_Slider extends \Elementor\Widget_Base {
 			'bg_video_mobile',
 			array(
 				'label'        => __( 'Play background videos on phones', 'medical-college-manager' ),
-				'description'  => __( 'Off: phones show the cover image instead (saves mobile data).', 'medical-college-manager' ),
+				'description'  => __( 'Off: phones show the thumbnail instead (saves mobile data).', 'medical-college-manager' ),
 				'type'         => \Elementor\Controls_Manager::SWITCHER,
 				'return_value' => 'yes',
 				'default'      => 'yes',
@@ -839,7 +850,7 @@ class MCM_Widget_Slider extends \Elementor\Widget_Base {
 			array(
 				'label'     => __( 'Overlay colour', 'medical-college-manager' ),
 				'type'      => \Elementor\Controls_Manager::COLOR,
-				'default'   => 'rgba(0,0,0,0.35)',
+				'default'   => 'rgba(0,0,0,0.45)',
 				'selectors' => array( '{{WRAPPER}} .mcm-sl-overlay' => 'background-color: {{VALUE}};' ),
 			)
 		);
@@ -916,13 +927,22 @@ class MCM_Widget_Slider extends \Elementor\Widget_Base {
 	 * Style tab: heading, description, button.
 	 */
 	private function register_style_text() {
-		$this->mcm_style_section( 'mcm_sl_style_heading', __( 'Heading', 'medical-college-manager' ) );
-		$this->mcm_text_style( 'sl_h', '.mcm-sl-heading', array( 'spacing' => true ) );
-		$this->end_controls_section();
-
-		$this->mcm_style_section( 'mcm_sl_style_desc', __( 'Description', 'medical-college-manager' ) );
-		$this->mcm_text_style( 'sl_d', '.mcm-sl-desc', array( 'spacing' => true ) );
-		$this->end_controls_section();
+		foreach ( array(
+			'h' => array( 'mcm_sl_style_heading', __( 'Heading', 'medical-college-manager' ), '.mcm-sl-heading' ),
+			'd' => array( 'mcm_sl_style_desc', __( 'Description', 'medical-college-manager' ), '.mcm-sl-desc' ),
+		) as $k => $cfg ) {
+			$this->mcm_style_section( $cfg[0], $cfg[1] );
+			$this->mcm_text_style( 'sl_' . $k, $cfg[2], array( 'spacing' => true ) );
+			// A soft shadow keeps white text legible on light photos; it can be changed or removed here.
+			$this->add_group_control(
+				\Elementor\Group_Control_Text_Shadow::get_type(),
+				array(
+					'name'     => 'sl_' . $k . '_shadow',
+					'selector' => '{{WRAPPER}} ' . $cfg[2],
+				)
+			);
+			$this->end_controls_section();
+		}
 
 		$this->mcm_style_section( 'mcm_sl_style_btn', __( 'Button', 'medical-college-manager' ) );
 		$this->mcm_button_style( 'sl_btn', '.mcm-sl-btn' );
@@ -1369,6 +1389,9 @@ class MCM_Widget_Slider extends \Elementor\Widget_Base {
 			$url = isset( $slide['image']['url'] ) ? (string) $slide['image']['url'] : '';
 		}
 		if ( $id && wp_attachment_is_image( $id ) ) {
+			if ( '' !== $this->img_sizes ) {
+				$attrs['sizes'] = $this->img_sizes;
+			}
 			return wp_get_attachment_image( $id, $size, false, $attrs );
 		}
 		if ( '' === $url ) {
@@ -1483,6 +1506,17 @@ class MCM_Widget_Slider extends \Elementor\Widget_Base {
 		$out  = '<div class="' . esc_attr( implode( ' ', $classes ) ) . '" role="region" aria-roledescription="' . esc_attr__( 'carousel', 'medical-college-manager' ) . '" aria-label="' . esc_attr( $label ) . '" data-mcm-slider="' . esc_attr( wp_json_encode( $config ) ) . '">';
 		$out .= '<div class="mcm-sl-viewport" aria-live="' . ( $autoplay ? 'off' : 'polite' ) . '">';
 		$out .= '<div class="mcm-sl-track">';
+
+		$per             = function ( $key, $fallback ) use ( $s ) {
+			$v = isset( $s[ $key ] ) && '' !== $s[ $key ] ? (int) $s[ $key ] : $fallback;
+			return max( 1, min( 6, $v ) );
+		};
+		$p_desk          = $per( 'per_view', 1 );
+		$p_tab           = $per( 'per_view_tablet', $p_desk );
+		$p_mob           = $per( 'per_view_mobile', 1 );
+		$this->img_sizes = $yes( 'stretch' ) || ! isset( $s['width']['size'] ) || '' === $s['width']['size']
+			? sprintf( '(max-width: 767px) %1$svw, (max-width: 1024px) %2$svw, %3$svw', round( 100 / $p_mob ), round( 100 / $p_tab ), round( 100 / $p_desk ) )
+			: '';
 
 		// A video slide may still hold the cover image set before it had its own
 		// Thumbnail. Elementor drops hidden controls from the display settings,

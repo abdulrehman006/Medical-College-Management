@@ -30,6 +30,16 @@ New: Elementor "Slider (Images & Videos)" widget:
   (HTML5, YouTube and Vimeo APIs), a stalled video shows a spinner, and a
   video that cannot play shows the provider's own message. The slider's
   pause button now also pauses background videos (WCAG 2.2.2).
+* Slider QA (owner / visitor / engineer, docs/qa-report-2026-11-09.md §8):
+  long text no longer gets cut off in short or phone-height slides (heights
+  are minimums; all slides stay equal); default overlay 45% plus a soft,
+  editable text shadow so white text stays legible on light photos; Windows
+  high-contrast mode shows button edges and the current dot; slides line up
+  to the sub-pixel (no sliver of the next slide); images download at the size
+  of their slot (a 3-across carousel no longer loads full-screen images);
+  player commands go only to the player's own origin; editor re-renders no
+  longer leave old sliders' listeners behind; two panel dropdowns no longer
+  cut off their options.
 * Performance: no library dependency; assets load only on pages with a
   slider; videos are created when their slide is shown and background videos
   pause off-screen or in a background tab; without JavaScript the slides

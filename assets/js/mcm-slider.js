@@ -266,7 +266,10 @@
 
 	Slider.prototype.offsetFor = function ( index ) {
 		var s = this.slides[ index ], s0 = this.slides[ 0 ];
-		return s && s0 ? -( s.offsetLeft - s0.offsetLeft ) : 0;
+		// Sub-pixel distance (offsetLeft rounds to whole pixels, and the error
+		// adds up slide after slide, leaving a sliver of the next slide showing).
+		// The track's transform moves both slides equally, so it cancels out.
+		return s && s0 ? -( s.getBoundingClientRect().left - s0.getBoundingClientRect().left ) : 0;
 	};
 
 	Slider.prototype.go = function ( index, opts ) {
@@ -486,6 +489,15 @@
 	var ORIGINS = { 'https://www.youtube-nocookie.com': 'youtube', 'https://www.youtube.com': 'youtube', 'https://player.vimeo.com': 'vimeo' };
 	var players = []; // { node, onMessage } for iframe players, for the shared message listener.
 
+	// Messages go only to the player's own origin (never '*').
+	function playerOrigin( node ) {
+		try {
+			return new URL( node.src ).origin;
+		} catch ( e ) {
+			return 'https://www.youtube-nocookie.com';
+		}
+	}
+
 	window.addEventListener( 'message', function ( e ) {
 		var kind = ORIGINS[ e.origin ], i, data;
 		if ( ! kind ) {
@@ -638,10 +650,10 @@
 				return;
 			}
 			if ( d.v.type === 'youtube' ) {
-				w.postMessage( JSON.stringify( { event: 'listening', id: d.slide.id || 'mcm-sl', channel: 'widget' } ), '*' );
+				w.postMessage( JSON.stringify( { event: 'listening', id: d.slide.id || 'mcm-sl', channel: 'widget' } ), playerOrigin( node ) );
 			} else {
 				[ 'play', 'playing', 'pause', 'ended', 'bufferstart', 'bufferend' ].forEach( function ( ev ) {
-					w.postMessage( JSON.stringify( { method: 'addEventListener', value: ev } ), '*' );
+					w.postMessage( JSON.stringify( { method: 'addEventListener', value: ev } ), playerOrigin( node ) );
 				} );
 			}
 			if ( ++tries < 8 ) {
@@ -749,9 +761,9 @@
 		var w = node.contentWindow;
 		if ( w ) {
 			if ( d.v.type === 'youtube' ) {
-				w.postMessage( JSON.stringify( { event: 'command', func: play ? 'playVideo' : 'pauseVideo', args: '' } ), '*' );
+				w.postMessage( JSON.stringify( { event: 'command', func: play ? 'playVideo' : 'pauseVideo', args: '' } ), playerOrigin( node ) );
 			} else {
-				w.postMessage( JSON.stringify( { method: play ? 'play' : 'pause' } ), '*' );
+				w.postMessage( JSON.stringify( { method: play ? 'play' : 'pause' } ), playerOrigin( node ) );
 			}
 		}
 		// A player that does not report its state: show the result directly.
@@ -908,14 +920,32 @@
 			this.ro.disconnect();
 		}
 		delete this.el.mcmSlider;
+		var self = this;
+		live = live.filter( function ( inst ) { return inst !== self; } );
 	};
 
+	// Every live slider. Elementor's editor replaces a widget's element on each
+	// re-render without telling the old instance, so sliders whose element has
+	// left the page are cleaned up here (their document/window listeners,
+	// observers and timers would otherwise pile up while editing).
+	var live = [];
+
+	function prune() {
+		live.slice().forEach( function ( inst ) {
+			if ( ! inst.el.isConnected ) {
+				inst.destroy();
+			}
+		} );
+	}
+
 	function boot( root ) {
+		prune();
 		( root || document ).querySelectorAll( '.mcm-sl[data-mcm-slider]' ).forEach( function ( el ) {
 			if ( el.mcmSlider ) {
 				el.mcmSlider.destroy();
 			}
 			el.mcmSlider = new Slider( el );
+			live.push( el.mcmSlider );
 		} );
 	}
 

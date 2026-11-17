@@ -32,12 +32,15 @@
 	flex: 0 0 calc((100% - (var(--mcm-sl-per) - 1) * var(--mcm-sl-gap)) / var(--mcm-sl-per));
 	min-width: 0;
 	overflow: hidden;
+	overflow: clip; /* unlike hidden, clip lets the slide grow to fit long text */
 	isolation: isolate;
 	display: flex;
 }
-/* Heights. */
-.mcm-sl--h-custom .mcm-sl-slide{ height: var(--mcm-sl-h); }
-.mcm-sl--h-screen .mcm-sl-slide{ height: calc(100vh - var(--mcm-sl-offset)); height: calc(100svh - var(--mcm-sl-offset)); min-height: 240px; }
+/* Heights are minimums: a slide whose text needs more room (a phone, a long
+   description, a large font) grows instead of cutting the text off, and every
+   slide in the row stretches to the same height. */
+.mcm-sl--h-custom .mcm-sl-slide{ min-height: var(--mcm-sl-h); }
+.mcm-sl--h-screen .mcm-sl-slide{ min-height: max(240px, calc(100vh - var(--mcm-sl-offset))); min-height: max(240px, calc(100svh - var(--mcm-sl-offset))); }
 .mcm-sl--h-ratio .mcm-sl-slide{ aspect-ratio: var(--mcm-sl-ratio); height: auto; }
 
 /* Without JavaScript the slides scroll sideways instead of being stuck. */
@@ -82,7 +85,7 @@
 .mcm-sl-slide--video-click.is-video-loading .mcm-sl-play{ visibility: hidden; }
 @keyframes mcm-sl-spin{ to{ transform: rotate(360deg); } }
 
-.mcm-sl-overlay{ position: absolute; inset: 0; z-index: 1; background-color: rgba(0,0,0,.35); pointer-events: none; }
+.mcm-sl-overlay{ position: absolute; inset: 0; z-index: 1; background-color: rgba(0,0,0,.45); pointer-events: none; }
 
 /* Content. */
 .mcm-sl-content{
@@ -95,9 +98,12 @@
 	padding: 40px 72px;
 	pointer-events: none;
 }
+/* Keep the text clear of pagination that sits over the slide. */
+.mcm-sl--pager-inside .mcm-sl-content{ padding-bottom: 64px;
+}
 .mcm-sl-inner{ max-width: 760px; text-align: center; pointer-events: auto; }
-.mcm-sl .mcm-sl-heading{ margin: 0 0 14px; color: #fff; font-size: clamp(1.5rem, 1rem + 2.4vw, 3rem); line-height: 1.15; font-weight: 700; }
-.mcm-sl .mcm-sl-desc{ margin: 0 0 22px; color: #fff; font-size: clamp(1rem, .9rem + .4vw, 1.2rem); line-height: 1.55; }
+.mcm-sl .mcm-sl-heading{ margin: 0 0 14px; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,.45); font-size: clamp(1.5rem, 1rem + 2.4vw, 3rem); line-height: 1.15; font-weight: 700; }
+.mcm-sl .mcm-sl-desc{ margin: 0 0 22px; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,.45); font-size: clamp(1rem, .9rem + .4vw, 1.2rem); line-height: 1.55; }
 .mcm-sl .mcm-sl-desc:last-child, .mcm-sl .mcm-sl-heading:last-child{ margin-bottom: 0; }
 .mcm-sl .mcm-sl-btn{
 	display: inline-flex; align-items: center; justify-content: center;
@@ -223,6 +229,17 @@
 	.mcm-sl--arrows-outside .mcm-sl-content{ padding-left: 20px; padding-right: 20px; }
 	.mcm-sl-play{ width: 60px; height: 60px; margin: -30px 0 0 -30px; }
 	.mcm-sl-slide--video-click .mcm-sl-content{ padding-bottom: 110px; }
+}
+
+/* Windows high-contrast mode: give buttons a visible edge and keep the
+   current dot / progress distinguishable. */
+@media (forced-colors: active){
+	.mcm-sl-arrow, .mcm-sl-pause, .mcm-sl-play{ border: 2px solid ButtonText; }
+	.mcm-sl-dot::before{ forced-color-adjust: none; background: Canvas; box-shadow: 0 0 0 1px CanvasText; }
+	.mcm-sl-dot[aria-current="true"]::before{ background: Highlight; box-shadow: 0 0 0 1px Highlight; }
+	.mcm-sl-pager--progress{ forced-color-adjust: none; background: Canvas; outline: 1px solid CanvasText; }
+	.mcm-sl-progress{ forced-color-adjust: none; background: Highlight; }
+	.mcm-sl-overlay{ display: none; }
 }
 
 @media (prefers-reduced-motion: reduce){
