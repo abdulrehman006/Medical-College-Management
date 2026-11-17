@@ -72,6 +72,7 @@ function mcm_modules() {
 	return array(
 		'class-mcm-cpt.php'                  => 'MCM_CPT',
 		'class-mcm-meta.php'                 => 'MCM_Meta',
+		'class-mcm-people.php'               => 'MCM_People',
 		'class-mcm-upgrade.php'              => 'MCM_Upgrade',
 		'class-mcm-settings.php'             => 'MCM_Settings',
 		'class-mcm-assets.php'               => 'MCM_Assets',

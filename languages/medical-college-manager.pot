@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-11-17T08:14:42+00:00\n"
+"POT-Creation-Date: 2026-11-17T08:38:52+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: medical-college-manager\n"
@@ -385,7 +385,7 @@ msgid "Sessions"
 msgstr ""
 
 #: includes/class-mcm-cpt.php:326
-#: includes/class-mcm-meta.php:1140
+#: includes/class-mcm-meta.php:1164
 #: includes/class-mcm-query.php:2748
 #: includes/class-mcm-query.php:2828
 #: includes/class-mcm-query.php:3001
@@ -821,7 +821,7 @@ msgstr ""
 
 #. translators: %d: number of further items not listed.
 #: includes/class-mcm-health.php:279
-#: includes/class-mcm-import.php:538
+#: includes/class-mcm-import.php:550
 #, php-format
 msgid "…and %d more."
 msgstr ""
@@ -962,146 +962,188 @@ msgstr ""
 #. translators: %d: number of rows.
 #: includes/class-mcm-import.php:494
 #, php-format
+msgid "%d row matched an existing person by email: that record was updated and keeps its other departments."
+msgid_plural "%d rows matched existing people by email: those records were updated and keep their other departments."
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %d: number of rows.
+#: includes/class-mcm-import.php:506
+#, php-format
 msgid "%d row has the same title as an existing entry – tick \"Update existing entries with the same title\" to update it instead."
 msgid_plural "%d rows have the same title as existing entries – tick \"Update existing entries with the same title\" to update them instead."
 msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %d: number of warnings.
-#: includes/class-mcm-import.php:508
+#: includes/class-mcm-import.php:520
 #, php-format
 msgid "%d warning (the row was imported)."
 msgid_plural "%d warnings (the rows were imported)."
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/class-mcm-import.php:514
+#: includes/class-mcm-import.php:526
 msgid "Skipped rows:"
 msgstr ""
 
-#: includes/class-mcm-import.php:515
+#: includes/class-mcm-import.php:527
 msgid "Warnings:"
 msgstr ""
 
-#: includes/class-mcm-import.php:575
+#: includes/class-mcm-import.php:587
 msgid "Could not read the file."
 msgstr ""
 
-#: includes/class-mcm-import.php:583
+#: includes/class-mcm-import.php:595
 msgid "The file is empty."
 msgstr ""
 
 #. translators: %d: CSV row number.
-#: includes/class-mcm-import.php:619
+#: includes/class-mcm-import.php:637
 #, php-format
 msgid "Row %d skipped (no title)."
 msgstr ""
 
 #. translators: 1: CSV row number, 2: column name, 3: the value.
-#: includes/class-mcm-import.php:635
+#: includes/class-mcm-import.php:653
 #, php-format
 msgid "Row %1$d skipped: \"%2$s\" value \"%3$s\" is not a valid date (use 15/10/2026 or 2026-10-15)."
 msgstr ""
 
 #. translators: 1: CSV row number, 2: column name, 3: the value.
-#: includes/class-mcm-import.php:637
+#: includes/class-mcm-import.php:655
 #, php-format
 msgid "Row %1$d skipped: \"%2$s\" value \"%3$s\" is not a valid time (use 14:30 or 2:30 PM)."
 msgstr ""
 
 #. translators: %d: CSV row number.
-#: includes/class-mcm-import.php:681
+#: includes/class-mcm-import.php:672
+#, php-format
+msgid "Row %d skipped: email is required for consultants and team members (each person is matched by email)."
+msgstr ""
+
+#. translators: 1: CSV row number, 2: the value.
+#: includes/class-mcm-import.php:674
+#, php-format
+msgid "Row %1$d skipped: \"%2$s\" is not a valid email address."
+msgstr ""
+
+#. translators: 1: CSV row number, 2: the reason.
+#: includes/class-mcm-import.php:682
+#, php-format
+msgid "Row %1$d skipped: %2$s"
+msgstr ""
+
+#. translators: %d: CSV row number.
+#: includes/class-mcm-import.php:725
 #, php-format
 msgid "Row %d failed."
 msgstr ""
 
 #. translators: 1: CSV row number, 2: column name, 3: the value.
-#: includes/class-mcm-import.php:697
+#: includes/class-mcm-import.php:741
 #, php-format
 msgid "Row %1$d: %2$s '%3$s' not recognised – existing value kept."
 msgstr ""
 
 #. translators: 1: CSV row number, 2: column name, 3: the value.
-#: includes/class-mcm-import.php:699
+#: includes/class-mcm-import.php:743
 #, php-format
 msgid "Row %1$d: %2$s '%3$s' not recognised – left blank."
 msgstr ""
 
-#: includes/class-mcm-import.php:929
+#. translators: 1: CSV row number, 2: phone number, 3: name of the other record.
+#: includes/class-mcm-import.php:794
+#, php-format
+msgid "Row %1$d: phone %2$s is also on \"%3$s\" – imported anyway; check it is not a mistake."
+msgstr ""
+
+#. translators: 1: email, 2: name of the record that has it, 3: id from the file.
+#: includes/class-mcm-import.php:851
+#, php-format
+msgid "email %1$s already belongs to \"%2$s\", not to id %3$s. Fix the email or the id."
+msgstr ""
+
+#: includes/class-mcm-import.php:1055
 msgid "Medical College Manager — CSV Import / Export"
 msgstr ""
 
-#: includes/class-mcm-import.php:932
+#: includes/class-mcm-import.php:1058
 #: includes/class-mcm-site-chrome-settings.php:566
 msgid "Import"
 msgstr ""
 
-#: includes/class-mcm-import.php:935
+#: includes/class-mcm-import.php:1061
 msgid "Upload a CSV to bulk-create any content type. The first row must be the column headers. Departments, sessions, faculty and categories are created automatically from the values you provide (comma-separate multiple terms). Matching values are reused as one shared term, so content imported from different files links together automatically."
 msgstr ""
 
-#: includes/class-mcm-import.php:938
+#: includes/class-mcm-import.php:1064
 msgid "Tip: import Timetable and Courses before Consultants/Team — a person whose name matches a Faculty entry is then auto-linked to the classes they teach. You can also add a \"faculty\" column to set this explicitly."
 msgstr ""
 
-#: includes/class-mcm-import.php:945
-#: includes/class-mcm-import.php:1002
+#: includes/class-mcm-import.php:1071
+#: includes/class-mcm-import.php:1129
 msgid "Content Type"
 msgstr ""
 
-#: includes/class-mcm-import.php:955
+#: includes/class-mcm-import.php:1081
 msgid "CSV File"
 msgstr ""
 
-#: includes/class-mcm-import.php:959
+#: includes/class-mcm-import.php:1085
 msgid "Create As"
 msgstr ""
 
-#: includes/class-mcm-import.php:962
+#: includes/class-mcm-import.php:1088
 #: includes/class-mcm-query.php:3097
 #: includes/class-mcm-query.php:3416
 #: includes/class-mcm-query.php:3500
 msgid "Published"
 msgstr ""
 
-#: includes/class-mcm-import.php:963
+#: includes/class-mcm-import.php:1089
 msgid "Draft"
 msgstr ""
 
-#: includes/class-mcm-import.php:968
+#: includes/class-mcm-import.php:1094
 msgid "Matching"
 msgstr ""
 
-#: includes/class-mcm-import.php:972
+#: includes/class-mcm-import.php:1098
 msgid "Update existing entries with the same title"
 msgstr ""
 
-#: includes/class-mcm-import.php:974
+#: includes/class-mcm-import.php:1100
 msgid "Rows with an \"id\" column (from an export) always update that exact entry. Leave this off when several entries legitimately share a title, such as timetable slots. Rows inside the same file are never merged."
 msgstr ""
 
-#: includes/class-mcm-import.php:978
+#: includes/class-mcm-import.php:1101
+msgid "Consultants and Team: the email column is required and identifies the person. A row whose email already exists updates that person and adds the file's department, specialty, faculty and research area to the ones they have (nothing is removed), so one person can belong to several departments. Phone is optional; a phone already on another person is reported as a warning."
+msgstr ""
+
+#: includes/class-mcm-import.php:1105
 msgid "Import CSV"
 msgstr ""
 
-#: includes/class-mcm-import.php:982
+#: includes/class-mcm-import.php:1109
 msgid "Sample CSV Templates"
 msgstr ""
 
-#: includes/class-mcm-import.php:983
+#: includes/class-mcm-import.php:1110
 msgid "Download a ready-made sample for each type, fill it with your data, and upload it above."
 msgstr ""
 
-#: includes/class-mcm-import.php:996
+#: includes/class-mcm-import.php:1123
 #: includes/class-mcm-site-chrome-settings.php:560
 msgid "Export"
 msgstr ""
 
-#: includes/class-mcm-import.php:997
+#: includes/class-mcm-import.php:1124
 msgid "Download every entry of a content type as a CSV — including its meta fields and its Departments / Sessions / Faculty / Categories. The columns match the import format, so you can export, edit in a spreadsheet, and re-import."
 msgstr ""
 
-#: includes/class-mcm-import.php:1012
+#: includes/class-mcm-import.php:1139
 msgid "Export CSV"
 msgstr ""
 
@@ -1117,41 +1159,41 @@ msgstr ""
 msgid "Missing: %s"
 msgstr ""
 
-#: includes/class-mcm-integrity.php:313
+#: includes/class-mcm-integrity.php:321
 msgid "Needs attention"
 msgstr ""
 
-#: includes/class-mcm-integrity.php:361
+#: includes/class-mcm-integrity.php:369
 msgid "Status on website"
 msgstr ""
 
-#: includes/class-mcm-integrity.php:384
+#: includes/class-mcm-integrity.php:392
 msgid "Shown (no expiry date)"
 msgstr ""
 
-#: includes/class-mcm-integrity.php:391
+#: includes/class-mcm-integrity.php:399
 msgid "Expired — hidden"
 msgstr ""
 
-#: includes/class-mcm-integrity.php:391
+#: includes/class-mcm-integrity.php:399
 msgid "Shown"
 msgstr ""
 
 #. translators: %s: date.
-#: includes/class-mcm-integrity.php:393
+#: includes/class-mcm-integrity.php:401
 #, php-format
 msgid "Expires %s"
 msgstr ""
 
-#: includes/class-mcm-integrity.php:399
+#: includes/class-mcm-integrity.php:407
 msgid "No event date"
 msgstr ""
 
-#: includes/class-mcm-integrity.php:399
+#: includes/class-mcm-integrity.php:407
 msgid "No deadline — stays open"
 msgstr ""
 
-#: includes/class-mcm-integrity.php:404
+#: includes/class-mcm-integrity.php:412
 msgid "Closed — hidden"
 msgstr ""
 
@@ -1256,7 +1298,7 @@ msgstr ""
 
 #: includes/class-mcm-job.php:598
 #: includes/class-mcm-meta.php:911
-#: includes/class-mcm-meta.php:1164
+#: includes/class-mcm-meta.php:1188
 #: includes/class-mcm-privacy.php:56
 #: includes/class-mcm-query.php:2767
 #: includes/class-mcm-query.php:2808
@@ -1283,7 +1325,7 @@ msgid "Timetable Details"
 msgstr ""
 
 #: includes/class-mcm-meta.php:302
-#: includes/class-mcm-meta.php:1135
+#: includes/class-mcm-meta.php:1159
 #: includes/class-mcm-query.php:2708
 #: includes/class-mcm-query.php:2993
 #: includes/class-mcm-query.php:3582
@@ -1324,7 +1366,7 @@ msgid "Degree Level"
 msgstr ""
 
 #: includes/class-mcm-meta.php:336
-#: includes/class-mcm-meta.php:1141
+#: includes/class-mcm-meta.php:1165
 #: includes/class-mcm-query.php:2749
 #: includes/class-mcm-query.php:3002
 #: includes/class-mcm-query.php:3365
@@ -1363,7 +1405,7 @@ msgid "Credit Hours"
 msgstr ""
 
 #: includes/class-mcm-meta.php:365
-#: includes/class-mcm-meta.php:1145
+#: includes/class-mcm-meta.php:1169
 #: includes/class-mcm-query.php:2723
 #: includes/class-mcm-query.php:3358
 msgid "Semester"
@@ -1380,7 +1422,7 @@ msgid "Event Details"
 msgstr ""
 
 #: includes/class-mcm-meta.php:378
-#: includes/class-mcm-meta.php:1148
+#: includes/class-mcm-meta.php:1172
 #: includes/class-mcm-query.php:2756
 #: includes/class-mcm-query.php:2775
 #: includes/class-mcm-query.php:3014
@@ -1393,7 +1435,7 @@ msgid "Date"
 msgstr ""
 
 #: includes/class-mcm-meta.php:390
-#: includes/class-mcm-meta.php:1149
+#: includes/class-mcm-meta.php:1173
 #: includes/class-mcm-query.php:2758
 #: includes/class-mcm-query.php:3016
 #: includes/class-mcm-query.php:3381
@@ -1418,7 +1460,7 @@ msgid "Consultant / Doctor Profile"
 msgstr ""
 
 #: includes/class-mcm-meta.php:411
-#: includes/class-mcm-meta.php:1152
+#: includes/class-mcm-meta.php:1176
 #: includes/class-mcm-privacy.php:68
 #: includes/class-mcm-privacy.php:79
 #: includes/class-mcm-query.php:2734
@@ -1521,7 +1563,7 @@ msgid "Team Member Profile"
 msgstr ""
 
 #: includes/class-mcm-meta.php:473
-#: includes/class-mcm-meta.php:1155
+#: includes/class-mcm-meta.php:1179
 msgid "Designation / Role"
 msgstr ""
 
@@ -1936,14 +1978,14 @@ msgid "Student Record"
 msgstr ""
 
 #: includes/class-mcm-meta.php:878
-#: includes/class-mcm-meta.php:1162
+#: includes/class-mcm-meta.php:1186
 #: includes/class-mcm-privacy.php:48
 #: includes/class-mcm-query.php:2826
 msgid "Student ID"
 msgstr ""
 
 #: includes/class-mcm-meta.php:882
-#: includes/class-mcm-meta.php:1163
+#: includes/class-mcm-meta.php:1187
 #: includes/class-mcm-privacy.php:49
 #: includes/class-mcm-query.php:2827
 #: includes/class-mcm-query.php:3102
@@ -1980,23 +2022,31 @@ msgstr ""
 msgid "Guardian Phone"
 msgstr ""
 
-#: includes/class-mcm-meta.php:967
+#: includes/class-mcm-meta.php:971
+msgid "Fill in the details below, then click Publish/Update. The Title (at the top) and Email are required; each person has one record, found by email — leave any other field blank to skip it."
+msgstr ""
+
+#: includes/class-mcm-meta.php:972
 msgid "Fill in the details below, then click Publish/Update. Only the Title (at the top) is required — leave any field blank to skip it."
 msgstr ""
 
-#: includes/class-mcm-meta.php:993
+#: includes/class-mcm-meta.php:994
+msgid "(required)"
+msgstr ""
+
+#: includes/class-mcm-meta.php:1005
 msgid "— Select —"
 msgstr ""
 
-#: includes/class-mcm-meta.php:1017
+#: includes/class-mcm-meta.php:1029
 msgid "Select document"
 msgstr ""
 
-#: includes/class-mcm-meta.php:1017
+#: includes/class-mcm-meta.php:1029
 msgid "Upload / Select"
 msgstr ""
 
-#: includes/class-mcm-meta.php:1018
+#: includes/class-mcm-meta.php:1030
 #: includes/class-mcm-settings.php:631
 #: includes/class-mcm-settings.php:670
 #: includes/class-mcm-settings.php:697
@@ -2006,51 +2056,51 @@ msgid "Clear"
 msgstr ""
 
 #. translators: %s: the stored value.
-#: includes/class-mcm-meta.php:1044
+#: includes/class-mcm-meta.php:1057
 #, php-format
 msgid "Stored value \"%s\" is not a recognised gender, so the general default photo is used. Choose a value and click Update."
 msgstr ""
 
 #. translators: %s: the stored value.
-#: includes/class-mcm-meta.php:1046
+#: includes/class-mcm-meta.php:1059
 #, php-format
 msgid "Stored value \"%s\" is not a valid date/time, so this entry may be hidden or sorted wrongly. Please enter it again."
 msgstr ""
 
 #. translators: 1: stored value, 2: corrected value.
-#: includes/class-mcm-meta.php:1057
+#: includes/class-mcm-meta.php:1070
 #, php-format
 msgid "Stored as \"%1$s\"; it will be saved as %2$s when you click Update."
 msgstr ""
 
-#: includes/class-mcm-meta.php:1136
+#: includes/class-mcm-meta.php:1160
 #: includes/class-mcm-query.php:2711
 #: includes/class-mcm-query.php:2995
 #: includes/class-mcm-query.php:3586
 msgid "Subject"
 msgstr ""
 
-#: includes/class-mcm-meta.php:1137
+#: includes/class-mcm-meta.php:1161
 #: includes/class-mcm-query.php:2714
 #: includes/class-mcm-query.php:2997
 #: includes/class-mcm-query.php:3589
 msgid "Room"
 msgstr ""
 
-#: includes/class-mcm-meta.php:1144
+#: includes/class-mcm-meta.php:1168
 #: includes/class-mcm-query.php:2718
 #: includes/class-mcm-query.php:3007
 msgid "Code"
 msgstr ""
 
-#: includes/class-mcm-meta.php:1158
+#: includes/class-mcm-meta.php:1182
 #: includes/class-mcm-query.php:2727
 #: includes/class-mcm-query.php:3034
 #: includes/class-mcm-query.php:3401
 msgid "Opens"
 msgstr ""
 
-#: includes/class-mcm-meta.php:1159
+#: includes/class-mcm-meta.php:1183
 #: includes/class-mcm-query.php:2728
 #: includes/class-mcm-query.php:3035
 #: includes/class-mcm-query.php:3402
@@ -2090,6 +2140,66 @@ msgstr ""
 
 #: includes/class-mcm-notice.php:672
 msgid "View all notices"
+msgstr ""
+
+#: includes/class-mcm-people.php:275
+msgid "Email is required for consultants and team members."
+msgstr ""
+
+#. translators: %s: the value entered.
+#: includes/class-mcm-people.php:280
+#, php-format
+msgid "\"%s\" is not a valid email address."
+msgstr ""
+
+#. translators: 1: email, 2: name of the other record.
+#: includes/class-mcm-people.php:286
+#, php-format
+msgid "%1$s is already used by \"%2$s\". Each person has one record: add this department to that record instead."
+msgstr ""
+
+#. translators: %s: the reason.
+#: includes/class-mcm-people.php:327
+#, php-format
+msgid "Email not saved: %s"
+msgstr ""
+
+#: includes/class-mcm-people.php:356
+msgid "Email is required. Add it in the Details box before saving."
+msgstr ""
+
+#: includes/class-mcm-people.php:357
+msgid "Enter a valid email address, e.g. name@gmc.edu.pk."
+msgstr ""
+
+#. translators: %s: name of the other record.
+#: includes/class-mcm-people.php:359
+#, php-format
+msgid "This email is already used by \"%s\". Each person has one record: open it and add this department there."
+msgstr ""
+
+#. translators: %s: name of the other record.
+#: includes/class-mcm-people.php:361
+#, php-format
+msgid "Note: this phone number is also on \"%s\". Saving is allowed (for a shared office line)."
+msgstr ""
+
+#: includes/class-mcm-people.php:362
+msgid "Open that record"
+msgstr ""
+
+#: includes/class-mcm-people.php:363
+msgid "You cannot edit that record: ask an administrator to add your department to it."
+msgstr ""
+
+#: includes/class-mcm-people.php:446
+msgid "No email"
+msgstr ""
+
+#. translators: %s: name of the other record.
+#: includes/class-mcm-people.php:452
+#, php-format
+msgid "Same email as: %s"
 msgstr ""
 
 #: includes/class-mcm-privacy.php:53
@@ -5928,12 +6038,12 @@ msgid "Medical College Manager requires PHP 7.2 or newer. This server runs PHP %
 msgstr ""
 
 #. translators: 1: required WordPress version, 2: installed version.
-#: medical-college-manager.php:115
+#: medical-college-manager.php:116
 #, php-format
 msgid "WordPress %1$s or newer is required; this site runs %2$s. Update WordPress (Dashboard → Updates)."
 msgstr ""
 
-#: medical-college-manager.php:136
+#: medical-college-manager.php:137
 msgid "Medical College Manager has not been loaded."
 msgstr ""
 

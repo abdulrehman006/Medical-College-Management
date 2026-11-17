@@ -488,6 +488,18 @@ class MCM_Import {
 			$result['updated'],
 			$result['skipped']
 		);
+		if ( ! empty( $result['by_email'] ) ) {
+			$msg .= ' ' . sprintf(
+				/* translators: %d: number of rows. */
+				_n(
+					'%d row matched an existing person by email: that record was updated and keeps its other departments.',
+					'%d rows matched existing people by email: those records were updated and keep their other departments.',
+					(int) $result['by_email'],
+					'medical-college-manager'
+				),
+				(int) $result['by_email']
+			);
+		}
 		if ( $result['same_title'] > 0 ) {
 			$msg .= ' ' . sprintf(
 				/* translators: %d: number of rows. */
@@ -596,6 +608,12 @@ class MCM_Import {
 		$meta_keys = isset( $map['meta'] ) ? $map['meta'] : array();
 		$tax_keys  = isset( $map['tax'] ) ? $map['tax'] : array();
 
+		// Consultants and team members: one record per person, found by email.
+		$people = class_exists( 'MCM_People' ) && MCM_People::is_person_type( $type );
+		// Columns a person collects across department files instead of replacing.
+		$additive = array( 'department', 'specialty', 'faculty', 'research_area' );
+		$by_email = 0;
+
 		$line = 1;
 		while ( true ) {
 			$row = fgetcsv( $handle, 0, ',', '"', '\\' );
@@ -644,12 +662,38 @@ class MCM_Import {
 				continue;
 			}
 
-			// Upsert by the 'id' column an export carries. Title matching only
-			// when the admin ticked it, and never onto a post this same file
-			// already wrote.
-			$existing = self::find_existing( $type, $data, $title, $match_title, $touched );
-			if ( ! $existing && ! $match_title && self::title_exists( $type, $title, $touched ) ) {
-				++$same_title;
+			if ( $people ) {
+				$raw_email = isset( $data['email'] ) ? $data['email'] : '';
+				$email     = MCM_People::normalize_email( $raw_email );
+				if ( '' === $email ) {
+					++$skipped;
+					$errors[] = '' === $raw_email
+						/* translators: %d: CSV row number. */
+						? sprintf( __( 'Row %d skipped: email is required for consultants and team members (each person is matched by email).', 'medical-college-manager' ), $line )
+						/* translators: 1: CSV row number, 2: the value. */
+						: sprintf( __( 'Row %1$d skipped: "%2$s" is not a valid email address.', 'medical-college-manager' ), $line, $raw_email );
+					continue;
+				}
+				$data['email'] = $email;
+				$person        = self::find_person( $type, $data, $title, $match_title, $touched );
+				if ( is_string( $person ) ) {
+					++$skipped;
+					/* translators: 1: CSV row number, 2: the reason. */
+					$errors[] = sprintf( __( 'Row %1$d skipped: %2$s', 'medical-college-manager' ), $line, $person );
+					continue;
+				}
+				list( $existing, $how ) = $person;
+				if ( 'email' === $how ) {
+					++$by_email;
+				}
+			} else {
+				// Upsert by the 'id' column an export carries. Title matching only
+				// when the admin ticked it, and never onto a post this same file
+				// already wrote.
+				$existing = self::find_existing( $type, $data, $title, $match_title, $touched );
+				if ( ! $existing && ! $match_title && self::title_exists( $type, $title, $touched ) ) {
+					++$same_title;
+				}
 			}
 
 			$postarr = array(
@@ -714,7 +758,10 @@ class MCM_Import {
 				if ( $names ) {
 					$ids = self::resolve_term_ids( $names, $tax );
 					if ( $ids ) {
-						wp_set_object_terms( $post_id, $ids, $tax, false );
+						// A person found again (e.g. in Department 2's file) keeps
+						// the departments they already have and gains this one.
+						$append = $people && $existing && in_array( $col, $additive, true );
+						wp_set_object_terms( $post_id, $ids, $tax, $append );
 					}
 				}
 			}
@@ -738,6 +785,21 @@ class MCM_Import {
 				}
 			}
 
+			// Phone is optional and may be shared (an office line): report, never refuse.
+			if ( $people && ! empty( $data['phone'] ) ) {
+				$other = MCM_People::find_by_phone( $type, $data['phone'], $post_id );
+				if ( $other ) {
+					$warnings[] = sprintf(
+						/* translators: 1: CSV row number, 2: phone number, 3: name of the other record. */
+						__( 'Row %1$d: phone %2$s is also on "%3$s" – imported anyway; check it is not a mistake.', 'medical-college-manager' ),
+						$line,
+						$data['phone'],
+						get_the_title( $other )
+					);
+				}
+				MCM_People::remember_phone( $type, $post_id, $data['phone'] );
+			}
+
 			$touched[] = (int) $post_id;
 			if ( $existing ) {
 				++$updated;
@@ -752,9 +814,73 @@ class MCM_Import {
 			'updated'    => $updated,
 			'skipped'    => $skipped,
 			'same_title' => $same_title,
+			'by_email'   => $by_email,
 			'errors'     => $errors,
 			'warnings'   => $warnings,
 		);
+	}
+
+	/**
+	 * Find the person a Consultant / Team row belongs to.
+	 *
+	 * 1. The 'id' column an export carries (same type); its email must not
+	 *    belong to a different record.
+	 * 2. The email: the same person in another department's file, or twice
+	 *    in one file, updates one record.
+	 * 3. Only when $match_title is on: a record with the same title that has
+	 *    no email yet (older data). A same-name record with a different email
+	 *    is a different person.
+	 *
+	 * @param string $type        Post type.
+	 * @param array  $data        Row keyed by column; 'email' already normalised.
+	 * @param string $title       Row title.
+	 * @param bool   $match_title Whether title matching is enabled.
+	 * @param int[]  $touched     Post IDs already written by this file.
+	 * @return array|string array( post ID or 0, 'id'|'email'|'title'|'' ), or why the row is refused.
+	 */
+	private static function find_person( $type, $data, $title, $match_title, $touched ) {
+		$email    = $data['email'];
+		$by_email = MCM_People::find_by_email( $type, $email );
+		$id       = isset( $data['id'] ) ? MCM_Safe::str( $data['id'] ) : '';
+		if ( '' !== $id && ctype_digit( $id ) ) {
+			$p = get_post( (int) $id );
+			if ( $p && $p->post_type === $type && 'trash' !== $p->post_status ) {
+				if ( $by_email && (int) $p->ID !== $by_email ) {
+					return sprintf(
+						/* translators: 1: email, 2: name of the record that has it, 3: id from the file. */
+						__( 'email %1$s already belongs to "%2$s", not to id %3$s. Fix the email or the id.', 'medical-college-manager' ),
+						$email,
+						get_the_title( $by_email ),
+						$id
+					);
+				}
+				return array( (int) $p->ID, 'id' );
+			}
+		}
+		if ( $by_email ) {
+			return array( $by_email, 'email' );
+		}
+		if ( $match_title ) {
+			$title = sanitize_text_field( $title );
+			$found = '' === $title ? array() : get_posts(
+				array(
+					'post_type'        => $type,
+					'title'            => $title,
+					'post_status'      => 'any',
+					'numberposts'      => 20,
+					'fields'           => 'ids',
+					'no_found_rows'    => true,
+					'post__not_in'     => array_map( 'intval', (array) $touched ), // phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_post__not_in -- Bounded by the size of one import file.
+					'suppress_filters' => false,
+				)
+			);
+			foreach ( $found as $fid ) {
+				if ( '' === trim( (string) get_post_meta( $fid, MCM_People::EMAIL, true ) ) ) {
+					return array( (int) $fid, 'title' );
+				}
+			}
+		}
+		return array( 0, '' );
 	}
 
 	/**
@@ -972,6 +1098,7 @@ class MCM_Import {
 								<?php esc_html_e( 'Update existing entries with the same title', 'medical-college-manager' ); ?>
 							</label>
 							<p class="description"><?php esc_html_e( 'Rows with an "id" column (from an export) always update that exact entry. Leave this off when several entries legitimately share a title, such as timetable slots. Rows inside the same file are never merged.', 'medical-college-manager' ); ?></p>
+							<p class="description"><?php esc_html_e( 'Consultants and Team: the email column is required and identifies the person. A row whose email already exists updates that person and adds the file\'s department, specialty, faculty and research area to the ones they have (nothing is removed), so one person can belong to several departments. Phone is optional; a phone already on another person is reported as a warning.', 'medical-college-manager' ); ?></p>
 						</td>
 					</tr>
 				</table>

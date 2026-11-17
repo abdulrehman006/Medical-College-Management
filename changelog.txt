@@ -1,6 +1,19 @@
 Medical College Manager — complete changelog.
 
 = 1.32.0 =
+New: one record per person for Consultants and Team (incl. staff), by email:
+* Email is required and unique within each type. The edit screen will not
+  save without a valid, unused email (it links to the record that has it);
+  the server refuses a duplicate too. Phone stays optional; a phone already
+  on another person is a note, not an error.
+* CSV import matches people by email (any case): importing Department 2
+  updates the person from Department 1 and adds the department (also
+  specialty, faculty, research area) instead of creating a duplicate or
+  replacing what they had. Rows without a valid email are skipped with the
+  reason; an "id" that contradicts the email is refused. Title matching only
+  fills in older records that have no email yet.
+* Older records with no email, or sharing one, show "No email" / "Same email
+  as: …" in the list and appear under "Needs attention"; nothing is merged.
 New: Elementor "Slider (Images & Videos)" widget:
 * Slides: image or video (YouTube via youtube-nocookie, Vimeo with Do Not
   Track, or an uploaded MP4 / WebM). Videos play as a muted background loop

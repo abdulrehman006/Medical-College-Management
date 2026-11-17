@@ -404,6 +404,17 @@ aspect-ratio height per screen size, a custom width, full-width stretch and
 slides per view. A video's Thumbnail shows while it loads and when it is
 paused or ends. Background videos only play while the slider is on screen.
 
+= How does importing people from several departments work? =
+Consultants and Team members (including staff) have one record per person,
+found by email. The email column is required; a row without a valid email is
+skipped and listed. When Department 2's file has an email that already exists,
+that person is updated and Department 2 is added to their departments (also
+specialty, faculty and research area); nothing is removed by an import. Phone
+is optional; a phone already on another person is shown as a warning. A doctor
+can be both a Consultant and a Team member. The edit screen will not save a
+person without a valid, unused email. Older records with no email, or sharing
+one, are labelled in the list and shown under "Needs attention".
+
 == Changelog ==
 
 = 1.32.0 =
@@ -421,6 +432,8 @@ New: college header & footer, Staff Type, full Elementor widget options.
 * Department access for editors; "Needs attention" flags; status column for dated content.
 * "Sort by" control (Newest first / Alphabetical A–Z) on every filterable listing and widget.
 * Publications and research tables show Supervisor, Team and a PDF Download.
+* One record per person (Consultants, Team): email required and unique; CSV import
+  matches by email and adds the new department instead of creating a duplicate.
 * Public student directory is now opt-in (off by default; switched off once on update).
 * Profile pages link to the department/faculty pages and list the person's publications
   and research; details panels link every department, faculty and specialty.

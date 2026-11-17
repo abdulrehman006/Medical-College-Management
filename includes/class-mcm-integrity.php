@@ -268,7 +268,15 @@ class MCM_Integrity {
 			);
 			$ids = array_merge( $ids, $q->posts );
 		}
-		return array_values( array_unique( array_map( 'intval', $ids ) ) );
+		$ids = array_values( array_unique( array_map( 'intval', $ids ) ) );
+		/**
+		 * Filter the published entries listed under "Needs attention".
+		 *
+		 * @param int[]  $ids  Post IDs.
+		 * @param string $type Post type.
+		 */
+		$ids = apply_filters( 'mcm_integrity_flagged_ids', $ids, $type );
+		return array_values( array_unique( array_map( 'intval', (array) $ids ) ) );
 	}
 
 	/**

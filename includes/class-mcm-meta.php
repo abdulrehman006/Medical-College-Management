@@ -964,7 +964,13 @@ class MCM_Meta {
 		}
 		wp_nonce_field( 'mcm_meta_save', 'mcm_meta_nonce' );
 
-		echo '<p class="description" style="margin:0 0 12px;">' . esc_html__( 'Fill in the details below, then click Publish/Update. Only the Title (at the top) is required — leave any field blank to skip it.', 'medical-college-manager' ) . '</p>';
+		// People are identified by their email (one record per person).
+		$people = class_exists( 'MCM_People' ) && MCM_People::is_person_type( $cpt );
+		echo '<p class="description" style="margin:0 0 12px;">' . esc_html(
+			$people
+				? __( 'Fill in the details below, then click Publish/Update. The Title (at the top) and Email are required; each person has one record, found by email — leave any other field blank to skip it.', 'medical-college-manager' )
+				: __( 'Fill in the details below, then click Publish/Update. Only the Title (at the top) is required — leave any field blank to skip it.', 'medical-college-manager' )
+		) . '</p>';
 
 		echo '<div class="mcm-meta-grid">';
 		foreach ( $config[ $cpt ]['fields'] as $key => $field ) {
@@ -979,8 +985,14 @@ class MCM_Meta {
 			} elseif ( 'gender' === $field['type'] && '' !== self::normalize_gender( $value ) ) {
 				$shown = self::normalize_gender( $value );
 			}
+			$required = $people && MCM_People::EMAIL === $key;
 			echo '<p class="mcm-meta-field">';
-			printf( '<label for="%1$s"><strong>%2$s</strong></label><br/>', esc_attr( $key ), esc_html( $field['label'] ) );
+			printf(
+				'<label for="%1$s"><strong>%2$s</strong>%3$s</label><br/>',
+				esc_attr( $key ),
+				esc_html( $field['label'] ),
+				$required ? ' <span aria-hidden="true" style="color:#b32d2e;">*</span><span class="screen-reader-text"> ' . esc_html__( '(required)', 'medical-college-manager' ) . '</span>' : ''
+			);
 
 			switch ( $field['type'] ) {
 				case 'textarea':
@@ -1021,10 +1033,11 @@ class MCM_Meta {
 
 				default:
 					printf(
-						'<input type="%1$s" id="%2$s" name="%2$s" value="%3$s" style="width:100%%;max-width:420px;" />',
+						'<input type="%1$s" id="%2$s" name="%2$s" value="%3$s" style="width:100%%;max-width:420px;"%4$s />',
 						esc_attr( $field['type'] ),
 						esc_attr( $key ),
-						esc_attr( $shown )
+						esc_attr( $shown ),
+						$required ? ' required aria-required="true"' : ''
 					);
 					break;
 			}
@@ -1100,6 +1113,17 @@ class MCM_Meta {
 			if ( ! self::is_valid( $field['type'], $raw ) ) {
 				$invalid[] = $field['label'];
 				continue;
+			}
+			// One record per person: an empty, invalid or already-used email is
+			// not saved (the stored one stays) and the editor is told why. The
+			// edit screen blocks this before saving; this guards other routes.
+			if ( class_exists( 'MCM_People' ) && MCM_People::is_person_type( $post->post_type ) && MCM_People::EMAIL === $key ) {
+				$problem = MCM_People::email_problem( $post->post_type, $post_id, $raw );
+				if ( '' !== $problem ) {
+					MCM_People::remember_notice( $post_id, $problem );
+					continue;
+				}
+				$raw = MCM_People::normalize_email( $raw );
 			}
 			$clean = self::sanitize_value( $field['type'], $raw );
 			update_post_meta( $post_id, $key, $clean );
