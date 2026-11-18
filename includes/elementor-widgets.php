@@ -2878,8 +2878,11 @@ abstract class MCM_Widget_Notice_Base extends \Elementor\Widget_Base {
 
 	/**
 	 * Controls shared by the three notice widgets.
+	 *
+	 * @param string $kind ticker | board | list. The ticker prints no date, so it
+	 *                     gets no "Show date" switch.
 	 */
-	protected function mcm_common_controls() {
+	protected function mcm_common_controls( $kind = 'list' ) {
 		$this->add_control(
 			'count',
 			array(
@@ -2950,15 +2953,17 @@ abstract class MCM_Widget_Notice_Base extends \Elementor\Widget_Base {
 				'description' => __( '0 shows all current notices.', 'medical-college-manager' ),
 			)
 		);
-		$this->add_control(
-			'show_date',
-			array(
-				'label'        => __( 'Show date', 'medical-college-manager' ),
-				'type'         => \Elementor\Controls_Manager::SWITCHER,
-				'return_value' => 'yes',
-				'default'      => 'yes',
-			)
-		);
+		if ( 'ticker' !== $kind ) {
+			$this->add_control(
+				'show_date',
+				array(
+					'label'        => __( 'Show date', 'medical-college-manager' ),
+					'type'         => \Elementor\Controls_Manager::SWITCHER,
+					'return_value' => 'yes',
+					'default'      => 'yes',
+				)
+			);
+		}
 		$this->add_control(
 			'show_badge',
 			array(
@@ -2992,6 +2997,14 @@ abstract class MCM_Widget_Notice_Base extends \Elementor\Widget_Base {
 						),
 					),
 					'selectors'  => array( '{{WRAPPER}} .mcm-ticker-item' => 'height: {{SIZE}}{{UNIT}};' ),
+				)
+			);
+			$this->add_control(
+				'st_pause',
+				array(
+					'label'     => __( 'Pause button colour', 'medical-college-manager' ),
+					'type'      => \Elementor\Controls_Manager::COLOR,
+					'selectors' => array( self::mcm_pause_selector( '.mcm-ticker' ) => 'color: {{VALUE}};' ),
 				)
 			);
 			$this->end_controls_section();
@@ -3033,7 +3046,7 @@ abstract class MCM_Widget_Notice_Base extends \Elementor\Widget_Base {
 				array(
 					'label'     => __( 'Pause button colour', 'medical-college-manager' ),
 					'type'      => \Elementor\Controls_Manager::COLOR,
-					'selectors' => array( '{{WRAPPER}} .mcm-board-head .mcm-scroll-pause' => 'color: {{VALUE}}; border-color: {{VALUE}};' ),
+					'selectors' => array( self::mcm_pause_selector( '.mcm-board-head' ) => 'color: {{VALUE}};' ),
 				)
 			);
 			$this->mcm_dimensions( 'st_head_pad', __( 'Padding', 'medical-college-manager' ), '{{WRAPPER}} .mcm-board-head', 'padding' );
@@ -3066,9 +3079,11 @@ abstract class MCM_Widget_Notice_Base extends \Elementor\Widget_Base {
 			$this->end_controls_section();
 		}
 
-		$this->mcm_style_section( 'mcm_ns_date', __( 'Date', 'medical-college-manager' ), array( 'condition' => array( 'show_date' => 'yes' ) ) );
-		$this->mcm_text_style( 'st_date', '.mcm-notice-date' );
-		$this->end_controls_section();
+		if ( 'ticker' !== $kind ) {
+			$this->mcm_style_section( 'mcm_ns_date', __( 'Date', 'medical-college-manager' ), array( 'condition' => array( 'show_date' => 'yes' ) ) );
+			$this->mcm_text_style( 'st_date', '.mcm-notice-date' );
+			$this->end_controls_section();
+		}
 
 		$this->mcm_style_section( 'mcm_ns_badges', __( 'Badges', 'medical-college-manager' ) );
 		$this->mcm_badge_style( 'st_badge', '.mcm-notice-badge', __( 'Category badge', 'medical-college-manager' ) );
@@ -3088,7 +3103,28 @@ abstract class MCM_Widget_Notice_Base extends \Elementor\Widget_Base {
 		);
 		$this->end_controls_section();
 
-		$this->mcm_empty_style();
+		// Only the list prints a visitor-facing empty message; an empty ticker
+		// or board shows visitors nothing (editors get the shared note).
+		if ( 'list' === $kind ) {
+			$this->mcm_empty_style();
+		}
+	}
+
+	/**
+	 * Selector for the pause button in every state. The theme-proof button
+	 * rules in mcm-frontend.css restate :hover and :focus with an element and
+	 * two classes, so a colour set on the plain state alone was lost on hover
+	 * and focus.
+	 *
+	 * @param string $box Container class (.mcm-ticker or .mcm-board-head).
+	 * @return string
+	 */
+	private static function mcm_pause_selector( $box ) {
+		$out = array();
+		foreach ( array( '', ':hover', ':focus' ) as $state ) {
+			$out[] = '{{WRAPPER}} ' . $box . ' button.mcm-scroll-pause' . $state;
+		}
+		return implode( ', ', $out );
 	}
 
 	/**
@@ -3185,10 +3221,11 @@ class MCM_Widget_Notice_Ticker extends MCM_Widget_Notice_Base {
 			array(
 				'label'       => __( 'Label', 'medical-college-manager' ),
 				'type'        => \Elementor\Controls_Manager::TEXT,
+				'dynamic'     => array( 'active' => true ),
 				'placeholder' => __( 'Latest', 'medical-college-manager' ),
 			)
 		);
-		$this->mcm_common_controls();
+		$this->mcm_common_controls( 'ticker' );
 		$this->add_control(
 			'speed',
 			array(
@@ -3261,18 +3298,20 @@ class MCM_Widget_Notice_Board extends MCM_Widget_Notice_Base {
 			array(
 				'label'       => __( 'Heading', 'medical-college-manager' ),
 				'type'        => \Elementor\Controls_Manager::TEXT,
+				'dynamic'     => array( 'active' => true ),
 				'placeholder' => __( 'Notice Board', 'medical-college-manager' ),
 			)
 		);
 		$this->mcm_common_controls();
-		$this->add_control(
+		$this->add_responsive_control(
 			'height',
 			array(
-				'label'   => __( 'Height (px)', 'medical-college-manager' ),
-				'type'    => \Elementor\Controls_Manager::NUMBER,
-				'min'     => 160,
-				'max'     => 800,
-				'default' => 340,
+				'label'     => __( 'Height (px)', 'medical-college-manager' ),
+				'type'      => \Elementor\Controls_Manager::NUMBER,
+				'min'       => 160,
+				'max'       => 800,
+				'default'   => 340,
+				'selectors' => array( '{{WRAPPER}} .mcm-board-viewport' => 'height: {{VALUE}}px;' ),
 			)
 		);
 		$this->add_control(

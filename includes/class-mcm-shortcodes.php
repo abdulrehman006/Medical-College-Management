@@ -135,10 +135,12 @@ class MCM_Shortcodes {
 	 * "Add" link where allowed) for logged-in editors, so a blank spot on the
 	 * page is explained to whoever can fix it.
 	 *
+	 * Also used by the notice ticker and board (MCM_Notice).
+	 *
 	 * @param string $type Post type.
 	 * @return string
 	 */
-	private static function empty_notice( $type ) {
+	public static function empty_notice( $type ) {
 		if ( ! current_user_can( 'edit_posts' ) ) {
 			return '';
 		}
