@@ -16,8 +16,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * Personal-data exporter and eraser.
+ */
 class MCM_Privacy {
 
+	/**
+	 * Register the hooks this module needs.
+	 */
 	public function __construct() {
 		add_filter( 'wp_privacy_personal_data_exporters', array( $this, 'register_exporter' ) );
 		add_filter( 'wp_privacy_personal_data_erasers', array( $this, 'register_eraser' ) );
@@ -35,47 +41,57 @@ class MCM_Privacy {
 			array(
 				'mcm_student'    => array(
 					'label'  => __( 'Student Record', 'medical-college-manager' ),
+					// Academic record kept on erasure (exported, but not personal data).
+					'keep'   => array( 'mcm_program', 'mcm_batch', 'mcm_status' ),
 					'email'  => 'mcm_email',
 					'fields' => array(
-						'mcm_student_id'  => __( 'Student ID', 'medical-college-manager' ),
-						'mcm_roll_no'     => __( 'PMDC No.', 'medical-college-manager' ),
-						'mcm_email'       => __( 'Email', 'medical-college-manager' ),
-						'mcm_phone'       => __( 'Phone', 'medical-college-manager' ),
-						'mcm_program'     => __( 'Program', 'medical-college-manager' ),
-						'mcm_batch'       => __( 'Batch', 'medical-college-manager' ),
-						'mcm_gender'      => __( 'Gender', 'medical-college-manager' ),
-						'mcm_dob'         => __( 'Date of Birth', 'medical-college-manager' ),
-						'mcm_status'      => __( 'Status', 'medical-college-manager' ),
-						'mcm_blood_group' => __( 'Blood Group', 'medical-college-manager' ),
-						'mcm_address'     => __( 'Address', 'medical-college-manager' ),
+						'mcm_student_id'     => __( 'Student ID', 'medical-college-manager' ),
+						'mcm_roll_no'        => __( 'PMDC No.', 'medical-college-manager' ),
+						'mcm_email'          => __( 'Email', 'medical-college-manager' ),
+						'mcm_phone'          => __( 'Phone', 'medical-college-manager' ),
+						'mcm_program'        => __( 'Program', 'medical-college-manager' ),
+						'mcm_batch'          => __( 'Batch', 'medical-college-manager' ),
+						'mcm_gender'         => __( 'Gender', 'medical-college-manager' ),
+						'mcm_dob'            => __( 'Date of Birth', 'medical-college-manager' ),
+						'mcm_status'         => __( 'Status', 'medical-college-manager' ),
+						'mcm_blood_group'    => __( 'Blood Group', 'medical-college-manager' ),
+						'mcm_address'        => __( 'Address', 'medical-college-manager' ),
 						'mcm_guardian'       => __( 'Guardian', 'medical-college-manager' ),
 						'mcm_guardian_phone' => __( 'Guardian Phone', 'medical-college-manager' ),
 					),
 				),
 				'mcm_consultant' => array(
 					'label'  => __( 'Consultant Profile', 'medical-college-manager' ),
+					'keep'   => array( 'mcm_designation' ),
 					'email'  => 'mcm_email',
 					'fields' => array(
 						'mcm_designation' => __( 'Designation', 'medical-college-manager' ),
 						'mcm_email'       => __( 'Email', 'medical-college-manager' ),
 						'mcm_phone'       => __( 'Phone', 'medical-college-manager' ),
+						'mcm_gender'      => __( 'Gender', 'medical-college-manager' ),
 					),
 				),
 				'mcm_team'       => array(
 					'label'  => __( 'Team Profile', 'medical-college-manager' ),
+					'keep'   => array( 'mcm_designation' ),
 					'email'  => 'mcm_email',
 					'fields' => array(
 						'mcm_designation' => __( 'Designation', 'medical-college-manager' ),
 						'mcm_email'       => __( 'Email', 'medical-college-manager' ),
 						'mcm_phone'       => __( 'Phone', 'medical-college-manager' ),
 						'mcm_linkedin'    => __( 'LinkedIn', 'medical-college-manager' ),
+						'mcm_gender'      => __( 'Gender', 'medical-college-manager' ),
 					),
 				),
 			)
 		);
 	}
 
-	/** @param array $exporters Registered exporters. */
+	/**
+	 * Register the personal-data exporter.
+	 *
+	 * @param array $exporters Registered exporters.
+	 */
 	public function register_exporter( $exporters ) {
 		$exporters['medical-college-manager'] = array(
 			'exporter_friendly_name' => __( 'Medical College Manager', 'medical-college-manager' ),
@@ -84,7 +100,11 @@ class MCM_Privacy {
 		return $exporters;
 	}
 
-	/** @param array $erasers Registered erasers. */
+	/**
+	 * Register the personal-data eraser.
+	 *
+	 * @param array $erasers Registered erasers.
+	 */
 	public function register_eraser( $erasers ) {
 		$erasers['medical-college-manager'] = array(
 			'eraser_friendly_name' => __( 'Medical College Manager', 'medical-college-manager' ),
@@ -106,17 +126,22 @@ class MCM_Privacy {
 		$more     = false;
 
 		foreach ( self::sources() as $type => $cfg ) {
-			$q = new WP_Query(
+			// get_posts() runs unfiltered by default, so a language or
+			// visibility plugin can never hide a record from a data request.
+			// One extra row is fetched to learn whether another page exists.
+			$ids = get_posts(
 				array(
-					'post_type'        => $type,
-					'post_status'      => 'any',
-					'posts_per_page'   => $per_page,
-					'paged'            => max( 1, (int) $page ),
-					'fields'           => 'ids',
-					'no_found_rows'    => false,
-					'suppress_filters' => true,
-					// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
-					'meta_query'       => array(
+					'post_type'      => $type,
+					// 'any' leaves out the trash: a record trashed less than 30 days
+					// ago must still be exported and erased.
+					'post_status'    => array( 'publish', 'draft', 'pending', 'private', 'future', 'trash' ),
+					'posts_per_page' => $per_page + 1,
+					'offset'         => ( max( 1, (int) $page ) - 1 ) * $per_page,
+					'orderby'        => 'ID',
+					'order'          => 'ASC',
+					'fields'         => 'ids',
+					// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Privacy requests only; matched by e-mail.
+					'meta_query'     => array(
 						array(
 							'key'     => $cfg['email'],
 							'value'   => $email,
@@ -125,16 +150,17 @@ class MCM_Privacy {
 					),
 				)
 			);
+			if ( count( $ids ) > $per_page ) {
+				$more = true;
+				$ids  = array_slice( $ids, 0, $per_page );
+			}
 
-			foreach ( $q->posts as $post_id ) {
+			foreach ( $ids as $post_id ) {
 				$items[] = array(
-					'id'   => $post_id,
+					'id'   => (int) $post_id,
 					'type' => $type,
 					'cfg'  => $cfg,
 				);
-			}
-			if ( $q->max_num_pages > $page ) {
-				$more = true;
 			}
 		}
 
@@ -158,7 +184,7 @@ class MCM_Privacy {
 		foreach ( $found['items'] as $item ) {
 			$data = array();
 			foreach ( $item['cfg']['fields'] as $key => $label ) {
-				$value = get_post_meta( $item['id'], $key, true );
+				$value = MCM_Safe::meta( $item['id'], $key );
 				if ( '' === $value || null === $value ) {
 					continue;
 				}
@@ -201,39 +227,103 @@ class MCM_Privacy {
 	 * department), and silently deleting enrolment history would be a worse
 	 * outcome than anonymising it. The admin is told this explicitly.
 	 *
+	 * A student's name (the post title) is personal data too, so it is
+	 * replaced with "Anonymised student #<ID>" and the slug with
+	 * "anonymised-student-<ID>". Staff profiles keep their name: they are
+	 * public faculty pages, and the admin is told so.
+	 *
+	 * Paging: WordPress calls this with page 1, 2, 3… But erasing a record
+	 * removes the email it was found by, so page 2 of what REMAINS would skip
+	 * records. Every call therefore takes page 1 of the remaining matches, and
+	 * reports done only when nothing matches any more.
+	 *
 	 * @param string $email Email address.
-	 * @param int    $page  Page number.
+	 * @param int    $page  Page number (ignored, see above).
 	 * @return array
 	 */
 	public function erase( $email, $page = 1 ) {
-		$found   = self::find( $email, $page );
-		$removed = false;
-		$msgs    = array();
+		unset( $page );
+		$found    = self::find( $email, 1 );
+		$removed  = false;
+		$retained = false;
+		$progress = false;
+		$msgs     = array();
 
 		foreach ( $found['items'] as $item ) {
+			$id      = (int) $item['id'];
 			$cleared = 0;
+			$keep    = isset( $item['cfg']['keep'] ) ? (array) $item['cfg']['keep'] : array();
 			foreach ( array_keys( $item['cfg']['fields'] ) as $key ) {
-				if ( '' !== (string) get_post_meta( $item['id'], $key, true ) ) {
-					delete_post_meta( $item['id'], $key );
+				if ( in_array( $key, $keep, true ) ) {
+					continue; // Not personal data — see 'keep' in sources().
+				}
+				if ( '' !== MCM_Safe::meta( $id, $key ) ) {
+					delete_post_meta( $id, $key );
 					++$cleared;
 				}
 			}
-			if ( $cleared ) {
-				$removed = true;
-				$msgs[]  = sprintf(
-					/* translators: 1: record type label, 2: record title. */
-					__( 'Anonymised the personal fields on %1$s "%2$s". The record itself was kept, because academic history is retained; delete it manually if a full removal is required.', 'medical-college-manager' ),
+
+			$renamed = false;
+			if ( 'mcm_student' === $item['type'] ) {
+				/* translators: %d: post ID. */
+				$anon = sprintf( __( 'Anonymised student #%d', 'medical-college-manager' ), $id );
+				if ( get_post_field( 'post_title', $id ) !== $anon ) {
+					$result  = wp_update_post(
+						array(
+							'ID'         => $id,
+							'post_title' => $anon,
+							'post_name'  => 'anonymised-student-' . $id,
+						),
+						true
+					);
+					$renamed = ! is_wp_error( $result );
+				}
+			}
+
+			if ( ! $cleared && ! $renamed ) {
+				continue;
+			}
+			$progress = true;
+			$removed  = true;
+			$retained = true; // The record itself is always kept.
+
+			if ( 'mcm_student' === $item['type'] ) {
+				$msgs[] = sprintf(
+					/* translators: 1: post ID, 2: number of fields removed. */
+					_n(
+						'Student record #%1$d: the name was replaced and %2$d personal field removed. The academic record (program, batch, status, department, session, level) was kept; delete the record manually if a full removal is required.',
+						'Student record #%1$d: the name was replaced and %2$d personal fields removed. The academic record (program, batch, status, department, session, level) was kept; delete the record manually if a full removal is required.',
+						$cleared,
+						'medical-college-manager'
+					),
+					$id,
+					$cleared
+				);
+			} else {
+				$msgs[] = sprintf(
+					/* translators: 1: record type label, 2: record title, 3: number of fields removed. */
+					_n(
+						'%1$s "%2$s": %3$d personal field removed. The public profile, its name and designation were kept; delete the profile manually if it should be removed.',
+						'%1$s "%2$s": %3$d personal fields removed. The public profile, its name and designation were kept; delete the profile manually if it should be removed.',
+						$cleared,
+						'medical-college-manager'
+					),
 					$item['cfg']['label'],
-					get_the_title( $item['id'] )
+					get_the_title( $id ),
+					$cleared
 				);
 			}
 		}
 
+		// Done when nothing matches any more — or when this pass could not
+		// change anything, so a stuck record can never loop forever.
+		$remaining = self::find( $email, 1 );
+
 		return array(
 			'items_removed'  => $removed,
-			'items_retained' => false,
+			'items_retained' => $retained,
 			'messages'       => $msgs,
-			'done'           => $found['done'],
+			'done'           => ! $progress || empty( $remaining['items'] ),
 		);
 	}
 }

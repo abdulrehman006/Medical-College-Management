@@ -178,12 +178,12 @@
    not the [mcm_single] two-column grid) — keep it from going full-bleed. */
 .mcm-single-media.mcm-wrap{ margin:0 auto 24px; }
 .mcm-single-media.mcm-wrap img.mcm-single-img{
-	width:100%; height:auto; max-height:460px; object-fit:cover;
+	width:100%; height:auto; max-height:360px; object-fit:cover; /* display standard §3 */
 	border-radius: var(--mcm-radius, 12px); display:block;
 }
 @media (max-width:600px){
 	.mcm-single-media.mcm-wrap{ margin-bottom:16px; }
-	.mcm-single-media.mcm-wrap img.mcm-single-img{ max-height:260px; }
+	.mcm-single-media.mcm-wrap img.mcm-single-img{ max-height:220px; }
 }
 .mcm-single-title{ margin:0 0 8px; color: var(--mcm-text, #1f2933); }
 .mcm-single-content{ margin-top:12px; }
@@ -221,7 +221,9 @@
 .mcm-print-btn:hover{ background: var(--mcm-primary, #0a6b5d); color:#fff; }
 
 /* ---------- Table view ---------- */
-.mcm-table-wrap{ overflow-x:auto; border:1px solid var(--mcm-border, #e5e7eb); border-radius: var(--mcm-radius, 12px); }
+.mcm-table-link{ color:var(--mcm-primary, #0a6b5d); font-weight:600; text-decoration:none; }
+.mcm-table-link:hover, .mcm-table-link:focus{ color:var(--mcm-primary, #0a6b5d); text-decoration:underline; }
+.mcm-table-wrap{ border:1px solid var(--mcm-border, #e5e7eb); border-radius: var(--mcm-radius, 12px); }
 .mcm-table{ width:100%; border-collapse:collapse; background: var(--mcm-card-bg, #fff); font-size:14px; }
 .mcm-table thead th{
 	text-align:left;
@@ -233,6 +235,15 @@
 }
 .mcm-table tbody td{ padding:12px 16px; border-top:1px solid var(--mcm-border, #e5e7eb); color: var(--mcm-text, #1f2933); vertical-align:top; }
 .mcm-table th.mcm-col-center, .mcm-table td.mcm-col-center{ text-align:center; }
+/* Team lists (one member per line) and the Download link (publications, research). */
+.mcm-cell-list{ list-style:none; margin:0; padding:0; }
+.mcm-cell-list li{ margin:0; padding:0; line-height:1.45; }
+.mcm-cell-list li + li{ margin-top:4px; }
+.mcm-table td.mcm-cell-file{ white-space:nowrap; }
+.mcm-table td.mcm-cell-lines{ min-width:13em; }
+.mcm-table-dl{ display:inline-flex; align-items:center; gap:6px; min-height:32px; padding:4px 12px; border:1px solid var(--mcm-primary, #0a6b5d); border-radius:999px; color:var(--mcm-primary, #0a6b5d); font-weight:600; font-size:13px; line-height:1; text-decoration:none; background:transparent; }
+.mcm-table-dl:hover, .mcm-table-dl:focus-visible{ background:var(--mcm-primary, #0a6b5d); color:#fff; text-decoration:none; }
+.mcm-table-dl:focus-visible{ outline:2px solid var(--mcm-primary, #0a6b5d); outline-offset:2px; }
 .mcm-table th.mcm-col-right, .mcm-table td.mcm-col-right{ text-align:right; }
 .mcm-table tbody tr:nth-child(even){ background: var(--mcm-page-bg, #f5f7fa); }
 .mcm-table tbody tr:hover{ background: rgba(0,0,0,.03); }
@@ -246,6 +257,10 @@
 	.mcm-table tr{ border-top:1px solid var(--mcm-border, #e5e7eb); padding:6px 0; }
 	.mcm-table td{ border:none; padding:6px 16px; display:flex; justify-content:space-between; gap:12px; }
 	.mcm-table td::before{ content: attr(data-label); font-weight:600; color: var(--mcm-muted, #6b7280); }
+	.mcm-table td::before{ flex:0 0 auto; }
+	.mcm-table td.mcm-cell-lines{ align-items:flex-start; }
+	.mcm-table td.mcm-cell-lines .mcm-cell-list{ text-align:right; }
+	.mcm-table td:empty{ display:none; }
 }
 
 /* Visible keyboard focus on every interactive control — many themes reset the
@@ -305,6 +320,8 @@
 	flex-direction:column;
 	gap:5px;
 }
+/* An odd last cell spans both columns: never an empty grey cell (display standard §3). */
+.mcm-sd-grid > .mcm-sd-item:last-child:nth-child(odd){ grid-column:1 / -1; }
 .mcm-sd-label{ font-size:11px; text-transform:uppercase; letter-spacing:.6px; color:var(--mcm-muted, #6b7280); font-weight:700; }
 .mcm-sd-value{ font-size:15px; color:var(--mcm-text, #1f2933); line-height:1.5; }
 .mcm-sd-actions{ display:flex; flex-wrap:wrap; gap:12px; margin-top:24px; }
@@ -449,12 +466,13 @@
 /* ---------- Directory (sidebar) layout ---------- */
 .mcm-directory{
 	display:grid;
-	grid-template-columns:280px 1fr;
+	grid-template-columns:var(--mcm-side-w, 280px) 1fr;
 	gap:30px;
 	align-items:start;
 }
 .mcm-dir-aside{ position:sticky; top:20px; }
-.mcm-dir-search{ display:flex; flex-direction:column; gap:12px; margin-bottom:22px; }
+.mcm-dir-search{ display:flex; gap:8px; margin-bottom:22px; }
+.mcm-dir-search .mcm-search{ flex:1 1 auto; min-width:0; }
 .mcm-dir-search .mcm-search{
 	padding:12px 14px;
 	border:1px solid var(--mcm-border, #e5e7eb);
@@ -464,8 +482,8 @@
 	color:var(--mcm-text, #1f2933);
 }
 .mcm-search-btn{
-	align-self:flex-start;
-	padding:10px 24px;
+	flex:0 0 auto;
+	padding:10px 18px;
 	border:none;
 	border-radius:8px;
 	background:var(--mcm-primary, #0a6b5d);
@@ -476,8 +494,14 @@
 	transition:background .2s ease;
 }
 .mcm-search-btn:hover{ background:var(--mcm-accent, #13a594); }
-.mcm-dir-facet-title{ font-size:15px; margin:0 0 12px; color:var(--mcm-text, #1f2933); }
-.mcm-dir-checks{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:10px; max-height:520px; overflow:auto; }
+.mcm-dir-facet + .mcm-dir-facet{ margin-top:20px; padding-top:20px; border-top:1px solid var(--mcm-border, #e5e7eb); }
+.mcm-dir-facet-title{ font-size:12px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; margin:0 0 12px; color:var(--mcm-muted, #6b7280); }
+.mcm-dir-checks{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:10px; }
+/* Long lists: the script shows the first items and a "Show all" button (ticked items always stay visible). */
+.mcm-dir-checks li.is-extra{ display:none; }
+.mcm-dir-checks.is-expanded li.is-extra, .mcm-dir-checks li.is-extra.is-pinned{ display:block; }
+.mcm-wrap button.mcm-dir-more{ margin-top:10px; padding:4px 0; border:0; background:none; color:var(--mcm-primary, #0a6b5d); font-size:14px; font-weight:600; cursor:pointer; text-decoration:underline; text-underline-offset:3px; }
+.mcm-wrap button.mcm-dir-more:hover, .mcm-wrap button.mcm-dir-more:focus{ background:none; color:var(--mcm-accent, #13a594); }
 .mcm-dir-checks li{ margin:0; }
 .mcm-dir-checks label{ display:flex; align-items:flex-start; gap:9px; font-size:14px; color:var(--mcm-text, #1f2933); cursor:pointer; line-height:1.35; }
 .mcm-dir-checks input{ margin-top:2px; flex:0 0 auto; }
@@ -512,11 +536,16 @@
 /* The review asked for more breathing room around each portrait: the photo now
    sits inset rather than bleeding to the card edge. */
 .mcm-dir-card-media{ width:100%; padding:16px 16px 0; }
+/* Square by default and sized by the card's width, so a photo keeps its
+   shape at any column count (a fixed height turned photos into tall strips
+   at 4-6 columns). Cropped toward the top, where faces are. */
 .mcm-dir-card-media img,
 .mcm-dir-card-ph{
-	width:100%; height:290px; object-fit:cover; display:block;
+	width:100%; height:auto; aspect-ratio:1 / 1; object-fit:cover; object-position:center 25%; display:block;
 	border-radius:calc( var(--mcm-radius, 12px) - 4px );
 }
+/* "Original" proportions leave an empty placeholder no height of its own. */
+.mcm-dir-card-ph, .mcm-card-ph{ min-height:120px; }
 .mcm-dir-card-ph{ background:var(--mcm-page-bg, #f3f5f9); }
 .mcm-dir-card-name{ font-size:22px; line-height:1.25; margin:18px 20px 4px; color:var(--mcm-text, #1f2933); }
 .mcm-dir-card-name a{ color:inherit; text-decoration:none; }
@@ -527,6 +556,7 @@
 	letter-spacing:.2px; margin:0 20px 4px;
 }
 .mcm-dir-card-desig{ color:var(--mcm-muted, #6b7280); font-size:15px; margin:0 20px 2px; }
+.mcm-dir-card-qual{ color:var(--mcm-muted, #6b7280); font-size:14px; line-height:1.45; margin:0 20px 4px; }
 .mcm-dir-card-dept{ font-weight:600; font-size:15px; margin:0 20px 16px; color:var(--mcm-text, #1f2933); }
 .mcm-dir-card-btn{
 	margin:auto 20px 0;
@@ -614,7 +644,7 @@
 .mcm-post-title a{ color:inherit; text-decoration:none; transition:color .2s ease; }
 .mcm-post-title a:hover{ color:var(--mcm-blog-navy); }
 .mcm-post-excerpt{ font-size:17px; color:var(--mcm-blog-body); margin:0; }
-.mcm-read-more{ margin-top:22px; align-self:flex-end; display:inline-flex; align-items:center; gap:6px; color:var(--mcm-blog-muted); font-weight:600; font-size:15px; text-decoration:none; transition:color .2s ease; }
+.mcm-read-more{ margin-top:22px; align-self:flex-end; display:inline-flex; align-items:center; gap:6px; color:#5b6270; /* --mcm-blog-muted was 3.2:1 on white */ font-weight:600; font-size:15px; text-decoration:none; transition:color .2s ease; }
 .mcm-read-more:hover{ color:var(--mcm-blog-navy); }
 .mcm-read-more svg{ width:14px; height:14px; fill:currentColor; }
 
@@ -636,6 +666,55 @@
 	.mcm-read-more{ align-self:flex-start; }
 }
 
+/* Date hidden: thumbnail + text (list layout). */
+.mcm-post--no-date{ grid-template-columns:400px 1fr; grid-template-areas:"thumb body"; }
+.mcm-post--no-date.mcm-post--no-thumb{ grid-template-columns:1fr; grid-template-areas:"body"; }
+@media (max-width:980px){
+	.mcm-post--no-date{ grid-template-columns:240px 1fr; }
+}
+@media (max-width:640px){
+	.mcm-post--no-date{ grid-template-columns:1fr; grid-template-areas:"thumb" "body"; }
+}
+
+/* Grid layout: posts as cards. Desktop columns come from the widget or the
+   columns attribute; tablet and phone fall back to 2 and 1. */
+.mcm-blog--grid{
+	display:grid;
+	grid-template-columns:repeat(var(--mcm-blog-cols, var(--mcm-blog-cols-d, 3)), minmax(0, 1fr));
+	gap:var(--mcm-blog-gap, 30px);
+	align-items:stretch;
+}
+@media (max-width:1024px){ .mcm-blog--grid{ --mcm-blog-cols:2; } }
+@media (max-width:767px){ .mcm-blog--grid{ --mcm-blog-cols:1; } }
+.mcm-blog--grid .mcm-blog-intro, .mcm-blog--grid > .mcm-empty{ grid-column:1 / -1; margin-bottom:0; }
+.mcm-blog--grid .mcm-post,
+.mcm-blog--grid .mcm-post--no-thumb,
+.mcm-blog--grid .mcm-post--no-date{
+	grid-template-columns:1fr;
+	grid-template-areas:"thumb" "meta" "body";
+	gap:16px;
+	margin:0;
+	padding:0 0 22px;
+	border:1px solid var(--mcm-blog-line);
+	border-radius:var(--mcm-radius, 12px);
+	background:var(--mcm-card-bg, #fff);
+	overflow:hidden;
+	transition:transform .25s ease, box-shadow .25s ease;
+}
+.mcm-blog--grid .mcm-post:last-child{ border-bottom:1px solid var(--mcm-blog-line); }
+.mcm-blog--grid .mcm-post:hover{ transform:var(--mcm-lift, none); }
+.mcm-blog--grid .mcm-post--no-thumb .mcm-post-thumb{ display:none; }
+.mcm-blog--grid .mcm-post-meta{ flex-direction:row; align-items:center; padding:0 20px; }
+.mcm-blog--grid .mcm-date-badge{ padding:8px 14px; }
+.mcm-blog--grid .mcm-date-badge .mcm-day{ font-size:24px; }
+.mcm-blog--grid .mcm-date-badge .mcm-ym{ margin-top:4px; padding-top:4px; font-size:12px; }
+.mcm-blog--grid .mcm-post-thumb{ border-radius:0; }
+.mcm-blog--grid .mcm-post-thumb img, .mcm-blog--grid .mcm-post-thumb-ph{ height:var(--mcm-blog-img-h, 220px); }
+.mcm-blog--grid .mcm-post-body{ padding:0 20px; }
+.mcm-blog--grid .mcm-post-title{ font-size:21px; margin-bottom:10px; }
+.mcm-blog--grid .mcm-post-excerpt{ font-size:15px; }
+.mcm-blog--grid .mcm-read-more{ align-self:flex-start; margin-top:auto; padding-top:16px; }
+
 /* ---------- Notice Board ---------- */
 .mcm-notice-badge{ display:inline-block; padding:2px 10px; border-radius:20px; background:var(--mcm-primary, #0a6b5d); color:#fff; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.4px; white-space:nowrap; }
 .mcm-notice-new{ display:inline-block; padding:1px 7px; border-radius:20px; background:#c62842; color:#fff; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.3px; }
@@ -650,6 +729,7 @@
 .mcm-ticker-viewport{ flex:1 1 auto; overflow:hidden; position:relative; }
 .mcm-ticker-track{ display:flex; width:max-content; animation:mcm-ticker-x linear infinite; }
 .mcm-ticker-track:hover,
+.mcm-ticker-track:focus-within,
 .mcm-ticker.is-paused .mcm-ticker-track{ animation-play-state:paused; }
 .mcm-ticker-group{ display:flex; }
 .mcm-ticker-item{ display:inline-flex; align-items:center; gap:8px; padding:0 22px; height:44px; color:var(--mcm-text, #1f2933); text-decoration:none; white-space:nowrap; border-right:1px solid var(--mcm-border, #e5e7eb); }
@@ -663,6 +743,7 @@
 .mcm-board-viewport{ height:var(--mcm-board-h, 340px); overflow:hidden; position:relative; }
 .mcm-board-track{ display:flex; flex-direction:column; animation:mcm-board-y linear infinite; }
 .mcm-board-track:hover,
+.mcm-board-track:focus-within,
 .mcm-board.is-paused .mcm-board-track{ animation-play-state:paused; }
 .mcm-board-group{ list-style:none; margin:0; padding:0; }
 .mcm-board-item{ padding:12px 16px; border-bottom:1px solid var(--mcm-border, #e5e7eb); }
@@ -704,8 +785,18 @@
 .mcm-list-ph{ width:72px; height:72px; border-radius:8px; flex:0 0 auto; }
 .mcm-list-ph svg{ width:56%; }
 .mcm-single-ph{ width:100%; aspect-ratio:1 / 1; border-radius:var(--mcm-radius, 12px); }
-.mcm-single-avatar{ max-width:220px; margin:0 auto 22px; }
-.mcm-single-avatar img.mcm-single-img{ width:100%; aspect-ratio:1 / 1; object-fit:cover; border-radius:var(--mcm-radius, 12px); display:block; }
+/* People: photo beside the details (display standard §3). Same 4:5 frame for an
+   own photo and a default photo; stacks above the details on phones. */
+.mcm-single-meta--profile{ display:grid; grid-template-columns:260px minmax(0,1fr); gap:32px; align-items:start; }
+.mcm-single-meta-main{ min-width:0; }
+.mcm-single-avatar{ margin:0; }
+.mcm-single-avatar img.mcm-single-img{ width:100%; aspect-ratio:4 / 5; object-fit:cover; border-radius:var(--mcm-radius, 12px); display:block; }
+.mcm-single-avatar .mcm-single-ph{ display:flex; align-items:center; justify-content:center; width:100%; aspect-ratio:4 / 5; border-radius:var(--mcm-radius, 12px); background:var(--mcm-card-bg, #fff); border:1px solid var(--mcm-border, #e5e7eb); }
+.mcm-single-avatar .mcm-single-ph svg{ width:45%; height:auto; fill:#9ca3af; }
+@media (max-width:760px){
+	.mcm-single-meta--profile{ grid-template-columns:1fr; gap:20px; }
+	.mcm-single-avatar{ max-width:240px; }
+}
 
 /* ---------- Publications (citation list) ---------- */
 .mcm-pub-list{ list-style:none; margin:0; padding:0; counter-reset:mcmpub; }
@@ -852,6 +943,7 @@
 	   tighten the cells and let long values wrap rather than force a scroll. */
 	.mcm-table th, .mcm-table td{ padding:4px 6px; word-break:break-word; }
 	.mcm-table a{ color:#000 !important; text-decoration:none; }
+	.mcm-table .mcm-cell-file{ display:none !important; } /* a Download button means nothing on paper */
 
 	/* Card/list fallbacks if a print-enabled block isn't a table. */
 	.mcm-card, .mcm-list-item{ box-shadow:none !important; border:1px solid #ccc !important; break-inside:avoid; }
@@ -962,4 +1054,457 @@ html:has(.mcm-hero-full){ overflow-x: clip; }
 	font-size:20px; font-weight:700; color:var(--mcm-text, #1f2933);
 	margin:0 0 14px; padding-bottom:8px;
 	border-bottom:2px solid var(--mcm-primary, #0a6b5d);
+}
+
+/* Shown only to administrators in place of a block that failed to render. */
+.mcm-error-box{
+	box-sizing:border-box;
+	margin:12px 0;
+	padding:10px 14px;
+	border:1px solid #d63638;
+	border-left-width:4px;
+	border-radius:4px;
+	background:#fcf0f1;
+	color:#50575e;
+	font-size:14px;
+	line-height:1.5;
+}
+
+/* Shown above a listing when a live filter request fails (expired page…). */
+.mcm-ajax-error{
+	box-sizing:border-box;
+	margin:0 0 12px;
+	padding:10px 14px;
+	border:1px solid #d63638;
+	border-radius:var(--mcm-radius, 8px);
+	background:#fcf0f1;
+	color:#8a2424;
+	font-size:14px;
+}
+
+/* ---------- Theme-proof buttons ----------
+ * Themes and Elementor kits style every <button>: Hello Elementor gives them a
+ * pink (#c36) border, and a pink background on hover and focus, with
+ * selectors such as button:hover and [type=button]:focus that outrank a single
+ * plugin class. These rules restate each plugin button's own look for every
+ * state, scoped to plugin containers and specific enough to win, so the
+ * plugin looks the same on a bare theme. Keyboard focus keeps the visible
+ * :focus-visible outline defined above. */
+.mcm-wrap button.mcm-print-btn,
+.mcm-wrap button.mcm-search-btn,
+.mcm-wrap button.mcm-reset,
+.mcm-ticker button.mcm-scroll-pause,
+.mcm-board button.mcm-scroll-pause{
+	box-shadow:none;
+	text-transform:none;
+	text-decoration:none;
+	letter-spacing:normal;
+	font-family:inherit;
+	line-height:1.2;
+	min-height:0;
+	transition:color .15s ease, border-color .15s ease, background-color .15s ease, opacity .15s ease;
+}
+
+.mcm-wrap button.mcm-print-btn{
+	padding:10px 18px;
+	border:1px solid var(--mcm-border, #e5e7eb);
+	border-radius:8px;
+	background-color:var(--mcm-card-bg, #fff);
+	color:var(--mcm-primary, #0a6b5d);
+	font-size:14px;
+	font-weight:600;
+}
+.mcm-wrap button.mcm-print-btn:hover,
+.mcm-wrap button.mcm-print-btn:focus{
+	border-color:var(--mcm-primary, #0a6b5d);
+	background-color:var(--mcm-primary, #0a6b5d);
+	color:#fff;
+}
+
+.mcm-wrap button.mcm-search-btn{
+	padding:10px 24px;
+	border:1px solid var(--mcm-primary, #0a6b5d);
+	border-radius:8px;
+	background-color:var(--mcm-primary, #0a6b5d);
+	color:#fff;
+	font-size:15px;
+	font-weight:600;
+}
+.mcm-wrap button.mcm-search-btn:hover,
+.mcm-wrap button.mcm-search-btn:focus{
+	border-color:var(--mcm-accent, #13a594);
+	background-color:var(--mcm-accent, #13a594);
+	color:#fff;
+}
+
+.mcm-wrap .mcm-filters button.mcm-reset{
+	border:1px solid var(--mcm-border, #e5e7eb);
+	border-radius:8px;
+	background-color:transparent;
+	color:var(--mcm-muted, #6b7280);
+}
+.mcm-wrap .mcm-filters button.mcm-reset:hover,
+.mcm-wrap .mcm-filters button.mcm-reset:focus{
+	border-color:var(--mcm-primary, #0a6b5d);
+	background-color:var(--mcm-page-bg, #f5f7fa);
+	color:var(--mcm-primary, #0a6b5d);
+}
+
+.mcm-wrap button.mcm-dir-reset{
+	padding:8px 16px;
+	border:1px solid var(--mcm-border, #e5e7eb);
+	border-radius:8px;
+	background-color:var(--mcm-card-bg, #fff);
+	color:var(--mcm-text, #1f2933);
+	font-size:14px;
+	font-weight:400;
+}
+.mcm-wrap button.mcm-dir-reset:hover,
+.mcm-wrap button.mcm-dir-reset:focus{
+	border-color:var(--mcm-border, #e5e7eb);
+	background-color:var(--mcm-page-bg, #f5f7fa);
+	color:var(--mcm-text, #1f2933);
+}
+
+.mcm-ticker button.mcm-scroll-pause,
+.mcm-board button.mcm-scroll-pause{
+	padding:0 12px;
+	border:none;
+	border-radius:0;
+	background-color:transparent;
+	color:inherit;
+	font-size:11px;
+}
+.mcm-ticker button.mcm-scroll-pause:hover,
+.mcm-ticker button.mcm-scroll-pause:focus,
+.mcm-board button.mcm-scroll-pause:hover,
+.mcm-board button.mcm-scroll-pause:focus{
+	border:none;
+	background-color:transparent;
+	color:inherit;
+	opacity:1;
+}
+/* The board's pause button sits on the dark header: keep its focus ring visible. */
+.mcm-board-head button.mcm-scroll-pause:focus-visible{ outline-color:#fff; }
+
+/* ---------- Theme-proof links ----------
+ * Themes colour links on hover (Hello Elementor: a:hover{color:#336}). Plugin
+ * links whose :hover only changed the background inherited that colour —
+ * dark blue on a green button. Restate the text colour for hover and focus
+ * with element+class specificity so the theme rule cannot win. */
+a.mcm-dir-card-btn,
+a.mcm-dir-card-btn:hover,
+a.mcm-dir-card-btn:focus,
+a.mcm-list-link,
+a.mcm-list-link:hover,
+a.mcm-list-link:focus,
+a.mcm-sd-btn--primary,
+a.mcm-sd-btn--primary:hover,
+a.mcm-sd-btn--primary:focus{
+	color:#fff;
+	text-decoration:none;
+}
+a.mcm-sd-btn,
+a.mcm-sd-btn:hover,
+a.mcm-sd-btn:focus,
+a.mcm-board-more,
+a.mcm-board-more:hover,
+a.mcm-board-more:focus{
+	text-decoration:none;
+}
+a.mcm-sd-btn:not(.mcm-sd-btn--primary):hover,
+a.mcm-sd-btn:not(.mcm-sd-btn--primary):focus,
+a.mcm-board-more:hover,
+a.mcm-board-more:focus{
+	color:var(--mcm-primary, #0a6b5d);
+}
+
+/* ---------- Jobs / vacancies ---------- */
+.mcm-badge{
+	display:inline-block;
+	box-sizing:border-box;
+	margin-left:4px;
+	padding:2px 9px;
+	border-radius:999px;
+	font-size:12px;
+	font-weight:700;
+	line-height:1.5;
+	letter-spacing:.01em;
+	vertical-align:middle;
+	white-space:nowrap;
+	border:1px solid transparent;
+}
+.mcm-badge--open{ background:var(--mcm-primary, #0a6b5d); border-color:var(--mcm-primary, #0a6b5d); color:#fff; }
+.mcm-badge--closing{ background:#fff4e5; border-color:#d97706; color:#8a4b00; }
+.mcm-badge--extended{ background:var(--mcm-card-bg, #fff); border-color:var(--mcm-accent, #13a594); color:var(--mcm-primary, #0a6b5d); }
+.mcm-badge--closed{ background:#f1f1f1; border-color:#c3c4c7; color:#50575e; }
+.mcm-badge--upcoming{ background:#eef4ff; border-color:#2563eb; color:#1d3f8a; }
+.mcm-sd-heading .mcm-badge{ font-size:13px; }
+.mcm-job-old-date{ color:var(--mcm-muted, #6b7280); }
+.mcm-job-closed{
+	box-sizing:border-box;
+	margin:16px 0 0;
+	padding:10px 14px;
+	border-left:4px solid #c3c4c7;
+	background:#f6f7f7;
+	color:#50575e;
+	font-weight:600;
+}
+.mcm-job-how{ margin-top:18px; }
+.mcm-job-how-title{ margin:0 0 6px; font-size:16px; color:var(--mcm-text, #1f2933); }
+.mcm-job-how p{ margin:0; color:var(--mcm-text, #1f2933); }
+.mcm-job-ad{ margin:20px 0 0; }
+.mcm-job-ad img{ display:block; max-width:100%; height:auto; border:1px solid var(--mcm-border, #e5e7eb); border-radius:var(--mcm-radius, 12px); }
+.mcm-job-ad figcaption{ margin-top:6px; font-size:13px; color:var(--mcm-muted, #6b7280); }
+@media print{
+	.mcm-badge{ border-color:#000 !important; background:#fff !important; color:#000 !important; }
+}
+
+/* Jobs and tenders on the notice ticker / board / list. */
+.mcm-notice-badge--job{ background:var(--mcm-primary, #0a6b5d); color:#fff; }
+.mcm-notice-badge--tender{ background:#5b4b8a; color:#fff; }
+.mcm-notice-deadline{
+	display:inline-block;
+	margin-left:6px;
+	font-size:12px;
+	font-weight:600;
+	color:var(--mcm-muted, #6b7280);
+	white-space:nowrap;
+}
+.mcm-ticker .mcm-notice-deadline{ margin-left:2px; }
+
+/* =====================================================================
+   Job card (grid / directory views of Jobs).
+   ===================================================================== */
+.mcm-jobcard{ position:relative; border-top:4px solid var(--mcm-primary, #0a6b5d); height:100%; }
+.mcm-jobcard.is-closing{ border-top-color:#d97706; }
+.mcm-jobcard.is-extended{ border-top-color:var(--mcm-accent, #13a594); }
+.mcm-jobcard.is-closed{ border-top-color:#c3c4c7; }
+.mcm-jobcard.is-upcoming{ border-top-color:#2563eb; }
+.mcm-jobcard-body{ padding:20px 20px 16px; display:flex; flex-direction:column; gap:10px; flex:1 1 auto; }
+.mcm-jobcard-top{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+.mcm-jobcard-top .mcm-badge{ margin-left:0; }
+.mcm-jobcard-cat{ font-size:12px; font-weight:600; letter-spacing:.04em; text-transform:uppercase; color:var(--mcm-muted, #6b7280); text-align:right; }
+.mcm-jobcard .mcm-jobcard-title{ font-size:19px; line-height:1.3; }
+.mcm-jobcard-dept{ margin:-4px 0 0; font-size:14px; color:var(--mcm-muted, #6b7280); }
+.mcm-jobcard-chips{ list-style:none; margin:0; padding:0; display:flex; flex-wrap:wrap; gap:6px; }
+.mcm-jobcard-chips li{ margin:0; padding:3px 10px; border-radius:6px; background:var(--mcm-page-bg, #f3f5f7); color:var(--mcm-text, #1f2933); font-size:13px; font-weight:600; }
+.mcm-jobcard-deadline{ display:grid; grid-template-columns:auto 1fr; align-items:baseline; gap:2px 10px; padding:10px 12px; border-radius:8px; background:var(--mcm-page-bg, #f3f5f7); font-size:14px; }
+.mcm-jobcard-label{ font-size:12px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--mcm-muted, #6b7280); }
+/* The grey deadline box needs darker small text to reach 4.5:1. */
+.mcm-jobcard-deadline .mcm-jobcard-label, .mcm-jobcard-deadline .mcm-job-old-date{ color:#4b5563; }
+.mcm-jobcard-date{ font-weight:600; color:var(--mcm-text, #1f2933); }
+.mcm-jobcard-date .mcm-job-old-date{ display:block; font-weight:400; font-size:13px; }
+.mcm-jobcard-date .mcm-job-time{ font-weight:400; color:#4b5563; } /* 4.5:1 on the grey deadline box. */
+.mcm-jobcard-left{ grid-column:1 / -1; font-size:13px; font-weight:600; color:var(--mcm-primary, #0a6b5d); }
+.mcm-jobcard.is-closing .mcm-jobcard-left{ color:#8a4b00; }
+.mcm-jobcard.is-closed .mcm-jobcard-left{ color:#50575e; }
+.mcm-jobcard.is-upcoming .mcm-jobcard-left{ color:#1d3f8a; }
+.mcm-jobcard-excerpt{ margin:0; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.mcm-jobcard-foot{ display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; padding:14px 20px; border-top:1px solid var(--mcm-border, #e5e7eb); }
+.mcm-jobcard-pub{ font-size:13px; color:var(--mcm-muted, #6b7280); }
+a.mcm-jobcard-btn, a.mcm-jobcard-btn:visited{ display:inline-flex; align-items:center; gap:6px; min-height:40px; padding:8px 16px; border-radius:8px; background:var(--mcm-primary, #0a6b5d); color:#fff; font-size:14px; font-weight:600; text-decoration:none; }
+a.mcm-jobcard-btn:hover, a.mcm-jobcard-btn:focus{ background:var(--mcm-accent, #13a594); color:#fff; }
+.mcm-jobcard.is-closed a.mcm-jobcard-btn{ background:#fff; color:var(--mcm-text, #1f2933); border:1px solid var(--mcm-border, #e5e7eb); }
+/* The whole card is easier to hit: the title link covers it (button stays on top). */
+.mcm-jobcard-title a::after{ content:""; position:absolute; inset:0; }
+a.mcm-jobcard-btn{ position:relative; z-index:1; }
+.mcm-jobcard-title a:focus-visible{ outline:none; }
+.mcm-jobcard:focus-within{ box-shadow:0 0 0 3px var(--mcm-accent, #13a594); }
+@media print{
+	.mcm-jobcard{ border-top-width:1px; }
+	.mcm-jobcard-foot{ padding:8px 12px; }
+	a.mcm-jobcard-btn{ display:none; }
+}
+
+/* Screen-reader-only text. */
+.mcm-sr-only{ position:absolute !important; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0, 0, 0, 0); white-space:nowrap; border:0; }
+/* Icon search button beside the field. */
+.mcm-wrap .mcm-search-btn--icon{ display:inline-flex; align-items:center; justify-content:center; width:48px; min-height:48px; padding:0; }
+.mcm-wrap .mcm-search-btn--icon svg{ flex:none; width:20px; height:20px; }
+/* Phones/tablets: the filters fold behind one "Filters" button (the script
+   adds it; without script every filter is shown). */
+.mcm-wrap button.mcm-dir-toggle{ display:none; }
+@media (max-width:880px){
+	.mcm-wrap button.mcm-dir-toggle{ display:flex; align-items:center; justify-content:space-between; width:100%; min-height:48px; margin:0 0 4px; padding:10px 14px; border:1px solid var(--mcm-border, #e5e7eb); border-radius:8px; background:#fff; color:var(--mcm-text, #1f2933); font-size:15px; font-weight:600; cursor:pointer; }
+	.mcm-wrap button.mcm-dir-toggle:hover, .mcm-wrap button.mcm-dir-toggle:focus{ background:var(--mcm-page-bg, #f5f7fa); color:var(--mcm-text, #1f2933); }
+	.mcm-dir-toggle .mcm-dir-toggle-caret{ transition:transform .2s ease; }
+	.mcm-dir-filters.is-open .mcm-dir-toggle-caret{ transform:rotate(180deg); }
+	.mcm-dir-filters.is-foldable:not(.is-open) .mcm-dir-facet,
+	.mcm-dir-filters.is-foldable:not(.is-open) .mcm-dir-reset{ display:none; }
+	.mcm-dir-filters.is-foldable.is-open .mcm-dir-toggle + .mcm-dir-facet{ margin-top:16px; }
+}
+
+/* =====================================================================
+   UI QA round (1.32): consistent cards, dated entries, notices, filters.
+   ===================================================================== */
+/* Cards: the body fills the card, so "View details" sits on the bottom edge
+   in every card of a row. */
+.mcm-card-body{ flex:1 1 auto; }
+/* Dated entries (admissions, scholarships, tenders, events): status + time left. */
+.mcm-card--dated{ border-top:4px solid var(--mcm-primary, #0a6b5d); }
+.mcm-card--dated.is-closing, .mcm-card--dated.is-today{ border-top-color:#d97706; }
+.mcm-card--dated.is-closed, .mcm-card--dated.is-past{ border-top-color:#c3c4c7; }
+.mcm-card--dated.is-upcoming{ border-top-color:#2563eb; }
+.mcm-card--event.mcm-card--dated.is-upcoming{ border-top-color:var(--mcm-primary, #0a6b5d); }
+.mcm-card-status{ display:flex; align-items:center; flex-wrap:wrap; gap:6px 10px; }
+.mcm-card-status .mcm-badge{ margin-left:0; }
+.mcm-card-left{ font-size:13px; font-weight:600; color:var(--mcm-primary, #0a6b5d); }
+.mcm-card--dated.is-closing .mcm-card-left, .mcm-card--dated.is-today .mcm-card-left{ color:#8a4b00; }
+.mcm-card--dated.is-upcoming .mcm-card-left{ color:#1d3f8a; }
+.mcm-card--event.mcm-card--dated.is-upcoming .mcm-card-left{ color:var(--mcm-primary, #0a6b5d); }
+/* Notice priority. */
+.mcm-prio{ display:inline-block; padding:1px 8px; border-radius:999px; font-size:12px; font-weight:700; line-height:1.5; border:1px solid var(--mcm-border, #e5e7eb); color:var(--mcm-text, #1f2933); background:var(--mcm-card-bg, #fff); }
+.mcm-prio--important{ border-color:#d97706; background:#fff4e5; color:#8a4b00; }
+.mcm-prio--urgent{ border-color:#b91c1c; background:#b91c1c; color:#fff; }
+/* Filter checkboxes: bigger, in the site colour. */
+.mcm-dir-checks input[type="checkbox"]{ width:18px; height:18px; margin-top:0; accent-color:var(--mcm-primary, #0a6b5d); }
+.mcm-dir-checks label{ align-items:center; min-height:24px; }
+/* Tables: no theme margin inside the rounded frame. */
+.mcm-table-wrap .mcm-table{ margin:0; }
+/* Theme / Elementor kit link styles must not underline the detail buttons. */
+.mcm-single-details a.mcm-sd-btn, .mcm-single-details a.mcm-sd-btn:hover, .mcm-single-details a.mcm-sd-btn:focus{ text-decoration:none; }
+.mcm-sd-left{ font-size:14px; font-weight:600; color:var(--mcm-muted, #6b7280); }
+/* Inside listings, links are titles and buttons: no underline, even when the
+   theme underlines every link in page content (Hello: .page-content a). */
+.mcm-wrap a:not(.mcm-underline){ text-decoration:none; }
+.mcm-list-body .mcm-card-status{ margin-bottom:4px; }
+.mcm-list-item.is-closing .mcm-card-left, .mcm-list-item.is-today .mcm-card-left{ color:#8a4b00; }
+.mcm-list-item.is-upcoming .mcm-card-left{ color:#1d3f8a; }
+.mcm-list-item--event.is-upcoming .mcm-card-left{ color:var(--mcm-primary, #0a6b5d); }
+
+/* ---------- Testimonial / Message widget ----------
+   Defaults follow the classic "Message from the Head of Department" page:
+   uppercase underlined heading, justified message, bold name lines, photo
+   beside the text. Photo position comes from per-device classes Elementor
+   puts on the widget (mcm-testi-pos-left|right|top, -tablet-, -mobile-). */
+.mcm-testi{ --mcm-testi-gap:36px; --mcm-testi-img-w:28%; color:var(--mcm-text, #1f2933); }
+.mcm-testi-title{ margin:0 0 28px; font-size:24px; font-weight:700; line-height:1.3; text-transform:uppercase; text-decoration:none; color:var(--mcm-text, #1f2933); }
+.mcm-testi-inner{ display:flex; gap:var(--mcm-testi-gap); align-items:var(--mcm-testi-valign, flex-start); }
+.mcm-testi-media{ flex:0 0 var(--mcm-testi-img-w); max-width:100%; overflow:hidden; }
+.mcm-testi-media a{ display:block; }
+.mcm-testi-media img{ display:block; width:100%; height:auto; object-fit:cover; transition:transform .3s ease, opacity .3s ease, filter .3s ease; }
+.mcm-testi-content{ flex:1 1 0; min-width:0; }
+.mcm-testi-quote{ display:block; height:.45em; font-family:Georgia, "Times New Roman", serif; font-size:64px; line-height:.8; color:var(--mcm-primary, #0a6b5d); }
+.mcm-testi .mcm-testi-message{ margin:0; padding:0; border:0; background:none; font-style:normal; font-size:16px; line-height:1.65; text-align:justify; color:inherit; quotes:none; }
+.mcm-testi .mcm-testi-message::before, .mcm-testi .mcm-testi-message::after{ content:none; }
+.mcm-testi-message p{ margin:0 0 1em; }
+.mcm-testi-message p:last-child{ margin-bottom:0; }
+.mcm-testi-author{ margin-top:22px; }
+.mcm-testi-author p{ margin:0; font-weight:700; line-height:1.5; }
+.mcm-testi .mcm-testi-name a{ color:inherit; text-decoration:none; }
+.mcm-testi .mcm-testi-name a:hover, .mcm-testi .mcm-testi-name a:focus-visible{ color:var(--mcm-primary, #0a6b5d); text-decoration:underline; }
+
+.mcm-testi-pos-left .mcm-testi-inner{ flex-direction:row; }
+.mcm-testi-pos-right .mcm-testi-inner{ flex-direction:row-reverse; }
+.mcm-testi-pos-top .mcm-testi-inner{ flex-direction:column; align-items:var(--mcm-testi-halign, flex-start); }
+.mcm-testi-pos-top .mcm-testi-media{ flex:0 0 auto; width:var(--mcm-testi-img-w); }
+.mcm-testi-pos-top .mcm-testi-content{ align-self:stretch; }
+@media (max-width:1024px){
+	.mcm-testi-pos-tablet-left .mcm-testi-inner{ flex-direction:row; align-items:var(--mcm-testi-valign, flex-start); }
+	.mcm-testi-pos-tablet-right .mcm-testi-inner{ flex-direction:row-reverse; align-items:var(--mcm-testi-valign, flex-start); }
+	.mcm-testi-pos-tablet-left .mcm-testi-media, .mcm-testi-pos-tablet-right .mcm-testi-media{ flex:0 0 var(--mcm-testi-img-w); width:auto; }
+	.mcm-testi-pos-tablet-top .mcm-testi-inner{ flex-direction:column; align-items:var(--mcm-testi-halign, flex-start); }
+	.mcm-testi-pos-tablet-top .mcm-testi-media{ flex:0 0 auto; width:var(--mcm-testi-img-w); }
+	.mcm-testi-pos-tablet-top .mcm-testi-content{ align-self:stretch; }
+}
+@media (max-width:767px){
+	.mcm-testi{ --mcm-testi-gap:22px; }
+	.mcm-testi-title{ font-size:20px; margin-bottom:20px; }
+	/* Still justified on phones; hyphenation keeps the word gaps small. */
+	.mcm-testi .mcm-testi-message{ -webkit-hyphens:auto; hyphens:auto; }
+	.mcm-testi-pos-mobile-left .mcm-testi-inner{ flex-direction:row; align-items:var(--mcm-testi-valign, flex-start); }
+	.mcm-testi-pos-mobile-right .mcm-testi-inner{ flex-direction:row-reverse; align-items:var(--mcm-testi-valign, flex-start); }
+	.mcm-testi-pos-mobile-left .mcm-testi-media, .mcm-testi-pos-mobile-right .mcm-testi-media{ flex:0 0 var(--mcm-testi-img-w); width:auto; }
+	.mcm-testi-pos-mobile-top .mcm-testi-inner{ flex-direction:column; align-items:var(--mcm-testi-halign, flex-start); }
+	.mcm-testi-pos-mobile-top .mcm-testi-media{ flex:0 0 auto; width:var(--mcm-testi-img-w); }
+	.mcm-testi-pos-mobile-top .mcm-testi-content{ align-self:stretch; }
+}
+
+/* ---------- Contact Info widget ----------
+   Rows of icon + label (left) and value (right); "stacked" puts the label
+   above the value. Layout classes come per device from Elementor
+   (mcm-contact-layout-row|stacked, -tablet-, -mobile-). */
+.mcm-contact{ --mcm-contact-label-w:32%; --mcm-contact-icon:16px; --mcm-contact-icon-box:0px; --mcm-contact-icon-gap:10px; color:var(--mcm-text, #1f2933); }
+.mcm-contact-title{ margin:0 0 8px; font-size:22px; font-weight:700; line-height:1.3; color:var(--mcm-text, #1f2933); }
+.mcm-contact-subtitle{ margin:0 0 18px; font-size:15px; line-height:1.55; color:var(--mcm-muted, #6b7280); }
+.mcm-contact .mcm-contact-list{ margin:0; padding:0; }
+.mcm-contact-item{ display:flex; align-items:baseline; gap:6px 20px; padding:12px 0; border:0 solid var(--mcm-border, #e5e7eb); transition:background-color .2s ease; }
+.mcm-contact-divider-yes .mcm-contact-item{ border-bottom-width:1px; }
+.mcm-contact-divider-yes .mcm-contact-item:last-child{ border-bottom-width:0; }
+.mcm-contact .mcm-contact-term{ flex:0 0 var(--mcm-contact-label-w); display:flex; align-items:center; gap:var(--mcm-contact-icon-gap); min-width:0; margin:0; font-weight:700; line-height:1.5; }
+.mcm-contact--no-labels .mcm-contact-term{ flex:0 0 auto; }
+.mcm-contact .mcm-contact-value{ flex:1 1 0; min-width:0; margin:0; line-height:1.55; overflow-wrap:anywhere; }
+.mcm-contact .mcm-contact-value a{ color:var(--mcm-primary, #0a6b5d); text-decoration:none; }
+.mcm-contact .mcm-contact-value a:hover, .mcm-contact .mcm-contact-value a:focus-visible{ text-decoration:underline; }
+.mcm-contact-icon{ display:inline-flex; align-items:center; justify-content:center; flex:0 0 auto; min-width:var(--mcm-contact-icon-box); min-height:var(--mcm-contact-icon-box); font-size:var(--mcm-contact-icon); line-height:1; color:var(--mcm-primary, #0a6b5d); transition:color .2s ease, background-color .2s ease; }
+.mcm-contact-icon svg{ width:1em; height:1em; fill:currentColor; }
+.mcm-contact-icon i{ font-size:inherit; }
+
+.mcm-contact-layout-stacked .mcm-contact-item{ flex-direction:column; align-items:stretch; gap:4px; }
+.mcm-contact-layout-stacked .mcm-contact-term{ flex:0 0 auto; }
+@media (max-width:1024px){
+	.mcm-contact-layout-tablet-row .mcm-contact-item{ flex-direction:row; align-items:baseline; gap:6px 20px; }
+	.mcm-contact-layout-tablet-row .mcm-contact-term{ flex:0 0 var(--mcm-contact-label-w); }
+	.mcm-contact-layout-tablet-stacked .mcm-contact-item{ flex-direction:column; align-items:stretch; gap:4px; }
+	.mcm-contact-layout-tablet-stacked .mcm-contact-term{ flex:0 0 auto; }
+}
+@media (max-width:767px){
+	.mcm-contact-layout-mobile-row .mcm-contact-item{ flex-direction:row; align-items:baseline; gap:6px 16px; }
+	.mcm-contact-layout-mobile-row .mcm-contact-term{ flex:0 0 var(--mcm-contact-label-w); }
+	.mcm-contact-layout-mobile-stacked .mcm-contact-item{ flex-direction:column; align-items:stretch; gap:4px; }
+	.mcm-contact-layout-mobile-stacked .mcm-contact-term{ flex:0 0 auto; }
+}
+/* Labels hidden: the icon sits beside its value on every layout and device. */
+.mcm-contact--no-labels .mcm-contact-item{ flex-direction:row; align-items:center; gap:6px 14px; }
+.mcm-contact--no-labels .mcm-contact-term{ flex:0 0 auto; }
+
+/* Empty listing, shown to logged-in editors only (visitors get nothing). */
+.mcm-empty-admin{ padding:14px 18px; border:1px dashed var(--mcm-border-strong, #c8d0cc); border-radius:var(--mcm-radius, 12px); background:var(--mcm-page-bg, #f5f7fa); color:var(--mcm-text, #1f2933); font-size:14px; line-height:1.5; }
+.mcm-empty-admin a{ color:var(--mcm-primary, #0a6b5d); font-weight:600; }
+
+/* Long unbroken words (department names, IDs, URLs) wrap instead of pushing
+   the page sideways on narrow phones (320px). Scoped to the plugin's own
+   pages and blocks; the theme's title is wrapped only on plugin pages. */
+body[class*="single-mcm_"] .entry-title,
+body[class*="post-type-archive-mcm_"] .page-title,
+body[class*="tax-mcm_"] .page-title,
+.mcm-wrap h1, .mcm-wrap h2, .mcm-wrap h3, .mcm-single-title, .mcm-card-title,
+.mcm-single-content, .mcm-single-details td, .mcm-pub-list li{ overflow-wrap:anywhere; }
+
+/* Details panel: linked departments / faculty / specialties, and a person's
+   publications & research. */
+.mcm-sd-value a{ color:var(--mcm-primary, #0a6b5d); text-decoration:underline; text-underline-offset:2px; }
+.mcm-sd-value a:hover, .mcm-sd-value a:focus-visible{ text-decoration-thickness:2px; }
+.mcm-sd-work{ margin-top:20px; }
+.mcm-sd-subheading{ margin:0 0 8px; font-size:16px; color:var(--mcm-text, #1f2933); }
+.mcm-sd-work-list{ margin:0; padding-left:1.1em; }
+.mcm-sd-work-list li{ margin:0 0 6px; line-height:1.45; }
+.mcm-sd-work-list a{ color:var(--mcm-primary, #0a6b5d); }
+.mcm-sd-work-type{ color:var(--mcm-muted, #52606d); font-size:13px; }
+.mcm-sd-work-more{ margin:8px 0 0; }
+.mcm-sd-work-more a{ color:var(--mcm-primary, #0a6b5d); font-weight:600; }
+
+/* "Sort by" control: inline in the filter bar, a block in the directory
+   sidebar. Same look as the filter dropdowns. */
+.mcm-sort{ display:flex; align-items:center; gap:8px; flex:0 1 auto; min-width:0; }
+.mcm-sort-label{ font-size:13px; font-weight:600; color:var(--mcm-muted, #6b7280); white-space:nowrap; }
+.mcm-sort .mcm-sort-select{
+	height:44px; width:auto !important; min-width:0; box-sizing:border-box; margin:0;
+	padding:0 38px 0 14px; border:1px solid var(--mcm-border, #e5e7eb); border-radius:8px;
+	background-color:var(--mcm-page-bg, #f5f7fa); font-size:14px; line-height:normal; color:var(--mcm-text, #1f2933);
+	-webkit-appearance:none; -moz-appearance:none; appearance:none; cursor:pointer;
+	background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='none' stroke='%236b7280' stroke-width='1.6' stroke-linecap='round' d='M1 1.5 6 6.5 11 1.5'/%3E%3C/svg%3E");
+	background-repeat:no-repeat; background-position:right 14px center;
+	transition:border-color .15s ease, box-shadow .15s ease, background-color .15s ease;
+}
+.mcm-sort .mcm-sort-select:hover{ border-color:var(--mcm-border-strong, #c8d0cc); }
+.mcm-sort .mcm-sort-select:focus{ outline:none; background-color:var(--mcm-card-bg, #fff); border-color:var(--mcm-primary, #0a6b5d); box-shadow:0 0 0 3px rgba(10,107,93,.12); }
+.mcm-sort .mcm-sort-select:focus-visible{ outline:2px solid var(--mcm-primary, #0a6b5d); outline-offset:2px; }
+.mcm-dir-sort{ display:block; margin:0 0 22px; }
+.mcm-dir-sort .mcm-sort-label{ display:block; margin:0 0 8px; font-size:12px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; }
+.mcm-dir-sort .mcm-sort-select{ width:100% !important; }
+@media (max-width:600px){
+	.mcm-filters .mcm-sort{ flex:1 1 100%; }
+	.mcm-filters .mcm-sort .mcm-sort-select{ flex:1 1 auto; }
 }

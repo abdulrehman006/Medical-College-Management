@@ -10,13 +10,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * Floating social-media bar.
+ */
 class MCM_Social {
 
 	const OPTION = 'mcm_social';
 
-	/** Whether the bar has already been output this request (avoid duplicates). */
+	/**
+	 * Whether the bar has already been output this request (avoid duplicates).
+	 *
+	 * @var bool
+	 */
 	private $shown = false;
 
+	/**
+	 * Register the hooks this module needs.
+	 */
 	public function __construct() {
 		add_action( 'admin_menu', array( $this, 'menu' ), 12 );
 		add_action( 'admin_init', array( $this, 'register' ) );
@@ -63,6 +73,9 @@ class MCM_Social {
 		);
 	}
 
+	/**
+	 * Default values.
+	 */
 	public static function defaults() {
 		$d = array(
 			'social_enable_sitewide' => '0',
@@ -75,16 +88,27 @@ class MCM_Social {
 		return $d;
 	}
 
+	/**
+	 * Saved settings merged over the defaults.
+	 */
 	public static function get() {
 		$saved = get_option( self::OPTION, array() );
 		return wp_parse_args( is_array( $saved ) ? $saved : array(), self::defaults() );
 	}
 
+	/**
+	 * One saved setting (or its default).
+	 *
+	 * @param string $key Key.
+	 */
 	public static function value( $key ) {
 		$all = self::get();
 		return isset( $all[ $key ] ) ? $all[ $key ] : '';
 	}
 
+	/**
+	 * Add the admin menu page.
+	 */
 	public function menu() {
 		add_submenu_page(
 			'mcm-settings',
@@ -96,17 +120,27 @@ class MCM_Social {
 		);
 	}
 
+	/**
+	 * Register the setting with its sanitize callback.
+	 */
 	public function register() {
 		register_setting( 'mcm_social_group', self::OPTION, array( $this, 'sanitize' ) );
 	}
 
+	/**
+	 * Sanitize the submitted settings.
+	 *
+	 * @param array $input Submitted values.
+	 */
 	public function sanitize( $input ) {
 		$defaults = self::defaults();
 		$out      = array();
+		// options.php can post anything: only an array of scalars is read.
+		$input = is_array( $input ) ? $input : array();
 
 		foreach ( array_keys( self::networks() ) as $key ) {
 			$field = 'social_' . $key;
-			$raw   = isset( $input[ $field ] ) ? trim( (string) $input[ $field ] ) : '';
+			$raw   = isset( $input[ $field ] ) ? trim( MCM_Safe::str( $input[ $field ] ) ) : '';
 			if ( 'whatsapp' === $key ) {
 				// Keep digits (and a leading +) only — used to build a wa.me link.
 				$out[ $field ] = preg_replace( '/[^0-9]/', '', $raw );
@@ -116,8 +150,8 @@ class MCM_Social {
 		}
 
 		$out['social_enable_sitewide'] = ! empty( $input['social_enable_sitewide'] ) ? '1' : '0';
-		$out['social_position']        = ( isset( $input['social_position'] ) && 'left' === $input['social_position'] ) ? 'left' : 'right';
-		$out['social_mobile']          = ( isset( $input['social_mobile'] ) && 'hide' === $input['social_mobile'] ) ? 'hide' : 'bottom';
+		$out['social_position']        = ( isset( $input['social_position'] ) && 'left' === MCM_Safe::str( $input['social_position'] ) ) ? 'left' : 'right';
+		$out['social_mobile']          = ( isset( $input['social_mobile'] ) && 'hide' === MCM_Safe::str( $input['social_mobile'] ) ) ? 'hide' : 'bottom';
 
 		return wp_parse_args( $out, $defaults );
 	}
@@ -128,6 +162,16 @@ class MCM_Social {
 	 * @return string
 	 */
 	public function render_bar() {
+		return MCM_Safe::render( array( $this, 'build_bar' ), 'social bar' );
+	}
+
+	/**
+	 * Unguarded builder; call render_bar() instead.
+	 *
+	 * @internal
+	 * @return string
+	 */
+	public function build_bar() {
 		MCM_Assets::need();
 		$s     = self::get();
 		$items = '';
@@ -169,7 +213,12 @@ class MCM_Social {
 		);
 	}
 
-	public function shortcode( $atts ) {
+	/**
+	 * Shortcode callback for [mcm_social_bar].
+	 *
+	 * @param array|string $atts Shortcode attributes.
+	 */
+	public function shortcode( $atts ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found -- Shortcode callback signature; the bar takes no attributes.
 		$this->shown = true;
 		return $this->render_bar();
 	}
@@ -183,6 +232,9 @@ class MCM_Social {
 		echo $this->render_bar(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 
+	/**
+	 * Render the admin page.
+	 */
 	public function render_page() {
 		$s = self::get();
 		?>

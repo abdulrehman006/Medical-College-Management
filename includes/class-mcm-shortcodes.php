@@ -9,8 +9,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * Content list shortcodes and the shared block renderer.
+ */
 class MCM_Shortcodes {
 
+	/**
+	 * Register the hooks this module needs.
+	 */
 	public function __construct() {
 		add_shortcode( 'mcm_consultants', array( $this, 'sc_consultants' ) );
 		add_shortcode( 'mcm_team', array( $this, 'sc_team' ) );
@@ -25,6 +31,8 @@ class MCM_Shortcodes {
 		add_shortcode( 'mcm_publications', array( $this, 'sc_publications' ) );
 		add_shortcode( 'mcm_research', array( $this, 'sc_research' ) );
 		add_shortcode( 'mcm_policies', array( $this, 'sc_policies' ) );
+		add_shortcode( 'mcm_jobs', array( $this, 'sc_jobs' ) );
+		add_shortcode( 'mcm_vacancies', array( $this, 'sc_jobs' ) ); // alias.
 		add_shortcode( 'mcm_students', array( $this, 'sc_students' ) );
 		add_shortcode( 'mcm_student', array( $this, 'sc_students' ) ); // alias.
 
@@ -37,11 +45,18 @@ class MCM_Shortcodes {
 
 	/**
 	 * WordPress passes '' (empty string) when a shortcode has no attributes.
+	 *
+	 * @param array|string $atts Shortcode attributes.
 	 */
 	private function normalize( $atts ) {
 		return is_array( $atts ) ? $atts : array();
 	}
 
+	/**
+	 * Whether a shortcode-style value means yes (yes/1/true/on).
+	 *
+	 * @param mixed $val Value.
+	 */
 	private static function truthy( $val ) {
 		return in_array( strtolower( (string) $val ), array( 'yes', '1', 'true', 'on' ), true );
 	}
@@ -49,6 +64,8 @@ class MCM_Shortcodes {
 	/**
 	 * Shared renderer: outputs a wrapper that AJAX can target. Instance method
 	 * kept for the shortcode callbacks; delegates to the reusable static below.
+	 *
+	 * @param array|string $atts Shortcode attributes.
 	 */
 	private function render( $atts ) {
 		return self::render_block( $atts );
@@ -57,14 +74,128 @@ class MCM_Shortcodes {
 	/**
 	 * Build one self-contained, AJAX-filterable block for the given attributes.
 	 * Public + static so archive templates can render blocks directly.
+	 *
+	 * Every listing on the site (shortcodes, Elementor widgets, archive and
+	 * department pages, program pages) comes through here, so this is the
+	 * render boundary: a failure becomes an empty block, never a broken page.
+	 *
+	 * @param array|string $atts    Shortcode attributes.
+	 * @param bool         $heading False when the caller already prints a visible
+	 *                              heading for this block (no hidden duplicate).
 	 */
-	public static function render_block( $atts ) {
+	public static function render_block( $atts, $heading = true ) {
+		$type = ( is_array( $atts ) && isset( $atts['type'] ) ) ? MCM_Safe::str( $atts['type'] ) : '';
+		return MCM_Safe::render(
+			function () use ( $atts, $heading ) {
+				return MCM_Shortcodes::build_block( $atts, $heading );
+			},
+			'listing ' . $type
+		);
+	}
+
+	/**
+	 * The unguarded block builder. Call render_block() instead.
+	 *
+	 * @internal
+	 * @param array $atts    Attributes.
+	 * @param bool  $heading Print the hidden results heading.
+	 * @return string
+	 */
+	public static function build_block( $atts, $heading = true ) {
+		MCM_Query::take_last_empty();
+		$html = self::block_html( $atts, $heading );
+		if ( '' === $html || ! MCM_Query::take_last_empty() || ! self::hide_when_empty( $atts ) ) {
+			return $html;
+		}
+		return self::empty_notice( is_array( $atts ) && isset( $atts['type'] ) ? sanitize_key( MCM_Safe::str( $atts['type'] ) ) : '' );
+	}
+
+	/**
+	 * Whether an empty block is hidden from visitors: a block placed on a page
+	 * (widget or shortcode) on its first page, with no message of its own.
+	 * Live filtering ("No results found") and archive pages (their own "nothing
+	 * to show here yet") are left alone.
+	 *
+	 * @param array|string $atts Block attributes.
+	 * @return bool
+	 */
+	private static function hide_when_empty( $atts ) {
+		$atts = is_array( $atts ) ? $atts : array();
+		if ( wp_doing_ajax() || is_post_type_archive() || is_tax() ) {
+			return false;
+		}
+		if ( isset( $atts['empty'] ) && '' !== trim( MCM_Safe::str( $atts['empty'] ) ) ) {
+			return false;
+		}
+		return max( 1, (int) get_query_var( 'paged' ), (int) get_query_var( 'page' ) ) <= 1;
+	}
+
+	/**
+	 * What an empty block shows: nothing for visitors; a short note (with an
+	 * "Add" link where allowed) for logged-in editors, so a blank spot on the
+	 * page is explained to whoever can fix it.
+	 *
+	 * Also used by the notice ticker and board (MCM_Notice).
+	 *
+	 * @param string $type Post type.
+	 * @return string
+	 */
+	public static function empty_notice( $type ) {
+		if ( ! current_user_can( 'edit_posts' ) ) {
+			return '';
+		}
+		$obj  = $type ? get_post_type_object( $type ) : null;
+		$name = $obj ? $obj->labels->name : __( 'items', 'medical-college-manager' );
+		$add  = '';
+		if ( $obj && current_user_can( $obj->cap->create_posts ) ) {
+			$add = ' <a href="' . esc_url( admin_url( 'post-new.php?post_type=' . $type ) ) . '">' . esc_html( $obj->labels->add_new_item ) . '</a>';
+		}
+		return '<div class="mcm-wrap mcm-empty-admin" role="note"><strong>'
+			/* translators: %s: content type plural name, e.g. Events. */
+			. esc_html( sprintf( __( 'No %s to show here yet.', 'medical-college-manager' ), $name ) )
+			. '</strong> ' . esc_html__( 'Only logged-in editors see this note; visitors see nothing in this spot.', 'medical-college-manager' )
+			. $add . '</div>';
+	}
+
+	/**
+	 * Markup of one block; see build_block().
+	 *
+	 * @param array $atts    Attributes.
+	 * @param bool  $heading Print the hidden results heading.
+	 * @return string
+	 */
+	private static function block_html( $atts, $heading = true ) {
 		// Backstop: whatever rendered this block (shortcode, Elementor widget,
 		// archive template) now needs the CSS/JS, even if detection missed it.
 		MCM_Assets::need();
 
 		$a   = MCM_Query::parse_atts( is_array( $atts ) ? $atts : array() );
 		$uid = 'mcm-' . wp_generate_password( 6, false, false );
+
+		// A paginated list placed on a page follows the page's own /page/N/
+		// (WordPress sets "paged" on archives and "page" on single pages).
+		// Archive templates pass the page number themselves.
+		if ( MCM_Query::truthy( $a['paginate'] ) && (int) $a['paged'] <= 1 && ! wp_doing_ajax() ) {
+			$a['paged'] = max( 1, (int) get_query_var( 'paged' ), (int) get_query_var( 'page' ) );
+		}
+
+		// [mcm_students], [mcm_table type="mcm_student"]… render nothing when the
+		// public student directory is switched off and the viewer is not staff.
+		if ( 'mcm_student' === $a['type'] && ! MCM_Query::students_visible() ) {
+			return '';
+		}
+		// Only this plugin's own content types, and only those the viewer may
+		// list (jobs need the Jobs module, which hides jobs not yet published).
+		// [mcm_table type="..."] must not list another plugin's private records.
+		if ( ! MCM_Query::type_allowed( $a['type'] ) ) {
+			return '';
+		}
+
+		// The listing starts with the sort its control shows (newest first,
+		// unless the author chose another order).
+		if ( MCM_Query::sort_visible( $a ) ) {
+			$a['sort'] = MCM_Query::initial_sort( $a );
+		}
 
 		$data = array(
 			'type'      => $a['type'],
@@ -74,14 +205,39 @@ class MCM_Shortcodes {
 			'orderby'   => $a['orderby'],
 			'order'     => $a['order'],
 			'category'  => $a['category'],
-			'meta_key'  => $a['meta_key'],
+			'meta_key'  => $a['meta_key'], // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- data-config attribute, not a query argument.
 			'meta_type' => $a['meta_type'],
 			'lock_tax'  => $a['lock_tax'],
 			'lock_term' => $a['lock_term'],
+			// The author's pre-filters (department="…", program="…", Elementor
+			// pre-filter controls…). Without them the first AJAX search, filter
+			// change, Reset or Print-all silently widened the list.
+			'scope'     => (object) MCM_Query::scope_terms( $a ),
+			// Jobs status filter (open/closed/all) must survive AJAX, Reset and Print.
+			'status'    => sanitize_key( MCM_Safe::str( $a['status'] ) ),
+			// Visitor-changeable (not signed): newest | az | ''.
+			'sort'      => MCM_Query::normalize_sort( $a['sort'] ),
 			// Without these a filtered AJAX response silently loses pagination.
 			'paginate'  => $a['paginate'],
 			'paged'     => (int) $a['paged'],
 		);
+		// The author's other choices must survive AJAX too; only sent when set.
+		$extra = array(
+			'ids'           => implode( ',', MCM_Query::id_list( $a['ids'] ) ),
+			'exclude_ids'   => implode( ',', MCM_Query::id_list( $a['exclude_ids'] ) ),
+			'offset'        => absint( $a['offset'] ),
+			'exclude_terms' => MCM_Query::exclude_terms( $a ),
+			'empty'         => sanitize_text_field( MCM_Safe::str( $a['empty'] ) ),
+			// With no search box the starting keyword is fixed.
+			'fixed_search'  => self::truthy( $a['search_box'] ) ? '' : sanitize_text_field( MCM_Safe::str( $a['search'] ) ),
+			// Images, table columns and card parts the author chose to hide.
+			'display'       => MCM_Query::display_opts( $a ),
+		);
+		foreach ( $extra as $key => $value ) {
+			if ( ! empty( $value ) ) {
+				$data[ $key ] = in_array( $key, array( 'exclude_terms', 'display' ), true ) ? (object) $value : $value;
+			}
+		}
 
 		$show_filters = self::truthy( $a['filters'] );
 
@@ -98,15 +254,25 @@ class MCM_Shortcodes {
 		$show_print  = in_array( $a['type'], $print_types, true )
 			&& ( '' === $print_attr ? true : self::truthy( $print_attr ) );
 
+		// Signed: the filter endpoint serves only this exact listing. 'max' is
+		// the page size the author chose; 'print' lets Print-all fetch the
+		// whole list.
+		$data['max']   = (int) $a['count'];
+		$data['print'] = $show_print ? 1 : 0;
+		$data['sig']   = MCM_Query::sign_config( $data );
+
 		ob_start();
 
 		// Directory layout: filters live in a left sidebar, results on the right.
 		if ( 'directory' === $a['view'] ) {
 			echo '<div class="mcm-wrap mcm-directory ' . esc_attr( $a['class_css'] ) . '" id="' . esc_attr( $uid ) . '" data-config="' . esc_attr( wp_json_encode( $data ) ) . '">';
-			echo '<aside class="mcm-dir-aside">';
+			echo '<aside class="mcm-dir-aside" aria-label="' . esc_attr__( 'Filters', 'medical-college-manager' ) . '">';
 			echo MCM_Query::render_sidebar( $a ); // phpcs:ignore
 			echo '</aside>';
 			echo '<div class="mcm-dir-main">';
+			// Keeps the heading outline intact (page h1 → filter h2s → card h3s),
+			// also on phones where the filters are folded away.
+			echo $heading ? self::results_heading( $a['type'] ) : ''; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped in results_heading().
 			if ( $show_print ) {
 				echo '<div class="mcm-toolbar"><button type="button" class="mcm-print-btn" aria-label="' . esc_attr__( 'Print', 'medical-college-manager' ) . '">&#128424; ' . esc_html__( 'Print', 'medical-college-manager' ) . '</button></div>';
 				echo MCM_Query::print_header( $a ); // phpcs:ignore
@@ -140,6 +306,9 @@ class MCM_Shortcodes {
 			echo MCM_Query::print_footer(); // phpcs:ignore
 		}
 
+		// Card and list titles are h3: a hidden h2 keeps the outline valid
+		// wherever the block is placed (straight under a page's h1 too).
+		echo $heading ? self::results_heading( $a['type'] ) : ''; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped in results_heading().
 		echo '<div class="mcm-results" aria-live="polite" aria-busy="false">';
 		echo MCM_Query::render_results( $a ); // phpcs:ignore
 		echo '</div>';
@@ -147,38 +316,79 @@ class MCM_Shortcodes {
 		return ob_get_clean();
 	}
 
+	/**
+	 * Visually hidden h2 naming the listed content (e.g. "Vacancies").
+	 *
+	 * @param string $type Post type.
+	 * @return string
+	 */
+	private static function results_heading( $type ) {
+		$obj = get_post_type_object( $type );
+		return '<h2 class="mcm-sr-only">' . esc_html( $obj ? $obj->labels->name : __( 'Results', 'medical-college-manager' ) ) . '</h2>';
+	}
+
+	/**
+	 * Shortcode callback for [mcm_consultants].
+	 *
+	 * @param array|string $atts Shortcode attributes.
+	 */
 	public function sc_consultants( $atts ) {
-		$atts = $this->normalize( $atts );
+		$atts         = $this->normalize( $atts );
 		$atts['type'] = 'mcm_consultant';
 		return $this->render( $atts );
 	}
 
+	/**
+	 * Shortcode callback for [mcm_team] and [mcm_teams].
+	 *
+	 * @param array|string $atts Shortcode attributes.
+	 */
 	public function sc_team( $atts ) {
-		$atts = $this->normalize( $atts );
+		$atts         = $this->normalize( $atts );
 		$atts['type'] = 'mcm_team';
 		return $this->render( $atts );
 	}
 
+	/**
+	 * Shortcode callback for [mcm_programs].
+	 *
+	 * @param array|string $atts Shortcode attributes.
+	 */
 	public function sc_programs( $atts ) {
-		$atts = $this->normalize( $atts );
+		$atts         = $this->normalize( $atts );
 		$atts['type'] = 'mcm_program';
 		return $this->render( $atts );
 	}
 
+	/**
+	 * Shortcode callback for [mcm_courses].
+	 *
+	 * @param array|string $atts Shortcode attributes.
+	 */
 	public function sc_courses( $atts ) {
-		$atts = $this->normalize( $atts );
+		$atts         = $this->normalize( $atts );
 		$atts['type'] = 'mcm_course';
 		return $this->render( $atts );
 	}
 
+	/**
+	 * Shortcode callback for [mcm_events].
+	 *
+	 * @param array|string $atts Shortcode attributes.
+	 */
 	public function sc_events( $atts ) {
-		$atts = $this->normalize( $atts );
+		$atts         = $this->normalize( $atts );
 		$atts['type'] = 'mcm_event';
 		return $this->render( $atts );
 	}
 
+	/**
+	 * Shortcode callback for [mcm_timetable].
+	 *
+	 * @param array|string $atts Shortcode attributes.
+	 */
 	public function sc_timetable( $atts ) {
-		$atts = $this->normalize( $atts );
+		$atts         = $this->normalize( $atts );
 		$atts['type'] = 'mcm_timetable';
 		if ( empty( $atts['view'] ) ) {
 			$atts['view'] = 'table';
@@ -186,24 +396,44 @@ class MCM_Shortcodes {
 		return $this->render( $atts );
 	}
 
+	/**
+	 * Shortcode callback for [mcm_admissions].
+	 *
+	 * @param array|string $atts Shortcode attributes.
+	 */
 	public function sc_admissions( $atts ) {
-		$atts = $this->normalize( $atts );
+		$atts         = $this->normalize( $atts );
 		$atts['type'] = 'mcm_admission';
 		return $this->render( $atts );
 	}
 
+	/**
+	 * Shortcode callback for [mcm_tenders].
+	 *
+	 * @param array|string $atts Shortcode attributes.
+	 */
 	public function sc_tenders( $atts ) {
-		$atts = $this->normalize( $atts );
+		$atts         = $this->normalize( $atts );
 		$atts['type'] = 'mcm_tender';
 		return $this->render( $atts );
 	}
 
+	/**
+	 * Shortcode callback for [mcm_scholarships].
+	 *
+	 * @param array|string $atts Shortcode attributes.
+	 */
 	public function sc_scholarships( $atts ) {
-		$atts = $this->normalize( $atts );
+		$atts         = $this->normalize( $atts );
 		$atts['type'] = 'mcm_scholarship';
 		return $this->render( $atts );
 	}
 
+	/**
+	 * Shortcode callback for [mcm_publications].
+	 *
+	 * @param array|string $atts Shortcode attributes.
+	 */
 	public function sc_publications( $atts ) {
 		$atts         = $this->normalize( $atts );
 		$atts['type'] = 'mcm_publication';
@@ -216,12 +446,36 @@ class MCM_Shortcodes {
 		return $this->render( $atts );
 	}
 
+	/**
+	 * Shortcode callback for [mcm_research].
+	 *
+	 * @param array|string $atts Shortcode attributes.
+	 */
 	public function sc_research( $atts ) {
 		$atts         = $this->normalize( $atts );
 		$atts['type'] = 'mcm_research';
 		return $this->render( $atts );
 	}
 
+	/**
+	 * Shortcode callback for [mcm_jobs] and [mcm_vacancies].
+	 *
+	 * @param array|string $atts Shortcode attributes.
+	 */
+	public function sc_jobs( $atts ) {
+		$atts         = $this->normalize( $atts );
+		$atts['type'] = 'mcm_job';
+		if ( empty( $atts['count'] ) ) {
+			$atts['count'] = 12;
+		}
+		return $this->render( $atts );
+	}
+
+	/**
+	 * Shortcode callback for [mcm_policies].
+	 *
+	 * @param array|string $atts Shortcode attributes.
+	 */
 	public function sc_policies( $atts ) {
 		$atts         = $this->normalize( $atts );
 		$atts['type'] = 'mcm_policy';
@@ -231,8 +485,13 @@ class MCM_Shortcodes {
 		return $this->render( $atts );
 	}
 
+	/**
+	 * Shortcode callback for [mcm_students] and [mcm_student].
+	 *
+	 * @param array|string $atts Shortcode attributes.
+	 */
 	public function sc_students( $atts ) {
-		$atts = $this->normalize( $atts );
+		$atts         = $this->normalize( $atts );
 		$atts['type'] = 'mcm_student';
 		if ( empty( $atts['view'] ) ) {
 			$atts['view'] = 'table';
@@ -243,26 +502,46 @@ class MCM_Shortcodes {
 		return $this->render( $atts );
 	}
 
+	/**
+	 * Shortcode callback for [mcm_grid].
+	 *
+	 * @param array|string $atts Shortcode attributes.
+	 */
 	public function sc_grid( $atts ) {
-		$atts = $this->normalize( $atts );
+		$atts         = $this->normalize( $atts );
 		$atts['view'] = 'grid';
 		return $this->render( $atts );
 	}
 
+	/**
+	 * Shortcode callback for [mcm_list].
+	 *
+	 * @param array|string $atts Shortcode attributes.
+	 */
 	public function sc_list( $atts ) {
-		$atts = $this->normalize( $atts );
+		$atts         = $this->normalize( $atts );
 		$atts['view'] = 'list';
 		return $this->render( $atts );
 	}
 
+	/**
+	 * Shortcode callback for [mcm_table].
+	 *
+	 * @param array|string $atts Shortcode attributes.
+	 */
 	public function sc_table( $atts ) {
-		$atts = $this->normalize( $atts );
+		$atts         = $this->normalize( $atts );
 		$atts['view'] = 'table';
 		return $this->render( $atts );
 	}
 
+	/**
+	 * Shortcode callback for [mcm_single].
+	 *
+	 * @param array|string $atts Shortcode attributes.
+	 */
 	public function sc_single( $atts ) {
-		$a = shortcode_atts(
+		$a  = shortcode_atts(
 			array(
 				'id'   => 0,
 				'type' => '',
@@ -274,7 +553,12 @@ class MCM_Shortcodes {
 		if ( ! $id ) {
 			return '';
 		}
-		MCM_Assets::need();
-		return '<div class="mcm-wrap">' . MCM_Query::single( $id ) . '</div>';
+		return MCM_Safe::render(
+			function () use ( $id ) {
+				MCM_Assets::need();
+				return '<div class="mcm-wrap">' . MCM_Query::single( $id ) . '</div>';
+			},
+			'shortcode mcm_single'
+		);
 	}
 }

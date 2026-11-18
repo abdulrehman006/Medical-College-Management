@@ -18,3 +18,7 @@
 .mcm-relations .mcm-rel-group strong{ color: #50575e; }
 .mcm-relations .mcm-rel-more{ color: #787c82; font-style: italic; }
 .mcm-rel-empty{ color: #787c82; margin: 4px 0; }
+
+/* Media picker: image narrower than the field needs (a warning, never a block). */
+.mcm-quality-warning{ color: #996800; margin: 6px 0 0; }
+.mcm-quality-warning::before{ content: "⚠ "; }

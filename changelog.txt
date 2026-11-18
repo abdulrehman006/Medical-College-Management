@@ -1,0 +1,995 @@
+Medical College Manager — complete changelog.
+
+= 1.32.0 =
+Notice widgets (Notice Ticker, Notice Board, Notices List) brought to the
+widget standard:
+* Fixed: keyboard users could not stop the ticker or board by tabbing into
+  it; focus on a notice now pauses the scroll, as hovering does.
+* Fixed: the pause button now shows a play icon while paused (it already
+  reported the state to screen readers).
+* Fixed: the ticker showed a "Show date" switch and a Date style section
+  that did nothing (the ticker prints no date). Both are removed from it.
+* Fixed: "Urgent colour" did nothing on the ticker; urgent notices now
+  carry the urgent style there too, as on the board and list.
+* Fixed: "Pause button colour" on the board was lost on hover and focus;
+  the ticker now has the same control.
+* Fixed: an empty ticker or board was invisible and hard to find in the
+  Elementor editor. Logged-in editors now see the plugin's usual "No
+  Notices to show here yet" note; visitors still see nothing. The unused
+  Empty Message style section is removed from these two.
+* Changed: the board height can be set per device; saved heights are kept.
+* Changed: Ticker label and Board heading accept dynamic tags.
+* Changed: the decorative icons before the ticker label and board heading
+  are no longer read out by screen readers.
+Security audit (docs/security-audit-ai-common-issues-2026-11-17.md):
+* Fixed (High): a department coordinator could put an entry in another
+  department, or remove one from a shared entry, through the REST API (the
+  department rule now also runs after the REST API stores terms).
+* Fixed (Medium): if the department-access module ever fails to start,
+  coordinators lose editing rights on plugin content instead of silently
+  getting full rights (fail closed; administrators are unaffected).
+* Department fields check that the user may edit that department (form and
+  REST meta), not just "manage terms"; malformed admin form input no longer
+  causes a fatal error; count messages use proper plural forms.
+New: one record per person for Consultants and Team (incl. staff), by email:
+* Email is required and unique within each type. The edit screen will not
+  save without a valid, unused email (it links to the record that has it);
+  the server refuses a duplicate too. Phone stays optional; a phone already
+  on another person is a note, not an error.
+* CSV import matches people by email (any case): importing Department 2
+  updates the person from Department 1 and adds the department (also
+  specialty, faculty, research area) instead of creating a duplicate or
+  replacing what they had. Rows without a valid email are skipped with the
+  reason; an "id" that contradicts the email is refused. Title matching only
+  fills in older records that have no email yet.
+* Older records with no email, or sharing one, show "No email" / "Same email
+  as: …" in the list and appear under "Needs attention"; nothing is merged.
+New: Elementor "Slider (Images & Videos)" widget:
+* Slides: image or video (YouTube via youtube-nocookie, Vimeo with Do Not
+  Track, or an uploaded MP4 / WebM). Videos play as a muted background loop
+  or behind a play button with sound and controls. Each slide has a heading,
+  description, button and link (button or whole slide), an optional lightbox,
+  and its own overlay, position and text colour.
+* Size: custom height (px / vh / em per desktop, tablet and phone), fit to
+  screen minus a header offset, or an aspect ratio (21:9 to 9:16); custom
+  width and alignment; stretch edge to edge even inside a boxed section.
+* Motion: slide or fade, speed, autoplay with time per slide, pause on hover,
+  stop after the visitor uses it, loop, slides per view and slides to move
+  per screen size, space between, Ken Burns zoom, content entrance animation.
+* Navigation: arrows (inside / outside), dots, numbers or a progress bar
+  (inside / below), each hideable per screen size; swipe / mouse drag and
+  keyboard arrows.
+* Style tab: overlay, content position / width / padding, frame border,
+  radius and shadow, heading, description, button (Normal / Hover), arrows,
+  pagination and pause button.
+* Accessibility: labelled carousel region and slides, off-screen slides are
+  inert, a pause / play button, autoplay pauses on keyboard focus, reduced
+  motion turns off autoplay and zoom.
+* Video thumbnails: each video slide has a Thumbnail (or uses YouTube's /
+  Vimeo's own; Vimeo's is looked up once by the server and cached). It shows
+  while the video loads (with a spinner for click-to-play), again when the
+  video is paused, and with a replay button when it ends; both can be
+  switched off per slide. The state follows the player's own events
+  (HTML5, YouTube and Vimeo APIs), a stalled video shows a spinner, and a
+  video that cannot play shows the provider's own message. The slider's
+  pause button now also pauses background videos (WCAG 2.2.2).
+* Slider QA (owner / visitor / engineer, docs/qa-report-2026-11-09.md §8):
+  long text no longer gets cut off in short or phone-height slides (heights
+  are minimums; all slides stay equal); default overlay 45% plus a soft,
+  editable text shadow so white text stays legible on light photos; Windows
+  high-contrast mode shows button edges and the current dot; slides line up
+  to the sub-pixel (no sliver of the next slide); images download at the size
+  of their slot (a 3-across carousel no longer loads full-screen images);
+  player commands go only to the player's own origin; editor re-renders no
+  longer leave old sliders' listeners behind; two panel dropdowns no longer
+  cut off their options.
+* Performance: no library dependency; assets load only on pages with a
+  slider; videos are created when their slide is shown and background videos
+  pause off-screen or in a background tab; without JavaScript the slides
+  scroll sideways.
+
+Pre-launch QA (see docs/qa-report-2026-11-09.md):
+* Changed (college decision): the public student directory is opt-in. The
+  setting ("Make student lists public", Settings > Privacy) is off by default,
+  and is switched off once on update, since the site has not launched; an
+  administrator can turn it on again and that choice is kept. The settings
+  screen now says exactly what becomes public when it is on.
+* New: "Sort by" control (Newest first / Alphabetical A–Z) next to the filters
+  on every archive and every filterable listing, including the Elementor
+  listing widgets (switch "Sort control", on by default) and department-page
+  sections that have filters. Sorting keeps the visitor's department / session
+  / specialty / faculty filters and search, carries through the pager and
+  Print all, and works the same on archive pages and in widgets. Newest first
+  = publication year for publications, publish date for everything else
+  (vacancies listings with the control therefore start newest-posted instead
+  of closing-soonest). Shortcodes: sort_control="no" hides it; sort="az"
+  starts alphabetical; an author's own orderby adds a "Default order" choice.
+* Performance: cached filter/count entries made stale by a content change are
+  deleted at the end of that request instead of waiting to expire.
+* Fixed: the closing time on job cards now meets 4.5:1 contrast.
+* Fixed: the publications table now shows Type, Supervisor, Team (one member
+  per line) and a PDF Download button; the research table shows Supervisor /
+  PI, Team and Download. These were entered on every paper but only appeared
+  on its single page. Cards show Type and Supervisor too. Search in both
+  listings also matches supervisor, team members, authors and journal. The
+  Download column is left out when printing; on phones, empty cells are hidden.
+* New: Department access. Under Users > Edit user an administrator can limit a
+  user to one or more departments: they see, edit, publish and delete only
+  those departments' entries (and their own new ones, which are put in their
+  department), edit only those department pages, cannot add departments, and
+  cannot remove departments they do not manage from a shared entry. Off for
+  everyone until departments are ticked; administrators are never limited.
+* New: Needs attention. A published entry missing what the website relies on
+  (team member / consultant / publication / research without a department;
+  course / timetable without a program; event, tender, scholarship or
+  admission without its date) shows a warning after saving, a "Missing: ..."
+  label in the list and appears in a "Needs attention" view. Nothing is
+  blocked.
+* New: "Status on website" column in the Tenders, Scholarships, Notices,
+  Admissions and Events lists (Open / Closed - hidden / Expired - hidden).
+* New: Upload / Select buttons for the notice attachment and the tender
+  document; new scholarship Documents field (form / guidelines), shown as a
+  download button and importable by CSV (scholarship_doc).
+* New: profile pages of team members and consultants list their publications
+  and research projects (through their Faculty term). Department, Faculty,
+  Specialty, Session and category values in every details panel link to their
+  pages.
+* New: meta description on the plugin's pages (excerpt, text or key facts;
+  archive and department pages get a short line) when no SEO plugin is active.
+* The featured image is called Photo / Event banner / Advertisement image, and
+  a hint above the editor says what the text is for.
+* Security: the public live-filter endpoint only serves listings the site
+  itself rendered (signed configuration): the content type, pre-filters, sort
+  and page size can no longer be changed by a crafted request. Print all is
+  unchanged. Pages cached before this update ask visitors to refresh once.
+* Security: shortcodes list only this plugin's content types.
+* Security: password-protected entries are no longer listed, embedded with
+  [mcm_single], put on the notice board or described in structured data.
+* Security: students cannot be sorted by a private field; jobs not yet
+  published cannot be embedded (oEmbed); the privacy exporter and eraser
+  include trashed records; the Related Content box no longer shows other
+  authors' drafts to users who cannot edit them.
+* Performance: filter and count caches are stored as transients, so they work
+  on hosts without a persistent object cache; a member search joins only the
+  searchable fields.
+* Fixed: long words in titles (e.g. "Otorhinolaryngology") no longer push the
+  page sideways on 320px phones.
+* Fixed: department sections no longer count password-protected entries.
+* Policies on department pages use the list layout, the same default as the
+  Policies widget.
+* The settings screen says when the Elementor widgets are unavailable
+  (Elementor not active or too old); everything else works without it.
+* New: Gender field (Male / Female) for consultants and team members. It is
+  never shown on the website and never sent through the REST API.
+* New: Settings → Default Photo — Male and Default Photo — Female. A person
+  without a photo now shows the photo for their gender, then the general
+  Default Profile Image, then the built-in silhouette. People whose gender is
+  not set look exactly as before.
+* Default photos chosen from the Media Library are now served at the right
+  size with srcset, width and height (faster, no layout shift).
+* CSV import/export: gender column for consultants and team (Male, Female,
+  M, F accepted, any case). An unrecognised value never skips the row: the row
+  is imported with gender left blank (an update keeps the stored gender) and a
+  warning is listed, e.g. "Row 12: gender 'Femal' not recognised – left blank".
+  Import results now list warnings separately from skipped rows. Student gender
+  values are normalised the same way (Male / Female / Other).
+* Privacy: the personal-data exporter and eraser now include the gender of
+  consultants and team members.
+* Developers: mcm_default_avatar_url now also receives the post ID and gender.
+* Display corrections (below) apply as soon as you update: they change how
+  existing pages look, never what is stored. Tested: every post, field, term,
+  department setting and plugin setting is identical before and after updating.
+* Fixed: the table view of notices, tenders, scholarships, publications,
+  research projects and policies showed only a Title column. Each now has its
+  own columns (e.g. tenders: reference, category, closing date, department).
+* Fixed: consultants and team members looked different depending on where
+  they were shown. They now use the same profile card (photo, name, specialty,
+  designation, department, one button) in shortcode grids, Elementor widgets,
+  department pages and archives.
+* Fixed: a person's page showed their photo as a full-width banner, or a
+  full-width placeholder box when there was no photo. People now get a profile
+  layout: the photo (or default photo) beside their details.
+* Fixed: an odd number of details left an empty grey box on single pages; the
+  last item now spans the full width. Featured images on single pages are at
+  most 360 px high (220 px on phones) and timetable entries show no banner.
+* Table titles now link to the entry's page (students stay plain text).
+* Jobs: a new card in grid and directory views. Status and category on
+  top, the department, posts / scale / type, the last date with the time
+  left ("8 days left", "Closes today"; an extended date shows the old one
+  struck through), the publication date and a View & Apply button aligned
+  across the row. The whole card is clickable; the advertisement image is
+  shown on the job's page instead of filling the grid.
+* Directory filters (Jobs, Consultants, Team…): search field with an icon
+  button, filter groups clearly separated, and long lists show the first
+  six options with "Show all (n)" instead of a scrolling box (ticked options
+  stay visible). On phones and tablets the filters fold behind a
+  "Filters (n)" button so the results come first. Filter groups are
+  labelled for screen readers and the heading order is correct.
+* Admissions, scholarships, tenders and events show where they stand, in
+  cards, list rows and on their own page: Upcoming / Open / Closing soon /
+  Closed (events: Upcoming / Today / Past event) with the time left
+  ("Opens in 5 days", "12 days left", "Tomorrow"), and a coloured top edge
+  on cards.
+* Cards: "View details" sits on the bottom edge of every card in a row.
+* Notices: the priority is a badge; Urgent stands out in red.
+* Fixed: on normal pages the theme underlined every link inside listings
+  (titles, "View details", even white button text); single-page buttons
+  were underlined too.
+* Fixed: no space between the college header and the title of classic
+  pages and posts.
+* Accessibility: archive pages have a main landmark (the archive title no
+  longer counts as a second site banner); correct heading order on single
+  pages, archives and pages using the shortcodes; the photo link repeated
+  next to each title is no longer a nameless tab stop; links in the hidden
+  looping copy of the notice ticker and board are no longer focusable;
+  larger filter checkboxes; the blog "Read More" link meets contrast.
+* Tables: no stray gap under the table inside its frame. In timetable
+  tables the Subject links to the entry's page (the timetable has no title
+  column).
+* Faster: the banner at the top of archive and department pages is no
+  longer lazy-loaded (it is the largest image on screen; Lighthouse on a
+  department page 72 → 88).
+* The same link label in grid, list and directory views ("View details",
+  "Meet the Consultant", "View Profile", "View & Apply" for jobs); developers
+  can change it with the mcm_link_label filter.
+* The default photos have their own "Default Photos" section in Settings.
+* New: Staff Type for team members (Team → Staff Types). "Teaching & Technical
+  Staff" and "Support Staff" are created once and can be renamed. Filter the
+  Team list by staff type; staff_type="…" works in [mcm_team], the Team widget
+  and the CSV import/export (staff_type column).
+* New: College header & footer (College Manager → Header & Footer), off until
+  switched on. Replaces the theme's header and footer on every page without
+  editing the theme (Hello Elementor is switched through its own setting);
+  if either part ever fails, the theme's own one is shown instead. Top bar
+  with email, phone and a menu; logo and a main menu with dropdowns three
+  levels deep (keyboard: arrows, Escape; the current department is
+  highlighted); a mobile menu panel; static, sticky, smart-sticky or
+  shrinking header; a four-column footer with the college logo, two link
+  menus, contact details, the Social Bar icons, a copyright line and legal
+  links; back-to-top. Five new menu locations (Appearance → Menus). All
+  colours, sizes and texts are settings, with a warning when text would be
+  hard to read; settings can be exported, imported and reset. Optionally
+  uses your own Elementor templates instead of the built-in design. The
+  Montserrat font is bundled (no Google request). Not shown on Elementor
+  Canvas pages, chosen pages, or with block themes; steps aside where an
+  Elementor Pro Theme Builder header/footer applies. Site Health reports
+  anything that stops it from showing as set up.
+  Also: separate logo heights for tablets and phones, an optional search
+  button and call-to-action button (off by default), the top bar shown in
+  full on phones if wanted, 4/3/2 footer columns, a "Reveal" footer style
+  (off on short pages, small screens and for reduced motion), and a
+  Typography tab (font, menu size and weight, footer heading size).
+* Department pages: the hero image is now stored at full size and the HOD
+  photo at large size when picked (sharp banners); existing pages unchanged.
+* Accessibility: department and program pages no longer announce each section
+  title twice to screen readers.
+* PHP 8.5: CSV import no longer triggers a deprecation notice.
+* Elementor widgets: every widget now has the full Elementor set of options.
+  - Content: show Upcoming / Past events and Open / Closed admissions,
+    scholarships and tenders; order by a field (e.g. event date, items
+    without it last) or by the order items were picked; skip the first N;
+    pagination; your own "nothing found" message.
+  - Filters: search box, placeholder, which dropdowns and the Reset button
+    can each be chosen; a starting search keyword (fixed when the search box
+    is off); printed page heading.
+  - Include / Exclude: leave out terms of any taxonomy; only these items or
+    leave out these items. All of these survive live filtering and paging.
+  - Style: cards, images, titles, details text, status badges, buttons, filter
+    bar and fields, directory sidebar, table, citations, pagination, print
+    button and the empty message, with Normal / Hover states where they
+    apply. Existing pages look exactly as before.
+  - Blog Posts: Grid layout with columns per device; show/hide image, date
+    and read-more; exclude categories, tags, author, offset; full Style tab.
+  - Notice Ticker / Board / List: "only from the last N days"; full Style tabs.
+  The same options are available as shortcode attributes (see readme).
+* Fixed: shared taxonomies (Department, Faculty, Session, Program, Research
+  Area…) showed the total for ALL content types. Events → Departments said
+  "Anatomy 20" when Anatomy had one event. Opened under a content type, the
+  count column now counts that type only (headed e.g. "Events") and links to
+  exactly those posts. Taxonomies used by one type are unchanged.
+* Fixed: front-end filters (dropdowns and directory checkboxes) offered every
+  term, so picking one often listed nothing. They now offer only terms that
+  the listing itself would show: same content type, status (open, upcoming,
+  past…), expiry, pre-filters and exclusions. A filter group with nothing to
+  offer is left out. Refreshes as soon as content changes.
+* Elementor Include / Exclude lists show each term's count for the widget's
+  type, e.g. "Anatomy (1)".
+* A listing with nothing to show (widget or shortcode) is now hidden from
+  visitors; logged-in editors see a short note with an "Add New …" link
+  instead. A message written in the widget's "Message when nothing is found"
+  is still shown to everyone, and live filtering still says "No results found".
+* Team and consultant cards now show qualifications (e.g. MBBS, FCPS, PhD)
+  under the designation, in the order name, specialty, designation,
+  qualifications, department. Elementor: Display → Qualifications switch;
+  shortcodes: show_qualifications="no".
+* Testimonial / Message: the heading is no longer underlined by default (add it
+  back under Style → Heading → Typography → Decoration), and the message stays
+  justified on phones too, with hyphenation for even spacing.
+* Profile photos (consultants, team) are now square by default and sized by
+  the card's width, so they keep their shape at 4, 5 or 6 columns instead of
+  becoming tall strips; they are cropped toward the top, where faces are, and
+  use a larger image file (medium_large) so they stay sharp. Display change,
+  applies on update.
+* Elementor listing widgets: Image proportions (square, portrait 4:5 / 3:4,
+  tall 2:3, landscape 4:3 / 3:2, wide 16:9 or original, per device), crop
+  focus, and Image quality (thumbnail … full size). Image height now also
+  applies to profile photos.
+* New Elementor widget: Contact Info — title, subtitle and rows of icon +
+  label + value. Values can be clickable: phone (tel:), email (mailto:,
+  encoded against harvesters), WhatsApp, Google Maps or a custom link, with an
+  optional "number to use" when the shown text differs. Label left / value
+  right or stacked, per device; per-row icon colour; full Style tab. A
+  description list, so screen readers read each label with its value; links
+  opening a new tab say so.
+* Elementor listing widgets: new Display section. Photos: show (default photo
+  when none uploaded, as before), only uploaded photos, or hide all photos
+  (text-only cards) — for teams where only some staff have a photo. Show or
+  hide specialty, designation, department, status badge, details, short
+  description and the button. Table columns: pick which to show (e.g. a Team
+  table without Staff Type and Specialty); with the name column hidden the
+  first column links to the profile. The choices hold through live
+  filtering, paging and printing. Same options as shortcode attributes
+  (images, table_cols, show_*). Existing pages are unchanged.
+* New Elementor widget: Testimonial / Message — heading (tag of your choice,
+  across the full width or beside the photo), rich-text message, photo with
+  image size, name, designation, organisation, optional profile link and
+  quotation mark. Photo left, right or on top per device (default: right on
+  desktop and tablet, top on phones). Full Style tab. Accessible: a labelled
+  region, the message is a blockquote, the photo's alt text falls back to the
+  name and a linked photo is not a second tab stop.
+* Fixed: a paginated list on an ordinary page ([mcm_events paginate="yes"])
+  showed page 1 again on /page/2/.
+* Accessibility: the "Last date" label and old dates on job cards now meet
+  4.5:1 contrast on the grey deadline box.
+* Fixed: links in table view took the theme's hover colour (Hello Elementor);
+  they now keep the plugin's link colour.
+
+= 1.31.0 =
+New: Jobs / Vacancies.
+* New content type Jobs with Job Categories (Teaching Faculty, Clinical,
+  Administrative, Support Staff are created once) and Departments. Fields:
+  publication date, last date and closing time, extended last date, apply link
+  and label, how to apply, job description and voucher/form (image or PDF),
+  number of posts, scale, type, contact.
+* Status is worked out from the dates in the site timezone: Open, Closing soon
+  (Settings > "Closing soon" days, default 3), Extended (old date struck
+  through), Closed. A job with a future publication date is hidden everywhere.
+  Closed jobs leave the list but their pages stay online.
+* [mcm_jobs] (alias [mcm_vacancies]) and an Elementor "Jobs / Vacancies" widget:
+  status="open" (default), "closed" or "all", with category and department
+  filters; the status survives search, filters, Reset and Print.
+* Department pages get a Vacancies section while that department has open jobs.
+* Notice board, ticker and list can show open jobs and open tenders next to
+  notices (Settings > Notice board sources; per item "Show on notice board";
+  include="notice,job,tender" per shortcode or widget).
+* CSV import/export for jobs (sample-jobs.csv); tenders gain an on_board column.
+* JobPosting structured data while a job is open; none once it closes.
+* Vacancies print on the letterhead.
+= 1.30.2 =
+Reliability and hardening release. Nothing a visitor sees changes unless it was broken.
+* Safety net: every module boots, and every shortcode, Elementor widget, archive
+  page, single-page panel, JSON-LD block and live filter renders, behind its own
+  error boundary. A failure shows visitors an empty block instead of a broken
+  page, shows administrators a short notice, and is logged.
+* New Tools > Site Health checks (PHP, WordPress, Elementor, recent errors,
+  timezone, permalinks) and a Medical College Manager section in Site Health >
+  Info. Errors are kept in a small log you can clear from there.
+* Requirements gate: on WordPress older than 5.8 the plugin loads nothing but a
+  notice. On Elementor older than 3.5 only the widgets are switched off (with a
+  notice); shortcodes keep working.
+* Fixed: pre-filters (department="", program="" … and Elementor pre-filter
+  controls) were lost on the first search, filter change, Reset or Print. They
+  are now always applied; with several terms visitors can narrow within them.
+* Fixed: Upload / Select did nothing in post meta boxes and on the Add Department
+  form. Fields can now accept images and PDFs.
+* Fixed: CSV import merged rows that share a title (e.g. timetable slots). Rows
+  now match by id only, unless you tick "Update existing entries with the same
+  title"; rows of one file are never merged; the result names likely duplicates.
+* Fixed: phone numbers such as +92-300… gained an apostrophe after export and
+  re-import.
+* Fixed: dates are validated and stored as YYYY-MM-DD (15/10/2026, 15-10-2026,
+  15.10.2026 accepted; 31/02/2026 rejected) and times as HH:MM (2:30 PM accepted).
+  An invalid value is not saved and the field is named in a notice or CSV error,
+  so a tender can no longer vanish because of a mistyped deadline.
+* Fixed: department pages showed an empty Tenders/Notices section when all of
+  them had expired.
+* Live filters now show "please refresh" when a request fails or the page has
+  expired, work for content added later (Elementor editor, popups, tabs) and
+  react to pasted text. New filter mcm_ajax_require_nonce for cached sites.
+* New setting: Public student directory (Settings > Privacy), on by default.
+  When off, the student list is shown only to staff who manage students.
+* Privacy eraser: replaces the student's name, no longer skips records beyond
+  20 per email, keeps the academic record, and reports accurately.
+* Block themes (Twenty Twenty-Four/Five): archive and department pages now show
+  the theme's header and footer. Elementor Pro Theme Builder archive templates
+  take precedence when they match. Single-page details appear exactly once.
+* Hello Elementor: plugin buttons and links keep their own colours on hover and
+  focus.
+* Stored values that are lists instead of text can no longer break a page.
+* Clean-up: duplicate import keys and dead code removed; uninstall now removes
+  every option, transient and capability on every site of a network.
+* Fixed: after a live search or filter on a paginated list (archive pages, or a
+  shortcode with paginate="yes"), the pager disappeared, so results beyond the
+  first page could not be reached and Print printed only one page. The pager
+  now stays and loads pages in place with the filters kept, and Print always
+  prints the whole list.
+* One-time upgrade: dates and times saved by older versions in another format
+  (e.g. 15/10/2026, 2:30 PM) are converted to the standard format, so expiry
+  and sorting work on them. Values that cannot be read are left unchanged and
+  listed under Tools > Site Health > "Unreadable dates" with edit links. It
+  runs in the background (first admin page or WP-Cron), never during a
+  visitor's page load.
+* If a part of the plugin is switched off after an error, its shortcodes show
+  nothing to visitors instead of raw [shortcode] text.
+
+= 1.30.1 =
+Security hardening.
+* The live-filter endpoint now only sorts by fields a content type is allowed
+  to show. Previously a crafted request could order the public student list by
+  a private field (e.g. date of birth) without ever displaying it.
+* [mcm_single] no longer renders non-public content (student records).
+* [mcm_blog] only lists publicly viewable post types; post_type="mcm_student"
+  or another plugin's private type now falls back to blog posts.
+* Added a directory-listing guard to /languages/.
+
+= 1.30.0 =
+* Fixed: department / event videos set as a YouTube or Vimeo link now always
+  display. The player is now built directly from the link instead of calling
+  the provider over the network on every page load — which previously failed
+  silently on many servers (Vimeo never worked, YouTube failed behind
+  firewalls/proxies), leaving only the image. Every common link form is
+  supported: youtube.com/watch, youtu.be, /embed/, /shorts/, /live/, and
+  vimeo.com / player.vimeo.com. Pages also load faster (no outbound request).
+* The hero banner (video or image) is now FULL-WIDTH and sits ABOVE the page
+  title on department and listing pages, as a proper cinematic banner. Videos
+  are centred at a sensible size; images span edge to edge. The full-width
+  banner no longer introduces a stray horizontal scrollbar.
+* The Head-of-Department card has been redesigned: a colour accent spine, a
+  framed photo, and the email / phone now show as tidy pill buttons with
+  icons — each appearing only when that detail is filled in.
+* New per-department "Hide Sections" control: on a department, tick any
+  sections you don't want on its page (e.g. hide the Timetable). Unticked
+  sections still appear automatically whenever they have content.
+* Security: unknown or internal URLs are still never embedded (SSRF-safe) and
+  fall back to a plain link. Videos carry explicit dimensions so they never
+  collapse to a tiny box when a theme's CSS is restrictive.
+* Fixed: the archive / directory filter bar (search + dropdowns + Reset) now
+  always stays on a single inline row. Some themes force every input and
+  select to full width, which stacked the filters vertically; the bar now
+  overrides that so it looks the same on every theme. Applies to the archive
+  pages and the Elementor content widgets (they share the same filter bar).
+
+= 1.29.0 =
+* Events can now carry a live stream. Add a "Live Stream / Embed URL" to any
+  event and the plugin shows the player at the top of the event page plus a
+  "Watch Live" button in the details card. Left blank, nothing is shown - the
+  feature is entirely optional and never displays an empty box. YouTube, Vimeo
+  and direct MP4/WebM links are supported; unknown/internal hosts are never
+  server-embedded (SSRF-safe) and fall back to a plain link.
+* New "Page Banners" in Settings: give any public listing page (Events,
+  Faculty, Scholarships, etc.) an optional hero video or image that appears
+  above the list. Video takes priority over image; blank means no banner.
+* Student lists ([mcm_students]) can be filtered by academic level, so
+  graduate and undergraduate rosters can be shown separately. Only safe,
+  public fields are ever rendered - no personal contact data is exposed.
+* Research & Publication pages now label the lead as "Supervisor / Principal
+  Investigator" and the team as "Assisting Students", matching institutional
+  wording.
+* Event live streams, department heroes and page banners now share one
+  consistent, hardened media renderer.
+
+= 1.28.0 =
+* Elementor content widgets are now fully designable and responsive:
+  - Columns are per-device (separate desktop / tablet / phone counts).
+  - New Style tab: Layout & Spacing (gap, card padding, corner radius, image
+    height - all responsive), Colours (primary, accent, text, borders, card &
+    panel backgrounds), Titles (full typography + colour) and Card shadow.
+  - Each widget can now be restyled independently, overriding the global
+    design just for that block, without any custom CSS.
+
+= 1.27.2 =
+* Settings page now has a complete, grouped "Shortcodes — copy & paste"
+  reference: every shortcode with a plain-language description and a one-click
+  Copy button, plus the common attributes and connector filters.
+
+= 1.27.1 =
+* Fix: a taxonomy term page that contained exactly one content type (e.g. any
+  category page, or a department with a single populated type) threw a fatal
+  error. It now renders and paginates correctly.
+* Standards: the student-only "Level" taxonomy no longer exposes a public term
+  URL or REST route (its pages could only ever be empty). It stays fully
+  usable in wp-admin and as a student-list filter. Any taxonomy that lives
+  only on private content is now automatically kept off the public site.
+
+= 1.27.0 =
+Department pages redesigned + composable department shortcodes.
+* Term/department pages now show a section ONLY for content types that actually
+  have entries — no more wall of empty "No results found" blocks. A filter bar
+  appears only on sections large enough to need one.
+* Department hero: a term now takes a Hero Video URL OR a Hero Image (new). The
+  video wins when both are set; otherwise the static banner shows.
+* The Head-of-Department message is a redesigned card (photo, name, message,
+  contact).
+* New shortcodes to build a custom department template (e.g. in Elementor),
+  each auto-detecting the current department or taking department="slug":
+    [mcm_department_hero]     - the video/image banner
+    [mcm_department_message]  - the HOD message card
+    [mcm_department_intro]    - hero + message together
+    [mcm_department_sections] - every populated section (courses, timetable,
+                                faculty, publications…) as titled blocks
+  The existing per-type shortcodes also fetch a department, e.g.
+  [mcm_courses department="anatomy"], [mcm_timetable department="anatomy"].
+* Filter bar restyled everywhere (cleaner inputs, select chevrons, a subtle
+  Reset, visible focus) and section headings given clearer hierarchy.
+= 1.26.1 =
+* Fix: the "professor" and "program" shortcode filter attributes now work
+  (e.g. [mcm_publications professor="dr-sara-khan"], [mcm_courses program="mbbs"]).
+  They were documented but not wired to their taxonomies.
+
+= 1.26.0 =
+Program is now the academic spine (architecture batch D).
+* New shared "Program" connector taxonomy (MBBS/BDS/BSN…) on Courses,
+  Timetable, Admissions and Students — the same pattern as Department and
+  Faculty. A Program page now lists its own curriculum, schedule and intake,
+  and /program/<name>/ term pages, filters and CSV columns come for free.
+* A matching Program term is created automatically whenever you save a Program
+  entry, so the Program dropdown is pre-populated — no double data entry.
+* One-time, additive migration: existing free-text program values on Students
+  and Admissions are turned into Program terms and assigned, while the original
+  text is kept intact (reversible; runs once on upgrade).
+* Students stay private — they carry the Program term for filtering, but the
+  public /program/ page never lists them (the roll remains protected).
+= 1.25.0 =
+CSV import is now an upsert — re-importing no longer creates duplicates.
+* Export files include an "id" column; re-importing updates the exact record it
+  came from instead of duplicating it.
+* Hand-written CSVs (no id column) match an existing entry by its exact title
+  within the type, so a corrected re-import updates rather than duplicates.
+* Genuinely new rows still insert; the import summary now reports created,
+  updated and skipped counts.
+* Re-importing a file that omits the content/excerpt columns no longer wipes the
+  existing body text — only columns present in the file are written.
+= 1.24.0 =
+Hardening, performance and accessibility pass (audit batch A).
+* Performance: listing/table/directory renderers now read term names from the
+  cache WordPress already primes instead of a fresh query per row — a 25-item
+  directory dropped from ~59 queries to 14, and the print/export path no longer
+  fires thousands of term queries.
+* Security: the AJAX endpoint now serves only this plugin's own content types
+  (never core post/page); department banner videos are oEmbedded only for known
+  providers (YouTube/Vimeo) to prevent server-side request forgery; CSV export
+  neutralises spreadsheet formula injection; the font-family setting is
+  character-restricted; JSON-LD is hex-tag encoded; and the Related Content box
+  no longer shows student names to editors who lack the student capability.
+* Accessibility: visible keyboard focus (:focus-visible) on all controls, an
+  accessible label on the search box, scope="col" on table headers, alt text on
+  card/list/single images, and a higher-contrast "New" badge.
+* Fix: the responsive stacked-table layout no longer leaks into print, so the
+  printed timetable and student list render as proper tables.
+= 1.23.0 =
+WordPress.org directory-readiness pass.
+* Text domain renamed from "mcm" to "medical-college-manager" to match the
+  plugin slug, as required for directory hosting and translation. Translations
+  now load correctly and Plugin Check no longer errors on the mismatch. No
+  behaviour change: the Elementor category, object-cache group and widget
+  keywords were renamed in lockstep, so everything keeps working.
+* Translation template renamed to languages/medical-college-manager.pot.
+* readme: valid Contributors username, tags trimmed to five, Tested up to 7.0.
+= 1.22.0 =
+Student privacy — the public student list now shows safe fields only.
+* The student list ([mcm_students]) shows only Name, Student ID, PMDC No.,
+  Level, Program, Department, Batch and Status. The Contact (email) column has
+  been removed.
+* Email, phone, date of birth, home address, blood group, gender and guardian
+  details are never rendered on the front end in any view — they remain in
+  wp-admin for staff only.
+* Whatever view is requested, students are forced to the safe table renderer,
+  so a grid/card view cannot surface a student photo (the public list is names
+  only) or any other field.
+* Student search matches Name, Student ID, PMDC No., Program and Batch only —
+  never email or phone, so the directory can't be used to confirm a student
+  from their contact details.
+* The public list can now be searched/filtered by anyone on those safe fields
+  (previously student filtering was blocked for logged-out visitors). Sensitive
+  data stays fully protected; only safe fields are ever returned.
+* AJAX result counts are clamped (filter: mcm_ajax_max_count, default 1000) so a
+  crafted request cannot ask for an unbounded list.
+= 1.21.0 =
+Research & Publications refinements requested after the portal review.
+* Research: the "Principal Investigator / Professor" field is now "Supervisor".
+* Research: "Assisting Student(s)" is now "Fellowship Members" - the students
+  working under the supervisor, entered one per line (e.g. "Dr. Farooq - Final
+  Year MBBS"). Line breaks are preserved on the page.
+* Research: Research Status now offers Completed, In Progress and Dropped
+  (Dropped is new).
+* Research: the paper now has clear View (opens in a new tab) and Download
+  buttons on the page, in addition to the existing upload.
+* Publications: added Supervisor and Fellowship Members fields.
+* Publications: the paper PDF is now uploaded / selected from the Media Library
+  (it was a plain URL box) and gets a Download button beside the view link.
+* Meta-box fields can now show a short format hint under the input.
+
+= 1.20.0 =
+Implements the GMC Website Portal Review Document (v1.0.0) items that fall to
+this plugin.
+* NEW Research Projects type (review item 14): title, principal investigator,
+  status (In Progress / Completed), start and completion dates, assisting
+  students, co-investigators, funding body, and a PDF uploaded from the Media
+  Library with a Download button. Filterable archive, CSV import/export,
+  Elementor widget, printable, and connected to the existing Professor,
+  Department and Research Area connectors - so a professor page lists their
+  projects automatically. This is distinct from Publications, which remains the
+  bibliographic (journal / DOI / citation) register.
+* NEW Policies type (review item 16): issuing body, reference no., effective
+  date, Policy Category and a downloadable document. Configurable from the
+  database, with CSV import/export and an Elementor widget.
+* Departments now carry their own content (review items 4 and 7): Head of
+  Department name and photograph, welcome message, banner video, and
+  departmental email/phone - edited on the Department term itself and shown at
+  the top of that department's page.
+* Faculty cards now show the SPECIALTY under the name, and the portrait has more
+  breathing room around it (review item 11).
+* A branded default profile image can be uploaded in Settings and is used for
+  anyone without a photograph (review item 11).
+* Staff records gained a Joining / Appointment Date (review item 4).
+* Tenders gained an Institute / Facility Name (review item 19).
+* Events gained a Live Stream / Embed URL (review item 18).
+* Document fields are now uploaded through the Media Library instead of pasting
+  a URL.
+* Research Projects and Policies are printable on the college letterhead.
+* SEO: schema.org JSON-LD for faculty, events, courses, programs, publications,
+  research projects and scholarships. Never emitted for students (review 25).
+* Accessibility: filtered result lists announce themselves to screen readers
+  via aria-live / aria-busy (review 25).
+
+= 1.19.0 =
+ * SECURITY: student records now have their own capabilities. Previously they
+   used the default post capabilities, so every Author and Contributor could
+   open the student roll and read PMDC numbers, emails, phones, dates of birth,
+   addresses and guardian contacts. Access is now granted to Administrators
+   only; use the mcm_student_roles filter to add a Registrar or Admissions
+   role. All other content types are untouched - staff who manage timetables,
+   events and faculty keep exactly the access they had.
+ * Privacy: registered a personal-data exporter and eraser, so a subject-access
+   or erasure request can be answered from Tools > Export/Erase Personal Data.
+   Erasing anonymises the personal fields and keeps the academic record, since
+   deleting enrolment history outright is rarely what a college wants.
+ * Performance: the front-end CSS and JS used to load on every page of the
+   site. They now load only where MCM content appears, with a render-time
+   fallback so page-builder layouts are never left unstyled. Filter
+   mcm_always_load_assets to force them everywhere.
+ * Performance: filter facets (the checkbox lists) are cached and refreshed
+   automatically when a term is added, renamed or deleted.
+ * The plugin now stops with a clear admin notice on PHP older than 7.2
+   instead of fataling mid-load.
+ * Added LICENSE, a languages/mcm.pot translation template, License URI,
+   Requires PHP / Requires at least headers, and corrected the plugin
+   description and readme (they still described seven post types, not twelve).
+ * Meta search now builds its SQL with prepared placeholders throughout.
+
+= 1.18.0 =
+ * Printed output (and Save-as-PDF) now uses a proper letterhead: logo,
+   institution name, address/contact line, the document title, the applied
+   filters, entry count and date - then an optional signature block
+   (Prepared by / Checked by / Principal) and a footer note with the
+   generation timestamp. Configure it under College Manager > Settings >
+   Printing & Letterhead, including a Media Library picker for the logo.
+   With nothing configured it falls back to the theme logo (then the site
+   icon) and the site title, so it still prints as a proper document.
+ * Printing a paginated list now prints the WHOLE list, not just the page on
+   screen - a paginated timetable used to print only its first 12 rows.
+ * Pagination links no longer appear on the printed sheet, and the entry count
+   is correct for grid, list, directory and citation views (it previously
+   counted table rows only and reported 0 for everything else).
+ * Featured images now display reliably on single pages. Many themes only
+   render a featured image for blog posts, so a photo set on a Consultant,
+   Event or Notice could end up invisible. College Manager > Settings >
+   "Featured Image on Single Pages" defaults to Auto: the plugin shows the
+   image only when the theme has not already rendered it, so it never appears
+   twice. Always / Never are available for themes that place it below the
+   content or handle it themselves.
+ * Publications can now have a featured image (journal cover, figure or graphical
+   abstract) - the type was registered without thumbnail support.
+ * Print is now a general capability instead of a timetable-only feature.
+   College Manager > Settings has a "Printable Content Types" checkbox list;
+   Timetable and Students are ticked by default. Any type can be enabled with
+   no code. The printout keeps the visitor's applied filters and search, prints
+   only the listing, and takes its heading from the content type.
+ * Student lists are printable: [mcm_students] on a protected page now shows a
+   Print button, giving a branded "Student List" sheet that respects the
+   Level / Department / Session filters and the search box.
+ * The print attribute is now optional - a listing follows the setting unless
+   you pass print="no" to suppress it on one instance.
+ * SECURITY (affects earlier versions): the AJAX filter endpoint accepted any
+   post type from the browser and is also registered for logged-out visitors,
+   so a crafted request could list a NON-PUBLIC type - returning the whole
+   student directory, PMDC numbers and contact details included, without
+   logging in. The endpoint now refuses any type the visitor could not already
+   read; server-rendered [mcm_students] on a protected page is unaffected.
+ * FIXED (affects earlier versions): archives ordered by an optional date/time
+   field (Events, Timetable) could sort records that lacked that field by an
+   unrelated value of their own, placing them in an apparently random position.
+   Ordering now pins the field explicitly and is deterministic.
+ * Directory archives now show a checkbox filter for EVERY taxonomy of the type,
+   not just the first one - so publications filter by Research Area AND
+   Department AND Professor, and consultants by Department AND Specialty.
+ * Taxonomy (professor / department) pages no longer cut their list off at 12
+   items with no pagination - a professor with 40 papers now shows all of them.
+ * CSV import now takes each field type from the meta-box definitions instead of
+   a separate hand-kept list that had drifted: multi-line fields keep their line
+   breaks and URL fields are validated on import.
+ * ORCID / Google Scholar / PubMed / Research Area are importable and exportable
+   for Consultants and Team; Consultants gained the LinkedIn field they were
+   already being rendered with.
+ * NEW: Research & Development module (v1 - Publications).
+ * Publications post type (Publications menu) with 14 fields: authors, journal,
+   year, volume, issue, pages, type, DOI, PMID, article URL, PDF, open access,
+   impact factor and indexing. Classic editor, no block editor.
+ * NEW Research Area taxonomy, shared by Publications, Consultants and Team, so a
+   research interest links a professor to every paper in that area.
+ * Publications are connected to Department and Professor. A professor page and a
+   department page now list that person's / that department's publications
+   automatically - no manual linking.
+ * Vancouver citation output (medical standard): Authors. Title. Journal.
+   Year;Volume(Issue):Pages. New view="citation" - a numbered reference list.
+ * Automatic DOI and PubMed links (doi.org / pubmed.ncbi.nlm.nih.gov), plus PDF
+   and full-text buttons, and an Open Access badge.
+ * Publications archive is filterable (Research Area, Department, Professor,
+   search) and sorted newest year first; entries with no year are never dropped.
+ * ORCID iD, Google Scholar and PubMed author fields added to Consultants and
+   Team; they appear as buttons on the profile page.
+ * New shortcode [mcm_publications] (all standard parameters, defaults to the
+   citation view, 20 items).
+ * New Elementor widget: Publications, in the Medical College category.
+ * CSV import AND export for publications, plus samples/sample-publications.csv.
+   Research area / department / professor are matched or created on import.
+
+= 1.17.3 =
+* Label updates: Timetable/Courses "Teacher" column and single-page label are
+  now "Professor"; the student Roll/Registration field is now "PMDC No." (field,
+  table, card, admin column, search box); the student table Email column heading
+  is now "Contact". Data keys are unchanged - existing records keep their values.
+
+= 1.17.2 =
+* Courses table: the Credit Hours column is now centre-aligned (header + cells).
+  Table columns support per-column alignment via an optional 4th value
+  (center/right) in the column definition.
+
+= 1.17.1 =
+* Students now also get the default avatar (in grid/list cards and [mcm_single])
+  when they have no photo.
+* Single detail pages: for people with no featured image, the default avatar now
+  shows at the top of the details card, so the page never looks photo-less.
+
+= 1.17.0 =
+* Default avatar: Consultants and Team (faculty/staff) with no featured image
+  now show a clean silhouette placeholder instead of a blank box - in the
+  directory cards, grid cards, list items and single page. Override the default
+  with your own image via the mcm_default_avatar_url filter (e.g. a college logo).
+
+= 1.16.1 =
+* Single-page polish: the details panel on every content type is now a padded,
+  self-contained card (background, border, comfortable cell padding) with proper
+  margins and vertical rhythm, and reduced padding on phones. Better separation
+  from the body content per UI spacing standards.
+
+= 1.16.0 =
+* Archive pagination: CPT archives (/consultants/, /courses/, /tenders/, etc.)
+  now paginate at 12 per page with numbered Prev/Next controls, so all entries
+  are reachable (previously capped at ~12 with no way to see more). Per-page is
+  filterable via mcm_archive_per_page; the [mcm_*] shortcodes gained a
+  paginate="yes" attribute. The main query per-page is aligned so /page/N/ URLs
+  resolve without a 404.
+
+= 1.15.1 =
+* Standards: added translators comments to all i18n strings with placeholders
+  (CPT/taxonomy labels, import row messages, related-content count) for full
+  WPCS i18n compliance. No functional change.
+
+= 1.15.0 =
+* New Scholarships content type (like Admissions) with a Scholarship Type
+  taxonomy (Merit / Performance / Need-Based) and fields for amount / coverage,
+  eligibility, application deadline and apply URL. Archive (/scholarships/),
+  elegant single page with an Apply button, [mcm_scholarships] shortcode, an
+  Elementor "Scholarships" widget, and CSV import/export with a sample file.
+  Matches the Scholarships section on medical-college sites like RMC.
+
+= 1.14.1 =
+* UI/UX QA pass: added a box-sizing reset for components rendered outside the
+  main wrapper (blog, notices, ticker/board, social bar, archive) so padding
+  never breaks their width on themes that don't set border-box globally.
+* Phone polish: smaller archive headings and tighter notice ticker on small
+  screens; removed a duplicate CSS rule.
+
+= 1.14.0 =
+* New Tenders content type (like Admissions) with a Tender Category taxonomy and
+  fields for reference no., published / submission-deadline / bid-opening dates,
+  document fee, earnest money, eligibility, document (download) and portal URLs.
+* Auto-expiry: tenders drop off the front-end automatically once the submission
+  deadline has passed (still visible and manageable in wp-admin; filterable via
+  mcm_tender_hide_expired). Archive (/tenders/), elegant single page with
+  Download/Submit buttons, [mcm_tenders] shortcode, an Elementor "Tenders"
+  widget, and CSV import/export (with a sample file) — all included.
+
+= 1.13.0 =
+* New Notice Board content type with a Notice Category taxonomy and fields for
+  priority, pin-to-top, notice/expiry dates, link and attachment.
+* Three front-end displays + three Elementor widgets: a scrolling Ticker, a
+  vertical auto-scroll Board, and a static Notices List. Notices auto-sort
+  (pinned -> priority -> date), auto-expire, show a "New" badge, pause on hover,
+  and honour reduced-motion. Feed is cached (transient) for speed.
+* /notices/ archive (filterable list) + elegant single notice page with a
+  Download/Open button. Notices join the CSV import/export (with a sample file).
+
+= 1.12.2 =
+* Fix: the branded print header (title + filters + count + date) now also shows
+  when printing from the Timetable archive page (it was only added for the
+  shortcode layout before).
+
+= 1.12.1 =
+* Print fix: the Print button now prints ONLY the timetable (header + table) —
+  not the page header/footer/sidebar/filters. It clones just the timetable into
+  a dedicated print area, so the rest of the page is fully excluded (and no blank
+  trailing pages). Save-as-PDF gives a clean one-piece document.
+
+= 1.12.0 =
+* Elegant single (detail) pages for every content type: each post now shows a
+  styled details panel with the fields that matter for that type and clear action
+  buttons — Consultants/Team get Profile + Call/Email/LinkedIn; Events get a
+  Register button; Programs/Admissions get an Apply button; Courses, Timetable
+  show their full details. Works on the native permalink and via [mcm_single].
+* Refined archive design: heading with an accent underline, divider, and tidier
+  section/card spacing. All colours follow the Design panel.
+
+= 1.11.2 =
+* All CPT archive pages now use the left-sidebar Directory layout (search +
+  primary-taxonomy checkboxes on the left). The main area adapts: Timetable shows
+  a table, Consultants/Team show profile cards, and Courses/Events/Programs/
+  Admissions show their info cards. Override per type via the mcm_archive_view
+  filter (return "grid"/"list"/"table"/"directory").
+
+= 1.11.1 =
+* The Consultants and Team archive pages (/consultants/, /team/) now use the
+  Directory layout — search box + Department checkboxes on the LEFT, cards on the
+  right — instead of the top filter bar. (Taxonomy term pages keep the grid.)
+
+= 1.11.0 =
+* New CSV Export next to Import (College Manager > CSV Import / Export). Pick a
+  content type and download every entry — meta fields plus Departments, Sessions,
+  Faculty and Categories — as a UTF-8 CSV (BOM for Excel). Columns match the
+  import format, so export → edit → re-import round-trips cleanly. Admin-only,
+  nonce-protected.
+
+= 1.10.1 =
+* Easier data entry: every content type now opens in the simple classic editor
+  (title + content + labelled fields) instead of the block editor — friendlier
+  for non-technical staff. The REST API stays enabled (for Elementor/meta), only
+  the editing screen changes. Core posts/pages are unaffected.
+* Added a short "how to fill this in" hint at the top of each details box.
+
+= 1.10.0 =
+* Timetable print/PDF template: the Print button now produces a clean printable
+  page with a branded header (site name + title), the active filters, the entry
+  count and the date — then prints only the timetable (use the browser's "Save
+  as PDF"). Tuned for A4, repeats the table header on every page, avoids row
+  splits.
+* Works after filtering: whatever Department/Session/Faculty/search is applied is
+  reflected in the printout and its header summary.
+* New print_title attribute to set the printed heading.
+
+= 1.9.1 =
+* Print is now a Timetable-only feature: the Print button only appears on the
+  timetable (print="yes"), and is ignored on other content types. Other types
+  can re-enable it via the mcm_print_types filter if ever needed.
+
+= 1.9.0 =
+* New Directory layout (view="directory") for Consultants/Team: a left sidebar
+  with a search box and multi-select Department checkboxes, next to a card grid
+  (photo, name, designation, department, "Meet the Consultant" button).
+* Consultant/Team search now matches name, email, phone and designation (not
+  just the title), so the sidebar "Find a Consultant" box works as expected.
+* Multi-select checkbox filtering + a Search button were added to the AJAX
+  layer; selecting several departments shows all of them (OR).
+* Available in Elementor too: pick Layout = "Directory (left filters)".
+
+= 1.8.0 =
+* New blog shortcode [mcm_blog]: lists standard WordPress posts in a date-badge
+  row layout (date + thumbnail + title + excerpt + read-more), fully responsive.
+* Parameters: count, orderby (date/title/rand/comment_count), order (ASC/DESC),
+  category, tag, author, post_type, offset, excerpt length, intro, read_more.
+* Matching Elementor "Blog Posts" widget (under the Medical College category)
+  with category multi-select and the same options — no shortcode needed.
+* Posts with no featured image fall back to a clean placeholder/2-column layout.
+
+= 1.7.0 =
+* New Social Bar: a floating social-media bar with its own settings page
+  (College Manager > Social Bar). Add Facebook, Instagram, X/Twitter, TikTok,
+  YouTube, LinkedIn and WhatsApp links; empty fields are hidden.
+* Show it site-wide with one toggle, or place [mcm_social_bar] on any page
+  (or in an Elementor Shortcode widget). Duplicates are prevented automatically.
+* Fully responsive: vertical bar with slide-out labels on desktop; on mobile it
+  becomes a horizontal bottom bar, or can be hidden — your choice. Choose left
+  or right side. WhatsApp builds a wa.me link from the number.
+
+= 1.6.1 =
+* Security/Privacy: the Students post type no longer exposes a REST route, so
+  student PII (email, phone, address, DOB, guardian) can never be read via
+  /wp-json. Student meta now follows each type's REST visibility. Students are
+  edited in the classic editor (meta boxes), which is unaffected.
+
+= 1.6.0 =
+* Elementor support: drag-and-drop widgets for Consultants, Team, Programs,
+  Courses, Events, Timetable and Admissions — found under a "Medical College"
+  category in the Elementor panel.
+* Each widget exposes Layout (grid/list/table), Columns, Count, Order, a Filter
+  bar toggle, a Print toggle, and optional per-taxonomy pre-filters — no
+  shortcodes or slugs to remember.
+* Widgets reuse the same engine as the shortcodes, so AJAX filtering, views and
+  the Faculty/Department connectors all work identically.
+* Requires Elementor 3.5+ (free). Students are intentionally not exposed as a
+  widget (PII); use the [mcm_students] shortcode deliberately if needed.
+
+= 1.5.0 =
+* Faculty connector: the Teacher taxonomy is now "Faculty" and is shared by
+  Timetable, Courses, Consultants and Team — so one faculty member links their
+  classes with their profile. Faculty term pages list everything they touch.
+* New "Related Content" meta box on every content type: shows, grouped by shared
+  Department / Faculty / Session / Specialty term, the linked posts across all
+  content types (each a direct edit link). Read-only — driven by shared terms.
+* CSV import now connects relationships automatically: matching term values are
+  reused as one shared term across files (so content imported separately links
+  up), and Consultants/Team are auto-linked to an existing Faculty entry that
+  matches their name. A "faculty" column is also supported for explicit control.
+* Note: the Faculty archive base changed from /teacher/ to /faculty/ (rewrite
+  rules flush automatically on update).
+
+= 1.4.0 =
+* Filterable archive pages: CPT archives (/events/, /programs/, /consultants/…)
+  and plugin taxonomy term pages now render the AJAX search + filter bar and
+  card/table views automatically — no shortcode needed.
+* Shared-taxonomy term pages (e.g. a Department) show one filterable section per
+  public content type, each scoped to that term and kept scoped through AJAX.
+* Themes can override per the standard hierarchy (archive-{cpt}.php /
+  taxonomy-{tax}.php) or by copying templates/archive-mcm.php to /mcm/.
+* New setting "Filterable Archive Pages" (on by default) to toggle the feature.
+
+= 1.3.0 =
+* Single CPT pages now display their custom fields (and consultant/team contact
+  details) on the native permalink, not only via [mcm_single].
+* Custom fields are registered with the REST API / block editor
+  (register_post_meta) with per-type sanitize + auth callbacks.
+* Event and Timetable archives now order sensibly (events soonest-first by date,
+  timetable by start time) instead of by publish date.
+* Admin list tables show key meta as columns, with sorting for IDs, codes and
+  dates (Student ID, Course Code, Event/Admission dates).
+* Internal: single shared sanitizer reused by meta box, CSV import and REST.
+
+= 1.2.1 =
+* Security: [mcm_single] now renders only published plugin content — drafts,
+  private/pending/trashed posts and non-plugin posts can no longer be exposed.
+* Privacy: Students are no longer publicly queryable or search-indexable
+  (PII directory is admin + shortcode only); the admin UI is unchanged.
+* Fix: AJAX filtering now preserves meta_key/meta_type, so meta-sorted views
+  (e.g. events by date) keep their order after searching/filtering.
+* Fix: meta_type is validated against an allowed SQL-type set.
+* Added table-view columns for Programs, Events and Team.
+* Compat: explicit fgetcsv() arguments remove the PHP 8.4 deprecation notice.
+* Hardening: CSV upload now content-sniffs the MIME type.
+* Print: printing a shortcode now isolates that block instead of the whole page.
+* Added uninstall.php to clean up the settings option on delete (content kept).
+
+= 1.2.0 =
+* Added Students CPT (graduate & undergraduate) with full records.
+* New Level taxonomy; students share Department & Session for filtering.
+* Meta-aware search: students findable by name, Student ID, roll no, email, phone, program, batch.
+* CSV import + sample for students; single students added via the normal Add New screen.
+
+= 1.1.0 =
+* Added Team and Admissions CPTs.
+* Shared Department taxonomy across all types; added Teacher & Session taxonomies.
+* CSV importer with per-type sample templates.
+* Table view + printable output.
+* Generic multi-taxonomy AJAX filtering (department, session, teacher, specialty + search).
+
+= 1.0.0 =
+* Initial release.

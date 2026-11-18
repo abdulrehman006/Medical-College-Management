@@ -9,8 +9,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * Front-end and admin asset loading, plus the settings-driven inline CSS.
+ */
 class MCM_Assets {
 
+	/**
+	 * Register the hooks this module needs.
+	 */
 	public function __construct() {
 		add_action( 'wp_enqueue_scripts', array( $this, 'frontend' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin' ) );
@@ -29,18 +35,44 @@ class MCM_Assets {
 	public function frontend() {
 		wp_register_style( 'mcm-frontend', MCM_URL . 'assets/css/mcm-frontend.css', array(), MCM_VERSION );
 		wp_register_script( 'mcm-frontend', MCM_URL . 'assets/js/mcm-frontend.js', array( 'jquery' ), MCM_VERSION, true );
+		// Slider widget: registered only; Elementor enqueues them on pages that use it.
+		wp_register_style( 'mcm-slider', MCM_URL . 'assets/css/mcm-slider.css', array(), self::file_ver( 'assets/css/mcm-slider.css' ) );
+		wp_register_script( 'mcm-slider', MCM_URL . 'assets/js/mcm-slider.js', array(), self::file_ver( 'assets/js/mcm-slider.js' ), true );
 		wp_localize_script(
 			'mcm-frontend',
 			'MCM',
 			array(
 				'ajaxurl' => admin_url( 'admin-ajax.php' ),
 				'nonce'   => wp_create_nonce( 'mcm_filter' ),
+				'i18n'    => array(
+					'loadError' => __( 'Could not load results. Please refresh the page and try again.', 'medical-college-manager' ),
+					'generated' => __( 'Generated', 'medical-college-manager' ),
+					'search'    => __( 'Search:', 'medical-college-manager' ),
+					'entry'     => __( 'entry', 'medical-college-manager' ),
+					'entries'   => __( 'entries', 'medical-college-manager' ),
+					/* translators: %d: number of filter options. */
+					'showAll'   => __( 'Show all (%d)', 'medical-college-manager' ),
+					'showFewer' => __( 'Show fewer', 'medical-college-manager' ),
+					'filters'   => __( 'Filters', 'medical-college-manager' ),
+				),
 			)
 		);
 
 		if ( self::is_needed() ) {
 			self::need();
 		}
+	}
+
+	/**
+	 * Asset version: the plugin version plus the file's modification time, so
+	 * an edited file is never served stale from a browser or page cache.
+	 *
+	 * @param string $rel Path relative to the plugin folder.
+	 * @return string
+	 */
+	public static function file_ver( $rel ) {
+		$time = @filemtime( MCM_PATH . $rel ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged -- A missing file just falls back to the version.
+		return $time ? MCM_VERSION . '.' . $time : MCM_VERSION;
 	}
 
 	/**
@@ -96,9 +128,16 @@ class MCM_Assets {
 		return (bool) apply_filters( 'mcm_needs_assets', false );
 	}
 
+	/**
+	 * Enqueue the admin scripts and styles on the plugin's screens.
+	 *
+	 * @param string $hook Admin page hook suffix.
+	 */
 	public function admin( $hook ) {
-		// Color picker only on our settings page.
-		if ( 'toplevel_page_mcm-settings' === $hook ) {
+		// Color picker + media on our settings screens (main settings, Header &
+		// Footer). Submenu hooks carry a translated parent prefix, so match the
+		// suffix.
+		if ( preg_match( '/_page_mcm-(settings|site-chrome)$/', (string) $hook ) ) {
 			wp_enqueue_style( 'wp-color-picker' );
 			// Needed by the letterhead logo picker.
 			wp_enqueue_media();
@@ -117,6 +156,24 @@ class MCM_Assets {
 		if ( $on_term || ( $screen && in_array( $screen->post_type, array_keys( MCM_CPT::post_types() ), true ) ) ) {
 			wp_enqueue_media();
 			wp_enqueue_script( 'mcm-admin', MCM_URL . 'assets/js/mcm-admin.js', array( 'jquery' ), MCM_VERSION, true );
+		}
+
+		if ( wp_script_is( 'mcm-admin', 'enqueued' ) ) {
+			wp_localize_script(
+				'mcm-admin',
+				'MCMAdmin',
+				array(
+					'i18n' => array(
+						'selectImage' => __( 'Select image', 'medical-college-manager' ),
+						'selectFile'  => __( 'Select file', 'medical-college-manager' ),
+						'useImage'    => __( 'Use this image', 'medical-college-manager' ),
+						'useFile'     => __( 'Use this file', 'medical-college-manager' ),
+						'copied'      => __( 'Copied!', 'medical-college-manager' ),
+						/* translators: 1: image width in px, 2: recommended minimum width in px. */
+						'tooSmall'    => __( 'This image is %1$d px wide; at least %2$d px is recommended, or it may look blurry.', 'medical-college-manager' ),
+					),
+				)
+			);
 		}
 
 		// Light admin styling for meta boxes everywhere in admin.

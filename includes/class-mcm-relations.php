@@ -11,6 +11,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * The Related Content box in wp-admin.
+ */
 class MCM_Relations {
 
 	/** Max related items shown per content type, per term. */
@@ -19,6 +22,9 @@ class MCM_Relations {
 	/** Max terms processed per connector taxonomy (keeps the box light). */
 	const MAX_TERMS = 6;
 
+	/**
+	 * Register the hooks this module needs.
+	 */
 	public function __construct() {
 		add_action( 'add_meta_boxes', array( $this, 'add_box' ) );
 	}
@@ -36,6 +42,9 @@ class MCM_Relations {
 		);
 	}
 
+	/**
+	 * Add the Related Content box to every content type.
+	 */
 	public function add_box() {
 		foreach ( array_keys( MCM_CPT::post_types() ) as $cpt ) {
 			add_meta_box(
@@ -49,9 +58,14 @@ class MCM_Relations {
 		}
 	}
 
+	/**
+	 * Shared renderer for the shortcode callbacks.
+	 *
+	 * @param WP_Post $post Post object.
+	 */
 	public function render( $post ) {
-		$type  = $post->post_type;
-		$taxes = MCM_CPT::taxonomies();
+		$type   = $post->post_type;
+		$taxes  = MCM_CPT::taxonomies();
 		$blocks = '';
 
 		foreach ( self::connectors() as $tax ) {
@@ -80,9 +94,9 @@ class MCM_Relations {
 
 					$links = array();
 					foreach ( $info['posts'] as $rid ) {
-						$edit  = get_edit_post_link( $rid );
-						$title = get_the_title( $rid );
-						$title = '' === $title ? __( '(no title)', 'medical-college-manager' ) : $title;
+						$edit    = get_edit_post_link( $rid );
+						$title   = get_the_title( $rid );
+						$title   = '' === $title ? __( '(no title)', 'medical-college-manager' ) : $title;
 						$links[] = $edit
 							? '<a href="' . esc_url( $edit ) . '">' . esc_html( $title ) . '</a>'
 							: esc_html( $title );
@@ -90,9 +104,8 @@ class MCM_Relations {
 
 					$blocks .= '<div class="mcm-rel-group"><strong>' . esc_html( $plabel ) . ':</strong> ' . implode( ', ', $links );
 					if ( $info['more'] > 0 ) {
-						/* translators: %d: number of additional related items */
 						/* translators: %d: number of additional related items. */
-						$blocks .= ' <span class="mcm-rel-more">' . esc_html( sprintf( __( '+%d more', 'medical-college-manager' ), $info['more'] ) ) . '</span>';
+						$blocks .= ' <span class="mcm-rel-more">' . esc_html( sprintf( _n( '+%d more', '+%d more', (int) $info['more'], 'medical-college-manager' ), $info['more'] ) ) . '</span>';
 					}
 					$blocks .= '</div>';
 				}
@@ -112,6 +125,10 @@ class MCM_Relations {
 	 * Posts (across every CPT using $tax) that share $term, excluding the
 	 * current post, grouped by post type and capped per type.
 	 *
+	 * @param int     $post_id Post ID.
+	 * @param string  $tax Taxonomy name.
+	 * @param WP_Term $term Term object.
+	 * @param mixed   $cpts_for Cpts for.
 	 * @return array  cpt => array( posts => int[], more => int )
 	 */
 	private function related_by_term( $post_id, $tax, $term, $cpts_for ) {
@@ -143,8 +160,8 @@ class MCM_Relations {
 			array(
 				'post_type'      => $cpts_for,
 				'post_status'    => array( 'publish', 'draft', 'pending', 'private', 'future' ),
-				'posts_per_page' => 200,
-				'post__not_in'   => array( $post_id ),
+				'posts_per_page' => 200, // phpcs:ignore WordPress.WP.PostsPerPage.posts_per_page_posts_per_page -- Admin meta box, IDs only; needed to count the "+N more".
+				'post__not_in'   => array( $post_id ), // phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_post__not_in -- Excludes only the post being edited, in an admin meta box.
 				'no_found_rows'  => true,
 				'orderby'        => 'title',
 				'order'          => 'ASC',
@@ -161,14 +178,22 @@ class MCM_Relations {
 
 		$grouped = array();
 		foreach ( $query->posts as $rid ) {
+			// Unpublished or private entries are listed only to someone who may
+			// edit them (a contributor must not learn other authors' drafts).
+			if ( 'publish' !== get_post_status( $rid ) && ! current_user_can( 'edit_post', $rid ) ) {
+				continue;
+			}
 			$cpt = get_post_type( $rid );
 			if ( ! isset( $grouped[ $cpt ] ) ) {
-				$grouped[ $cpt ] = array( 'posts' => array(), 'more' => 0 );
+				$grouped[ $cpt ] = array(
+					'posts' => array(),
+					'more'  => 0,
+				);
 			}
 			if ( count( $grouped[ $cpt ]['posts'] ) < self::PER_TYPE ) {
 				$grouped[ $cpt ]['posts'][] = $rid;
 			} else {
-				$grouped[ $cpt ]['more']++;
+				++$grouped[ $cpt ]['more'];
 			}
 		}
 

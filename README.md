@@ -4,18 +4,21 @@ A WordPress plugin that turns a WordPress site into a complete website for a med
 
 ## Features
 
-- **14 content types**: Timetable, Programs, Courses, Events, Consultants, Team, Admissions, Notices, Tenders, Scholarships, Publications, Research Projects, Policies and Students.
+- **15 content types**: Timetable, Programs, Courses, Events, Consultants, Team, Admissions, Notices, Tenders, Scholarships, Publications, Research Projects, Policies, Jobs and Students.
 - **Shared connectors**: Department, Faculty, Program, Session, Research Area and Specialty link content across types, so a department or professor page lists everything related to it automatically.
 - **Department pages** with a hero video or image, a Head of Department message card and only the sections that have content.
+- **College header & footer**: a global header (top bar, logo, three-level accessible menus, mobile panel, sticky modes) and footer configured from a settings page, replacing the theme's without editing it. Off until switched on; if it fails, the theme's own header and footer come back.
+- **Staff Type** for team members (Teaching & Technical, Support), with filters, CSV and `staff_type="…"`.
 - **Live search and filters** (AJAX) in grid, list, table, directory and citation layouts.
 - **Publications** as a numbered Vancouver reference list with automatic DOI and PubMed links.
 - **Notice board**: scrolling ticker, auto-scroll board and list, with pinning, priority and auto-expiry. Tenders hide themselves after their deadline.
 - **Printing on the college letterhead** (logo, address, signature block), including filtered lists and Save as PDF.
 - **CSV import/export** for every type, with upsert on re-import and sample files in `samples/`.
-- **Elementor**: 16 drag-and-drop widgets with full style controls.
+- **Elementor**: 19 drag-and-drop widgets, including a Testimonial / Message widget (e.g. "Message from the Head of Department") with the photo left, right or on top, and a Contact Info widget (icon + label + clickable value rows). Each has the full Elementor set of query options (include/exclude terms and items, status, order by field, offset, pagination, filter-bar parts) and Style options (typography, colours, background, border, radius, shadow, Normal/Hover) for every part.
 - **Design settings**: colours, spacing, columns, page banners and custom CSS, without code.
-- **SEO**: schema.org JSON-LD for people, events, courses, programs and publications.
+- **SEO**: schema.org JSON-LD for people, events, courses, programs, publications and jobs.
 - **Privacy**: student records have their own capabilities (administrators only), no REST route, and only safe fields on the front end. Includes WordPress personal-data export and erase support.
+- **Built not to break your site**: every module and every rendered block runs behind an error boundary. A problem shows visitors an empty block instead of a broken page, is logged, and appears under Tools → Site Health with checks for PHP, WordPress, Elementor, timezone and permalinks.
 
 ## Requirements
 
@@ -40,19 +43,20 @@ A WordPress plugin that turns a WordPress site into a complete website for a med
 | `[mcm_admissions]`, `[mcm_scholarships]` | Admissions and scholarships |
 | `[mcm_events]`, `[mcm_tenders]`, `[mcm_policies]` | Events, open tenders, policies |
 | `[mcm_publications]`, `[mcm_research]` | Research output |
+| `[mcm_jobs]` (alias `[mcm_vacancies]`) | Jobs / vacancies: open by default, `status="closed"` or `"all"` |
 | `[mcm_students]` | Student list (safe fields only) |
-| `[mcm_notice_ticker]`, `[mcm_notice_board]`, `[mcm_notices]` | Notices |
-| `[mcm_department_intro]`, `[mcm_department_sections]` | Department page parts |
+| `[mcm_notice_ticker]`, `[mcm_notice_board]`, `[mcm_notices]` | Notices, plus open jobs and tenders (`include="notice,job,tender"`) |
+| `[mcm_department_hero]`, `[mcm_department_message]`, `[mcm_department_intro]`, `[mcm_department_sections]` | Department page parts |
 | `[mcm_blog]`, `[mcm_social_bar]` | Blog posts, social links |
 
-Common attributes: `view`, `columns`, `count`, `filters="yes"`, `print`, `paginate`, and connector filters such as `department="anatomy"` or `program="mbbs"`. The full reference is on the plugin's settings page and in `readme.txt`.
+Common attributes: `view`, `columns`, `count`, `filters="yes"`, `print`, `paginate`, `status`, `ids`, `exclude_ids`, `offset`, `facets`, `empty`, and connector filters such as `department="anatomy"` or `program="mbbs"`. The full reference is on the plugin's settings page and in `readme.txt`.
 
 ## Project structure
 
 ```
 medical-college-manager.php   Bootstrap, constants, activation and upgrades
 includes/                     One class per feature (types, fields, query engine, shortcodes, templates, import, Elementor…)
-templates/archive-mcm.php     Archive and department page template (overridable from a theme)
+templates/archive-mcm.php     Archive and department page layout (overridable from a theme)
 assets/                       Front-end and admin CSS/JS
 samples/                      Example CSV files for the importer
 languages/                    Translation template (.pot)

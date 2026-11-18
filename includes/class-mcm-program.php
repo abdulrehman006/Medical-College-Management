@@ -19,10 +19,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * The Program spine: Program terms kept in sync with Program posts.
+ */
 class MCM_Program {
 
 	const TAX = 'mcm_program_link';
 
+	/**
+	 * Register the hooks this module needs.
+	 */
 	public function __construct() {
 		// Keep a Program term in sync with each Program CPT entry.
 		add_action( 'save_post_mcm_program', array( $this, 'sync_term' ), 10, 3 );
@@ -30,7 +36,11 @@ class MCM_Program {
 		add_filter( 'mcm_program_related', array( $this, 'noop' ) ); // reserved hook.
 	}
 
-	/** Placeholder so the reserved filter always exists. */
+	/**
+	 * Placeholder so the reserved filter always exists.
+	 *
+	 * @param mixed $v Value.
+	 */
 	public function noop( $v ) {
 		return $v;
 	}
@@ -42,7 +52,7 @@ class MCM_Program {
 	 * @param WP_Post $post    Post object.
 	 * @param bool    $update  Whether this is an update.
 	 */
-	public function sync_term( $post_id, $post = null, $update = false ) {
+	public function sync_term( $post_id, $post = null, $update = false ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed -- save_post_{post_type} callback signature.
 		if ( wp_is_post_revision( $post_id ) || wp_is_post_autosave( $post_id ) ) {
 			return;
 		}
@@ -98,11 +108,10 @@ class MCM_Program {
 		// 1. Seed terms from existing Program CPT entries.
 		$programs = get_posts(
 			array(
-				'post_type'        => 'mcm_program',
-				'post_status'      => 'any',
-				'numberposts'      => -1,
-				'fields'           => 'ids',
-				'suppress_filters' => true,
+				'post_type'   => 'mcm_program',
+				'post_status' => 'any',
+				'numberposts' => -1,
+				'fields'      => 'ids',
 			)
 		);
 		foreach ( $programs as $pid ) {
@@ -117,15 +126,14 @@ class MCM_Program {
 		foreach ( $sources as $type => $meta_key ) {
 			$posts = get_posts(
 				array(
-					'post_type'        => $type,
-					'post_status'      => 'any',
-					'numberposts'      => -1,
-					'fields'           => 'ids',
-					'suppress_filters' => true,
+					'post_type'   => $type,
+					'post_status' => 'any',
+					'numberposts' => -1,
+					'fields'      => 'ids',
 				)
 			);
 			foreach ( $posts as $pid ) {
-				$value = trim( (string) get_post_meta( $pid, $meta_key, true ) );
+				$value = trim( (string) MCM_Safe::meta( $pid, $meta_key ) );
 				if ( '' === $value ) {
 					continue;
 				}
@@ -191,10 +199,10 @@ class MCM_Program {
 				continue;
 			}
 
-			$view  = ( 'mcm_timetable' === $type ) ? 'table' : 'grid';
-			$out  .= '<section class="mcm-program-section">';
-			$out  .= '<h2 class="mcm-program-section-title">' . esc_html( $label ) . '</h2>';
-			$out  .= MCM_Shortcodes::render_block(
+			$view = ( 'mcm_timetable' === $type ) ? 'table' : 'grid';
+			$out .= '<section class="mcm-program-section">';
+			$out .= '<h2 class="mcm-program-section-title">' . esc_html( $label ) . '</h2>';
+			$out .= MCM_Shortcodes::render_block(
 				array(
 					'type'      => $type,
 					'view'      => $view,
@@ -202,9 +210,10 @@ class MCM_Program {
 					'lock_tax'  => self::TAX,
 					'lock_term' => $term->slug,
 					'count'     => 50,
-				)
+				),
+				false
 			);
-			$out  .= '</section>';
+			$out .= '</section>';
 		}
 
 		return $out;

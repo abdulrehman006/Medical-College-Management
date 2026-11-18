@@ -9,19 +9,137 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * Registers the content types and taxonomies.
+ */
 class MCM_CPT {
 
+	/**
+	 * Register the hooks this module needs.
+	 */
 	public function __construct() {
 		add_action( 'init', array( $this, 'register_post_types' ) );
 		add_action( 'init', array( $this, 'register_taxonomies' ) );
+		add_action( 'restrict_manage_posts', array( $this, 'staff_type_filter' ) );
 		// Force the simple classic editor for every plugin CPT (keeps the REST
 		// API on for meta/Elementor, but no block editor — easier data entry).
 		add_filter( 'use_block_editor_for_post_type', array( $this, 'force_classic_editor' ), 10, 2 );
+		add_action( 'admin_init', array( $this, 'term_count_columns' ) );
+		add_action( 'edit_form_after_title', array( $this, 'editor_hint' ) );
+	}
+
+	/**
+	 * Name of the featured image per type ('' = WordPress's "Featured image").
+	 *
+	 * @param string $type Post type.
+	 * @return string
+	 */
+	public static function image_label( $type ) {
+		$map = array(
+			'mcm_team'       => __( 'Photo', 'medical-college-manager' ),
+			'mcm_consultant' => __( 'Photo', 'medical-college-manager' ),
+			'mcm_event'      => __( 'Event banner', 'medical-college-manager' ),
+			'mcm_job'        => __( 'Advertisement image', 'medical-college-manager' ),
+		);
+		return isset( $map[ $type ] ) ? $map[ $type ] : '';
+	}
+
+	/**
+	 * One line above the editor saying what the text is for.
+	 *
+	 * @param WP_Post $post Post being edited.
+	 */
+	public function editor_hint( $post ) {
+		$hints = array(
+			'mcm_team'        => __( 'Biography — shown on the profile page. Photo, department and specialty are set in the boxes on the right.', 'medical-college-manager' ),
+			'mcm_consultant'  => __( 'Biography — shown on the profile page. Photo, department and specialty are set in the boxes on the right.', 'medical-college-manager' ),
+			'mcm_research'    => __( 'Abstract / project summary — shown on the project page.', 'medical-college-manager' ),
+			'mcm_publication' => __( 'Abstract (optional) — shown on the publication page under the citation.', 'medical-college-manager' ),
+			'mcm_event'       => __( 'Event description — shown on the event page. Add the banner in "Event banner" on the right.', 'medical-college-manager' ),
+			'mcm_notice'      => __( 'Notice text — shown on the notice page. Attach a PDF in "Notice Details" below.', 'medical-college-manager' ),
+		);
+		if ( ! $post instanceof WP_Post || ! isset( $hints[ $post->post_type ] ) ) {
+			return;
+		}
+		echo '<p class="description mcm-editor-hint" style="margin:12px 0 4px;">' . esc_html( $hints[ $post->post_type ] ) . '</p>';
+	}
+
+	/**
+	 * Per-type Count column on shared taxonomy screens.
+	 *
+	 * Departments, Faculty, Sessions… belong to many content types, and
+	 * WordPress's Count column adds them all up: Events → Departments showed
+	 * "Anatomy 20" when Anatomy had one event. Opened under one content type,
+	 * the column now counts that type only and links to exactly those posts.
+	 */
+	public function term_count_columns() {
+		foreach ( array_keys( self::taxonomies() ) as $tax ) {
+			add_filter(
+				"manage_edit-{$tax}_columns",
+				function ( $cols ) use ( $tax ) {
+					$type = self::term_screen_type( $tax );
+					if ( '' === $type || ! isset( $cols['posts'] ) ) {
+						return $cols;
+					}
+					$obj = get_post_type_object( $type );
+					$out = array();
+					foreach ( $cols as $key => $label ) {
+						$out[ 'posts' === $key ? 'mcm_type_count' : $key ] = 'posts' === $key ? ( $obj ? $obj->labels->name : $label ) : $label;
+					}
+					return $out;
+				}
+			);
+			add_filter(
+				"manage_{$tax}_custom_column",
+				function ( $out, $column, $term_id ) use ( $tax ) {
+					$type = self::term_screen_type( $tax );
+					if ( 'mcm_type_count' !== $column || '' === $type ) {
+						return $out;
+					}
+					$counts = MCM_Query::type_term_counts( $tax, $type );
+					$n      = isset( $counts[ (int) $term_id ] ) ? $counts[ (int) $term_id ] : 0;
+					$term   = get_term( (int) $term_id, $tax );
+					if ( ! $term instanceof WP_Term ) {
+						return number_format_i18n( $n );
+					}
+					$url = add_query_arg(
+						array(
+							'taxonomy'  => $tax,
+							'term'      => $term->slug,
+							'post_type' => $type,
+						),
+						admin_url( 'edit.php' )
+					);
+					return '<a href="' . esc_url( $url ) . '">' . esc_html( number_format_i18n( $n ) ) . '</a>';
+				},
+				10,
+				3
+			);
+		}
+	}
+
+	/**
+	 * The content type a taxonomy screen was opened under, when the taxonomy
+	 * is shared by several types ('' otherwise: the normal count is right).
+	 *
+	 * @param string $tax Taxonomy.
+	 * @return string
+	 */
+	private static function term_screen_type( $tax ) {
+		$type = isset( $_REQUEST['post_type'] ) ? sanitize_key( wp_unslash( $_REQUEST['post_type'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only screen context (also sent by the Add term AJAX form).
+		$tobj = get_taxonomy( $tax );
+		if ( ! $tobj || count( (array) $tobj->object_type ) < 2 || ! in_array( $type, (array) $tobj->object_type, true ) ) {
+			return '';
+		}
+		return $type;
 	}
 
 	/**
 	 * Use the classic editor for our content types so non-technical staff get a
 	 * plain title + content + labelled meta-box screen instead of blocks.
+	 *
+	 * @param mixed $use_block Use block.
+	 * @param mixed $post_type Post type.
 	 */
 	public function force_classic_editor( $use_block, $post_type ) {
 		return array_key_exists( $post_type, self::post_types() ) ? false : $use_block;
@@ -34,7 +152,7 @@ class MCM_CPT {
 	 */
 	public static function post_types() {
 		return array(
-			'mcm_timetable'  => array(
+			'mcm_timetable'   => array(
 				'singular'    => __( 'Timetable Entry', 'medical-college-manager' ),
 				'plural'      => __( 'Timetable', 'medical-college-manager' ),
 				'menu_icon'   => 'dashicons-calendar-alt',
@@ -42,7 +160,7 @@ class MCM_CPT {
 				'supports'    => array( 'title' ),
 				'has_archive' => true,
 			),
-			'mcm_program'    => array(
+			'mcm_program'     => array(
 				'singular'    => __( 'Program', 'medical-college-manager' ),
 				'plural'      => __( 'Programs', 'medical-college-manager' ),
 				'menu_icon'   => 'dashicons-welcome-learn-more',
@@ -50,7 +168,7 @@ class MCM_CPT {
 				'supports'    => array( 'title', 'editor', 'thumbnail', 'excerpt' ),
 				'has_archive' => true,
 			),
-			'mcm_course'     => array(
+			'mcm_course'      => array(
 				'singular'    => __( 'Course', 'medical-college-manager' ),
 				'plural'      => __( 'Courses', 'medical-college-manager' ),
 				'menu_icon'   => 'dashicons-book',
@@ -58,7 +176,7 @@ class MCM_CPT {
 				'supports'    => array( 'title', 'editor', 'thumbnail', 'excerpt' ),
 				'has_archive' => true,
 			),
-			'mcm_event'      => array(
+			'mcm_event'       => array(
 				'singular'    => __( 'Event', 'medical-college-manager' ),
 				'plural'      => __( 'Events', 'medical-college-manager' ),
 				'menu_icon'   => 'dashicons-megaphone',
@@ -66,7 +184,7 @@ class MCM_CPT {
 				'supports'    => array( 'title', 'editor', 'thumbnail', 'excerpt' ),
 				'has_archive' => true,
 			),
-			'mcm_consultant' => array(
+			'mcm_consultant'  => array(
 				'singular'    => __( 'Consultant', 'medical-college-manager' ),
 				'plural'      => __( 'Consultants', 'medical-college-manager' ),
 				'menu_icon'   => 'dashicons-businessperson',
@@ -74,7 +192,7 @@ class MCM_CPT {
 				'supports'    => array( 'title', 'editor', 'thumbnail' ),
 				'has_archive' => true,
 			),
-			'mcm_team'       => array(
+			'mcm_team'        => array(
 				'singular'    => __( 'Team Member', 'medical-college-manager' ),
 				'plural'      => __( 'Team', 'medical-college-manager' ),
 				'menu_icon'   => 'dashicons-groups',
@@ -82,7 +200,7 @@ class MCM_CPT {
 				'supports'    => array( 'title', 'editor', 'thumbnail' ),
 				'has_archive' => true,
 			),
-			'mcm_admission'  => array(
+			'mcm_admission'   => array(
 				'singular'    => __( 'Admission', 'medical-college-manager' ),
 				'plural'      => __( 'Admissions', 'medical-college-manager' ),
 				'menu_icon'   => 'dashicons-id-alt',
@@ -90,7 +208,7 @@ class MCM_CPT {
 				'supports'    => array( 'title', 'editor', 'thumbnail', 'excerpt' ),
 				'has_archive' => true,
 			),
-			'mcm_notice'     => array(
+			'mcm_notice'      => array(
 				'singular'    => __( 'Notice', 'medical-college-manager' ),
 				'plural'      => __( 'Notices', 'medical-college-manager' ),
 				'menu_icon'   => 'dashicons-bell',
@@ -98,7 +216,7 @@ class MCM_CPT {
 				'supports'    => array( 'title', 'editor', 'thumbnail', 'excerpt' ),
 				'has_archive' => true,
 			),
-			'mcm_tender'     => array(
+			'mcm_tender'      => array(
 				'singular'    => __( 'Tender', 'medical-college-manager' ),
 				'plural'      => __( 'Tenders', 'medical-college-manager' ),
 				'menu_icon'   => 'dashicons-media-document',
@@ -122,7 +240,7 @@ class MCM_CPT {
 				'supports'    => array( 'title', 'editor', 'excerpt', 'thumbnail' ),
 				'has_archive' => true,
 			),
-			'mcm_research'   => array(
+			'mcm_research'    => array(
 				'singular'    => __( 'Research Project', 'medical-college-manager' ),
 				'plural'      => __( 'Research Projects', 'medical-college-manager' ),
 				'menu_icon'   => 'dashicons-microscope',
@@ -130,7 +248,7 @@ class MCM_CPT {
 				'supports'    => array( 'title', 'editor', 'excerpt', 'thumbnail' ),
 				'has_archive' => true,
 			),
-			'mcm_policy'     => array(
+			'mcm_policy'      => array(
 				'singular'    => __( 'Policy', 'medical-college-manager' ),
 				'plural'      => __( 'Policies', 'medical-college-manager' ),
 				'menu_icon'   => 'dashicons-media-document',
@@ -138,7 +256,17 @@ class MCM_CPT {
 				'supports'    => array( 'title', 'editor', 'excerpt', 'thumbnail' ),
 				'has_archive' => true,
 			),
-			'mcm_student'    => array(
+			// Jobs / vacancies. Editor = full job description; featured image =
+			// the newspaper advertisement. Closed jobs keep their single page.
+			'mcm_job'         => array(
+				'singular'    => __( 'Job', 'medical-college-manager' ),
+				'plural'      => __( 'Jobs', 'medical-college-manager' ),
+				'menu_icon'   => 'dashicons-businessperson',
+				'slug'        => 'jobs',
+				'supports'    => array( 'title', 'editor', 'thumbnail', 'excerpt' ),
+				'has_archive' => true,
+			),
+			'mcm_student'     => array(
 				'singular'    => __( 'Student', 'medical-college-manager' ),
 				'plural'      => __( 'Students', 'medical-college-manager' ),
 				'menu_icon'   => 'dashicons-admin-users',
@@ -177,15 +305,15 @@ class MCM_CPT {
 	public static function taxonomies() {
 		return array(
 			// Shared across most CPTs — the backbone filter.
-			'mcm_department'  => array(
-				'post_types'   => array( 'mcm_timetable', 'mcm_program', 'mcm_course', 'mcm_event', 'mcm_consultant', 'mcm_team', 'mcm_admission', 'mcm_student', 'mcm_notice', 'mcm_tender', 'mcm_scholarship', 'mcm_publication', 'mcm_research', 'mcm_policy' ),
+			'mcm_department'      => array(
+				'post_types'   => array( 'mcm_timetable', 'mcm_program', 'mcm_course', 'mcm_event', 'mcm_consultant', 'mcm_team', 'mcm_admission', 'mcm_student', 'mcm_notice', 'mcm_tender', 'mcm_scholarship', 'mcm_publication', 'mcm_research', 'mcm_policy', 'mcm_job' ),
 				'singular'     => __( 'Department', 'medical-college-manager' ),
 				'plural'       => __( 'Departments', 'medical-college-manager' ),
 				'slug'         => 'department',
 				'hierarchical' => true,
 			),
 			// Academic session / intake.
-			'mcm_session'     => array(
+			'mcm_session'         => array(
 				'post_types'   => array( 'mcm_timetable', 'mcm_course', 'mcm_admission', 'mcm_student' ),
 				'singular'     => __( 'Session', 'medical-college-manager' ),
 				'plural'       => __( 'Sessions', 'medical-college-manager' ),
@@ -193,7 +321,7 @@ class MCM_CPT {
 				'hierarchical' => true,
 			),
 			// Student level — Graduate / Undergraduate.
-			'mcm_level'       => array(
+			'mcm_level'           => array(
 				'post_types'   => array( 'mcm_student' ),
 				'singular'     => __( 'Level', 'medical-college-manager' ),
 				'plural'       => __( 'Levels', 'medical-college-manager' ),
@@ -203,15 +331,15 @@ class MCM_CPT {
 			// Faculty / Teacher — the person who teaches. Shared so a faculty
 			// member links their Timetable & Courses with their Consultant/Team
 			// profile (one term = one person).
-			'mcm_teacher'     => array(
-				'post_types'   => array( 'mcm_timetable', 'mcm_course', 'mcm_consultant', 'mcm_team', 'mcm_publication' , 'mcm_research' ),
+			'mcm_teacher'         => array(
+				'post_types'   => array( 'mcm_timetable', 'mcm_course', 'mcm_consultant', 'mcm_team', 'mcm_publication', 'mcm_research' ),
 				'singular'     => __( 'Faculty', 'medical-college-manager' ),
 				'plural'       => __( 'Faculty', 'medical-college-manager' ),
 				'slug'         => 'faculty',
 				'hierarchical' => false,
 			),
 			// Specialty — consultants & team.
-			'mcm_specialty'   => array(
+			'mcm_specialty'       => array(
 				'post_types'   => array( 'mcm_consultant', 'mcm_team' ),
 				'singular'     => __( 'Specialty', 'medical-college-manager' ),
 				'plural'       => __( 'Specialties', 'medical-college-manager' ),
@@ -219,35 +347,35 @@ class MCM_CPT {
 				'hierarchical' => false,
 			),
 			// Per-type categories.
-			'mcm_program_cat' => array(
+			'mcm_program_cat'     => array(
 				'post_types'   => array( 'mcm_program' ),
 				'singular'     => __( 'Program Category', 'medical-college-manager' ),
 				'plural'       => __( 'Program Categories', 'medical-college-manager' ),
 				'slug'         => 'program-category',
 				'hierarchical' => true,
 			),
-			'mcm_course_cat'  => array(
+			'mcm_course_cat'      => array(
 				'post_types'   => array( 'mcm_course' ),
 				'singular'     => __( 'Course Category', 'medical-college-manager' ),
 				'plural'       => __( 'Course Categories', 'medical-college-manager' ),
 				'slug'         => 'course-category',
 				'hierarchical' => true,
 			),
-			'mcm_event_cat'   => array(
+			'mcm_event_cat'       => array(
 				'post_types'   => array( 'mcm_event' ),
 				'singular'     => __( 'Event Category', 'medical-college-manager' ),
 				'plural'       => __( 'Event Categories', 'medical-college-manager' ),
 				'slug'         => 'event-category',
 				'hierarchical' => true,
 			),
-			'mcm_notice_cat'  => array(
+			'mcm_notice_cat'      => array(
 				'post_types'   => array( 'mcm_notice' ),
 				'singular'     => __( 'Notice Category', 'medical-college-manager' ),
 				'plural'       => __( 'Notice Categories', 'medical-college-manager' ),
 				'slug'         => 'notice-category',
 				'hierarchical' => true,
 			),
-			'mcm_tender_cat'  => array(
+			'mcm_tender_cat'      => array(
 				'post_types'   => array( 'mcm_tender' ),
 				'singular'     => __( 'Tender Category', 'medical-college-manager' ),
 				'plural'       => __( 'Tender Categories', 'medical-college-manager' ),
@@ -263,14 +391,23 @@ class MCM_CPT {
 			),
 			// Research Area — shared by publications and the people who research
 			// them, so a professor's interests and output stay connected.
-			'mcm_research_area' => array(
-				'post_types'   => array( 'mcm_publication', 'mcm_consultant', 'mcm_team' , 'mcm_research' ),
+			'mcm_research_area'   => array(
+				'post_types'   => array( 'mcm_publication', 'mcm_consultant', 'mcm_team', 'mcm_research' ),
 				'singular'     => __( 'Research Area', 'medical-college-manager' ),
 				'plural'       => __( 'Research Areas', 'medical-college-manager' ),
 				'slug'         => 'research-area',
 				'hierarchical' => true,
 			),
-			'mcm_policy_cat'  => array(
+			// Team: Teaching & Technical Staff / Support Staff (1.32). Groups faculty on
+			// department pages; seeded once by install_staff_types().
+			'mcm_staff_type'      => array(
+				'post_types'   => array( 'mcm_team' ),
+				'singular'     => __( 'Staff Type', 'medical-college-manager' ),
+				'plural'       => __( 'Staff Types', 'medical-college-manager' ),
+				'slug'         => 'staff-type',
+				'hierarchical' => true,
+			),
+			'mcm_policy_cat'      => array(
 				'post_types'   => array( 'mcm_policy' ),
 				'singular'     => __( 'Policy Category', 'medical-college-manager' ),
 				'plural'       => __( 'Policy Categories', 'medical-college-manager' ),
@@ -282,7 +419,14 @@ class MCM_CPT {
 			// Distinct key from the mcm_program CPT (which holds the rich program
 			// page); a matching term is auto-created for each Program entry
 			// (see MCM_Program) so there is no double data entry.
-			'mcm_program_link' => array(
+			'mcm_job_cat'         => array(
+				'post_types'   => array( 'mcm_job' ),
+				'singular'     => __( 'Job Category', 'medical-college-manager' ),
+				'plural'       => __( 'Job Categories', 'medical-college-manager' ),
+				'slug'         => 'job-category',
+				'hierarchical' => true,
+			),
+			'mcm_program_link'    => array(
 				'post_types'   => array( 'mcm_course', 'mcm_timetable', 'mcm_admission', 'mcm_student' ),
 				'singular'     => __( 'Program', 'medical-college-manager' ),
 				'plural'       => __( 'Programs', 'medical-college-manager' ),
@@ -292,31 +436,45 @@ class MCM_CPT {
 		);
 	}
 
+	/**
+	 * Register every content type defined in post_types().
+	 */
 	public function register_post_types() {
 		foreach ( self::post_types() as $key => $cfg ) {
 			/* translators (all %s below): the content type's singular or plural name. */
-			$s = $cfg['singular'];
-			$p = $cfg['plural'];
+			$s      = $cfg['singular'];
+			$p      = $cfg['plural'];
 			$labels = array(
 				'name'               => $p,
 				'singular_name'      => $s,
 				'menu_name'          => $p,
 				'add_new'            => __( 'Add New', 'medical-college-manager' ),
-				/* translators: %s: content type singular name. */
+				/* translators: %s: content type or taxonomy singular name. */
 				'add_new_item'       => sprintf( __( 'Add New %s', 'medical-college-manager' ), $s ),
-				/* translators: %s: content type singular name. */
+				/* translators: %s: content type or taxonomy singular name. */
 				'edit_item'          => sprintf( __( 'Edit %s', 'medical-college-manager' ), $s ),
-				/* translators: %s: content type singular name. */
+				/* translators: %s: content type or taxonomy singular name. */
 				'new_item'           => sprintf( __( 'New %s', 'medical-college-manager' ), $s ),
-				/* translators: %s: content type singular name. */
+				/* translators: %s: content type or taxonomy singular name. */
 				'view_item'          => sprintf( __( 'View %s', 'medical-college-manager' ), $s ),
-				/* translators: %s: content type plural name. */
+				/* translators: %s: content type or taxonomy plural name. */
 				'search_items'       => sprintf( __( 'Search %s', 'medical-college-manager' ), $p ),
 				'not_found'          => __( 'Nothing found', 'medical-college-manager' ),
 				'not_found_in_trash' => __( 'Nothing found in Trash', 'medical-college-manager' ),
-				/* translators: %s: content type plural name. */
+				/* translators: %s: content type or taxonomy plural name. */
 				'all_items'          => sprintf( __( 'All %s', 'medical-college-manager' ), $p ),
 			);
+			// Say what the image is for: a person's photo, an event banner.
+			$image = self::image_label( $key );
+			if ( '' !== $image ) {
+				$labels['featured_image'] = $image;
+				/* translators: %s: image name, e.g. "Photo". */
+				$labels['set_featured_image'] = sprintf( __( 'Set %s', 'medical-college-manager' ), strtolower( $image ) );
+				/* translators: %s: image name, e.g. "Photo". */
+				$labels['remove_featured_image'] = sprintf( __( 'Remove %s', 'medical-college-manager' ), strtolower( $image ) );
+				/* translators: %s: image name, e.g. "Photo". */
+				$labels['use_featured_image'] = sprintf( __( 'Use as %s', 'medical-college-manager' ), strtolower( $image ) );
+			}
 
 			$args = array(
 				'labels'       => $labels,
@@ -327,7 +485,10 @@ class MCM_CPT {
 				'menu_icon'    => $cfg['menu_icon'],
 				'supports'     => $cfg['supports'],
 				'has_archive'  => $cfg['has_archive'],
-				'rewrite'      => array( 'slug' => $cfg['slug'], 'with_front' => false ),
+				'rewrite'      => array(
+					'slug'       => $cfg['slug'],
+					'with_front' => false,
+				),
 				'hierarchical' => false,
 			);
 
@@ -336,28 +497,42 @@ class MCM_CPT {
 				$args = array_merge( $args, $cfg['args'] );
 			}
 
+			// Fail closed: the Jobs module is what keeps jobs with a future
+			// publication date out of view. If it failed to start, jobs stay
+			// editable but nothing about them is public until it is fixed.
+			// Rewrite rules are kept, so /jobs/ returns once the module works.
+			if ( 'mcm_job' === $key && class_exists( 'MCM_Health' ) && array_key_exists( 'MCM_Job', MCM_Health::disabled_modules() ) ) {
+				$args['publicly_queryable']  = false;
+				$args['exclude_from_search'] = true;
+				$args['show_in_rest']        = false;
+				$args['show_in_nav_menus']   = false;
+			}
+
 			register_post_type( $key, apply_filters( "mcm_cpt_args_{$key}", $args ) );
 		}
 	}
 
+	/**
+	 * Register every taxonomy defined in taxonomies().
+	 */
 	public function register_taxonomies() {
 		foreach ( self::taxonomies() as $key => $cfg ) {
-			$s = $cfg['singular'];
-			$p = $cfg['plural'];
+			$s      = $cfg['singular'];
+			$p      = $cfg['plural'];
 			$labels = array(
 				'name'          => $p,
 				'singular_name' => $s,
-				/* translators: %s: taxonomy plural name. */
+				/* translators: %s: content type or taxonomy plural name. */
 				'search_items'  => sprintf( __( 'Search %s', 'medical-college-manager' ), $p ),
-				/* translators: %s: taxonomy plural name. */
+				/* translators: %s: content type or taxonomy plural name. */
 				'all_items'     => sprintf( __( 'All %s', 'medical-college-manager' ), $p ),
-				/* translators: %s: taxonomy singular name. */
+				/* translators: %s: content type or taxonomy singular name. */
 				'edit_item'     => sprintf( __( 'Edit %s', 'medical-college-manager' ), $s ),
-				/* translators: %s: taxonomy singular name. */
+				/* translators: %s: content type or taxonomy singular name. */
 				'update_item'   => sprintf( __( 'Update %s', 'medical-college-manager' ), $s ),
-				/* translators: %s: taxonomy singular name. */
+				/* translators: %s: content type or taxonomy singular name. */
 				'add_new_item'  => sprintf( __( 'Add New %s', 'medical-college-manager' ), $s ),
-				/* translators: %s: taxonomy singular name. */
+				/* translators: %s: content type or taxonomy singular name. */
 				'new_item_name' => sprintf( __( 'New %s Name', 'medical-college-manager' ), $s ),
 				'menu_name'     => $p,
 			);
@@ -366,7 +541,7 @@ class MCM_CPT {
 			// students-only) must not expose a public term archive or REST route —
 			// its pages could only ever be empty, and it keeps student-only
 			// vocabulary off the open web. It stays fully usable in wp-admin.
-			$types    = self::post_types();
+			$types     = self::post_types();
 			$is_public = false;
 			foreach ( (array) $cfg['post_types'] as $pt ) {
 				$pub = ! isset( $types[ $pt ]['args']['public'] ) || false !== $types[ $pt ]['args']['public'];
@@ -390,5 +565,64 @@ class MCM_CPT {
 
 			register_taxonomy( $key, $cfg['post_types'], apply_filters( "mcm_tax_args_{$key}", $args ) );
 		}
+	}
+	/** Option recording that the default staff types were created. */
+	const STAFF_TYPES_INSTALLED = 'mcm_staff_type_installed';
+
+	/**
+	 * Create the two default staff types once (activation / upgrade). Admins
+	 * can rename them or add more; they are never re-created after that.
+	 */
+	public static function install_staff_types() {
+		if ( get_option( self::STAFF_TYPES_INSTALLED ) || ! taxonomy_exists( 'mcm_staff_type' ) ) {
+			return;
+		}
+		$types = array(
+			'teaching-technical-staff' => array(
+				__( 'Teaching & Technical Staff', 'medical-college-manager' ),
+				__( 'Professors, lecturers, demonstrators, laboratory and technical staff.', 'medical-college-manager' ),
+			),
+			'support-staff'            => array(
+				__( 'Support Staff', 'medical-college-manager' ),
+				__( 'Non-technical roles such as office assistants, security and attendants.', 'medical-college-manager' ),
+			),
+		);
+		foreach ( $types as $slug => $t ) {
+			if ( ! term_exists( $slug, 'mcm_staff_type' ) ) {
+				wp_insert_term(
+					$t[0],
+					'mcm_staff_type',
+					array(
+						'slug'        => $slug,
+						'description' => $t[1],
+					)
+				);
+			}
+		}
+		update_option( self::STAFF_TYPES_INSTALLED, defined( 'MCM_VERSION' ) ? MCM_VERSION : '1', false );
+	}
+
+	/**
+	 * Team list (wp-admin): a "Staff Type" filter dropdown next to the date filter.
+	 *
+	 * @param string $post_type Post type of the list screen.
+	 */
+	public function staff_type_filter( $post_type ) {
+		if ( 'mcm_team' !== $post_type || ! taxonomy_exists( 'mcm_staff_type' ) ) {
+			return;
+		}
+		$current = isset( $_GET['mcm_staff_type'] ) ? sanitize_title( wp_unslash( $_GET['mcm_staff_type'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only list filter.
+		wp_dropdown_categories(
+			array(
+				'taxonomy'        => 'mcm_staff_type',
+				'name'            => 'mcm_staff_type',
+				'value_field'     => 'slug',
+				'selected'        => $current,
+				'show_option_all' => __( 'All staff types', 'medical-college-manager' ),
+				'hide_empty'      => false,
+				'hierarchical'    => true,
+				'orderby'         => 'name',
+			)
+		);
 	}
 }

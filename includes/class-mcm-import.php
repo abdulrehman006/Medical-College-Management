@@ -9,10 +9,21 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * CSV import and export screen.
+ */
 class MCM_Import {
 
+	/**
+	 * Result notice shown at the top of the import page.
+	 *
+	 * @var string
+	 */
 	private $notice = '';
 
+	/**
+	 * Register the hooks this module needs.
+	 */
 	public function __construct() {
 		add_action( 'admin_menu', array( $this, 'menu' ), 11 );
 		// Handle CSV export early (before the admin page outputs any HTML).
@@ -35,17 +46,56 @@ class MCM_Import {
 	 */
 	private static function csv_safe( $value ) {
 		$value = (string) $value;
-		if ( '' !== $value && in_array( $value[0], array( '=', '+', '-', '@', "	", "" ), true ) ) {
+		if ( '' !== $value && in_array( $value[0], array( '=', '+', '-', '@', "\t", "\r" ), true ) ) {
 			return "'" . $value;
 		}
 		return $value;
 	}
 
+	/**
+	 * Undo csv_safe() on import: drop ONE leading apostrophe when it guards a
+	 * formula character, so "+92-300…" or "-5" survive export → re-import.
+	 * A deliberate apostrophe before any other character is kept.
+	 *
+	 * @param string $value Cell value.
+	 * @return string
+	 */
+	private static function csv_unsafe( $value ) {
+		$value = (string) $value;
+		if ( strlen( $value ) > 1 && "'" === $value[0] && in_array( $value[1], array( '=', '+', '-', '@', "\t", "\r" ), true ) ) {
+			return substr( $value, 1 );
+		}
+		return $value;
+	}
+
+	/**
+	 * Columns of an export file: exactly the columns the importer reads.
+	 *
+	 * @param string $type Post type.
+	 */
+	/**
+	 * Meta key for a CSV column of a type: the schema's 'map' entry when there
+	 * is one, otherwise mcm_<column>.
+	 *
+	 * @param string $type Post type.
+	 * @param string $col  CSV column.
+	 * @return string
+	 */
+	public static function meta_key_for( $type, $col ) {
+		$schema = self::schema();
+		return isset( $schema[ $type ]['map'][ $col ] ) ? $schema[ $type ]['map'][ $col ] : 'mcm_' . $col;
+	}
+
+	/**
+	 * Columns of an export file: exactly the columns the importer reads.
+	 *
+	 * @param string $type Post type.
+	 */
 	private static function export_columns( $type ) {
 		$schema = self::schema();
 		// 'id' is first so a re-imported export updates the exact record it came
 		// from instead of creating a duplicate (see import_file / find_existing).
-		$cols   = array( 'id', 'title', 'content', 'excerpt' );
+		$cols = array( 'id', 'title', 'content', 'excerpt' );
 		if ( isset( $schema[ $type ]['tax'] ) ) {
 			$cols = array_merge( $cols, array_keys( $schema[ $type ]['tax'] ) );
 		}
@@ -70,7 +120,7 @@ class MCM_Import {
 			return;
 		}
 
-		$type   = isset( $_POST['mcm_export_type'] ) ? sanitize_key( $_POST['mcm_export_type'] ) : '';
+		$type   = sanitize_key( MCM_Safe::post( 'mcm_export_type' ) );
 		$schema = self::schema();
 		if ( ! isset( $schema[ $type ] ) ) {
 			return;
@@ -81,12 +131,11 @@ class MCM_Import {
 
 		$posts = get_posts(
 			array(
-				'post_type'        => $type,
-				'post_status'      => array( 'publish', 'draft', 'pending', 'private', 'future' ),
-				'numberposts'      => -1,
-				'orderby'          => 'title',
-				'order'            => 'ASC',
-				'suppress_filters' => true,
+				'post_type'   => $type,
+				'post_status' => array( 'publish', 'draft', 'pending', 'private', 'future' ),
+				'numberposts' => -1,
+				'orderby'     => 'title',
+				'order'       => 'ASC',
 			)
 		);
 
@@ -103,7 +152,8 @@ class MCM_Import {
 		}
 
 		$out = fopen( 'php://output', 'w' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen
-		fwrite( $out, "\xEF\xBB\xBF" ); // UTF-8 BOM so Excel opens it correctly. phpcs:ignore
+		// UTF-8 BOM so Excel opens the file correctly.
+		fwrite( $out, "\xEF\xBB\xBF" ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fwrite -- Streaming a download to php://output; WP_Filesystem has no stream API.
 		fputcsv( $out, $cols, ',', '"', '\\' );
 
 		foreach ( $posts as $p ) {
@@ -121,7 +171,7 @@ class MCM_Import {
 					$names = wp_get_post_terms( $p->ID, $tax_keys[ $col ], array( 'fields' => 'names' ) );
 					$row[] = is_wp_error( $names ) ? '' : implode( ', ', $names );
 				} else {
-					$row[] = (string) get_post_meta( $p->ID, 'mcm_' . $col, true );
+					$row[] = MCM_Safe::meta( $p->ID, self::meta_key_for( $type, $col ) );
 				}
 			}
 			fputcsv( $out, array_map( array( __CLASS__, 'csv_safe' ), $row ), ',', '"', '\\' );
@@ -140,61 +190,144 @@ class MCM_Import {
 	 */
 	public static function schema() {
 		return array(
-			'mcm_timetable'  => array(
+			'mcm_timetable'   => array(
 				'meta' => array( 'day', 'start_time', 'end_time', 'subject', 'room', 'year' ),
-				'tax'  => array( 'program' => 'mcm_program_link', 'department' => 'mcm_department', 'session' => 'mcm_session', 'teacher' => 'mcm_teacher' ),
+				'tax'  => array(
+					'program'    => 'mcm_program_link',
+					'department' => 'mcm_department',
+					'session'    => 'mcm_session',
+					'teacher'    => 'mcm_teacher',
+				),
 			),
-			'mcm_program'    => array(
+			'mcm_program'     => array(
 				'meta' => array( 'degree_level', 'duration', 'fees', 'intake', 'apply_url' ),
-				'tax'  => array( 'program_category' => 'mcm_program_cat', 'department' => 'mcm_department' ),
+				'tax'  => array(
+					'program_category' => 'mcm_program_cat',
+					'department'       => 'mcm_department',
+				),
 			),
-			'mcm_course'     => array(
+			'mcm_course'      => array(
 				'meta' => array( 'course_code', 'credit_hours', 'semester', 'course_lead' ),
-				'tax'  => array( 'program' => 'mcm_program_link', 'course_category' => 'mcm_course_cat', 'department' => 'mcm_department', 'teacher' => 'mcm_teacher', 'session' => 'mcm_session' ),
+				'tax'  => array(
+					'program'         => 'mcm_program_link',
+					'course_category' => 'mcm_course_cat',
+					'department'      => 'mcm_department',
+					'teacher'         => 'mcm_teacher',
+					'session'         => 'mcm_session',
+				),
 			),
-			'mcm_event'      => array(
+			'mcm_event'       => array(
 				'meta' => array( 'event_date', 'start_time', 'end_time', 'venue', 'organizer', 'event_url', 'event_stream' ),
-				'tax'  => array( 'event_category' => 'mcm_event_cat', 'department' => 'mcm_department' ),
+				'tax'  => array(
+					'event_category' => 'mcm_event_cat',
+					'department'     => 'mcm_department',
+				),
 			),
-			'mcm_consultant' => array(
-				'meta' => array( 'designation', 'qualifications', 'experience', 'opd_days', 'opd_time', 'phone', 'email', 'linkedin', 'joining_date', 'orcid', 'scholar', 'pubmed' ),
-				'tax'  => array( 'department' => 'mcm_department', 'specialty' => 'mcm_specialty', 'faculty' => 'mcm_teacher', 'research_area' => 'mcm_research_area' ),
+			'mcm_consultant'  => array(
+				'meta' => array( 'designation', 'qualifications', 'experience', 'opd_days', 'opd_time', 'phone', 'email', 'linkedin', 'joining_date', 'orcid', 'scholar', 'pubmed', 'gender' ),
+				'tax'  => array(
+					'department'    => 'mcm_department',
+					'specialty'     => 'mcm_specialty',
+					'faculty'       => 'mcm_teacher',
+					'research_area' => 'mcm_research_area',
+				),
 			),
-			'mcm_team'       => array(
-				'meta' => array( 'designation', 'qualifications', 'experience', 'phone', 'email', 'linkedin', 'joining_date', 'orcid', 'scholar', 'pubmed' ),
-				'tax'  => array( 'department' => 'mcm_department', 'specialty' => 'mcm_specialty', 'faculty' => 'mcm_teacher', 'research_area' => 'mcm_research_area' ),
+			'mcm_team'        => array(
+				'meta' => array( 'designation', 'qualifications', 'experience', 'phone', 'email', 'linkedin', 'joining_date', 'orcid', 'scholar', 'pubmed', 'gender' ),
+				'tax'  => array(
+					'department'    => 'mcm_department',
+					'staff_type'    => 'mcm_staff_type',
+					'specialty'     => 'mcm_specialty',
+					'faculty'       => 'mcm_teacher',
+					'research_area' => 'mcm_research_area',
+				),
 			),
-			'mcm_admission'  => array(
+			'mcm_admission'   => array(
 				'meta' => array( 'program_name', 'open_date', 'close_date', 'eligibility', 'fee', 'apply_url' ),
-				'tax'  => array( 'program' => 'mcm_program_link', 'department' => 'mcm_department', 'session' => 'mcm_session' ),
+				'tax'  => array(
+					'program'    => 'mcm_program_link',
+					'department' => 'mcm_department',
+					'session'    => 'mcm_session',
+				),
 			),
-			'mcm_tender'     => array(
-				'meta' => array( 'tender_institute', 'tender_ref', 'tender_open', 'tender_close', 'tender_bid', 'tender_fee', 'tender_earnest', 'tender_eligibility', 'tender_doc', 'tender_apply' ),
-				'tax'  => array( 'tender_category' => 'mcm_tender_cat', 'department' => 'mcm_department' ),
+			'mcm_tender'      => array(
+				'meta' => array( 'tender_institute', 'tender_ref', 'tender_open', 'tender_close', 'tender_bid', 'tender_fee', 'tender_earnest', 'tender_eligibility', 'tender_doc', 'tender_apply', 'on_board' ),
+				// Column => meta key where the key is not simply mcm_<column>.
+				'map'  => array( 'on_board' => 'mcm_tender_on_board' ),
+				'tax'  => array(
+					'tender_category' => 'mcm_tender_cat',
+					'department'      => 'mcm_department',
+				),
 			),
 			'mcm_scholarship' => array(
-				'meta' => array( 'scholarship_amount', 'scholarship_eligibility', 'scholarship_deadline', 'scholarship_apply' ),
-				'tax'  => array( 'scholarship_type' => 'mcm_scholarship_cat', 'department' => 'mcm_department' ),
+				'meta' => array( 'scholarship_amount', 'scholarship_eligibility', 'scholarship_deadline', 'scholarship_apply', 'scholarship_doc' ),
+				'tax'  => array(
+					'scholarship_type' => 'mcm_scholarship_cat',
+					'department'       => 'mcm_department',
+				),
 			),
 			'mcm_publication' => array(
 				'meta' => array( 'pub_authors', 'pub_journal', 'pub_year', 'pub_volume', 'pub_issue', 'pub_pages', 'pub_type', 'pub_doi', 'pub_pmid', 'pub_url', 'pub_pdf', 'pub_supervisor', 'pub_fellows', 'pub_open_access', 'pub_impact', 'pub_indexing' ),
-				'tax'  => array( 'research_area' => 'mcm_research_area', 'department' => 'mcm_department', 'professor' => 'mcm_teacher' ),
+				'tax'  => array(
+					'research_area' => 'mcm_research_area',
+					'department'    => 'mcm_department',
+					'professor'     => 'mcm_teacher',
+				),
 			),
-			'mcm_research'   => array(
+			'mcm_research'    => array(
 				'meta' => array( 'res_pi', 'res_status', 'res_start', 'res_completed', 'res_students', 'res_coinv', 'res_funding', 'res_doc' ),
-				'tax'  => array( 'research_area' => 'mcm_research_area', 'department' => 'mcm_department', 'professor' => 'mcm_teacher' ),
+				'tax'  => array(
+					'research_area' => 'mcm_research_area',
+					'department'    => 'mcm_department',
+					'professor'     => 'mcm_teacher',
+				),
 			),
-			'mcm_policy'     => array(
+			'mcm_job'         => array(
+				'meta' => array( 'publish_date', 'deadline', 'deadline_time', 'extended_deadline', 'apply_url', 'apply_label', 'how_to_apply', 'document', 'voucher', 'posts', 'scale', 'type', 'contact', 'on_board' ),
+				// Every job column is stored as mcm_job_<column>.
+				'map'  => array(
+					'publish_date'      => 'mcm_job_publish_date',
+					'deadline'          => 'mcm_job_deadline',
+					'deadline_time'     => 'mcm_job_deadline_time',
+					'extended_deadline' => 'mcm_job_extended_deadline',
+					'apply_url'         => 'mcm_job_apply_url',
+					'apply_label'       => 'mcm_job_apply_label',
+					'how_to_apply'      => 'mcm_job_how_to_apply',
+					'document'          => 'mcm_job_document',
+					'voucher'           => 'mcm_job_voucher',
+					'posts'             => 'mcm_job_posts',
+					'scale'             => 'mcm_job_scale',
+					'type'              => 'mcm_job_type',
+					'contact'           => 'mcm_job_contact',
+					'on_board'          => 'mcm_job_on_board',
+				),
+				'tax'  => array(
+					'job_category' => 'mcm_job_cat',
+					'department'   => 'mcm_department',
+				),
+			),
+			'mcm_policy'      => array(
 				'meta' => array( 'policy_issuer', 'policy_ref', 'policy_date', 'policy_doc' ),
-				'tax'  => array( 'policy_category' => 'mcm_policy_cat', 'department' => 'mcm_department' ),
+				'tax'  => array(
+					'policy_category' => 'mcm_policy_cat',
+					'department'      => 'mcm_department',
+				),
 			),
-			'mcm_notice'     => array(
+			'mcm_notice'      => array(
 				'meta' => array( 'notice_priority', 'notice_pinned', 'notice_date', 'notice_expiry', 'notice_url', 'notice_attachment' ),
-				'tax'  => array( 'notice_category' => 'mcm_notice_cat', 'department' => 'mcm_department' ),
+				'tax'  => array(
+					'notice_category' => 'mcm_notice_cat',
+					'department'      => 'mcm_department',
+				),
 			),
-			'mcm_student'    => array(
+			'mcm_student'     => array(
 				'meta' => array( 'student_id', 'roll_no', 'email', 'phone', 'program', 'batch', 'gender', 'dob', 'status', 'blood_group', 'address', 'guardian', 'guardian_phone' ),
-				'tax'  => array( 'program' => 'mcm_program_link', 'level' => 'mcm_level', 'department' => 'mcm_department', 'session' => 'mcm_session' ),
+				'tax'  => array(
+					'program'    => 'mcm_program_link',
+					'level'      => 'mcm_level',
+					'department' => 'mcm_department',
+					'session'    => 'mcm_session',
+				),
 			),
 		);
 	}
@@ -202,31 +335,72 @@ class MCM_Import {
 	/** Friendly labels + sample file names. */
 	public static function types() {
 		return array(
-			'mcm_timetable'  => array( 'label' => __( 'Timetable', 'medical-college-manager' ), 'sample' => 'sample-timetable.csv' ),
-			'mcm_program'    => array( 'label' => __( 'Programs', 'medical-college-manager' ), 'sample' => 'sample-programs.csv' ),
-			'mcm_course'     => array( 'label' => __( 'Courses', 'medical-college-manager' ), 'sample' => 'sample-courses.csv' ),
-			'mcm_event'      => array( 'label' => __( 'Events', 'medical-college-manager' ), 'sample' => 'sample-events.csv' ),
-			'mcm_consultant' => array( 'label' => __( 'Consultants', 'medical-college-manager' ), 'sample' => 'sample-consultants.csv' ),
-			'mcm_team'       => array( 'label' => __( 'Team', 'medical-college-manager' ), 'sample' => 'sample-team.csv' ),
-			'mcm_admission'  => array( 'label' => __( 'Admissions', 'medical-college-manager' ), 'sample' => 'sample-admissions.csv' ),
-			'mcm_tender'     => array( 'label' => __( 'Tenders', 'medical-college-manager' ), 'sample' => 'sample-tenders.csv' ),
-			'mcm_scholarship' => array( 'label' => __( 'Scholarships', 'medical-college-manager' ), 'sample' => 'sample-scholarships.csv' ),
-			'mcm_publication' => array( 'label' => __( 'Publications', 'medical-college-manager' ), 'sample' => 'sample-publications.csv' ),
-			'mcm_research'   => array(
-				'meta' => array( 'res_pi', 'res_status', 'res_start', 'res_completed', 'res_students', 'res_coinv', 'res_funding', 'res_doc' ),
-				'tax'  => array( 'research_area' => 'mcm_research_area', 'department' => 'mcm_department', 'professor' => 'mcm_teacher' ),
+			'mcm_timetable'   => array(
+				'label'  => __( 'Timetable', 'medical-college-manager' ),
+				'sample' => 'sample-timetable.csv',
 			),
-			'mcm_policy'     => array(
-				'meta' => array( 'policy_issuer', 'policy_ref', 'policy_date', 'policy_doc' ),
-				'tax'  => array( 'policy_category' => 'mcm_policy_cat', 'department' => 'mcm_department' ),
+			'mcm_program'     => array(
+				'label'  => __( 'Programs', 'medical-college-manager' ),
+				'sample' => 'sample-programs.csv',
 			),
-			'mcm_research'   => array( 'label' => __( 'Research Projects', 'medical-college-manager' ), 'sample' => 'sample-research.csv' ),
-			'mcm_policy'     => array( 'label' => __( 'Policies', 'medical-college-manager' ), 'sample' => 'sample-policies.csv' ),
-			'mcm_notice'     => array( 'label' => __( 'Notices', 'medical-college-manager' ), 'sample' => 'sample-notices.csv' ),
-			'mcm_student'    => array( 'label' => __( 'Students', 'medical-college-manager' ), 'sample' => 'sample-students.csv' ),
+			'mcm_course'      => array(
+				'label'  => __( 'Courses', 'medical-college-manager' ),
+				'sample' => 'sample-courses.csv',
+			),
+			'mcm_event'       => array(
+				'label'  => __( 'Events', 'medical-college-manager' ),
+				'sample' => 'sample-events.csv',
+			),
+			'mcm_consultant'  => array(
+				'label'  => __( 'Consultants', 'medical-college-manager' ),
+				'sample' => 'sample-consultants.csv',
+			),
+			'mcm_team'        => array(
+				'label'  => __( 'Team', 'medical-college-manager' ),
+				'sample' => 'sample-team.csv',
+			),
+			'mcm_admission'   => array(
+				'label'  => __( 'Admissions', 'medical-college-manager' ),
+				'sample' => 'sample-admissions.csv',
+			),
+			'mcm_tender'      => array(
+				'label'  => __( 'Tenders', 'medical-college-manager' ),
+				'sample' => 'sample-tenders.csv',
+			),
+			'mcm_scholarship' => array(
+				'label'  => __( 'Scholarships', 'medical-college-manager' ),
+				'sample' => 'sample-scholarships.csv',
+			),
+			'mcm_publication' => array(
+				'label'  => __( 'Publications', 'medical-college-manager' ),
+				'sample' => 'sample-publications.csv',
+			),
+			'mcm_research'    => array(
+				'label'  => __( 'Research Projects', 'medical-college-manager' ),
+				'sample' => 'sample-research.csv',
+			),
+			'mcm_policy'      => array(
+				'label'  => __( 'Policies', 'medical-college-manager' ),
+				'sample' => 'sample-policies.csv',
+			),
+			'mcm_job'         => array(
+				'label'  => __( 'Jobs', 'medical-college-manager' ),
+				'sample' => 'sample-jobs.csv',
+			),
+			'mcm_notice'      => array(
+				'label'  => __( 'Notices', 'medical-college-manager' ),
+				'sample' => 'sample-notices.csv',
+			),
+			'mcm_student'     => array(
+				'label'  => __( 'Students', 'medical-college-manager' ),
+				'sample' => 'sample-students.csv',
+			),
 		);
 	}
 
+	/**
+	 * Add the admin menu page.
+	 */
 	public function menu() {
 		add_submenu_page(
 			'mcm-settings',
@@ -254,26 +428,32 @@ class MCM_Import {
 			return;
 		}
 
-		$type   = isset( $_POST['mcm_import_type'] ) ? sanitize_key( $_POST['mcm_import_type'] ) : '';
+		$type   = sanitize_key( MCM_Safe::post( 'mcm_import_type' ) );
 		$schema = self::schema();
 		if ( ! isset( $schema[ $type ] ) ) {
 			$this->notice = $this->error_html( __( 'Please choose a valid content type.', 'medical-college-manager' ) );
 			return;
 		}
 
-		$status = isset( $_POST['mcm_import_status'] ) && 'draft' === $_POST['mcm_import_status'] ? 'draft' : 'publish';
+		$status = 'draft' === MCM_Safe::post( 'mcm_import_status' ) ? 'draft' : 'publish';
 
-		if ( empty( $_FILES['mcm_csv']['name'] ) || ! isset( $_FILES['mcm_csv']['tmp_name'] ) ) {
+		// Off by default: matching by title merged unrelated rows that happen
+		// to share a name (e.g. every "Anatomy Lecture" in a timetable).
+		$match_title = '1' === MCM_Safe::post( 'mcm_import_match_title' );
+
+		// A single file only: an array here means a crafted multi-file field.
+		$file = isset( $_FILES['mcm_csv'] ) && is_array( $_FILES['mcm_csv'] ) ? $_FILES['mcm_csv'] : array(); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput -- Each part is validated below.
+		if ( '' === MCM_Safe::scalar( $file, 'name' ) || '' === MCM_Safe::scalar( $file, 'tmp_name' ) ) {
 			$this->notice = $this->error_html( __( 'No file was uploaded.', 'medical-college-manager' ) );
 			return;
 		}
-		if ( ! empty( $_FILES['mcm_csv']['error'] ) ) {
+		if ( 0 !== (int) MCM_Safe::scalar( $file, 'error', '0' ) ) {
 			$this->notice = $this->error_html( __( 'File upload error. Check the file size limit and try again.', 'medical-college-manager' ) );
 			return;
 		}
 
-		$tmp  = $_FILES['mcm_csv']['tmp_name']; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
-		$name = sanitize_file_name( $_FILES['mcm_csv']['name'] );
+		$tmp  = MCM_Safe::scalar( $file, 'tmp_name' );
+		$name = sanitize_file_name( MCM_Safe::scalar( $file, 'name' ) );
 		$ext  = strtolower( pathinfo( $name, PATHINFO_EXTENSION ) );
 
 		if ( 'csv' !== $ext ) {
@@ -290,9 +470,8 @@ class MCM_Import {
 		if ( function_exists( 'finfo_open' ) ) {
 			$finfo    = finfo_open( FILEINFO_MIME_TYPE );
 			$detected = $finfo ? finfo_file( $finfo, $tmp ) : false;
-			if ( $finfo ) {
-				finfo_close( $finfo );
-			}
+			// unset() frees it on every PHP version; finfo_close() is deprecated in PHP 8.5.
+			unset( $finfo );
 			$allowed_mimes = array( 'text/csv', 'text/plain', 'application/csv', 'application/vnd.ms-excel', 'application/octet-stream' );
 			if ( $detected && ! in_array( $detected, $allowed_mimes, true ) ) {
 				$this->notice = $this->error_html( __( 'The uploaded file does not look like a CSV.', 'medical-college-manager' ) );
@@ -300,7 +479,7 @@ class MCM_Import {
 			}
 		}
 
-		$result = $this->import_file( $tmp, $type, $schema[ $type ], $status );
+		$result = $this->import_file( $tmp, $type, $schema[ $type ], $status, $match_title );
 
 		$msg = sprintf(
 			/* translators: 1: created, 2: updated, 3: skipped */
@@ -309,33 +488,112 @@ class MCM_Import {
 			$result['updated'],
 			$result['skipped']
 		);
-		if ( ! empty( $result['errors'] ) ) {
-			$msg .= ' ' . esc_html( implode( ' ', array_slice( $result['errors'], 0, 5 ) ) );
+		if ( ! empty( $result['by_email'] ) ) {
+			$msg .= ' ' . sprintf(
+				/* translators: %d: number of rows. */
+				_n(
+					'%d row matched an existing person by email: that record was updated and keeps its other departments.',
+					'%d rows matched existing people by email: those records were updated and keep their other departments.',
+					(int) $result['by_email'],
+					'medical-college-manager'
+				),
+				(int) $result['by_email']
+			);
 		}
-		$this->notice = '<div class="notice notice-success is-dismissible"><p>' . esc_html( $msg ) . '</p></div>';
+		if ( $result['same_title'] > 0 ) {
+			$msg .= ' ' . sprintf(
+				/* translators: %d: number of rows. */
+				_n(
+					'%d row has the same title as an existing entry – tick "Update existing entries with the same title" to update it instead.',
+					'%d rows have the same title as existing entries – tick "Update existing entries with the same title" to update them instead.',
+					$result['same_title'],
+					'medical-college-manager'
+				),
+				$result['same_title']
+			);
+		}
+
+		$warnings = isset( $result['warnings'] ) ? (array) $result['warnings'] : array();
+		if ( $warnings ) {
+			$msg .= ' ' . sprintf(
+				/* translators: %d: number of warnings. */
+				_n( '%d warning (the row was imported).', '%d warnings (the rows were imported).', count( $warnings ), 'medical-college-manager' ),
+				count( $warnings )
+			);
+		}
+
+		$html         = '<p>' . esc_html( $msg ) . '</p>';
+		$html        .= self::message_list( $result['errors'], __( 'Skipped rows:', 'medical-college-manager' ) );
+		$html        .= self::message_list( $warnings, __( 'Warnings:', 'medical-college-manager' ) );
+		$class        = empty( $result['errors'] ) && empty( $warnings ) ? 'notice-success' : 'notice-warning';
+		$this->notice = '<div class="notice ' . esc_attr( $class ) . ' is-dismissible">' . $html . '</div>';
+	}
+
+	/**
+	 * A titled list of import messages (first 20, then a count), or ''.
+	 *
+	 * @param string[] $items Messages.
+	 * @param string   $title List heading.
+	 * @return string
+	 */
+	private static function message_list( $items, $title ) {
+		if ( empty( $items ) ) {
+			return '';
+		}
+		$html = '<p><strong>' . esc_html( $title ) . '</strong></p><ul style="list-style:disc;padding-left:20px;">';
+		foreach ( array_slice( $items, 0, 20 ) as $item ) {
+			$html .= '<li>' . esc_html( $item ) . '</li>';
+		}
+		$more = count( $items ) - 20;
+		if ( $more > 0 ) {
+			/* translators: %d: number of further items not listed. */
+			$html .= '<li>' . esc_html( sprintf( _n( '…and %d more.', '…and %d more.', $more, 'medical-college-manager' ), $more ) ) . '</li>';
+		}
+		return $html . '</ul>';
 	}
 
 	/**
 	 * Stream the CSV and create posts.
 	 *
-	 * @return array { created, skipped, errors[] }
+	 * @param string $tmp         Uploaded file path.
+	 * @param string $type        Post type.
+	 * @param array  $map         Column schema for the type.
+	 * @param string $status      Status for NEW posts.
+	 * @param bool   $match_title Update an existing entry with the same title.
+	 * @return array { created, updated, skipped, same_title, errors[], warnings[] }
 	 */
-	private function import_file( $tmp, $type, $map, $status ) {
-		$created = 0;
-		$updated = 0;
-		$skipped = 0;
-		$errors  = array();
+	private function import_file( $tmp, $type, $map, $status, $match_title = false ) {
+		$created    = 0;
+		$updated    = 0;
+		$skipped    = 0;
+		$same_title = 0;
+		$errors     = array();
+		$warnings   = array(); // Row imported, but a value was not understood.
+		// Posts created or updated by THIS file: rows of one file never merge
+		// into each other, even when title matching is on.
+		$touched = array();
+
+		$empty = array(
+			'created'    => 0,
+			'updated'    => 0,
+			'skipped'    => 0,
+			'same_title' => 0,
+			'errors'     => array(),
+			'warnings'   => array(),
+		);
 
 		$handle = fopen( $tmp, 'r' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen
 		if ( false === $handle ) {
-			return array( 'created' => 0, 'updated' => 0, 'skipped' => 0, 'errors' => array( __( 'Could not read the file.', 'medical-college-manager' ) ) );
+			$empty['errors'][] = __( 'Could not read the file.', 'medical-college-manager' );
+			return $empty;
 		}
 
 		// Explicit args silence the PHP 8.4 deprecation and keep parsing stable.
 		$header = fgetcsv( $handle, 0, ',', '"', '\\' );
-		if ( false === $header ) {
+		if ( false === $header || null === $header ) {
 			fclose( $handle ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
-			return array( 'created' => 0, 'updated' => 0, 'skipped' => 0, 'errors' => array( __( 'The file is empty.', 'medical-college-manager' ) ) );
+			$empty['errors'][] = __( 'The file is empty.', 'medical-college-manager' );
+			return $empty;
 		}
 
 		// Normalize headers: lowercase, trim, strip BOM.
@@ -350,31 +608,93 @@ class MCM_Import {
 		$meta_keys = isset( $map['meta'] ) ? $map['meta'] : array();
 		$tax_keys  = isset( $map['tax'] ) ? $map['tax'] : array();
 
+		// Consultants and team members: one record per person, found by email.
+		$people = class_exists( 'MCM_People' ) && MCM_People::is_person_type( $type );
+		// Columns a person collects across department files instead of replacing.
+		$additive = array( 'department', 'specialty', 'faculty', 'research_area' );
+		$by_email = 0;
+
 		$line = 1;
-		while ( false !== ( $row = fgetcsv( $handle, 0, ',', '"', '\\' ) ) ) {
-			$line++;
+		while ( true ) {
+			$row = fgetcsv( $handle, 0, ',', '"', '\\' );
+			if ( false === $row ) {
+				break;
+			}
+			++$line;
 			if ( null === $row || ( 1 === count( $row ) && ( null === $row[0] || '' === trim( (string) $row[0] ) ) ) ) {
 				continue; // blank line.
 			}
 
 			$data = array();
 			foreach ( $header as $i => $col ) {
-				$data[ $col ] = isset( $row[ $i ] ) ? trim( (string) $row[ $i ] ) : '';
+				$data[ $col ] = isset( $row[ $i ] ) ? self::csv_unsafe( trim( (string) $row[ $i ] ) ) : '';
 			}
 
 			$title = isset( $data['title'] ) ? $data['title'] : '';
 			if ( '' === $title ) {
-				$skipped++;
+				++$skipped;
 				/* translators: %d: CSV row number. */
 				$errors[] = sprintf( __( 'Row %d skipped (no title).', 'medical-college-manager' ), $line );
 				continue;
 			}
 
-			// Upsert: update the matching record instead of duplicating it. Match
-			// on the 'id' column an export carries, else an exact title within
-			// this type — so both an edited export and a hand-authored file are
-			// safe to re-import.
-			$existing = self::find_existing( $type, $data, $title );
+			// Dates and times must be understood before anything is written: a
+			// deadline the database cannot read would silently hide or misorder
+			// the entry. The whole row is skipped and reported instead.
+			$bad = '';
+			foreach ( $meta_keys as $mk ) {
+				$ftype = MCM_Meta::field_type( $type, self::meta_key_for( $type, $mk ) );
+				if ( 'gender' === $ftype ) {
+					continue; // Reported as a warning below; never a reason to skip the row.
+				}
+				if ( isset( $data[ $mk ] ) && '' !== $data[ $mk ] && ! MCM_Meta::is_valid( $ftype, $data[ $mk ] ) ) {
+					$bad = 'date' === $ftype
+						/* translators: 1: CSV row number, 2: column name, 3: the value. */
+						? sprintf( __( 'Row %1$d skipped: "%2$s" value "%3$s" is not a valid date (use 15/10/2026 or 2026-10-15).', 'medical-college-manager' ), $line, $mk, $data[ $mk ] )
+						/* translators: 1: CSV row number, 2: column name, 3: the value. */
+						: sprintf( __( 'Row %1$d skipped: "%2$s" value "%3$s" is not a valid time (use 14:30 or 2:30 PM).', 'medical-college-manager' ), $line, $mk, $data[ $mk ] );
+					break;
+				}
+			}
+			if ( '' !== $bad ) {
+				++$skipped;
+				$errors[] = $bad;
+				continue;
+			}
+
+			if ( $people ) {
+				$raw_email = isset( $data['email'] ) ? $data['email'] : '';
+				$email     = MCM_People::normalize_email( $raw_email );
+				if ( '' === $email ) {
+					++$skipped;
+					$errors[] = '' === $raw_email
+						/* translators: %d: CSV row number. */
+						? sprintf( __( 'Row %d skipped: email is required for consultants and team members (each person is matched by email).', 'medical-college-manager' ), $line )
+						/* translators: 1: CSV row number, 2: the value. */
+						: sprintf( __( 'Row %1$d skipped: "%2$s" is not a valid email address.', 'medical-college-manager' ), $line, $raw_email );
+					continue;
+				}
+				$data['email'] = $email;
+				$person        = self::find_person( $type, $data, $title, $match_title, $touched );
+				if ( is_string( $person ) ) {
+					++$skipped;
+					/* translators: 1: CSV row number, 2: the reason. */
+					$errors[] = sprintf( __( 'Row %1$d skipped: %2$s', 'medical-college-manager' ), $line, $person );
+					continue;
+				}
+				list( $existing, $how ) = $person;
+				if ( 'email' === $how ) {
+					++$by_email;
+				}
+			} else {
+				// Upsert by the 'id' column an export carries. Title matching only
+				// when the admin ticked it, and never onto a post this same file
+				// already wrote.
+				$existing = self::find_existing( $type, $data, $title, $match_title, $touched );
+				if ( ! $existing && ! $match_title && self::title_exists( $type, $title, $touched ) ) {
+					++$same_title;
+				}
+			}
 
 			$postarr = array(
 				'post_type'  => $type,
@@ -396,11 +716,11 @@ class MCM_Import {
 				$post_id = wp_update_post( $postarr, true );
 			} else {
 				$postarr['post_status'] = $status;
-				$post_id = wp_insert_post( $postarr, true );
+				$post_id                = wp_insert_post( $postarr, true );
 			}
 
 			if ( is_wp_error( $post_id ) ) {
-				$skipped++;
+				++$skipped;
 				/* translators: %d: CSV row number. */
 				$errors[] = sprintf( __( 'Row %d failed.', 'medical-college-manager' ), $line );
 				continue;
@@ -411,7 +731,19 @@ class MCM_Import {
 				if ( ! array_key_exists( $mk, $data ) || '' === $data[ $mk ] ) {
 					continue;
 				}
-				update_post_meta( $post_id, 'mcm_' . $mk, self::sanitize_meta_value( $mk, $data[ $mk ] ) );
+				$meta_key = self::meta_key_for( $type, $mk );
+				$ftype    = MCM_Meta::field_type( $type, $meta_key );
+				if ( 'gender' === $ftype && '' === MCM_Meta::normalize_gender( $data[ $mk ] ) ) {
+					// Like an empty cell: nothing is written, so an update keeps the
+					// value already stored instead of losing it to a typo.
+					$warnings[] = '' !== MCM_Safe::meta( $post_id, $meta_key )
+						/* translators: 1: CSV row number, 2: column name, 3: the value. */
+						? sprintf( __( 'Row %1$d: %2$s \'%3$s\' not recognised – existing value kept.', 'medical-college-manager' ), $line, $mk, $data[ $mk ] )
+						/* translators: 1: CSV row number, 2: column name, 3: the value. */
+						: sprintf( __( 'Row %1$d: %2$s \'%3$s\' not recognised – left blank.', 'medical-college-manager' ), $line, $mk, $data[ $mk ] );
+					continue;
+				}
+				update_post_meta( $post_id, $meta_key, '' !== $ftype ? MCM_Meta::sanitize_value( $ftype, $data[ $mk ] ) : self::sanitize_meta_value( $mk, $data[ $mk ] ) );
 			}
 
 			// Taxonomies (term names, comma separated). Reuse an existing term
@@ -426,7 +758,10 @@ class MCM_Import {
 				if ( $names ) {
 					$ids = self::resolve_term_ids( $names, $tax );
 					if ( $ids ) {
-						wp_set_object_terms( $post_id, $ids, $tax, false );
+						// A person found again (e.g. in Department 2's file) keeps
+						// the departments they already have and gains this one.
+						$append = $people && $existing && in_array( $col, $additive, true );
+						wp_set_object_terms( $post_id, $ids, $tax, $append );
 					}
 				}
 			}
@@ -450,51 +785,173 @@ class MCM_Import {
 				}
 			}
 
+			// Phone is optional and may be shared (an office line): report, never refuse.
+			if ( $people && ! empty( $data['phone'] ) ) {
+				$other = MCM_People::find_by_phone( $type, $data['phone'], $post_id );
+				if ( $other ) {
+					$warnings[] = sprintf(
+						/* translators: 1: CSV row number, 2: phone number, 3: name of the other record. */
+						__( 'Row %1$d: phone %2$s is also on "%3$s" – imported anyway; check it is not a mistake.', 'medical-college-manager' ),
+						$line,
+						$data['phone'],
+						get_the_title( $other )
+					);
+				}
+				MCM_People::remember_phone( $type, $post_id, $data['phone'] );
+			}
+
+			$touched[] = (int) $post_id;
 			if ( $existing ) {
-				$updated++;
+				++$updated;
 			} else {
-				$created++;
+				++$created;
 			}
 		}
 
 		fclose( $handle ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
-		return array( 'created' => $created, 'updated' => $updated, 'skipped' => $skipped, 'errors' => $errors );
+		return array(
+			'created'    => $created,
+			'updated'    => $updated,
+			'skipped'    => $skipped,
+			'same_title' => $same_title,
+			'by_email'   => $by_email,
+			'errors'     => $errors,
+			'warnings'   => $warnings,
+		);
 	}
 
 	/**
-	 * Find an existing post to update for a CSV row: the 'id' column an export
-	 * carries first, then an exact title match within the same type. Returns 0
-	 * when the row is genuinely new.
+	 * Find the person a Consultant / Team row belongs to.
 	 *
-	 * @param string $type  Post type.
-	 * @param array  $data  Row keyed by column.
-	 * @param string $title Row title.
-	 * @return int Existing post ID, or 0.
+	 * 1. The 'id' column an export carries (same type); its email must not
+	 *    belong to a different record.
+	 * 2. The email: the same person in another department's file, or twice
+	 *    in one file, updates one record.
+	 * 3. Only when $match_title is on: a record with the same title that has
+	 *    no email yet (older data). A same-name record with a different email
+	 *    is a different person.
+	 *
+	 * @param string $type        Post type.
+	 * @param array  $data        Row keyed by column; 'email' already normalised.
+	 * @param string $title       Row title.
+	 * @param bool   $match_title Whether title matching is enabled.
+	 * @param int[]  $touched     Post IDs already written by this file.
+	 * @return array|string array( post ID or 0, 'id'|'email'|'title'|'' ), or why the row is refused.
 	 */
-	private static function find_existing( $type, $data, $title ) {
-		if ( ! empty( $data['id'] ) && ctype_digit( (string) $data['id'] ) ) {
-			$p = get_post( (int) $data['id'] );
-			if ( $p && $p->post_type === $type ) {
-				return (int) $p->ID;
+	private static function find_person( $type, $data, $title, $match_title, $touched ) {
+		$email    = $data['email'];
+		$by_email = MCM_People::find_by_email( $type, $email );
+		$id       = isset( $data['id'] ) ? MCM_Safe::str( $data['id'] ) : '';
+		if ( '' !== $id && ctype_digit( $id ) ) {
+			$p = get_post( (int) $id );
+			if ( $p && $p->post_type === $type && 'trash' !== $p->post_status ) {
+				if ( $by_email && (int) $p->ID !== $by_email ) {
+					return sprintf(
+						/* translators: 1: email, 2: name of the record that has it, 3: id from the file. */
+						__( 'email %1$s already belongs to "%2$s", not to id %3$s. Fix the email or the id.', 'medical-college-manager' ),
+						$email,
+						get_the_title( $by_email ),
+						$id
+					);
+				}
+				return array( (int) $p->ID, 'id' );
 			}
 		}
-		if ( '' !== $title ) {
-			$found = get_posts(
+		if ( $by_email ) {
+			return array( $by_email, 'email' );
+		}
+		if ( $match_title ) {
+			$title = sanitize_text_field( $title );
+			$found = '' === $title ? array() : get_posts(
 				array(
 					'post_type'        => $type,
 					'title'            => $title,
 					'post_status'      => 'any',
-					'numberposts'      => 1,
+					'numberposts'      => 20,
 					'fields'           => 'ids',
 					'no_found_rows'    => true,
+					'post__not_in'     => array_map( 'intval', (array) $touched ), // phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_post__not_in -- Bounded by the size of one import file.
 					'suppress_filters' => false,
 				)
 			);
-			if ( ! empty( $found ) ) {
+			foreach ( $found as $fid ) {
+				if ( '' === trim( (string) get_post_meta( $fid, MCM_People::EMAIL, true ) ) ) {
+					return array( (int) $fid, 'title' );
+				}
+			}
+		}
+		return array( 0, '' );
+	}
+
+	/**
+	 * Find an existing post to update for a CSV row.
+	 *
+	 * 1. The 'id' column an export carries (same type only).
+	 * 2. Only when $match_title is on: an exact title match within the type,
+	 *    excluding posts this same file already created or updated.
+	 *
+	 * @param string $type        Post type.
+	 * @param array  $data        Row keyed by column.
+	 * @param string $title       Row title.
+	 * @param bool   $match_title Whether title matching is enabled.
+	 * @param int[]  $touched     Post IDs already written by this file.
+	 * @return int Existing post ID, or 0 when the row is new.
+	 */
+	private static function find_existing( $type, $data, $title, $match_title = false, $touched = array() ) {
+		$id = isset( $data['id'] ) ? MCM_Safe::str( $data['id'] ) : '';
+		if ( '' !== $id && ctype_digit( $id ) ) {
+			$p = get_post( (int) $id );
+			if ( $p && $p->post_type === $type ) {
+				return (int) $p->ID;
+			}
+		}
+		if ( $match_title ) {
+			$found = self::posts_with_title( $type, $title, $touched );
+			if ( $found ) {
 				return (int) $found[0];
 			}
 		}
 		return 0;
+	}
+
+	/**
+	 * Does an entry of this type with this exact title exist that this file
+	 * has not written itself? Used to tell the admin about likely duplicates.
+	 *
+	 * @param string $type    Post type.
+	 * @param string $title   Title.
+	 * @param int[]  $touched Post IDs already written by this file.
+	 * @return bool
+	 */
+	private static function title_exists( $type, $title, $touched ) {
+		return (bool) self::posts_with_title( $type, $title, $touched );
+	}
+
+	/**
+	 * Post IDs of one type with an exact title, excluding $exclude.
+	 *
+	 * @param string $type    Post type.
+	 * @param string $title   Title as it appears in the CSV.
+	 * @param int[]  $exclude Post IDs to ignore.
+	 * @return int[]
+	 */
+	private static function posts_with_title( $type, $title, $exclude ) {
+		$title = sanitize_text_field( $title ); // As stored by the importer.
+		if ( '' === $title ) {
+			return array();
+		}
+		return get_posts(
+			array(
+				'post_type'        => $type,
+				'title'            => $title,
+				'post_status'      => 'any',
+				'numberposts'      => 1,
+				'fields'           => 'ids',
+				'no_found_rows'    => true,
+				'post__not_in'     => array_map( 'intval', (array) $exclude ), // phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_post__not_in -- Bounded by the size of one import file.
+				'suppress_filters' => false,
+			)
+		);
 	}
 
 	/**
@@ -503,6 +960,8 @@ class MCM_Import {
 	 * and creating it only when none exists. This keeps the same entity as ONE
 	 * term across separate CSV imports so relationships connect reliably.
 	 *
+	 * @param string[] $names Term names.
+	 * @param string   $tax Taxonomy name.
 	 * @return int[]
 	 */
 	private static function resolve_term_ids( $names, $tax ) {
@@ -531,6 +990,9 @@ class MCM_Import {
 	/**
 	 * Sanitize a meta value according to the field's nature (URL / email /
 	 * multi-line) so CSV imports match the admin meta-box behaviour.
+	 *
+	 * @param string $key Key.
+	 * @param mixed  $val Value.
 	 */
 	private static function sanitize_meta_value( $key, $val ) {
 		// Derive the type from the meta-box definitions rather than a hand-kept
@@ -559,8 +1021,8 @@ class MCM_Import {
 					continue;
 				}
 				foreach ( $cfg['fields'] as $meta_key => $field ) {
-					$type   = isset( $field['type'] ) ? $field['type'] : 'text';
-					$short  = ( 0 === strpos( $meta_key, 'mcm_' ) ) ? substr( $meta_key, 4 ) : $meta_key;
+					$type               = isset( $field['type'] ) ? $field['type'] : 'text';
+					$short              = ( 0 === strpos( $meta_key, 'mcm_' ) ) ? substr( $meta_key, 4 ) : $meta_key;
 					$types[ $meta_key ] = $type;
 					// Never let one CPT's short name overwrite another's.
 					if ( ! isset( $types[ $short ] ) ) {
@@ -573,10 +1035,18 @@ class MCM_Import {
 		return isset( $types[ $key ] ) ? $types[ $key ] : 'text';
 	}
 
+	/**
+	 * An error notice.
+	 *
+	 * @param string $msg Message.
+	 */
 	private function error_html( $msg ) {
 		return '<div class="notice notice-error is-dismissible"><p>' . esc_html( $msg ) . '</p></div>';
 	}
 
+	/**
+	 * Render the admin page.
+	 */
 	public function render_page() {
 		$this->process();
 		$types = self::types();
@@ -620,6 +1090,17 @@ class MCM_Import {
 							</select>
 						</td>
 					</tr>
+					<tr>
+						<th scope="row"><?php esc_html_e( 'Matching', 'medical-college-manager' ); ?></th>
+						<td>
+							<label>
+								<input type="checkbox" name="mcm_import_match_title" value="1" />
+								<?php esc_html_e( 'Update existing entries with the same title', 'medical-college-manager' ); ?>
+							</label>
+							<p class="description"><?php esc_html_e( 'Rows with an "id" column (from an export) always update that exact entry. Leave this off when several entries legitimately share a title, such as timetable slots. Rows inside the same file are never merged.', 'medical-college-manager' ); ?></p>
+							<p class="description"><?php esc_html_e( 'Consultants and Team: the email column is required and identifies the person. A row whose email already exists updates that person and adds the file\'s department, specialty, faculty and research area to the ones they have (nothing is removed), so one person can belong to several departments. Phone is optional; a phone already on another person is reported as a warning.', 'medical-college-manager' ); ?></p>
+						</td>
+					</tr>
 				</table>
 				<?php submit_button( __( 'Import CSV', 'medical-college-manager' ), 'primary', 'mcm_import_submit' ); ?>
 			</form>
@@ -661,6 +1142,11 @@ class MCM_Import {
 		<?php
 	}
 
+	/**
+	 * Comma-separated list of the columns a type's CSV may use.
+	 *
+	 * @param string $type Post type.
+	 */
 	private function columns_hint( $type ) {
 		$schema = self::schema();
 		$cols   = array( 'title', 'content' );

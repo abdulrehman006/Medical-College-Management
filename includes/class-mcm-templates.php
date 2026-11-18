@@ -11,14 +11,35 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * Archive, department and single-page template integration.
+ */
 class MCM_Templates {
 
-	/** Archive render context for the current request (set by archive_template). */
+	/**
+	 * Archive render context for the current request (set by archive_template).
+	 *
+	 * @var array|null
+	 */
 	private static $context = null;
 
-	/** Post IDs whose featured image the theme has already rendered. */
+	/**
+	 * Post IDs whose featured image the theme has already rendered.
+	 *
+	 * @var array<int,bool>
+	 */
 	private static $thumb_shown = array();
 
+	/**
+	 * Post IDs whose single-page details were already appended this request.
+	 *
+	 * @var array<int,bool>
+	 */
+	private static $details_done = array();
+
+	/**
+	 * Register the hooks this module needs.
+	 */
 	public function __construct() {
 		// Show the custom fields on the native single CPT page.
 		add_filter( 'the_content', array( $this, 'single_meta' ), 20 );
@@ -34,11 +55,20 @@ class MCM_Templates {
 		add_filter( 'template_include', array( $this, 'archive_template' ) );
 	}
 
-	/** Per-page count for a CPT archive (filterable). */
+	/**
+	 * Per-page count for a CPT archive (filterable).
+	 *
+	 * @param string $cpt Post type.
+	 */
 	public static function archive_per_page( $cpt ) {
 		return max( 1, (int) apply_filters( 'mcm_archive_per_page', 12, $cpt ) );
 	}
 
+	/**
+	 * Match the archive main query's page size to the plugin's listing, so /page/N/ resolves.
+	 *
+	 * @param WP_Query $query The query.
+	 */
 	public function set_archive_per_page( $query ) {
 		if ( is_admin() || ! $query->is_main_query() || ! $query->is_post_type_archive() ) {
 			return;
@@ -61,8 +91,26 @@ class MCM_Templates {
 	 * Swap in the plugin's filterable archive template for our CPT archives and
 	 * our taxonomy term archives — unless the feature is off or the active theme
 	 * provides its own specific template (which always wins).
+	 *
+	 * @param string $template Template path.
 	 */
 	public function archive_template( $template ) {
+		// Boundary: if building the archive context fails, the theme's own
+		// template is used instead — the page still renders.
+		// run(), not render(): the value is a file path, so no notice markup
+		// may ever be appended to it.
+		$chosen = MCM_Safe::run( array( $this, 'choose_archive_template' ), 'archive template', array( $template ), $template );
+		return is_string( $chosen ) && '' !== $chosen ? $chosen : $template;
+	}
+
+	/**
+	 * Unguarded template choice; see archive_template().
+	 *
+	 * @internal
+	 * @param string $template Template path chosen by WordPress.
+	 * @return string
+	 */
+	public function choose_archive_template( $template ) {
 		if ( is_admin() || is_feed() ) {
 			return $template;
 		}
@@ -80,11 +128,50 @@ class MCM_Templates {
 			return $template;
 		}
 
+		// Elementor Pro Theme Builder: when an Archive template's conditions
+		// match this page, the site owner designed it there — step aside.
+		if ( apply_filters( 'mcm_yield_to_theme_builder', true ) && self::theme_builder_has( 'archive' ) ) {
+			return $template;
+		}
+
 		self::$context = $ctx;
 
 		// Allow a child/parent theme to override the plugin template via /mcm/.
 		$override = locate_template( array( 'mcm/archive-mcm.php' ) );
 		return $override ? $override : MCM_PATH . 'templates/archive-mcm.php';
+	}
+
+	/**
+	 * Does Elementor Pro's Theme Builder have a template whose conditions match
+	 * the current request for this location ('archive' or 'single')?
+	 *
+	 * Written defensively against Pro's internal API: every class and method is
+	 * checked before use, and any failure counts as "no" (the plugin's own
+	 * template is then used, as before). Not exercised without Elementor Pro.
+	 *
+	 * @param string $location Theme Builder location.
+	 * @return bool
+	 */
+	public static function theme_builder_has( $location ) {
+		$module_class = '\ElementorPro\Modules\ThemeBuilder\Module';
+		if ( ! class_exists( $module_class ) || ! method_exists( $module_class, 'instance' ) ) {
+			return false;
+		}
+		try {
+			$module = call_user_func( array( $module_class, 'instance' ) );
+			if ( ! is_object( $module ) || ! method_exists( $module, 'get_conditions_manager' ) ) {
+				return false;
+			}
+			$conditions = $module->get_conditions_manager();
+			if ( ! is_object( $conditions ) || ! method_exists( $conditions, 'get_documents_for_location' ) ) {
+				return false;
+			}
+			$documents = $conditions->get_documents_for_location( $location );
+			return ! empty( $documents );
+		} catch ( \Throwable $e ) {
+			MCM_Health::report( 'Elementor Pro Theme Builder check', $e );
+			return false;
+		}
 	}
 
 	/**
@@ -136,9 +223,9 @@ class MCM_Templates {
 			if ( ! $term instanceof WP_Term ) {
 				return null;
 			}
-			$tax    = $term->taxonomy;
-			$blocks = self::term_blocks( $term );
-			$tobj   = get_taxonomy( $tax );
+			$tax     = $term->taxonomy;
+			$blocks  = self::term_blocks( $term );
+			$tobj    = get_taxonomy( $tax );
 			$heading = ( $tobj ? $tobj->labels->singular_name . ': ' : '' ) . $term->name;
 
 			if ( empty( $blocks ) ) {
@@ -215,29 +302,43 @@ class MCM_Templates {
 			if ( isset( $hidden[ $cpt ] ) ) {
 				continue; // admin hid this section on the department page.
 			}
-			$probe = new WP_Query(
-				array(
-					'post_type'              => $cpt,
-					'post_status'            => 'publish',
-					'posts_per_page'         => 1,
-					'fields'                 => 'ids',
-					'no_found_rows'          => false,
-					'ignore_sticky_posts'    => true,
-					'update_post_meta_cache' => false,
-					'update_post_term_cache' => false,
-					// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
-					'tax_query'              => array(
-						array( 'taxonomy' => $tax, 'field' => 'term_id', 'terms' => $term->term_id ),
+			$probe_args = array(
+				'post_type'              => $cpt,
+				'post_status'            => 'publish',
+				'posts_per_page'         => 1,
+				'fields'                 => 'ids',
+				'no_found_rows'          => false,
+				'has_password'           => false, // Listings leave these out too.
+				'ignore_sticky_posts'    => true,
+				'update_post_meta_cache' => false,
+				'update_post_term_cache' => false,
+				// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
+				'tax_query'              => array(
+					array(
+						'taxonomy' => $tax,
+						'field'    => 'term_id',
+						'terms'    => $term->term_id,
 					),
+				),
+			);
+			// Run the probe through the same filters as the section itself, so
+			// expired tenders/notices (hidden by mcm_query_args) cannot create a
+			// section that then renders "No results found".
+			$probe_atts = MCM_Query::parse_atts(
+				array(
+					'type'      => $cpt,
+					'lock_tax'  => $tax,
+					'lock_term' => $term->slug,
 				)
 			);
-			$found = (int) $probe->found_posts;
+			$probe      = new WP_Query( apply_filters( 'mcm_query_args', $probe_args, $probe_atts ) );
+			$found      = (int) $probe->found_posts;
 			if ( $found < 1 ) {
 				continue; // empty — no section.
 			}
 			$pt       = get_post_type_object( $cpt );
 			$blocks[] = array(
-				'label' => $pt ? $pt->labels->name : $cpt,
+				'label' => 'mcm_job' === $cpt ? __( 'Vacancies', 'medical-college-manager' ) : ( $pt ? $pt->labels->name : $cpt ),
 				'atts'  => array(
 					'type'      => $cpt,
 					'filters'   => ( $found > $threshold ) ? 'yes' : 'no',
@@ -272,20 +373,27 @@ class MCM_Templates {
 			if ( '' !== $block['label'] ) {
 				$out .= '<h2 class="mcm-archive-section">' . esc_html( $block['label'] ) . '</h2>';
 			}
-			$out .= MCM_Shortcodes::render_block( $block['atts'] );
+			$out .= MCM_Shortcodes::render_block( $block['atts'], '' === $block['label'] );
 			$out .= '</section>';
 		}
 		$out .= '</div>';
 		return $out;
 	}
 
-	/** Timetable reads best as a table; everything else defaults to a grid. */
+	/**
+	 * Timetable reads best as a table; everything else defaults to a grid.
+	 *
+	 * @param string $cpt Post type.
+	 */
 	private static function default_view( $cpt ) {
 		if ( 'mcm_timetable' === $cpt ) {
 			return 'table';
 		}
 		if ( 'mcm_publication' === $cpt ) {
 			return 'citation'; // professor/department pages list proper citations.
+		}
+		if ( 'mcm_policy' === $cpt ) {
+			return 'list'; // Documents read as a list — same default as the Policies widget.
 		}
 		return 'grid';
 	}
@@ -294,6 +402,8 @@ class MCM_Templates {
 	 * View for a single-CPT archive page. All archives use the Directory layout
 	 * (left filter sidebar); the main area adapts per type (timetable = table,
 	 * consultants/team = profile cards, others = info cards). Filterable.
+	 *
+	 * @param string $cpt Post type.
 	 */
 	private static function cpt_archive_view( $cpt ) {
 		return (string) apply_filters( 'mcm_archive_view', 'directory', $cpt );
@@ -302,13 +412,50 @@ class MCM_Templates {
 	/**
 	 * Append the meta block (and contact details, where relevant) to the
 	 * content of a single MCM post on its own URL.
+	 *
+	 * @param string $content Post content.
 	 */
 	public function single_meta( $content ) {
-		if ( is_admin() || is_feed() || ! is_singular() || ! is_main_query() || ! in_the_loop() ) {
+		// Boundary: on failure the post content is returned untouched.
+		return MCM_Safe::render( array( $this, 'build_single_meta' ), 'single page details', array( $content ), $content );
+	}
+
+	/**
+	 * Unguarded single-page additions; see single_meta().
+	 *
+	 * @internal
+	 * @param string $content Post content.
+	 * @return string
+	 */
+	public function build_single_meta( $content ) {
+		if ( is_admin() || is_feed() || ! is_singular() || ! is_main_query() ) {
 			return $content;
 		}
 
-		$id = get_the_ID();
+		$id = (int) get_the_ID();
+
+		/*
+		 * Only the post this page is about, rendered as body content, once:
+		 *  - in the loop (classic themes), OR the queried post itself when a
+		 *    builder renders it outside the loop (Elementor Pro Theme Builder's
+		 *    Post Content widget);
+		 *  - never while <head> is being built or an excerpt is generated (SEO
+		 *    plugins run the_content there) — that would use up the "once";
+		 *  - exactly once per request, so a builder that renders the content
+		 *    twice can never print the details twice.
+		 */
+		if ( ! $id || ( ! in_the_loop() && get_queried_object_id() !== $id ) ) {
+			return $content;
+		}
+		// (Not "after wp_head": block themes render the template, post content
+		// included, BEFORE wp_head runs.)
+		if ( doing_action( 'wp_head' ) || doing_filter( 'get_the_excerpt' ) || doing_filter( 'wp_trim_excerpt' ) ) {
+			return $content;
+		}
+		if ( isset( self::$details_done[ $id ] ) ) {
+			return $content;
+		}
+
 		if ( post_password_required( $id ) ) {
 			return $content;
 		}
@@ -317,6 +464,7 @@ class MCM_Templates {
 			return $content;
 		}
 
+		self::$details_done[ $id ] = true;
 		MCM_Assets::need();
 
 		$details = MCM_Query::single_details( $id, $type );
@@ -325,18 +473,41 @@ class MCM_Templates {
 		// show one for a CPT — many only do it for posts — so the plugin makes
 		// sure a set image is never simply invisible. See should_show_image()
 		// for how a theme that already rendered it avoids a duplicate.
-		$media = '';
-		if ( has_post_thumbnail( $id ) && self::should_show_image( $id ) ) {
+		$media  = '';
+		$person = in_array( $type, array( 'mcm_consultant', 'mcm_team' ), true );
+		// Jobs show their advertisement (the featured image) inside the details
+		// panel, linked to full size, so it is not repeated here. People get a
+		// profile photo beside their details instead of a banner, and timetable
+		// entries are schedule rows with no banner at all (display standard §3).
+		if ( ! $person && ! in_array( $type, array( 'mcm_job', 'mcm_timetable' ), true ) && has_post_thumbnail( $id ) && self::should_show_image( $id ) ) {
 			$media = '<div class="mcm-wrap mcm-single-media">'
 				. get_the_post_thumbnail( $id, 'large', array( 'class' => 'mcm-single-img' ) )
 				. '</div>';
 		}
 
-		// For people with no featured image, show the default avatar at the top
-		// of the details card so the single page never looks photo-less.
+		// People: one profile layout, photo beside the details — the person's own
+		// photo, or the default photo (male / female / general / silhouette). The
+		// same frame either way, so a profile never changes shape because a photo
+		// is missing. When the theme already printed the photo, it is not repeated.
 		$avatar = '';
-		if ( MCM_Query::is_person( $type ) && ! has_post_thumbnail( $id ) ) {
-			$avatar = '<div class="mcm-single-avatar">' . MCM_Query::default_avatar( 'mcm-single-img', 'mcm-single-ph' ) . '</div>';
+		if ( $person ) {
+			if ( has_post_thumbnail( $id ) ) {
+				if ( self::should_show_image( $id ) ) {
+					$avatar = get_the_post_thumbnail(
+						$id,
+						'medium_large',
+						array(
+							'class' => 'mcm-single-img',
+							'alt'   => esc_attr( get_the_title( $id ) ),
+						)
+					);
+				}
+			} else {
+				$avatar = MCM_Query::default_avatar( 'mcm-single-img', 'mcm-single-ph', $id, 'medium_large' );
+			}
+			if ( '' !== $avatar ) {
+				$avatar = '<div class="mcm-single-avatar">' . $avatar . '</div>';
+			}
 		}
 
 		// A Program page lists its own curriculum, schedule and intake (matched
@@ -350,7 +521,7 @@ class MCM_Templates {
 		$stream_embed = '';
 		if ( 'mcm_event' === $type ) {
 			$stream_embed = MCM_Query::video_embed(
-				get_post_meta( $id, 'mcm_event_stream', true ),
+				MCM_Safe::meta( $id, 'mcm_event_stream' ),
 				'mcm-hero mcm-hero--video mcm-wrap'
 			);
 		}
@@ -359,7 +530,8 @@ class MCM_Templates {
 			return $stream_embed . $media . $content . $related;
 		}
 
-		return $stream_embed . $media . $content . '<div class="mcm-wrap mcm-single-meta">' . $avatar . $details . '</div>' . $related;
+		$meta_class = '' !== $avatar ? 'mcm-wrap mcm-single-meta mcm-single-meta--profile' : 'mcm-wrap mcm-single-meta';
+		return $stream_embed . $media . $content . '<div class="' . esc_attr( $meta_class ) . '">' . $avatar . '<div class="mcm-single-meta-main">' . $details . '</div></div>' . $related;
 	}
 
 	/**
@@ -383,12 +555,12 @@ class MCM_Templates {
 	/**
 	 * Should the plugin output the featured image on this single page?
 	 *
-	 * auto (default) — only when the theme has not already rendered it, so
+	 * Auto (default) — only when the theme has not already rendered it, so
 	 *                  themes that handle CPT images keep working untouched and
 	 *                  themes that ignore them get the image anyway.
-	 * always         — output regardless (for a theme that renders it *after*
+	 * Always         — output regardless (for a theme that renders it *after*
 	 *                  the content, or one that shows it too small).
-	 * never          — leave it entirely to the theme.
+	 * Never          — leave it entirely to the theme.
 	 *
 	 * @param int $id Post ID.
 	 * @return bool
@@ -409,6 +581,8 @@ class MCM_Templates {
 	/**
 	 * Default ordering for front-end CPT archives where date-DESC is wrong.
 	 * Events list soonest-first by their event date; timetable by start time.
+	 *
+	 * @param WP_Query $query The query.
 	 */
 	public function archive_order( $query ) {
 		if ( is_admin() || ! $query->is_main_query() || ! $query->is_post_type_archive() ) {
@@ -437,6 +611,11 @@ class MCM_Templates {
 	 * Order an archive by a meta value WITHOUT dropping posts that lack it, and
 	 * without the arbitrary-row problem the EXISTS/NOT EXISTS meta_query trick
 	 * has. See MCM_Query::order_by_optional_meta() for the full explanation.
+	 *
+	 * @param WP_Query $query The query.
+	 * @param string   $meta_key Meta key.
+	 * @param string   $meta_type Meta type.
+	 * @param string   $dir ASC or DESC.
 	 */
 	private function order_by_optional_meta( $query, $meta_key, $meta_type, $dir = 'ASC' ) {
 		$cast = ( 'NUMERIC' === $meta_type ) ? 'SIGNED' : $meta_type;

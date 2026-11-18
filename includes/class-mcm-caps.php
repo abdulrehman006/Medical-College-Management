@@ -18,6 +18,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * Capabilities for student records.
+ */
 class MCM_Caps {
 
 	/**

@@ -11,8 +11,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * Hides tenders after their submission deadline.
+ */
 class MCM_Tender {
 
+	/**
+	 * Register the hooks this module needs.
+	 */
 	public function __construct() {
 		add_filter( 'mcm_query_args', array( $this, 'hide_expired' ), 10, 2 );
 	}
@@ -21,6 +27,9 @@ class MCM_Tender {
 	 * On the front-end, restrict tender queries to those still open (deadline
 	 * today or later, or no deadline set). Filterable so a "past tenders" view
 	 * can be built if ever needed.
+	 *
+	 * @param array $args Query arguments.
+	 * @param array $a Parsed attributes.
 	 */
 	public function hide_expired( $args, $a ) {
 		if ( 'mcm_tender' !== $a['type'] ) {
@@ -37,11 +46,6 @@ class MCM_Tender {
 
 	/** Meta query matching tenders whose submission deadline has not passed. */
 	public static function open_meta_query() {
-		return array(
-			'relation' => 'OR',
-			array( 'key' => 'mcm_tender_close', 'compare' => 'NOT EXISTS' ),
-			array( 'key' => 'mcm_tender_close', 'value' => '', 'compare' => '=' ),
-			array( 'key' => 'mcm_tender_close', 'value' => current_time( 'Y-m-d' ), 'compare' => '>=', 'type' => 'DATE' ),
-		);
+		return MCM_Query::expiry_meta_query( 'mcm_tender_close' );
 	}
 }

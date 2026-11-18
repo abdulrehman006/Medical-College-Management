@@ -17,8 +17,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * Department fields (hero, Head of Department message, hidden sections) and department shortcodes.
+ */
 class MCM_TermMeta {
 
+	/**
+	 * Register the hooks this module needs.
+	 */
 	public function __construct() {
 		// Everything here is deferred to init. The field definitions are
 		// translated, and touching them at plugin-load time would load the text
@@ -54,14 +60,48 @@ class MCM_TermMeta {
 			'mcm_term_fields',
 			array(
 				'mcm_department' => array(
-					'mcm_term_video'     => array( 'label' => __( 'Hero Video URL', 'medical-college-manager' ), 'type' => 'url', 'desc' => __( 'YouTube/Vimeo link or an uploaded MP4 for the banner at the top of the page. Takes priority over the hero image. Note: some videos have embedding turned off by their owner and will show "Video unavailable" on any website — if that happens, use a different (embeddable) video or upload an MP4.', 'medical-college-manager' ) ),
-					'mcm_term_banner'    => array( 'label' => __( 'Hero Image', 'medical-college-manager' ), 'type' => 'media', 'desc' => __( 'Static banner shown at the top when no hero video is set. A wide (16:9) image works best.', 'medical-college-manager' ) ),
-					'mcm_term_hod'       => array( 'label' => __( 'Head of Department', 'medical-college-manager' ), 'type' => 'text', 'desc' => __( 'Name shown with the message.', 'medical-college-manager' ) ),
-					'mcm_term_hod_photo' => array( 'label' => __( 'HOD Photograph', 'medical-college-manager' ), 'type' => 'media', 'desc' => __( 'Shown beside the message.', 'medical-college-manager' ) ),
-					'mcm_term_message'   => array( 'label' => __( "Head of Department's Message", 'medical-college-manager' ), 'type' => 'textarea', 'desc' => __( 'The welcome / introduction message for this department page.', 'medical-college-manager' ) ),
-					'mcm_term_email'     => array( 'label' => __( 'Departmental Email', 'medical-college-manager' ), 'type' => 'email', 'desc' => __( 'e.g. anatomy@gmcdik.edu.pk', 'medical-college-manager' ) ),
-					'mcm_term_phone'     => array( 'label' => __( 'Departmental Phone', 'medical-college-manager' ), 'type' => 'text', 'desc' => '' ),
-					'mcm_term_hidden'    => array( 'label' => __( 'Hide Sections', 'medical-college-manager' ), 'type' => 'sections', 'desc' => __( 'Tick any sections you do NOT want on this department page (e.g. hide the timetable). Unticked sections appear automatically whenever they have content.', 'medical-college-manager' ) ),
+					'mcm_term_video'     => array(
+						'label' => __( 'Hero Video URL', 'medical-college-manager' ),
+						'type'  => 'url',
+						'desc'  => __( 'YouTube/Vimeo link or an uploaded MP4 for the banner at the top of the page. Takes priority over the hero image. Note: some videos have embedding turned off by their owner and will show "Video unavailable" on any website — if that happens, use a different (embeddable) video or upload an MP4.', 'medical-college-manager' ),
+					),
+					'mcm_term_banner'    => array(
+						'label' => __( 'Hero Image', 'medical-college-manager' ),
+						'type'  => 'media',
+						'size'  => 'full', // A full-width banner: never the blurry 'medium' copy.
+						'desc'  => __( 'Static banner shown at the top when no hero video is set. A wide (16:9) image works best.', 'medical-college-manager' ),
+					),
+					'mcm_term_hod'       => array(
+						'label' => __( 'Head of Department', 'medical-college-manager' ),
+						'type'  => 'text',
+						'desc'  => __( 'Name shown with the message.', 'medical-college-manager' ),
+					),
+					'mcm_term_hod_photo' => array(
+						'label' => __( 'HOD Photograph', 'medical-college-manager' ),
+						'type'  => 'media',
+						'size'  => 'large',
+						'desc'  => __( 'Shown beside the message.', 'medical-college-manager' ),
+					),
+					'mcm_term_message'   => array(
+						'label' => __( "Head of Department's Message", 'medical-college-manager' ),
+						'type'  => 'textarea',
+						'desc'  => __( 'The welcome / introduction message for this department page.', 'medical-college-manager' ),
+					),
+					'mcm_term_email'     => array(
+						'label' => __( 'Departmental Email', 'medical-college-manager' ),
+						'type'  => 'email',
+						'desc'  => __( 'e.g. anatomy@gmcdik.edu.pk', 'medical-college-manager' ),
+					),
+					'mcm_term_phone'     => array(
+						'label' => __( 'Departmental Phone', 'medical-college-manager' ),
+						'type'  => 'text',
+						'desc'  => '',
+					),
+					'mcm_term_hidden'    => array(
+						'label' => __( 'Hide Sections', 'medical-college-manager' ),
+						'type'  => 'sections',
+						'desc'  => __( 'Tick any sections you do NOT want on this department page (e.g. hide the timetable). Unticked sections appear automatically whenever they have content.', 'medical-college-manager' ),
+					),
 				),
 			)
 		);
@@ -98,7 +138,7 @@ class MCM_TermMeta {
 	 * @return array<string,bool>
 	 */
 	public static function hidden_sections( $term_id ) {
-		$raw    = (string) get_term_meta( $term_id, 'mcm_term_hidden', true );
+		$raw    = (string) MCM_Safe::term_meta( $term_id, 'mcm_term_hidden' );
 		$hidden = array();
 		foreach ( array_filter( array_map( 'trim', explode( ',', $raw ) ) ) as $cpt ) {
 			$hidden[ $cpt ] = true;
@@ -106,7 +146,11 @@ class MCM_TermMeta {
 		return $hidden;
 	}
 
-	/** Fields for one taxonomy, or an empty array. */
+	/**
+	 * Fields for one taxonomy, or an empty array.
+	 *
+	 * @param string $tax Taxonomy name.
+	 */
 	public static function fields_for( $tax ) {
 		$all = self::taxonomies();
 		return isset( $all[ $tax ] ) ? $all[ $tax ] : array();
@@ -130,8 +174,10 @@ class MCM_TermMeta {
 							}
 							return MCM_Meta::sanitize_value( $type, $value );
 						},
-						'auth_callback'     => function () {
-							return current_user_can( 'manage_categories' );
+						// Object-level: may this user edit THIS term? (Department
+						// coordinators are limited to their own departments).
+						'auth_callback'     => function ( $allowed, $meta_key, $term_id ) {
+							return current_user_can( 'edit_term', (int) $term_id );
 						},
 					)
 				);
@@ -139,7 +185,11 @@ class MCM_TermMeta {
 		}
 	}
 
-	/** The "add new term" screen has no table wrapper. */
+	/**
+	 * The "add new term" screen has no table wrapper.
+	 *
+	 * @param string $taxonomy Taxonomy name.
+	 */
 	public function add_fields( $taxonomy ) {
 		$fields = self::fields_for( $taxonomy );
 		if ( ! $fields ) {
@@ -157,7 +207,12 @@ class MCM_TermMeta {
 		}
 	}
 
-	/** The "edit term" screen is a table. */
+	/**
+	 * The "edit term" screen is a table.
+	 *
+	 * @param WP_Term $term Term object.
+	 * @param string  $taxonomy Taxonomy name.
+	 */
 	public function edit_fields( $term, $taxonomy ) {
 		$fields = self::fields_for( $taxonomy );
 		if ( ! $fields ) {
@@ -165,7 +220,7 @@ class MCM_TermMeta {
 		}
 		wp_nonce_field( 'mcm_term_save', 'mcm_term_nonce' );
 		foreach ( $fields as $key => $field ) {
-			$value = get_term_meta( $term->term_id, $key, true );
+			$value = MCM_Safe::term_meta( $term->term_id, $key );
 			echo '<tr class="form-field">';
 			printf( '<th scope="row"><label for="%s">%s</label></th><td>', esc_attr( $key ), esc_html( $field['label'] ) );
 			self::control( $key, $value, $field );
@@ -176,7 +231,13 @@ class MCM_TermMeta {
 		}
 	}
 
-	/** Render one input. */
+	/**
+	 * Render one input.
+	 *
+	 * @param string $key Key.
+	 * @param mixed  $value Value.
+	 * @param array  $field Field definition.
+	 */
 	private static function control( $key, $value, $field ) {
 		switch ( $field['type'] ) {
 			case 'textarea':
@@ -193,7 +254,7 @@ class MCM_TermMeta {
 					esc_attr( $key ),
 					esc_attr( $value )
 				);
-				echo '<button type="button" class="button mcm-media-pick">' . esc_html__( 'Select Image', 'medical-college-manager' ) . '</button> ';
+				echo '<button type="button" class="button mcm-media-pick" data-type="' . esc_attr( ! empty( $field['accept'] ) ? $field['accept'] : 'image' ) . '" data-size="' . esc_attr( ! empty( $field['size'] ) ? $field['size'] : 'medium' ) . '">' . esc_html__( 'Select Image', 'medical-college-manager' ) . '</button> ';
 				echo '<button type="button" class="button-link mcm-media-clear">' . esc_html__( 'Clear', 'medical-college-manager' ) . '</button>';
 				echo '<span class="mcm-media-preview"></span>';
 				break;
@@ -241,7 +302,9 @@ class MCM_TermMeta {
 		if ( ! isset( $_POST['mcm_term_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['mcm_term_nonce'] ) ), 'mcm_term_save' ) ) {
 			return;
 		}
-		if ( ! current_user_can( 'manage_categories' ) ) {
+		// Object-level check: the term being saved, not "can manage terms in
+		// general" (a department coordinator may edit only their departments).
+		if ( ! current_user_can( 'edit_term', (int) $term_id ) ) {
 			return;
 		}
 
@@ -259,7 +322,7 @@ class MCM_TermMeta {
 				$checked = isset( $_POST[ $key ] ) && is_array( $_POST[ $key ] ) ? wp_unslash( $_POST[ $key ] ) : array(); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
 				$keep    = array();
 				foreach ( $checked as $cpt ) {
-					$cpt = sanitize_key( $cpt );
+					$cpt = sanitize_key( MCM_Safe::str( $cpt ) ); // A nested array is not a value.
 					if ( isset( $valid[ $cpt ] ) ) {
 						$keep[] = $cpt;
 					}
@@ -283,34 +346,6 @@ class MCM_TermMeta {
 				update_term_meta( $term_id, $key, $clean );
 			}
 		}
-	}
-
-	/**
-	 * The department intro block rendered above a term archive: banner video,
-	 * HOD photo, name and welcome message. Returns '' when nothing is set, so a
-	 * department that has not filled anything in looks exactly as before.
-	 *
-	 * @param WP_Term $term Term object.
-	 * @return string
-	 */
-	/**
-	 * Is this URL a known oEmbed video provider we are willing to let the
-	 * server contact? Restricts SSRF to YouTube/Vimeo only.
-	 *
-	 * @param string $url Candidate URL.
-	 * @return bool
-	 */
-	private static function is_embed_provider( $url ) {
-		$host = wp_parse_url( $url, PHP_URL_HOST );
-		if ( ! $host ) {
-			return false;
-		}
-		$host  = strtolower( $host );
-		$allow = apply_filters(
-			'mcm_embed_provider_hosts',
-			array( 'youtube.com', 'www.youtube.com', 'm.youtube.com', 'youtu.be', 'vimeo.com', 'www.vimeo.com', 'player.vimeo.com' )
-		);
-		return in_array( $host, $allow, true );
 	}
 
 	/**
@@ -349,8 +384,8 @@ class MCM_TermMeta {
 		}
 		// Shared hero renderer — same banner markup as events and archive pages.
 		return MCM_Query::hero_banner(
-			get_term_meta( $term->term_id, 'mcm_term_video', true ),
-			get_term_meta( $term->term_id, 'mcm_term_banner', true ),
+			MCM_Safe::term_meta( $term->term_id, 'mcm_term_video' ),
+			MCM_Safe::term_meta( $term->term_id, 'mcm_term_banner' ),
 			$term->name
 		);
 	}
@@ -366,11 +401,11 @@ class MCM_TermMeta {
 		if ( ! $term instanceof WP_Term ) {
 			return '';
 		}
-		$hod     = trim( (string) get_term_meta( $term->term_id, 'mcm_term_hod', true ) );
-		$photo   = trim( (string) get_term_meta( $term->term_id, 'mcm_term_hod_photo', true ) );
-		$message = trim( (string) get_term_meta( $term->term_id, 'mcm_term_message', true ) );
-		$email   = trim( (string) get_term_meta( $term->term_id, 'mcm_term_email', true ) );
-		$phone   = trim( (string) get_term_meta( $term->term_id, 'mcm_term_phone', true ) );
+		$hod     = trim( (string) MCM_Safe::term_meta( $term->term_id, 'mcm_term_hod' ) );
+		$photo   = trim( (string) MCM_Safe::term_meta( $term->term_id, 'mcm_term_hod_photo' ) );
+		$message = trim( (string) MCM_Safe::term_meta( $term->term_id, 'mcm_term_message' ) );
+		$email   = trim( (string) MCM_Safe::term_meta( $term->term_id, 'mcm_term_email' ) );
+		$phone   = trim( (string) MCM_Safe::term_meta( $term->term_id, 'mcm_term_phone' ) );
 
 		if ( '' === $hod && '' === $message && '' === $email && '' === $phone ) {
 			return '';
@@ -426,26 +461,40 @@ class MCM_TermMeta {
 		return self::hero_html( $term ) . self::message_html( $term );
 	}
 
-	/* ----------------------------------------------------------------- *
-	 *  Shortcodes for building a custom department template (Elementor).
-	 * ----------------------------------------------------------------- */
+	/*
+	 * ----------------------------------------------------------------
+	 * Shortcodes for building a custom department template (Elementor).
+	 * ----------------------------------------------------------------
+	 */
 
-	/** [mcm_department_hero department="anatomy"] — video or image banner. */
+	/**
+	 * [mcm_department_hero department="anatomy"] — video or image banner.
+	 *
+	 * @param array|string $atts Shortcode attributes.
+	 */
 	public function sc_hero( $atts ) {
 		$term = self::resolve_term( is_array( $atts ) ? $atts : array() );
-		return $term ? self::hero_html( $term ) : '';
+		return $term ? MCM_Safe::render( array( __CLASS__, 'hero_html' ), 'shortcode mcm_department_hero', array( $term ) ) : '';
 	}
 
-	/** [mcm_department_message department="anatomy"] — the HOD message card. */
+	/**
+	 * [mcm_department_message department="anatomy"] — the HOD message card.
+	 *
+	 * @param array|string $atts Shortcode attributes.
+	 */
 	public function sc_message( $atts ) {
 		$term = self::resolve_term( is_array( $atts ) ? $atts : array() );
-		return $term ? self::message_html( $term ) : '';
+		return $term ? MCM_Safe::render( array( __CLASS__, 'message_html' ), 'shortcode mcm_department_message', array( $term ) ) : '';
 	}
 
-	/** [mcm_department_intro department="anatomy"] — hero + message together. */
+	/**
+	 * [mcm_department_intro department="anatomy"] — hero + message together.
+	 *
+	 * @param array|string $atts Shortcode attributes.
+	 */
 	public function sc_intro( $atts ) {
 		$term = self::resolve_term( is_array( $atts ) ? $atts : array() );
-		return $term ? self::term_intro( $term ) : '';
+		return $term ? MCM_Safe::render( array( __CLASS__, 'term_intro' ), 'shortcode mcm_department_intro', array( $term ) ) : '';
 	}
 
 	/**
@@ -453,9 +502,11 @@ class MCM_TermMeta {
 	 * department actually has (courses, timetable, faculty, publications…), each
 	 * as its own titled section. Populated types only. Perfect as the body of a
 	 * custom Elementor department template.
+	 *
+	 * @param array|string $atts Shortcode attributes.
 	 */
 	public function sc_sections( $atts ) {
 		$term = self::resolve_term( is_array( $atts ) ? $atts : array() );
-		return $term ? MCM_Templates::term_sections_html( $term ) : '';
+		return $term ? MCM_Safe::render( array( 'MCM_Templates', 'term_sections_html' ), 'shortcode mcm_department_sections', array( $term ) ) : '';
 	}
 }
