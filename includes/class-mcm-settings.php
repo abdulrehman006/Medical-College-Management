@@ -177,10 +177,16 @@ class MCM_Settings {
 	public function sanitize( $input ) {
 		$defaults = self::default_settings();
 		$out      = array();
+		// options.php can post anything: arrays where a value is expected are
+		// read as '' instead of reaching a sanitizer (PHP 8 TypeError).
+		$input = is_array( $input ) ? $input : array();
+		$v     = function ( $k ) use ( $input ) {
+			return isset( $input[ $k ] ) ? MCM_Safe::str( $input[ $k ] ) : '';
+		};
 
 		$colors = array( 'primary_color', 'accent_color', 'text_color', 'muted_color', 'card_bg', 'page_bg', 'border_color' );
 		foreach ( $colors as $c ) {
-			$out[ $c ] = isset( $input[ $c ] ) ? sanitize_hex_color( $input[ $c ] ) : $defaults[ $c ];
+			$out[ $c ] = isset( $input[ $c ] ) ? sanitize_hex_color( $v( $c ) ) : $defaults[ $c ];
 			if ( empty( $out[ $c ] ) ) {
 				$out[ $c ] = $defaults[ $c ];
 			}
@@ -188,7 +194,7 @@ class MCM_Settings {
 
 		$numbers = array( 'border_radius', 'card_padding', 'gap', 'columns', 'title_size', 'image_height' );
 		foreach ( $numbers as $n ) {
-			$out[ $n ] = isset( $input[ $n ] ) ? absint( $input[ $n ] ) : $defaults[ $n ];
+			$out[ $n ] = isset( $input[ $n ] ) ? absint( $v( $n ) ) : $defaults[ $n ];
 		}
 
 		$toggles = array( 'card_shadow', 'hover_lift', 'archive_filters', 'public_students' );
@@ -212,7 +218,7 @@ class MCM_Settings {
 		$out['print_types'] = array();
 		if ( ! empty( $input['print_types'] ) && is_array( $input['print_types'] ) ) {
 			foreach ( $input['print_types'] as $pt ) {
-				$pt = sanitize_key( $pt );
+				$pt = sanitize_key( MCM_Safe::str( $pt ) );
 				if ( post_type_exists( $pt ) ) {
 					$out['print_types'][] = $pt;
 				}
@@ -222,25 +228,25 @@ class MCM_Settings {
 		foreach ( array( 'default_avatar', 'default_avatar_male', 'default_avatar_female' ) as $mcm_key ) {
 			$out[ $mcm_key ] = isset( $input[ $mcm_key ] ) ? esc_url_raw( MCM_Safe::str( $input[ $mcm_key ] ) ) : '';
 		}
-		$out['print_logo']      = isset( $input['print_logo'] ) ? esc_url_raw( $input['print_logo'] ) : '';
-		$out['print_org']       = isset( $input['print_org'] ) ? sanitize_text_field( $input['print_org'] ) : '';
-		$out['print_address']   = isset( $input['print_address'] ) ? sanitize_text_field( $input['print_address'] ) : '';
-		$out['print_footnote']  = isset( $input['print_footnote'] ) ? sanitize_text_field( $input['print_footnote'] ) : '';
+		$out['print_logo']      = esc_url_raw( $v( 'print_logo' ) );
+		$out['print_org']       = sanitize_text_field( $v( 'print_org' ) );
+		$out['print_address']   = sanitize_text_field( $v( 'print_address' ) );
+		$out['print_footnote']  = sanitize_text_field( $v( 'print_footnote' ) );
 		$out['print_signature'] = ! empty( $input['print_signature'] ) ? '1' : '0';
 
-		$mode                = isset( $input['single_image'] ) ? sanitize_key( $input['single_image'] ) : 'auto';
+		$mode                = isset( $input['single_image'] ) ? sanitize_key( $v( 'single_image' ) ) : 'auto';
 		$out['single_image'] = in_array( $mode, array( 'auto', 'always', 'never' ), true ) ? $mode : 'auto';
 
 		// Per-archive banners — keep only real content types, sanitize the URLs.
 		$out['archive_banners'] = array();
 		if ( ! empty( $input['archive_banners'] ) && is_array( $input['archive_banners'] ) ) {
 			foreach ( $input['archive_banners'] as $pt => $vals ) {
-				$pt = sanitize_key( $pt );
+				$pt = sanitize_key( MCM_Safe::str( $pt ) );
 				if ( ! post_type_exists( $pt ) || ! is_array( $vals ) ) {
 					continue;
 				}
-				$video = isset( $vals['video'] ) ? esc_url_raw( $vals['video'] ) : '';
-				$image = isset( $vals['image'] ) ? esc_url_raw( $vals['image'] ) : '';
+				$video = isset( $vals['video'] ) ? esc_url_raw( MCM_Safe::str( $vals['video'] ) ) : '';
+				$image = isset( $vals['image'] ) ? esc_url_raw( MCM_Safe::str( $vals['image'] ) ) : '';
 				if ( '' !== $video || '' !== $image ) {
 					$out['archive_banners'][ $pt ] = array(
 						'video' => $video,
@@ -253,12 +259,12 @@ class MCM_Settings {
 		// font_family is interpolated raw into an inline <style> (--mcm-font),
 		// so restrict it to characters that can appear in a font stack. Prevents
 		// a "x;} body{display:none}" style-rule injection.
-		$font               = isset( $input['font_family'] ) ? (string) $input['font_family'] : 'inherit';
+		$font               = isset( $input['font_family'] ) ? $v( 'font_family' ) : 'inherit';
 		$font               = preg_replace( '/[^A-Za-z0-9 ,\'"\-]/', '', $font );
 		$out['font_family'] = '' !== trim( $font ) ? $font : 'inherit';
 
 		// Custom CSS — strip tags only, keep CSS intact.
-		$out['custom_css'] = isset( $input['custom_css'] ) ? wp_strip_all_tags( $input['custom_css'] ) : '';
+		$out['custom_css'] = wp_strip_all_tags( $v( 'custom_css' ) );
 
 		return $out;
 	}

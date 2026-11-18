@@ -195,6 +195,7 @@ class MCM_Site_Chrome {
 	 * @return array
 	 */
 	public static function clean( $in ) {
+		$in   = is_array( $in ) ? $in : array();
 		$d    = self::defaults();
 		$out  = array();
 		$str  = function ( $k ) use ( $in ) {

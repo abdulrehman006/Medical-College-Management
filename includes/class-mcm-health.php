@@ -240,7 +240,12 @@ class MCM_Health {
 		if ( is_array( $record ) && isset( $record['converted'], $record['time'] ) ) {
 			$ran = sprintf(
 				/* translators: 1: number of values converted, 2: date of the upgrade. */
-				__( 'The 1.30.2 upgrade converted %1$d stored dates/times to the standard format on %2$s.', 'medical-college-manager' ),
+				_n(
+					'The 1.30.2 upgrade converted %1$d stored date/time to the standard format on %2$s.',
+					'The 1.30.2 upgrade converted %1$d stored dates/times to the standard format on %2$s.',
+					(int) $record['converted'],
+					'medical-college-manager'
+				),
 				(int) $record['converted'],
 				wp_date( get_option( 'date_format' ), (int) $record['time'] )
 			);
@@ -254,7 +259,7 @@ class MCM_Health {
 				trim(
 					sprintf(
 						/* translators: %d: number of values checked. */
-						__( '%d stored dates and times checked.', 'medical-college-manager' ),
+						_n( '%d stored date or time checked.', '%d stored dates and times checked.', (int) $scan['scanned'], 'medical-college-manager' ),
 						$scan['scanned']
 					) . ' ' . $ran
 				)
@@ -276,7 +281,7 @@ class MCM_Health {
 			$table = '<table class="widefat striped" style="margin-top:8px;"><thead><tr><th>' . esc_html__( 'Entry', 'medical-college-manager' ) . '</th><th>' . esc_html__( 'Type', 'medical-college-manager' ) . '</th><th>' . esc_html__( 'Field', 'medical-college-manager' ) . '</th><th>' . esc_html__( 'Stored value', 'medical-college-manager' ) . '</th></tr></thead><tbody>' . $rows . '</tbody></table>';
 			if ( count( $scan['unreadable'] ) > 100 ) {
 				/* translators: %d: number of further items not listed. */
-				$table .= '<p>' . esc_html( sprintf( __( '…and %d more.', 'medical-college-manager' ), count( $scan['unreadable'] ) - 100 ) ) . '</p>';
+				$table .= '<p>' . esc_html( sprintf( _n( '…and %d more.', '…and %d more.', count( $scan['unreadable'] ) - 100, 'medical-college-manager' ), count( $scan['unreadable'] ) - 100 ) ) . '</p>';
 			}
 		}
 		if ( $scan['convertible'] ) {

@@ -229,7 +229,12 @@ class MCM_Upgrade {
 		echo esc_html(
 			sprintf(
 				/* translators: 1: number of dates/times converted, 2: number checked. */
-				__( 'converted %1$d of %2$d stored dates and times to the standard format.', 'medical-college-manager' ),
+				_n(
+					'converted %1$d of %2$d stored date and time to the standard format.',
+					'converted %1$d of %2$d stored dates and times to the standard format.',
+					isset( $record['scanned'] ) ? (int) $record['scanned'] : 0,
+					'medical-college-manager'
+				),
 				isset( $record['converted'] ) ? (int) $record['converted'] : 0,
 				isset( $record['scanned'] ) ? (int) $record['scanned'] : 0
 			)

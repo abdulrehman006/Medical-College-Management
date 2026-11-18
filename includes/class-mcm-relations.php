@@ -105,7 +105,7 @@ class MCM_Relations {
 					$blocks .= '<div class="mcm-rel-group"><strong>' . esc_html( $plabel ) . ':</strong> ' . implode( ', ', $links );
 					if ( $info['more'] > 0 ) {
 						/* translators: %d: number of additional related items. */
-						$blocks .= ' <span class="mcm-rel-more">' . esc_html( sprintf( __( '+%d more', 'medical-college-manager' ), $info['more'] ) ) . '</span>';
+						$blocks .= ' <span class="mcm-rel-more">' . esc_html( sprintf( _n( '+%d more', '+%d more', (int) $info['more'], 'medical-college-manager' ), $info['more'] ) ) . '</span>';
 					}
 					$blocks .= '</div>';
 				}

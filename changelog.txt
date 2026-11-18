@@ -1,6 +1,16 @@
 Medical College Manager — complete changelog.
 
 = 1.32.0 =
+Security audit (docs/security-audit-ai-common-issues-2026-11-17.md):
+* Fixed (High): a department coordinator could put an entry in another
+  department, or remove one from a shared entry, through the REST API (the
+  department rule now also runs after the REST API stores terms).
+* Fixed (Medium): if the department-access module ever fails to start,
+  coordinators lose editing rights on plugin content instead of silently
+  getting full rights (fail closed; administrators are unaffected).
+* Department fields check that the user may edit that department (form and
+  REST meta), not just "manage terms"; malformed admin form input no longer
+  causes a fatal error; count messages use proper plural forms.
 New: one record per person for Consultants and Team (incl. staff), by email:
 * Email is required and unique within each type. The edit screen will not
   save without a valid, unused email (it links to the record that has it);
